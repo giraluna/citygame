@@ -1,0 +1,7 @@
+js*
+!js/lib
+doc
+*sublime-project
+*sublime-workspace
+data/js
+*bat

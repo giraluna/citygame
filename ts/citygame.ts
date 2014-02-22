@@ -15,32 +15,24 @@ WORLD_HEIGHT = TILES * TILE_HEIGHT;
 
 
 
-class Sprite
+class Sprite extends PIXI.Sprite
 {
   type: string;
-  s: PIXI.Sprite;
   cell: Cell;
   content: Content;
 
   constructor( template )
   {
+    var _texture = PIXI.Texture.fromImage(template.texture, false, 1); //scale mode
+    super(_texture); //pixi caches and reuses the texture as needed
+    
     this.type    = template.type;
-
-    this.init( template );
-  }
-
-  init( template )
-  {
-    //pixi caches and reuses the texture
-    var texture = PIXI.Texture.fromImage(template.texture, false, 1); //scale mode
-    var sprite = this.s = new PIXI.Sprite(texture);
-    sprite.anchor = arrayToPoint(template.anchor);
-    sprite.S = this;
+    this.anchor = arrayToPoint(template.anchor);
 
     if (template.interactive === true)
     {
-      sprite.interactive = true;
-      sprite.hitArea = arrayToPolygon(template.hitArea);
+      this.interactive = true;
+      this.hitArea = arrayToPolygon(template.hitArea);
     }
   }
 }
@@ -66,8 +58,8 @@ class Content
     _s.content = this;
     var cellSprite = this.cell.sprite;
     var gridPos = this.cell.gridPos;
-    _s.s.position = this.cell.sprite.s.position.clone();
-    game.layers["content"].addChildAt(_s.s, gridPos[0] + gridPos[1]);
+    _s.position = this.cell.sprite.position.clone();
+    game.layers["content"].addChildAt(_s, gridPos[0] + gridPos[1]);
   }
 
 }
@@ -90,30 +82,29 @@ class Cell
   init( type:string )
   {
     var template = cg["terrain"][type]
-    this.sprite = new Sprite( template );
+    var _s = this.sprite = new Sprite( template );
     this.sprite.cell = this;
     this.buildable = template["buildable"];
 
-    var _s = this.sprite.s;
     _s.mousedown = function(event)
     {
-      game.mouseEventHandler.cellStart(event.target.S.cell.gridPos);
+      //typescript doesnt like 
+      game.mouseEventHandler.cellStart(event.target["cell"].gridPos);
     }
     _s.mouseover = function(event)
     {
-      game.mouseEventHandler.cellOver(event.target.S.cell.gridPos);
+      game.mouseEventHandler.cellOver(event.target["cell"].gridPos);
     }
     _s.mouseup = function(event)
     {
-      game.mouseEventHandler.cellEnd(event.target.S.cell.gridPos);
-      console.log("cellEnd");
+      game.mouseEventHandler.cellEnd(event.target["cell"].gridPos);
     }
   }
   replace( type:string )
   {
     var template = cg["terrain"][type];
     var _texture = template["texture"];
-    this.sprite.s.setTexture( PIXI.Texture.fromImage( _texture ));
+    this.sprite.setTexture( PIXI.Texture.fromImage( _texture ));
     this.type = type;
     this.buildable = template["buildable"];
     if (this.content !== undefined)
@@ -133,7 +124,7 @@ class Cell
     }
     if (this.content !== undefined)
     {
-      game.layers["content"].removeChild(this.content.sprite.s,
+      game.layers["content"].removeChildAt(this.content.sprite,
         this.gridPos[0] + this.gridPos[1]);
     }
     if (type === "plant")
@@ -152,7 +143,7 @@ class Cell
     {
       return;
     }
-    game.layers["content"].removeChild(this.content.sprite.s,
+    game.layers["content"].removeChildAt(this.content.sprite,
       this.gridPos[0] + this.gridPos[1]);
     this.content = undefined;
   }
@@ -186,7 +177,7 @@ class Board
       {
         var cellType = "grass";
         var cell = this.cells[i][j] = new Cell([i, j], cellType);
-        var sprite = cell.sprite.s;
+        var sprite = cell.sprite;
         sprite.position = arrayToPoint( getIsoCoord(i, j,
           TILE_WIDTH, TILE_HEIGHT,
           [WORLD_WIDTH/2, TILE_HEIGHT]) );
@@ -245,7 +236,7 @@ class Game
       _ground.interactive = true;
       _main.addChild(_ground);
       var _content = this.layers["content"] = new SortedDisplayObjectContainer(TILES * 2);
-      _main.addChild(_content.container);
+      _main.addChild(_content);
     }
     initTools()
     {
@@ -294,11 +285,11 @@ class Game
   {
     this.renderer.render(this.stage);
 
-    window.requestAnimationFrame( this.render.bind(this) );
+    requestAnimFrame( this.render.bind(this) );
   }
 }
 
-class SortedDisplayObjectContainer
+class SortedDisplayObjectContainer extends PIXI.DisplayObjectContainer
 {
   container: PIXI.DisplayObjectContainer;
   indexes: number[];
@@ -307,8 +298,8 @@ class SortedDisplayObjectContainer
   
   constructor( layers:number)
   {
-    this.container = new PIXI.DisplayObjectContainer();
     this.indexes = new Array(layers);
+    super();
     this.init();
   }
   
@@ -337,12 +328,13 @@ class SortedDisplayObjectContainer
   
   addChildAt(element:PIXI.DisplayObject, index:number)
   {
-    this.container.addChildAt( element, this.indexes[index] );
+    debugger;
+    super.addChildAt( element, this.indexes[index] );
     this.incrementIndexes(index);
   }
-  removeChild(element:PIXI.DisplayObject, index:number)
+  removeChildAt(element:PIXI.DisplayObject, index:number)
   {
-    this.container.removeChild(element);
+    super.removeChild(element);
     this.decrementIndexes(index);
   }
 }
@@ -578,11 +570,11 @@ class MouseEventHandler
 class Highlighter
 {
   currHighlighted: Sprite[] = [];
-  tintSprites(sprites: Sprite[], color: string)
+  tintSprites(sprites: Sprite[], color: number)
   {
     for (var i = 0; i < sprites.length; i++)
     {
-      var _sprite = sprites[i].s;
+      var _sprite = sprites[i];
       _sprite.tint = color;
       this.currHighlighted.push( sprites[i] );
     }
@@ -591,12 +583,12 @@ class Highlighter
   {
     for (var i = 0; i < this.currHighlighted.length; i++)
     {
-      var _sprite = this.currHighlighted[i].s;
-      _sprite.tint = "0xFFFFFF";
+      var _sprite = this.currHighlighted[i];
+      _sprite.tint = 0xFFFFFF;
     }
     this.currHighlighted = [];
   }
-  tintCells(cells: Cell[], color: string)
+  tintCells(cells: Cell[], color: number)
   {
     var _sprites = [];
     for (var i = 0; i < cells.length; i++)
@@ -614,7 +606,7 @@ class Highlighter
 interface Tool
 {
   selectType: any
-  tintColor: string;
+  tintColor: number;
 
   activate(target:Cell[]);
 }
@@ -622,11 +614,11 @@ interface Tool
 class WaterTool implements Tool
 {
   selectType: any;
-  tintColor: string;
+  tintColor: number;
   constructor()
   {
     this.selectType = manhattanSelect;
-    this.tintColor = "0x4444FF";
+    this.tintColor = 0x4444FF;
   }
   activate(target)
   {
@@ -640,11 +632,11 @@ class WaterTool implements Tool
 class GrassTool implements Tool
 {
   selectType: any
-  tintColor: string;
+  tintColor: number;
   constructor()
   {
     this.selectType = rectSelect;
-    this.tintColor = "0x617A4E";
+    this.tintColor = 0x617A4E;
   }
   activate(target)
   {
@@ -658,11 +650,11 @@ class GrassTool implements Tool
 class SandTool implements Tool
 {
   selectType: any
-  tintColor: string;
+  tintColor: number;
   constructor()
   {
     this.selectType = rectSelect;
-    this.tintColor = "0xE2BF93";
+    this.tintColor = 0xE2BF93;
   }
   activate(target)
   {
@@ -676,11 +668,11 @@ class SandTool implements Tool
 class SnowTool implements Tool
 {
   selectType: any
-  tintColor: string;
+  tintColor: number;
   constructor()
   {
     this.selectType = rectSelect;
-    this.tintColor = "0xBBDFD7";
+    this.tintColor = 0xBBDFD7;
   }
   activate(target)
   {
@@ -693,11 +685,11 @@ class SnowTool implements Tool
 class RemoveTool implements Tool
 {
   selectType: any
-  tintColor: string;
+  tintColor: number;
   constructor()
   {
     this.selectType = rectSelect;
-    this.tintColor = "0xFF5555";
+    this.tintColor = 0xFF5555;
   }
   activate(target)
   {
@@ -711,11 +703,11 @@ class RemoveTool implements Tool
 class PlantTool implements Tool
 {
   selectType: any
-  tintColor: string;
+  tintColor: number;
   constructor()
   {
     this.selectType = rectSelect;
-    this.tintColor = "0x338833";
+    this.tintColor = 0x338833;
   }
   activate(target)
   {
@@ -729,11 +721,11 @@ class PlantTool implements Tool
 class HouseTool implements Tool
 {
   selectType: any
-  tintColor: string;
+  tintColor: number;
   constructor()
   {
     this.selectType = rectSelect;
-    this.tintColor = "0x696969";
+    this.tintColor = 0x696969;
   }
   activate(target)
   {
@@ -747,11 +739,11 @@ class HouseTool implements Tool
 class PineappleTool implements Tool
 {
   selectType: any
-  tintColor: string;
+  tintColor: number;
   constructor()
   {
     this.selectType = rectSelect;
-    this.tintColor = "0xF7B218";
+    this.tintColor = 0xF7B218;
   }
   activate(target)
   {

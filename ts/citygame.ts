@@ -247,7 +247,8 @@ class Game
       this.tools.remove = new RemoveTool();
       this.tools.plant = new PlantTool();
       this.tools.house = new HouseTool();
-      this.tools.pineapple = new PineappleTool();
+
+      //this.tools.pineapple = new PineappleTool();
     }
 
     bindElements()
@@ -328,7 +329,6 @@ class SortedDisplayObjectContainer extends PIXI.DisplayObjectContainer
   
   addChildAt(element:PIXI.DisplayObject, index:number)
   {
-    debugger;
     super.addChildAt( element, this.indexes[index] );
     this.incrementIndexes(index);
   }
@@ -735,7 +735,7 @@ class HouseTool implements Tool
     }
   }
 }
-
+/*
 class PineappleTool implements Tool
 {
   selectType: any
@@ -753,7 +753,7 @@ class PineappleTool implements Tool
     }
   }
 }
-
+*/
 
 function rectSelect(a:number[], b:number[]): number[]
 {
@@ -867,12 +867,13 @@ document.addEventListener('DOMContentLoaded', function()
 {
   game.init();
   var stage = game.stage;
-  // temp check center
+  /* check center
   var gfx = new PIXI.Graphics();
   gfx.beginFill();
   gfx.drawEllipse(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 3, 3);
   gfx.endFill();
   stage.addChild(gfx);
+  */
 
 
   stage.mousedown = function(event)

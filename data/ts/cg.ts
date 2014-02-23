@@ -8,7 +8,7 @@ var cg =
       "width": 64,
       "height": 32,
       "anchor": [0.5, 1],
-      "texture": "..\/img\/grass.png",
+      "texture": "img\/grass.png",
       "interactive": true,
       "hitArea": [[0, -32], [32, -16], [0, 0], [-32, -16]],
       "plant": "tree",
@@ -20,7 +20,7 @@ var cg =
       "width": 64,
       "height": 32,
       "anchor": [0.5, 1],
-      "texture": "..\/img\/water.png",
+      "texture": "img\/water.png",
       "interactive": true,
       "hitArea": [[0, -32], [32, -16], [0, 0], [-32, -16]],
       "plant": "tentacle",
@@ -32,7 +32,7 @@ var cg =
       "width": 64,
       "height": 32,
       "anchor": [0.5, 1],
-      "texture": "..\/img\/sand.png",
+      "texture": "img\/sand.png",
       "interactive": true,
       "hitArea": [[0, -32], [32, -16], [0, 0], [-32, -16]],
       "plant": "cactus",
@@ -44,7 +44,7 @@ var cg =
       "width": 64,
       "height": 32,
       "anchor": [0.5, 1],
-      "texture": "..\/img\/snow.png",
+      "texture": "img\/snow.png",
       "interactive": true,
       "hitArea": [[0, -32], [32, -16], [0, 0], [-32, -16]],
       "plant": "snowman",
@@ -59,7 +59,7 @@ var cg =
       "width": 16,
       "height": 32,
       "anchor": [0.5, 1.5],
-      "texture": "..\/img\/tree.png",
+      "texture": "img\/tree.png",
     },
     "cactus":
     {
@@ -67,7 +67,7 @@ var cg =
       "width": 16,
       "height": 32,
       "anchor": [0.5, 1.5],
-      "texture": "..\/img\/cactus.png",
+      "texture": "img\/cactus.png",
     },
     "tentacle":
     {
@@ -75,7 +75,7 @@ var cg =
       "width": 16,
       "height": 32,
       "anchor": [0.5, 1.5],
-      "texture": "..\/img\/tentacle.png",
+      "texture": "img\/tentacle.png",
     },
     "snowman":
     {
@@ -83,7 +83,7 @@ var cg =
       "width": 32,
       "height": 64,
       "anchor": [0.5, 1.25],
-      "texture": "..\/img\/snowman.png",
+      "texture": "img\/snowman.png",
     },
     "house":
     {
@@ -91,7 +91,7 @@ var cg =
       "width": 64,
       "height": 44,
       "anchor": [0.5, 1],
-      "texture": "..\/img\/house.png",
+      "texture": "img\/house.png",
     },
     "pineapple":
     {
@@ -99,7 +99,7 @@ var cg =
       "width": 24,
       "height": 56,
       "anchor": [0.5, 1.13],
-      "texture": "..\/img\/pineapple2.png",
+      "texture": "img\/pineapple2.png",
     }
   }
 };

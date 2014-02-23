@@ -23,7 +23,8 @@ class Sprite extends PIXI.Sprite
 
   constructor( template )
   {
-    var _texture = PIXI.Texture.fromImage(template.texture, false, 1); //scale mode
+    var _texture = PIXI.Texture.fromImage(
+      template.texture, false, 1); //scale mode
     super(_texture); //pixi caches and reuses the texture as needed
     
     this.type    = template.type;
@@ -403,6 +404,9 @@ class Scroller
     var rect = container.getLocalBounds();
     //var centerX = SCREEN_WIDTH / 2 - rect.width / 2 * zoomAmount;
     //var centerY = SCREEN_HEIGHT / 2 - rect.height / 2 * zoomAmount;
+
+    //these 2 get position of screen center in relation to the container
+    //0: far left 1: far right
     var xRatio = 1 - ((container.x - SCREEN_WIDTH/2) / rect.width / oldZoom + 1);
     var yRatio = 1 - ((container.y - SCREEN_HEIGHT/2) / rect.height / oldZoom + 1);
 
@@ -419,18 +423,17 @@ class Scroller
     {
       return;
     }
-    var absDelta = Math.abs(delta);
+    //var scaledDelta = absDelta + scale / absDelta;
     var direction = delta < 0 ? "out" : "in";
-    delta = Math.pow(absDelta, scale);
+    var adjDelta = 1 + Math.abs(delta) * scale
     if (direction === "out")
     {
-      this.zoom(this.currZoom / delta);
+      this.zoom(this.currZoom / adjDelta);
     }
     else
     {
-      this.zoom(this.currZoom * delta);
+      this.zoom(this.currZoom * adjDelta);
     }
-    //this.zoom(this.currZoom + delta * scale);
   }
   clampEdges()
   {
@@ -512,7 +515,7 @@ class MouseEventHandler
     {
       var delta = event.global.x + this.currPoint[1] - 
         this.currPoint[0] - event.global.y;
-      this.scroller.deltaZoom(delta, 0.05);
+      this.scroller.deltaZoom(delta, 0.005);
       this.currPoint = [event.global.x, event.global.y];
       event.originalEvent.stopPropagation();
     }

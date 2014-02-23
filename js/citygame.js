@@ -307,6 +307,8 @@ var Scroller = (function () {
 
         //var centerX = SCREEN_WIDTH / 2 - rect.width / 2 * zoomAmount;
         //var centerY = SCREEN_HEIGHT / 2 - rect.height / 2 * zoomAmount;
+        //these 2 get position of screen center in relation to the container
+        //0: far left 1: far right
         var xRatio = 1 - ((container.x - SCREEN_WIDTH / 2) / rect.width / oldZoom + 1);
         var yRatio = 1 - ((container.y - SCREEN_HEIGHT / 2) / rect.height / oldZoom + 1);
 
@@ -321,15 +323,15 @@ var Scroller = (function () {
         if (delta === 0) {
             return;
         }
-        var absDelta = Math.abs(delta);
+
+        //var scaledDelta = absDelta + scale / absDelta;
         var direction = delta < 0 ? "out" : "in";
-        delta = Math.pow(absDelta, scale);
+        var adjDelta = 1 + Math.abs(delta) * scale;
         if (direction === "out") {
-            this.zoom(this.currZoom / delta);
+            this.zoom(this.currZoom / adjDelta);
         } else {
-            this.zoom(this.currZoom * delta);
+            this.zoom(this.currZoom * adjDelta);
         }
-        //this.zoom(this.currZoom + delta * scale);
     };
     Scroller.prototype.clampEdges = function () {
         var x = this.container.position.x;
@@ -381,7 +383,7 @@ var MouseEventHandler = (function () {
             event.originalEvent.stopPropagation();
         } else if (this.currAction === "zoom") {
             var delta = event.global.x + this.currPoint[1] - this.currPoint[0] - event.global.y;
-            this.scroller.deltaZoom(delta, 0.05);
+            this.scroller.deltaZoom(delta, 0.005);
             this.currPoint = [event.global.x, event.global.y];
             event.originalEvent.stopPropagation();
         }

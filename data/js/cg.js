@@ -106,9 +106,9 @@ function githubifyUrls() {
 }
 (function () {
     var github = checkImage("citygame/" + cg.terrain.grass.texture);
-    console.log("github", github);
+    console.log(github);
     if (github) {
-        githubifyUrls();
+        //githubifyUrls();
     }
 }());
 

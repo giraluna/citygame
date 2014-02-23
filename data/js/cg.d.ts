@@ -90,6 +90,8 @@ declare var cg: {
         };
     };
 };
+declare function checkImage(url: any): boolean;
+declare function githubifyUrls(): void;
 declare var map: {
     "mapKey": {
         "0": string;

@@ -103,6 +103,36 @@ var cg =
     }
   }
 };
+function checkImage(url)
+{
+  var req = new XMLHttpRequest();
+  req.open('HEAD', url, false);
+  req.send();
+  return req.status==200;
+}
+function githubifyUrls()
+{
+  for (var category in cg)
+  {
+    for (var sprite in cg[category])
+    {
+      sprite = cg[category][sprite];
+      sprite["texture"] = "citygame/" + sprite["texture"];
+    }
+  }
+}
+(function()
+{
+  var github = checkImage("citygame/" + cg.terrain.grass.texture);
+  console.log(github);
+  if (github)
+  {
+    githubifyUrls();
+  }
+
+}());
+
+
 cg = JSON.parse(JSON.stringify(cg)); //dumb
 
 var map =

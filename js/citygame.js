@@ -12,7 +12,7 @@ SCREEN_WIDTH = 940;
 SCREEN_HEIGHT = 480;
 TILE_WIDTH = 64;
 TILE_HEIGHT = 32;
-TILES = 30;
+TILES = 10;
 WORLD_WIDTH = TILES * TILE_WIDTH;
 WORLD_HEIGHT = TILES * TILE_HEIGHT;
 
@@ -147,30 +147,40 @@ var Board = (function () {
             this.cells[i] = [];
         }
     };
-    Board.prototype.makeEmptyMap = function () {
-        for (var i = 0; i < this.width; i++) {
-            for (var j = 0; j < this.height; j++) {
-                var cellType = "grass";
-                var cell = this.cells[i][j] = new Cell([i, j], cellType);
-                var sprite = cell.sprite;
-                sprite.position = arrayToPoint(getIsoCoord(i, j, TILE_WIDTH, TILE_HEIGHT, [WORLD_WIDTH / 2, TILE_HEIGHT]));
-                game.layers["ground"].addChild(sprite);
-            }
-        }
-    };
+
+    /*makeEmptyMap()
+    {
+    for (var i = 0; i < this.width; i++)
+    {
+    for (var j = 0; j < this.height; j++)
+    {
+    var cellType = "grass";
+    var cell = this.cells[i][j] = new Cell([i, j], cellType);
+    var sprite = cell.sprite;
+    sprite.position = arrayToPoint( getIsoCoord(i, j,
+    TILE_WIDTH, TILE_HEIGHT,
+    [WORLD_WIDTH/2, TILE_HEIGHT]) );
+    game.layers["ground"].addChild(sprite);
+    }
+    }
+    }*/
     Board.prototype.makeMap = function (data) {
         for (var i = 0; i < this.width; i++) {
             for (var j = 0; j < this.height; j++) {
-                var dataCell = data[i][j];
-                var cellType = dataCell["type"] || "grass";
+                if (data) {
+                    var dataCell = data[i][j] || undefined;
+                    console.log(dataCell);
+                }
+                var cellType = dataCell ? dataCell["type"] : "grass";
                 var cell = this.cells[i][j] = new Cell([i, j], cellType);
-                cell.buildable = dataCell.buildable || true;
+                cell.buildable = dataCell ? dataCell.buildable : true;
 
                 var sprite = cell.sprite;
                 sprite.position = arrayToPoint(getIsoCoord(i, j, TILE_WIDTH, TILE_HEIGHT, [WORLD_WIDTH / 2, TILE_HEIGHT]));
                 game.layers["ground"].addChild(sprite);
-
-                cell.changeContent(dataCell.content.type, dataCell.content.data);
+                if (data && dataCell.content) {
+                    cell.changeContent(dataCell.content.type, dataCell.content.data);
+                }
             }
         }
     };
@@ -196,7 +206,7 @@ var Game = (function () {
         this.bindElements();
 
         this.board = new Board(TILES, TILES);
-        this.board.makeEmptyMap();
+        this.board.makeMap();
 
         this.highlighter = new Highlighter();
 
@@ -209,11 +219,7 @@ var Game = (function () {
         var _main = this.layers["main"] = new PIXI.DisplayObjectContainer();
         _main.position.set(SCREEN_WIDTH / 2 - WORLD_WIDTH / 2, SCREEN_HEIGHT / 2 - WORLD_HEIGHT / 2);
         _stage.addChild(_main);
-        var _ground = this.layers["ground"] = new PIXI.DisplayObjectContainer();
-        _ground.interactive = true;
-        _main.addChild(_ground);
-        var _content = this.layers["content"] = new SortedDisplayObjectContainer(TILES * 2);
-        _main.addChild(_content);
+        this.initLayers();
 
         var _game = this;
 
@@ -231,6 +237,14 @@ var Game = (function () {
         _stage.mouseup = function (event) {
             _game.mouseEventHandler.stageEnd(event);
         };
+    };
+    Game.prototype.initLayers = function () {
+        var _main = this.layers["main"];
+        var _ground = this.layers["ground"] = new PIXI.DisplayObjectContainer();
+        _ground.interactive = true;
+        _main.addChild(_ground);
+        var _content = this.layers["content"] = new SortedDisplayObjectContainer(TILES * 2);
+        _main.addChild(_content);
     };
     Game.prototype.initTools = function () {
         this.tools.water = new WaterTool();
@@ -263,6 +277,9 @@ var Game = (function () {
         }
 
         //renderer
+        this.bindRenderer();
+    };
+    Game.prototype.bindRenderer = function () {
         var _canvas = document.getElementById("pixi-container");
         _canvas.appendChild(this.renderer.view);
     };
@@ -270,17 +287,49 @@ var Game = (function () {
         this.activeTool = this.tools[tool];
     };
     Game.prototype.saveBoard = function () {
-        var data = JSON.stringify(this.board);
-        localStorage.setItem("board", data);
+        var data = JSON.stringify(this.board, function replacerFN(key, value) {
+            var replaced = {};
+            if (typeof (value) === "object") {
+                switch (key) {
+                    case "content":
+                        replaced = {
+                            "type": this.content.type,
+                            "id": this.content.id
+                        };
+                        return replaced;
+                    case "sprite":
+                        return this.sprite.type;
+                    default:
+                        return value;
+                }
+            }
+            return value;
+        });
+        this.savedBoard = data;
     };
     Game.prototype.loadBoard = function () {
-        var data = localStorage.getItem("board");
-        this.board = JSON.parse(data);
+        this.resetLayers();
+        var parsed = JSON.parse(this.savedBoard);
+        console.log(parsed);
+        var board = this.board = new Board(parsed["width"], parsed["height"]);
+        board.makeMap(parsed["cells"]);
     };
     Game.prototype.render = function () {
         this.renderer.render(this.stage);
 
         requestAnimFrame(this.render.bind(this));
+    };
+    Game.prototype.resetLayers = function () {
+        var main = this.layers["main"];
+        for (var layer in this.layers) {
+            if (layer !== "main") {
+                console.log(layer);
+                var _l = this.layers[layer];
+                main.removeChild(_l);
+                this.layers[layer] = undefined;
+                this.initLayers();
+            }
+        }
     };
     return Game;
 })();
@@ -753,8 +802,9 @@ function replacer(key, value) {
 
 function makeMapFromJSON(data) {
     var parsed = JSON.parse(data);
-    var board = new Board(data["width"], data["height"]);
-    board.makeMapFromJSON(data["cells"]);
+    console.log(parsed);
+    var board = new Board(parsed["width"], parsed["height"]);
+    board.makeMap(parsed["cells"]);
     return board;
 }
 //# sourceMappingURL=citygame.js.map

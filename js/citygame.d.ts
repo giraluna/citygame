@@ -42,8 +42,7 @@ declare class Board {
     public cells: Cell[][];
     constructor(width: any, height: any);
     public init(): void;
-    public makeEmptyMap(): void;
-    public makeMapFromJSON(data: any): void;
+    public makeMap(data?: any): void;
     public getCell(arr: number[]): Cell;
     public getCells(arr: number[]): Cell[];
 }
@@ -56,15 +55,19 @@ declare class Game {
     public stage: PIXI.Stage;
     public renderer: any;
     public layers: any;
+    public savedBoard: string;
     constructor();
     public init(): void;
     public initContainers(): void;
+    public initLayers(): void;
     public initTools(): void;
     public bindElements(): void;
+    public bindRenderer(): void;
     public changeTool(tool: any): void;
     public saveBoard(): void;
     public loadBoard(): void;
     public render(): void;
+    public resetLayers(): void;
 }
 declare class SortedDisplayObjectContainer extends PIXI.DisplayObjectContainer {
     public container: PIXI.DisplayObjectContainer;

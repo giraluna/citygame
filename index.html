@@ -8,21 +8,33 @@
   <script type="text/javascript" src="js/citygame.js"></script>
 </head>
 <body>
-<div id="pixi-container"style="float:left"></div>
-ctrl+click to scroll
-<br>
-shift+click to zoom
-<br>
-<input type="number" id="zoom-amount" value=1 step=0.1>
-<button id="zoomBtn">zoom</button>
-<div id="buttons">
-  <button id="grassBtn">grass</button>
-  <button id="waterBtn">water</button>
-  <button id="sandBtn">sand</button>
-  <button id="snowBtn">snow</button>
-  <button id="removeBtn">remove</button>
-  <button id="plantBtn">plant</button>
-  <!-- <button id="pineappleBtn">???</button> -->
-  <button id="houseBtn">house</button>
+<div id="main" style="height: 100%">
+  <div id="pixi-container"></div>
+  <div id="tool-buttons">
+    <button id="grassBtn">grass</button>
+    <button id="waterBtn">water</button>
+    <button id="sandBtn">sand</button>
+    <button id="snowBtn">snow</button>
+    <button id="removeBtn">remove</button>
+    <button id="plantBtn">plant</button>
+    <!-- <button id="pineappleBtn">???</button> -->
+    <button id="houseBtn">house</button>
+  </div>
+</div>
+
+<div>
+  <div id="zoom">
+    ctrl+click to scroll
+    <br>
+    shift+click to zoom
+    <br>
+    <input type="number" id="zoom-amount" value=1 step=0.1>
+    <button id="zoomBtn">zoom</button>
+  </div>
+  <div id ="load-buttons">
+    it doesn't actually save it anywhere yet
+    <button id="saveBtn">save</button>
+    <button id="loadBtn">load</button>
+  </div>
 </div>
 </body>

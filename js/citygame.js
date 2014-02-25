@@ -276,6 +276,16 @@ var Game = (function () {
             })(btn, tool);
         }
 
+        //save & load
+        var saveBtn = document.getElementById("saveBtn");
+        var loadBtn = document.getElementById("loadBtn");
+        saveBtn.addEventListener("click", function () {
+            self.saveBoard();
+        });
+        loadBtn.addEventListener("click", function () {
+            self.loadBoard();
+        });
+
         //renderer
         this.bindRenderer();
     };

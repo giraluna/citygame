@@ -18,7 +18,6 @@ WORLD_HEIGHT = TILES * TILE_HEIGHT;
 class Sprite extends PIXI.Sprite
 {
   type: string;
-  cell: Cell;
   content: Content;
 
   constructor( template )
@@ -38,6 +37,28 @@ class Sprite extends PIXI.Sprite
   }
 }
 
+class GroundSprite extends Sprite
+{
+  cell: Cell;
+
+  constructor(type, cell)
+  {
+    this.cell = cell;
+    super(cg["terrain"][type]);
+  }
+}
+
+class ContentSprite extends Sprite
+{
+  content: Content;
+
+  constructor(type, content)
+  {
+    this.content = content;
+    super(cg["content"][type]);
+  }
+}
+
 class Content
 {
   type: string;
@@ -45,22 +66,30 @@ class Content
   sprite: Sprite;
   cell: Cell;
 
-  constructor( cell: Cell, template)
+  constructor( cell: Cell, type, data?)
   {
     this.cell = cell;
-    this.type = template["type"];
+    this.type = type;
 
-    this.init( template );
+    this.init( type );
+
+    if (data)
+    {
+      this.applyData(data);
+    }
 
   }
-  init( template )
+  init( type )
   {
-    var _s = this.sprite = new Sprite( cg["content"][this.type] );
-    _s.content = this;
+    var _s = this.sprite = new ContentSprite( type, this );
     var cellSprite = this.cell.sprite;
     var gridPos = this.cell.gridPos;
     _s.position = this.cell.sprite.position.clone();
     game.layers["content"].addChildAt(_s, gridPos[0] + gridPos[1]);
+  }
+  applyData( data )
+  {
+    this.id = data.id;
   }
 
 }
@@ -83,13 +112,11 @@ class Cell
   init( type:string )
   {
     var template = cg["terrain"][type]
-    var _s = this.sprite = new Sprite( template );
-    this.sprite.cell = this;
+    var _s = this.sprite = new GroundSprite( type, this );
     this.buildable = template["buildable"];
 
     _s.mousedown = function(event)
-    {
-      //typescript doesnt like 
+    { 
       game.mouseEventHandler.cellStart(event.target["cell"].gridPos);
     }
     _s.mouseover = function(event)
@@ -106,17 +133,15 @@ class Cell
     var template = cg["terrain"][type];
     var _texture = template["texture"];
     this.sprite.setTexture( PIXI.Texture.fromImage( _texture ));
+    this.sprite.type = type;
     this.type = type;
     this.buildable = template["buildable"];
     if (this.content !== undefined)
     {
       this.changeContent(this.content.type);
     }
-    {
-
-    }
   }
-  changeContent( type:string )
+  changeContent( type:string, data? )
   {
     if (this.buildable !== true && type !== "plant")
     {
@@ -131,12 +156,11 @@ class Cell
     if (type === "plant")
     {
       type = cg["terrain"][this.type]["plant"];
-      this.content = new Content( this, cg["content"][type] );
+      this.content = new Content( this, type, data );
       this.content.type = "plant";
       return;
     }
-    this.content = new Content( this, cg["content"][type] );
-    
+    this.content = new Content( this, type, data );
   }
   removeContent()
   {
@@ -170,7 +194,7 @@ class Board
       this.cells[i] = [];
     }
   }
-  makeMap( key? )
+  makeEmptyMap()
   {
     for (var i = 0; i < this.width; i++)
     {
@@ -186,11 +210,36 @@ class Board
       }
     }
   }
-  getCells(arr): Cell[]
+  makeMap( data? )
   {
-    var cells;
-    cells = getFrom2dArray(this.cells, arr);
-    return cells;
+    for (var i = 0; i < this.width; i++)
+    {
+      for (var j = 0; j < this.height; j++)
+      {
+        var dataCell = data[i][j];
+        var cellType = dataCell["type"] || "grass";
+        var cell = this.cells[i][j] = new Cell([i, j], cellType);
+        cell.buildable = dataCell.buildable || true;
+
+        var sprite = cell.sprite;
+        sprite.position = arrayToPoint( getIsoCoord(i, j,
+          TILE_WIDTH, TILE_HEIGHT,
+          [WORLD_WIDTH/2, TILE_HEIGHT]) );
+        game.layers["ground"].addChild(sprite);
+
+        cell.changeContent(dataCell.content.type, dataCell.content.data);
+
+      }
+    }
+  }
+  
+  getCell(arr: number[]): Cell
+  {
+    return this.cells[arr[0]][arr[1]];
+  }
+  getCells(arr:number[]): Cell[]
+  {
+    return getFrom2dArray(this.cells, arr);
   }
 }
 
@@ -215,7 +264,7 @@ class Game
     this.bindElements();
 
     this.board = new Board(TILES, TILES);
-    this.board.makeMap();
+    this.board.makeEmptyMap();
 
     this.highlighter = new Highlighter();
 
@@ -238,6 +287,28 @@ class Game
       _main.addChild(_ground);
       var _content = this.layers["content"] = new SortedDisplayObjectContainer(TILES * 2);
       _main.addChild(_content);
+
+      var _game = this;
+
+      _stage.mousedown = function(event)
+      {
+        if (event.originalEvent.ctrlKey === true)
+        {
+          _game.mouseEventHandler.scrollStart(event);
+        }
+        if (event.originalEvent.shiftKey === true)
+        {
+          _game.mouseEventHandler.zoomStart(event);
+        }
+      }
+      _stage.mousemove = function(event)
+      {
+        _game.mouseEventHandler.stageMove(event);
+      }
+      _stage.mouseup = function(event)
+      {
+        _game.mouseEventHandler.stageEnd(event);
+      }
     }
     initTools()
     {
@@ -282,6 +353,16 @@ class Game
   changeTool( tool )
   {
     this.activeTool = this.tools[tool];
+  }
+  saveBoard()
+  {
+    var data = JSON.stringify(this.board);
+    localStorage.setItem("board", data);
+  }
+  loadBoard()
+  {
+    var data = localStorage.getItem("board");
+    this.board = JSON.parse(data);
   }
   render()
   {
@@ -816,7 +897,7 @@ function manhattanSelect(a, b) : number[]
 }
 
 
-function getFrom2dArray(target, arr): number[][]
+function getFrom2dArray(target, arr: number[]): any
 {
   var result = [];
   for (var i = 0; i < arr.length; i++)
@@ -869,8 +950,9 @@ var game = new Game();
 document.addEventListener('DOMContentLoaded', function()
 {
   game.init();
-  var stage = game.stage;
+
   /* check center
+  var stage = game.stage;
   var gfx = new PIXI.Graphics();
   gfx.beginFill();
   gfx.drawEllipse(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 3, 3);
@@ -878,25 +960,36 @@ document.addEventListener('DOMContentLoaded', function()
   stage.addChild(gfx);
   */
 
-
-  stage.mousedown = function(event)
-  {
-    if (event.originalEvent.ctrlKey === true)
-    {
-      game.mouseEventHandler.scrollStart(event);
-    }
-    if (event.originalEvent.shiftKey === true)
-    {
-      game.mouseEventHandler.zoomStart(event);
-    }
-  }
-  stage.mousemove = function(event)
-  {
-    game.mouseEventHandler.stageMove(event);
-  }
-  stage.mouseup = function(event)
-  {
-    game.mouseEventHandler.stageEnd(event);
-  }
   game.render();
 });
+
+function replacer(key, value)
+{
+  var replaced= {};
+  if (typeof(value) === "object")
+  {
+    switch (key)
+    {
+      case "content":
+        replaced =
+        {
+          "type": this.content.type,
+          "id": this.content.id
+        };
+        return replaced;
+      case "sprite":
+        return this.sprite.type;
+      default:
+        return value;
+    }
+  }
+  return value;
+}
+
+function makeMapFromJSON( data )
+{
+  var parsed = JSON.parse(data);
+  var board = new Board(data["width"], data["height"]);
+  board.makeMapFromJSON( data["cells"] );
+  return board;
+}

@@ -33,20 +33,44 @@ var Sprite = (function (_super) {
     return Sprite;
 })(PIXI.Sprite);
 
-var Content = (function () {
-    function Content(cell, template) {
+var GroundSprite = (function (_super) {
+    __extends(GroundSprite, _super);
+    function GroundSprite(type, cell) {
         this.cell = cell;
-        this.type = template["type"];
-
-        this.init(template);
+        _super.call(this, cg["terrain"][type]);
     }
-    Content.prototype.init = function (template) {
-        var _s = this.sprite = new Sprite(cg["content"][this.type]);
-        _s.content = this;
+    return GroundSprite;
+})(Sprite);
+
+var ContentSprite = (function (_super) {
+    __extends(ContentSprite, _super);
+    function ContentSprite(type, content) {
+        this.content = content;
+        _super.call(this, cg["content"][type]);
+    }
+    return ContentSprite;
+})(Sprite);
+
+var Content = (function () {
+    function Content(cell, type, data) {
+        this.cell = cell;
+        this.type = type;
+
+        this.init(type);
+
+        if (data) {
+            this.applyData(data);
+        }
+    }
+    Content.prototype.init = function (type) {
+        var _s = this.sprite = new ContentSprite(type, this);
         var cellSprite = this.cell.sprite;
         var gridPos = this.cell.gridPos;
         _s.position = this.cell.sprite.position.clone();
         game.layers["content"].addChildAt(_s, gridPos[0] + gridPos[1]);
+    };
+    Content.prototype.applyData = function (data) {
+        this.id = data.id;
     };
     return Content;
 })();
@@ -60,12 +84,10 @@ var Cell = (function () {
     }
     Cell.prototype.init = function (type) {
         var template = cg["terrain"][type];
-        var _s = this.sprite = new Sprite(template);
-        this.sprite.cell = this;
+        var _s = this.sprite = new GroundSprite(type, this);
         this.buildable = template["buildable"];
 
         _s.mousedown = function (event) {
-            //typescript doesnt like
             game.mouseEventHandler.cellStart(event.target["cell"].gridPos);
         };
         _s.mouseover = function (event) {
@@ -79,15 +101,14 @@ var Cell = (function () {
         var template = cg["terrain"][type];
         var _texture = template["texture"];
         this.sprite.setTexture(PIXI.Texture.fromImage(_texture));
+        this.sprite.type = type;
         this.type = type;
         this.buildable = template["buildable"];
         if (this.content !== undefined) {
             this.changeContent(this.content.type);
         }
-         {
-        }
     };
-    Cell.prototype.changeContent = function (type) {
+    Cell.prototype.changeContent = function (type, data) {
         if (this.buildable !== true && type !== "plant") {
             this.removeContent();
             return;
@@ -97,11 +118,11 @@ var Cell = (function () {
         }
         if (type === "plant") {
             type = cg["terrain"][this.type]["plant"];
-            this.content = new Content(this, cg["content"][type]);
+            this.content = new Content(this, type, data);
             this.content.type = "plant";
             return;
         }
-        this.content = new Content(this, cg["content"][type]);
+        this.content = new Content(this, type, data);
     };
     Cell.prototype.removeContent = function () {
         if (this.content === undefined) {
@@ -126,7 +147,7 @@ var Board = (function () {
             this.cells[i] = [];
         }
     };
-    Board.prototype.makeMap = function (key) {
+    Board.prototype.makeEmptyMap = function () {
         for (var i = 0; i < this.width; i++) {
             for (var j = 0; j < this.height; j++) {
                 var cellType = "grass";
@@ -137,10 +158,28 @@ var Board = (function () {
             }
         }
     };
+    Board.prototype.makeMap = function (data) {
+        for (var i = 0; i < this.width; i++) {
+            for (var j = 0; j < this.height; j++) {
+                var dataCell = data[i][j];
+                var cellType = dataCell["type"] || "grass";
+                var cell = this.cells[i][j] = new Cell([i, j], cellType);
+                cell.buildable = dataCell.buildable || true;
+
+                var sprite = cell.sprite;
+                sprite.position = arrayToPoint(getIsoCoord(i, j, TILE_WIDTH, TILE_HEIGHT, [WORLD_WIDTH / 2, TILE_HEIGHT]));
+                game.layers["ground"].addChild(sprite);
+
+                cell.changeContent(dataCell.content.type, dataCell.content.data);
+            }
+        }
+    };
+
+    Board.prototype.getCell = function (arr) {
+        return this.cells[arr[0]][arr[1]];
+    };
     Board.prototype.getCells = function (arr) {
-        var cells;
-        cells = getFrom2dArray(this.cells, arr);
-        return cells;
+        return getFrom2dArray(this.cells, arr);
     };
     return Board;
 })();
@@ -157,7 +196,7 @@ var Game = (function () {
         this.bindElements();
 
         this.board = new Board(TILES, TILES);
-        this.board.makeMap();
+        this.board.makeEmptyMap();
 
         this.highlighter = new Highlighter();
 
@@ -175,6 +214,23 @@ var Game = (function () {
         _main.addChild(_ground);
         var _content = this.layers["content"] = new SortedDisplayObjectContainer(TILES * 2);
         _main.addChild(_content);
+
+        var _game = this;
+
+        _stage.mousedown = function (event) {
+            if (event.originalEvent.ctrlKey === true) {
+                _game.mouseEventHandler.scrollStart(event);
+            }
+            if (event.originalEvent.shiftKey === true) {
+                _game.mouseEventHandler.zoomStart(event);
+            }
+        };
+        _stage.mousemove = function (event) {
+            _game.mouseEventHandler.stageMove(event);
+        };
+        _stage.mouseup = function (event) {
+            _game.mouseEventHandler.stageEnd(event);
+        };
     };
     Game.prototype.initTools = function () {
         this.tools.water = new WaterTool();
@@ -212,6 +268,14 @@ var Game = (function () {
     };
     Game.prototype.changeTool = function (tool) {
         this.activeTool = this.tools[tool];
+    };
+    Game.prototype.saveBoard = function () {
+        var data = JSON.stringify(this.board);
+        localStorage.setItem("board", data);
+    };
+    Game.prototype.loadBoard = function () {
+        var data = localStorage.getItem("board");
+        this.board = JSON.parse(data);
     };
     Game.prototype.render = function () {
         this.renderer.render(this.stage);
@@ -656,29 +720,41 @@ var game = new Game();
 
 document.addEventListener('DOMContentLoaded', function () {
     game.init();
-    var stage = game.stage;
 
     /* check center
+    var stage = game.stage;
     var gfx = new PIXI.Graphics();
     gfx.beginFill();
     gfx.drawEllipse(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 3, 3);
     gfx.endFill();
     stage.addChild(gfx);
     */
-    stage.mousedown = function (event) {
-        if (event.originalEvent.ctrlKey === true) {
-            game.mouseEventHandler.scrollStart(event);
-        }
-        if (event.originalEvent.shiftKey === true) {
-            game.mouseEventHandler.zoomStart(event);
-        }
-    };
-    stage.mousemove = function (event) {
-        game.mouseEventHandler.stageMove(event);
-    };
-    stage.mouseup = function (event) {
-        game.mouseEventHandler.stageEnd(event);
-    };
     game.render();
 });
+
+function replacer(key, value) {
+    var replaced = {};
+    if (typeof (value) === "object") {
+        switch (key) {
+            case "content":
+                replaced = {
+                    "type": this.content.type,
+                    "id": this.content.id
+                };
+                return replaced;
+            case "sprite":
+                return this.sprite.type;
+            default:
+                return value;
+        }
+    }
+    return value;
+}
+
+function makeMapFromJSON(data) {
+    var parsed = JSON.parse(data);
+    var board = new Board(data["width"], data["height"]);
+    board.makeMapFromJSON(data["cells"]);
+    return board;
+}
 //# sourceMappingURL=citygame.js.map

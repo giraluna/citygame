@@ -4,17 +4,25 @@ declare var container: any;
 declare var SCREEN_WIDTH: any, SCREEN_HEIGHT: any, TILE_WIDTH: any, TILE_HEIGHT: any, TILES: any, WORLD_WIDTH: any, WORLD_HEIGHT: any;
 declare class Sprite extends PIXI.Sprite {
     public type: string;
-    public cell: Cell;
     public content: Content;
     constructor(template: any);
+}
+declare class GroundSprite extends Sprite {
+    public cell: Cell;
+    constructor(type: any, cell: any);
+}
+declare class ContentSprite extends Sprite {
+    public content: Content;
+    constructor(type: any, content: any);
 }
 declare class Content {
     public type: string;
     public id: number;
     public sprite: Sprite;
     public cell: Cell;
-    constructor(cell: Cell, template: any);
-    public init(template: any): void;
+    constructor(cell: Cell, type: any, data?: any);
+    public init(type: any): void;
+    public applyData(data: any): void;
 }
 declare class Cell {
     public type: string;
@@ -25,7 +33,7 @@ declare class Cell {
     constructor(gridPos: any, type: any);
     public init(type: string): void;
     public replace(type: string): void;
-    public changeContent(type: string): void;
+    public changeContent(type: string, data?: any): void;
     public removeContent(): void;
 }
 declare class Board {
@@ -34,8 +42,10 @@ declare class Board {
     public cells: Cell[][];
     constructor(width: any, height: any);
     public init(): void;
-    public makeMap(key?: any): void;
-    public getCells(arr: any): Cell[];
+    public makeEmptyMap(): void;
+    public makeMapFromJSON(data: any): void;
+    public getCell(arr: number[]): Cell;
+    public getCells(arr: number[]): Cell[];
 }
 declare class Game {
     public board: Board;
@@ -52,6 +62,8 @@ declare class Game {
     public initTools(): void;
     public bindElements(): void;
     public changeTool(tool: any): void;
+    public saveBoard(): void;
+    public loadBoard(): void;
     public render(): void;
 }
 declare class SortedDisplayObjectContainer extends PIXI.DisplayObjectContainer {
@@ -154,9 +166,11 @@ declare class HouseTool implements Tool {
 }
 declare function rectSelect(a: number[], b: number[]): number[];
 declare function manhattanSelect(a: any, b: any): number[];
-declare function getFrom2dArray(target: any, arr: any): number[][];
+declare function getFrom2dArray(target: any, arr: number[]): any;
 declare function arrayToPolygon(points: any): PIXI.Polygon;
 declare function arrayToPoint(point: any): PIXI.Point;
 declare function getIsoCoord(x: number, y: number, width: number, height: number, offset?: number[]): number[];
 declare function fround(x: any): number;
 declare var game: Game;
+declare function replacer(key: any, value: any): any;
+declare function makeMapFromJSON(data: any): Board;

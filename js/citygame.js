@@ -12,7 +12,7 @@ SCREEN_WIDTH = 940;
 SCREEN_HEIGHT = 480;
 TILE_WIDTH = 64;
 TILE_HEIGHT = 32;
-TILES = 10;
+TILES = 30;
 WORLD_WIDTH = TILES * TILE_WIDTH;
 WORLD_HEIGHT = TILES * TILE_HEIGHT;
 
@@ -70,7 +70,9 @@ var Content = (function () {
         game.layers["content"].addChildAt(_s, gridPos[0] + gridPos[1]);
     };
     Content.prototype.applyData = function (data) {
-        this.id = data.id;
+        for (var key in data) {
+            this[key] = data[key];
+        }
     };
     return Content;
 })();
@@ -169,7 +171,6 @@ var Board = (function () {
             for (var j = 0; j < this.height; j++) {
                 if (data) {
                     var dataCell = data[i][j] || undefined;
-                    console.log(dataCell);
                 }
                 var cellType = dataCell ? dataCell["type"] : "grass";
                 var cell = this.cells[i][j] = new Cell([i, j], cellType);
@@ -316,11 +317,13 @@ var Game = (function () {
             return value;
         });
         this.savedBoard = data;
+        localStorage.setItem("board", data);
     };
     Game.prototype.loadBoard = function () {
         this.resetLayers();
-        var parsed = JSON.parse(this.savedBoard);
-        console.log(parsed);
+
+        //var parsed = JSON.parse(this.savedBoard);
+        var parsed = JSON.parse(localStorage.getItem("board"));
         var board = this.board = new Board(parsed["width"], parsed["height"]);
         board.makeMap(parsed["cells"]);
     };
@@ -333,7 +336,6 @@ var Game = (function () {
         var main = this.layers["main"];
         for (var layer in this.layers) {
             if (layer !== "main") {
-                console.log(layer);
                 var _l = this.layers[layer];
                 main.removeChild(_l);
                 this.layers[layer] = undefined;
@@ -790,31 +792,4 @@ document.addEventListener('DOMContentLoaded', function () {
     */
     game.render();
 });
-
-function replacer(key, value) {
-    var replaced = {};
-    if (typeof (value) === "object") {
-        switch (key) {
-            case "content":
-                replaced = {
-                    "type": this.content.type,
-                    "id": this.content.id
-                };
-                return replaced;
-            case "sprite":
-                return this.sprite.type;
-            default:
-                return value;
-        }
-    }
-    return value;
-}
-
-function makeMapFromJSON(data) {
-    var parsed = JSON.parse(data);
-    console.log(parsed);
-    var board = new Board(parsed["width"], parsed["height"]);
-    board.makeMap(parsed["cells"]);
-    return board;
-}
 //# sourceMappingURL=citygame.js.map

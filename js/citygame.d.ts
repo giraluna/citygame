@@ -175,5 +175,3 @@ declare function arrayToPoint(point: any): PIXI.Point;
 declare function getIsoCoord(x: number, y: number, width: number, height: number, offset?: number[]): number[];
 declare function fround(x: any): number;
 declare var game: Game;
-declare function replacer(key: any, value: any): any;
-declare function makeMapFromJSON(data: any): Board;

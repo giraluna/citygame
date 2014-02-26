@@ -99,6 +99,25 @@ var Cell = (function () {
             game.mouseEventHandler.cellEnd(event.target["cell"].gridPos);
         };
     };
+    Cell.prototype.getNeighbors = function () {
+        var neighbors = {
+            n: undefined,
+            e: undefined,
+            s: undefined,
+            w: undefined
+        };
+        var cells = game.board.cells;
+        var size = game.board.width;
+        var x = this.gridPos[0];
+        var y = this.gridPos[1];
+
+        neighbors.n = (y + 1 < size) ? cells[x][y + 1] : undefined;
+        neighbors.e = (x + 1 < size) ? cells[x + 1][y] : undefined;
+        neighbors.s = (-1 < y - 1) ? cells[x][y - 1] : undefined;
+        neighbors.w = (-1 < x - 1) ? cells[x - 1][y] : undefined;
+
+        return neighbors;
+    };
     Cell.prototype.replace = function (type) {
         var template = cg["terrain"][type];
         var _texture = template["texture"];
@@ -536,8 +555,22 @@ var MouseEventHandler = (function () {
         if (this.currAction === "cellAction") {
             this.currCell = pos;
             var selectedCells = game.board.getCells(game.activeTool.selectType(this.startCell, this.currCell));
+
+            // temp
+            var neighborCells = [];
+            for (var i = 0; i < selectedCells.length; i++) {
+                var neighbors = selectedCells[i].getNeighbors();
+                for (var cell in neighbors) {
+                    if (neighbors[cell] !== undefined) {
+                        neighborCells.push(neighbors[cell]);
+                    }
+                }
+            }
+
+            // endtemp
             game.highlighter.clearSprites();
             game.highlighter.tintCells(selectedCells, game.activeTool.tintColor);
+            game.highlighter.tintCells(neighborCells, game.activeTool.tintColor);
         }
     };
     MouseEventHandler.prototype.cellEnd = function (pos) {

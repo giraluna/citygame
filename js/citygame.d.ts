@@ -24,6 +24,12 @@ declare class Content {
     public init(type: any): void;
     public applyData(data: any): void;
 }
+interface neighborCells {
+    n: Cell;
+    e: Cell;
+    s: Cell;
+    w: Cell;
+}
 declare class Cell {
     public type: string;
     public sprite: Sprite;
@@ -32,6 +38,7 @@ declare class Cell {
     public buildable: boolean;
     constructor(gridPos: any, type: any);
     public init(type: string): void;
+    public getNeighbors(): neighborCells;
     public replace(type: string): void;
     public changeContent(type: string, data?: any): void;
     public removeContent(): void;

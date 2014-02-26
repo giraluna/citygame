@@ -103,6 +103,8 @@ var cg =
     }
   }
 };
+//ignore
+/* 
 function checkImage(url)
 {
   var req = new XMLHttpRequest();
@@ -131,6 +133,7 @@ function githubifyUrls()
   }
 
 }());
+*/
 
 
 cg = JSON.parse(JSON.stringify(cg)); //dumb

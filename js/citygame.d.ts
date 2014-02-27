@@ -41,7 +41,7 @@ declare class Cell {
     public init(type: string): void;
     public getNeighbors(): neighborCells;
     public replace(type: string): void;
-    public changeContent(type: string, data?: any): void;
+    public changeContent(type: string, update?: boolean, data?: any): void;
     public checkBuildable(type: string): string;
     public addPlant(): void;
     public updateCell(): void;
@@ -184,7 +184,7 @@ declare class RoadTool implements Tool {
     constructor();
     public activate(target: any): void;
 }
-declare function getRoadConnections(target: Cell, depth: number): string;
+declare function getRoadConnections(target: Cell, depth: number): any;
 declare function rectSelect(a: number[], b: number[]): number[];
 declare function manhattanSelect(a: any, b: any): number[];
 declare function getFrom2dArray(target: any, arr: number[]): any;

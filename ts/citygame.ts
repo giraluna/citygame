@@ -173,7 +173,7 @@ class Cell
       this.addPlant();
     }
   }
-  changeContent( type:string, data? )
+  changeContent( type:string, update:boolean=true, data? )
   {
     var type2 = cg["content"][type] ?
       cg["content"][type]["type2"] : "none";
@@ -185,7 +185,10 @@ class Cell
     {
       this.content = new Content( this, type, data );
     }
-    this.updateCell();
+    if (update)
+    {
+      this.updateCell();
+    }
   }
   checkBuildable( type: string )
   {
@@ -971,7 +974,6 @@ function getRoadConnections(target: Cell, depth:number)
   }
   if (dir === "")
   {
-    console.log("none");
     return null;
   }
   else if (dir === "n" || dir === "s" || dir === "ns")
@@ -982,10 +984,10 @@ function getRoadConnections(target: Cell, depth:number)
   {
     dir = "h";
   }
-
-  console.log(dir);
-  
-  return dir;
+  if (target.content && target.content.type2 === "road")
+  {
+    target.changeContent("road_" + dir, false);
+  }
 }
 
 

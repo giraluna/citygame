@@ -1,5 +1,6 @@
 /// <reference path="lib/pixi.d.ts" />
 /// <reference path="../data/js/cg.d.ts" />
+declare var LZString: any;
 declare var container: any;
 declare var SCREEN_WIDTH: any, SCREEN_HEIGHT: any, TILE_WIDTH: any, TILE_HEIGHT: any, TILES: any, WORLD_WIDTH: any, WORLD_HEIGHT: any;
 declare class Sprite extends PIXI.Sprite {

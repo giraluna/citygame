@@ -6,6 +6,7 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
+
 var container;
 var SCREEN_WIDTH, SCREEN_HEIGHT, TILE_WIDTH, TILE_HEIGHT, TILES, WORLD_WIDTH, WORLD_HEIGHT;
 SCREEN_WIDTH = 940;
@@ -346,14 +347,15 @@ var Game = (function () {
             }
             return value;
         });
-        this.savedBoard = data;
-        localStorage.setItem("board", data);
+        var compressed = LZString.compressToUTF16(data);
+        localStorage.setItem("board", compressed);
     };
     Game.prototype.loadBoard = function () {
         this.resetLayers();
 
         //var parsed = JSON.parse(this.savedBoard);
-        var parsed = JSON.parse(localStorage.getItem("board"));
+        var decompressed = LZString.decompressFromUTF16(localStorage.getItem("board"));
+        var parsed = JSON.parse(decompressed);
         var board = this.board = new Board(parsed["width"], parsed["height"]);
         board.makeMap(parsed["cells"]);
     };

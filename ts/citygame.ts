@@ -1,6 +1,7 @@
 /// <reference path="../js/lib/pixi.d.ts" />
 /// <reference path="../data/js/cg.d.ts" />
 
+declare var LZString: any;
 
 var container;
 var SCREEN_WIDTH, SCREEN_HEIGHT, TILE_WIDTH,TILE_HEIGHT,
@@ -449,14 +450,15 @@ class Game
         }
         return value;
       });
-    this.savedBoard = data;
-    localStorage.setItem("board", data);
+    var compressed = LZString.compressToUTF16(data);
+    localStorage.setItem("board", compressed);
   }
   loadBoard()
   {
     this.resetLayers();
     //var parsed = JSON.parse(this.savedBoard);
-    var parsed = JSON.parse(localStorage.getItem("board"));
+    var decompressed = LZString.decompressFromUTF16(localStorage.getItem("board"));
+    var parsed = JSON.parse( decompressed );
     var board = this.board = new Board(parsed["width"], parsed["height"]);
     board.makeMap( parsed["cells"] );
   }

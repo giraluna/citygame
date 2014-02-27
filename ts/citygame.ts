@@ -954,7 +954,8 @@ function getRoadConnections(target: Cell, depth:number)
   var neighbors = target.getNeighbors();
   for ( var cell in neighbors )
   {
-    if (neighbors[cell].content && neighbors[cell].content.type2 === "road")
+    if (neighbors[cell] && neighbors[cell].content
+      && neighbors[cell].content.type2 === "road")
     {
       connections[cell] = true;
     }

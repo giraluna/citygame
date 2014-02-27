@@ -62,6 +62,7 @@ class ContentSprite extends Sprite
 class Content
 {
   type: string;
+  type2: string;
   id: number;
   sprite: Sprite;
   cell: Cell;
@@ -69,7 +70,8 @@ class Content
   constructor( cell: Cell, type, data?)
   {
     this.cell = cell;
-    this.type = type;
+    this.type = cg["content"][type]["type"];
+    this.type2 = cg["content"][type]["type2"] || undefined;
 
     this.init( type );
 
@@ -151,9 +153,9 @@ class Cell
     var x = this.gridPos[0];
     var y = this.gridPos[1];
 
-    neighbors.n = (y+1 < size) ? cells[x]  [y+1] : undefined;
+    neighbors.s = (y+1 < size) ? cells[x]  [y+1] : undefined;
     neighbors.e = (x+1 < size) ? cells[x+1][y]   : undefined;
-    neighbors.s = (-1 < y-1)   ? cells[x]  [y-1] : undefined;
+    neighbors.n = (-1 < y-1)   ? cells[x]  [y-1] : undefined;
     neighbors.w = (-1 < x-1)   ? cells[x-1][y]   : undefined; 
 
     return neighbors; 
@@ -166,31 +168,39 @@ class Cell
     this.sprite.type = type;
     this.type = type;
     this.buildable = template["buildable"];
-    if (this.content !== undefined)
+    if (this.content && this.content.type2 === "plant")
     {
-      this.changeContent(this.content.type);
+      this.addPlant();
     }
   }
   changeContent( type:string, data? )
   {
+    var type2 = cg["content"][type] ?
+      cg["content"][type]["type2"] : "none";
+    this.checkBuildable(type2);
+
+    this.removeContent();
+
+    if (type !== "none")
+    {
+      this.content = new Content( this, type, data );
+    }
+    this.updateCell();
+  }
+  checkBuildable( type: string )
+  {
     if (this.buildable !== true && type !== "plant")
     {
-      this.removeContent();
-      return;
+      return "none";
     }
-    if (this.content !== undefined)
-    {
-      game.layers["content"].removeChildAt(this.content.sprite,
-        this.gridPos[0] + this.gridPos[1]);
-    }
-    if (type === "plant")
-    {
-      type = cg["terrain"][this.type]["plant"];
-      this.content = new Content( this, type, data );
-      this.content.type = "plant";
-      return;
-    }
-    this.content = new Content( this, type, data );
+  }
+  addPlant()
+  {
+    this.changeContent( cg["terrain"][this.type]["plant"] );
+  }
+  updateCell()
+  {
+    getRoadConnections(this, 1);
   }
   removeContent()
   {
@@ -359,6 +369,7 @@ class Game
       this.tools.remove = new RemoveTool();
       this.tools.plant = new PlantTool();
       this.tools.house = new HouseTool();
+      this.tools.road = new RoadTool();
 
       //this.tools.pineapple = new PineappleTool();
     }
@@ -729,23 +740,8 @@ class MouseEventHandler
       var selectedCells = game.board.getCells(
         game.activeTool.selectType(this.startCell, this.currCell));
 
-      // temp
-      var neighborCells = [];
-      for (var i = 0; i < selectedCells.length; i++)
-      {
-        var neighbors = selectedCells[i].getNeighbors();
-        for ( var cell in neighbors )
-        {
-          if (neighbors[cell] !== undefined)
-          {
-            neighborCells.push(neighbors[cell]);
-          }
-        }
-      }
-      // endtemp
       game.highlighter.clearSprites();
       game.highlighter.tintCells(selectedCells, game.activeTool.tintColor);
-      game.highlighter.tintCells(neighborCells, game.activeTool.tintColor);
     }
   }
   cellEnd(pos: number[])
@@ -891,7 +887,7 @@ class RemoveTool implements Tool
   {
     for (var i = 0; i < target.length; i++)
     {
-      target[i].removeContent();
+      target[i].changeContent("none");
     }
   }
 }
@@ -909,7 +905,7 @@ class PlantTool implements Tool
   {
     for (var i = 0; i < target.length; i++)
     {
-      target[i].changeContent("plant");
+      target[i].addPlant();
     }
   }
 }
@@ -931,6 +927,68 @@ class HouseTool implements Tool
     }
   }
 }
+class RoadTool implements Tool
+{
+  selectType: any
+  tintColor: number;
+  constructor()
+  {
+    this.selectType = manhattanSelect;
+    this.tintColor = 0x696969;
+  }
+  activate(target)
+  {
+    for (var i = 0; i < target.length; i++)
+    {
+      target[i].changeContent( "road_nesw" );
+    }
+  }
+}
+function getRoadConnections(target: Cell, depth:number)
+{
+  var connections = {};
+  var dir = "";
+  var neighbors = target.getNeighbors();
+  for ( var cell in neighbors )
+  {
+    if (neighbors[cell].content && neighbors[cell].content.type2 === "road")
+    {
+      connections[cell] = true;
+    }
+  }
+
+  if (depth > 0)
+  {
+    for (var connection in connections)
+    {
+      getRoadConnections( neighbors[connection], depth - 1 );
+    }
+  }
+
+  for (var connection in connections)
+  {
+    dir += connection;
+  }
+  if (dir === "")
+  {
+    console.log("none");
+    return null;
+  }
+  else if (dir === "n" || dir === "s" || dir === "ns")
+  {
+    dir = "v";
+  }
+  else if (dir === "e" || dir === "w" || dir === "ew")
+  {
+    dir = "h";
+  }
+
+  console.log(dir);
+  
+  return dir;
+}
+
+
 /*
 class PineappleTool implements Tool
 {

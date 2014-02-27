@@ -17,6 +17,7 @@ declare class ContentSprite extends Sprite {
 }
 declare class Content {
     public type: string;
+    public type2: string;
     public id: number;
     public sprite: Sprite;
     public cell: Cell;
@@ -41,6 +42,9 @@ declare class Cell {
     public getNeighbors(): neighborCells;
     public replace(type: string): void;
     public changeContent(type: string, data?: any): void;
+    public checkBuildable(type: string): string;
+    public addPlant(): void;
+    public updateCell(): void;
     public removeContent(): void;
 }
 declare class Board {
@@ -174,6 +178,13 @@ declare class HouseTool implements Tool {
     constructor();
     public activate(target: any): void;
 }
+declare class RoadTool implements Tool {
+    public selectType: any;
+    public tintColor: number;
+    constructor();
+    public activate(target: any): void;
+}
+declare function getRoadConnections(target: Cell, depth: number): string;
 declare function rectSelect(a: number[], b: number[]): number[];
 declare function manhattanSelect(a: any, b: any): number[];
 declare function getFrom2dArray(target: any, arr: number[]): any;

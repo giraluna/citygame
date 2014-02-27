@@ -48,6 +48,7 @@ var cg = {
     "content": {
         "tree": {
             "type": "tree",
+            "type2": "plant",
             "width": 16,
             "height": 32,
             "anchor": [0.5, 1.5],
@@ -55,6 +56,7 @@ var cg = {
         },
         "cactus": {
             "type": "cactus",
+            "type2": "plant",
             "width": 16,
             "height": 32,
             "anchor": [0.5, 1.5],
@@ -62,6 +64,7 @@ var cg = {
         },
         "tentacle": {
             "type": "tentacle",
+            "type2": "plant",
             "width": 16,
             "height": 32,
             "anchor": [0.5, 1.5],
@@ -69,6 +72,7 @@ var cg = {
         },
         "snowman": {
             "type": "snowman",
+            "type2": "plant",
             "width": 32,
             "height": 64,
             "anchor": [0.5, 1.25],
@@ -76,17 +80,99 @@ var cg = {
         },
         "house": {
             "type": "house",
+            "type2": "building",
             "width": 64,
             "height": 44,
             "anchor": [0.5, 1],
             "texture": "img\/house.png"
         },
-        "pineapple": {
-            "type": "pineapple",
-            "width": 24,
-            "height": 56,
-            "anchor": [0.5, 1.13],
-            "texture": "img\/pineapple2.png"
+        "road_h": {
+            "type": "road_h",
+            "type2": "road",
+            "width": 64,
+            "height": 32,
+            "anchor": [0.5, 1.0],
+            "texture": "img\/road_h2.png"
+        },
+        "road_v": {
+            "type": "road_v",
+            "type2": "road",
+            "width": 64,
+            "height": 32,
+            "anchor": [0.5, 1.0],
+            "texture": "img\/road_v.png"
+        },
+        "road_ne": {
+            "type": "road_ne",
+            "type2": "road",
+            "width": 64,
+            "height": 32,
+            "anchor": [0.5, 1.0],
+            "texture": "img\/road_ne.png"
+        },
+        "road_nw": {
+            "type": "road_nw",
+            "type2": "road",
+            "width": 64,
+            "height": 32,
+            "anchor": [0.5, 1.0],
+            "texture": "img\/road_nw.png"
+        },
+        "road_sw": {
+            "type": "road_sw",
+            "type2": "road",
+            "width": 64,
+            "height": 32,
+            "anchor": [0.5, 1.0],
+            "texture": "img\/road_sw.png"
+        },
+        "road_es": {
+            "type": "road_es",
+            "type2": "road",
+            "width": 64,
+            "height": 32,
+            "anchor": [0.5, 1.0],
+            "texture": "img\/road_se.png"
+        },
+        "road_nesw": {
+            "type": "road_nesw",
+            "type2": "road",
+            "width": 64,
+            "height": 32,
+            "anchor": [0.5, 1.0],
+            "texture": "img\/road_news.png"
+        },
+        "road_new": {
+            "type": "road_new",
+            "type2": "road",
+            "width": 64,
+            "height": 32,
+            "anchor": [0.5, 1.0],
+            "texture": "img\/road_new.png"
+        },
+        "road_nsw": {
+            "type": "road_nsw",
+            "type2": "road",
+            "width": 64,
+            "height": 32,
+            "anchor": [0.5, 1.0],
+            "texture": "img\/road_nsw.png"
+        },
+        "road_esw": {
+            "type": "road_esw",
+            "type2": "road",
+            "width": 64,
+            "height": 32,
+            "anchor": [0.5, 1.0],
+            "texture": "img\/road_sew.png"
+        },
+        "road_nes": {
+            "type": "road_nes",
+            "type2": "road",
+            "width": 64,
+            "height": 32,
+            "anchor": [0.5, 1.0],
+            "texture": "img\/road_nse.png"
         }
     }
 };

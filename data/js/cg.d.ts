@@ -48,6 +48,7 @@ declare var cg: {
     "content": {
         "tree": {
             "type": string;
+            "type2": string;
             "width": number;
             "height": number;
             "anchor": number[];
@@ -55,6 +56,7 @@ declare var cg: {
         };
         "cactus": {
             "type": string;
+            "type2": string;
             "width": number;
             "height": number;
             "anchor": number[];
@@ -62,6 +64,7 @@ declare var cg: {
         };
         "tentacle": {
             "type": string;
+            "type2": string;
             "width": number;
             "height": number;
             "anchor": number[];
@@ -69,6 +72,7 @@ declare var cg: {
         };
         "snowman": {
             "type": string;
+            "type2": string;
             "width": number;
             "height": number;
             "anchor": number[];
@@ -76,13 +80,95 @@ declare var cg: {
         };
         "house": {
             "type": string;
+            "type2": string;
             "width": number;
             "height": number;
             "anchor": number[];
             "texture": string;
         };
-        "pineapple": {
+        "road_h": {
             "type": string;
+            "type2": string;
+            "width": number;
+            "height": number;
+            "anchor": number[];
+            "texture": string;
+        };
+        "road_v": {
+            "type": string;
+            "type2": string;
+            "width": number;
+            "height": number;
+            "anchor": number[];
+            "texture": string;
+        };
+        "road_ne": {
+            "type": string;
+            "type2": string;
+            "width": number;
+            "height": number;
+            "anchor": number[];
+            "texture": string;
+        };
+        "road_nw": {
+            "type": string;
+            "type2": string;
+            "width": number;
+            "height": number;
+            "anchor": number[];
+            "texture": string;
+        };
+        "road_sw": {
+            "type": string;
+            "type2": string;
+            "width": number;
+            "height": number;
+            "anchor": number[];
+            "texture": string;
+        };
+        "road_es": {
+            "type": string;
+            "type2": string;
+            "width": number;
+            "height": number;
+            "anchor": number[];
+            "texture": string;
+        };
+        "road_nesw": {
+            "type": string;
+            "type2": string;
+            "width": number;
+            "height": number;
+            "anchor": number[];
+            "texture": string;
+        };
+        "road_new": {
+            "type": string;
+            "type2": string;
+            "width": number;
+            "height": number;
+            "anchor": number[];
+            "texture": string;
+        };
+        "road_nsw": {
+            "type": string;
+            "type2": string;
+            "width": number;
+            "height": number;
+            "anchor": number[];
+            "texture": string;
+        };
+        "road_esw": {
+            "type": string;
+            "type2": string;
+            "width": number;
+            "height": number;
+            "anchor": number[];
+            "texture": string;
+        };
+        "road_nes": {
+            "type": string;
+            "type2": string;
             "width": number;
             "height": number;
             "anchor": number[];

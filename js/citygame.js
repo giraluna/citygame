@@ -54,7 +54,8 @@ var ContentSprite = (function (_super) {
 var Content = (function () {
     function Content(cell, type, data) {
         this.cell = cell;
-        this.type = type;
+        this.type = cg["content"][type]["type"];
+        this.type2 = cg["content"][type]["type2"] || undefined;
 
         this.init(type);
 
@@ -111,9 +112,9 @@ var Cell = (function () {
         var x = this.gridPos[0];
         var y = this.gridPos[1];
 
-        neighbors.n = (y + 1 < size) ? cells[x][y + 1] : undefined;
+        neighbors.s = (y + 1 < size) ? cells[x][y + 1] : undefined;
         neighbors.e = (x + 1 < size) ? cells[x + 1][y] : undefined;
-        neighbors.s = (-1 < y - 1) ? cells[x][y - 1] : undefined;
+        neighbors.n = (-1 < y - 1) ? cells[x][y - 1] : undefined;
         neighbors.w = (-1 < x - 1) ? cells[x - 1][y] : undefined;
 
         return neighbors;
@@ -125,25 +126,31 @@ var Cell = (function () {
         this.sprite.type = type;
         this.type = type;
         this.buildable = template["buildable"];
-        if (this.content !== undefined) {
-            this.changeContent(this.content.type);
+        if (this.content && this.content.type2 === "plant") {
+            this.addPlant();
         }
     };
     Cell.prototype.changeContent = function (type, data) {
-        if (this.buildable !== true && type !== "plant") {
-            this.removeContent();
-            return;
-        }
-        if (this.content !== undefined) {
-            game.layers["content"].removeChildAt(this.content.sprite, this.gridPos[0] + this.gridPos[1]);
-        }
-        if (type === "plant") {
-            type = cg["terrain"][this.type]["plant"];
+        var type2 = cg["content"][type] ? cg["content"][type]["type2"] : "none";
+        this.checkBuildable(type2);
+
+        this.removeContent();
+
+        if (type !== "none") {
             this.content = new Content(this, type, data);
-            this.content.type = "plant";
-            return;
         }
-        this.content = new Content(this, type, data);
+        this.updateCell();
+    };
+    Cell.prototype.checkBuildable = function (type) {
+        if (this.buildable !== true && type !== "plant") {
+            return "none";
+        }
+    };
+    Cell.prototype.addPlant = function () {
+        this.changeContent(cg["terrain"][this.type]["plant"]);
+    };
+    Cell.prototype.updateCell = function () {
+        getRoadConnections(this, 1);
     };
     Cell.prototype.removeContent = function () {
         if (this.content === undefined) {
@@ -274,6 +281,7 @@ var Game = (function () {
         this.tools.remove = new RemoveTool();
         this.tools.plant = new PlantTool();
         this.tools.house = new HouseTool();
+        this.tools.road = new RoadTool();
         //this.tools.pineapple = new PineappleTool();
     };
 
@@ -556,21 +564,8 @@ var MouseEventHandler = (function () {
             this.currCell = pos;
             var selectedCells = game.board.getCells(game.activeTool.selectType(this.startCell, this.currCell));
 
-            // temp
-            var neighborCells = [];
-            for (var i = 0; i < selectedCells.length; i++) {
-                var neighbors = selectedCells[i].getNeighbors();
-                for (var cell in neighbors) {
-                    if (neighbors[cell] !== undefined) {
-                        neighborCells.push(neighbors[cell]);
-                    }
-                }
-            }
-
-            // endtemp
             game.highlighter.clearSprites();
             game.highlighter.tintCells(selectedCells, game.activeTool.tintColor);
-            game.highlighter.tintCells(neighborCells, game.activeTool.tintColor);
         }
     };
     MouseEventHandler.prototype.cellEnd = function (pos) {
@@ -675,7 +670,7 @@ var RemoveTool = (function () {
     }
     RemoveTool.prototype.activate = function (target) {
         for (var i = 0; i < target.length; i++) {
-            target[i].removeContent();
+            target[i].changeContent("none");
         }
     };
     return RemoveTool;
@@ -688,7 +683,7 @@ var PlantTool = (function () {
     }
     PlantTool.prototype.activate = function (target) {
         for (var i = 0; i < target.length; i++) {
-            target[i].changeContent("plant");
+            target[i].addPlant();
         }
     };
     return PlantTool;
@@ -706,6 +701,50 @@ var HouseTool = (function () {
     };
     return HouseTool;
 })();
+var RoadTool = (function () {
+    function RoadTool() {
+        this.selectType = manhattanSelect;
+        this.tintColor = 0x696969;
+    }
+    RoadTool.prototype.activate = function (target) {
+        for (var i = 0; i < target.length; i++) {
+            target[i].changeContent("road_nesw");
+        }
+    };
+    return RoadTool;
+})();
+function getRoadConnections(target, depth) {
+    var connections = {};
+    var dir = "";
+    var neighbors = target.getNeighbors();
+    for (var cell in neighbors) {
+        if (neighbors[cell].content && neighbors[cell].content.type2 === "road") {
+            connections[cell] = true;
+        }
+    }
+
+    if (depth > 0) {
+        for (var connection in connections) {
+            getRoadConnections(neighbors[connection], depth - 1);
+        }
+    }
+
+    for (var connection in connections) {
+        dir += connection;
+    }
+    if (dir === "") {
+        console.log("none");
+        return null;
+    } else if (dir === "n" || dir === "s" || dir === "ns") {
+        dir = "v";
+    } else if (dir === "e" || dir === "w" || dir === "ew") {
+        dir = "h";
+    }
+
+    console.log(dir);
+
+    return dir;
+}
 
 /*
 class PineappleTool implements Tool

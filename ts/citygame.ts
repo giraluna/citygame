@@ -1117,7 +1117,7 @@ function fround(x)
 function getRandomProperty( target )
 {
   var _targetKeys = Object.keys(target);
-  var _rnd = Math.floor(Math.random() * (_targetKeys.length - 1));
+  var _rnd = Math.floor(Math.random() * (_targetKeys.length));
   var _rndProp = target[ _targetKeys[_rnd] ];
   return _rndProp;
 }
@@ -1140,3 +1140,16 @@ document.addEventListener('DOMContentLoaded', function()
 
   game.render();
 });
+
+function pineapple()
+{
+  cg["content"]["buildings"]["pineapple"] =
+  {
+    "type": "pineapple",
+    "type2": "building",
+    "width": 64,
+    "height": 128,
+    "anchor": [0.5, 1.25],
+    "texture": "img\/pineapple2.png"
+  };
+}

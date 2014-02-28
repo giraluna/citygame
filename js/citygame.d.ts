@@ -195,3 +195,4 @@ declare function getIsoCoord(x: number, y: number, width: number, height: number
 declare function fround(x: any): number;
 declare function getRandomProperty(target: any): any;
 declare var game: Game;
+declare function pineapple(): void;

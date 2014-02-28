@@ -1,7 +1,9 @@
 /// <reference path="../js/lib/pixi.d.ts" />
-/// <reference path="../data/js/cg.d.ts" />
 
 declare var LZString: any;
+declare var cg:any;
+
+cg = JSON.parse(JSON.stringify(cg)); //dumb
 
 var container;
 var SCREEN_WIDTH, SCREEN_HEIGHT, TILE_WIDTH,TILE_HEIGHT,
@@ -13,6 +15,7 @@ TILE_HEIGHT = 32
 TILES = 30
 WORLD_WIDTH = TILES * TILE_WIDTH;
 WORLD_HEIGHT = TILES * TILE_HEIGHT;
+
 
 
 
@@ -45,7 +48,7 @@ class GroundSprite extends Sprite
   constructor(type, cell)
   {
     this.cell = cell;
-    super(cg["terrain"][type]);
+    super(type);
   }
 }
 
@@ -56,7 +59,7 @@ class ContentSprite extends Sprite
   constructor(type, content)
   {
     this.content = content;
-    super(cg["content"][type]);
+    super(type);
   }
 }
 
@@ -71,8 +74,8 @@ class Content
   constructor( cell: Cell, type, data?)
   {
     this.cell = cell;
-    this.type = cg["content"][type]["type"];
-    this.type2 = cg["content"][type]["type2"] || undefined;
+    this.type = type;
+    this.type2 = type["type2"] || undefined;
 
     this.init( type );
 
@@ -123,9 +126,8 @@ class Cell
   }
   init( type:string )
   {
-    var template = cg["terrain"][type]
     var _s = this.sprite = new GroundSprite( type, this );
-    this.buildable = template["buildable"];
+    this.buildable = type["buildable"];
 
     _s.mousedown = function(event)
     { 
@@ -161,28 +163,29 @@ class Cell
 
     return neighbors; 
   }
-  replace( type:string )
+  replace( type:string ) //change base type of tile
   {
-    var template = cg["terrain"][type];
-    var _texture = template["texture"];
+    var _texture = type["texture"];
     this.sprite.setTexture( PIXI.Texture.fromImage( _texture ));
-    this.sprite.type = type;
-    this.type = type;
-    this.buildable = template["buildable"];
+    this.sprite.type = this.type = type;
+    this.buildable = type["buildable"];
     if (this.content && this.content.type2 === "plant")
     {
       this.addPlant();
     }
+    else if(this.content)
+    {
+      this.changeContent( this.content.type );
+    }
   }
   changeContent( type:string, update:boolean=true, data? )
   {
-    var type2 = cg["content"][type] ?
-      cg["content"][type]["type2"] : "none";
-    this.checkBuildable(type2);
+    var type2 = type["type2"] ? type["type2"] : "none";
+    var buildable = this.checkBuildable(type2);
 
     this.removeContent();
 
-    if (type !== "none")
+    if (type !== "none" && buildable !== false )
     {
       this.content = new Content( this, type, data );
     }
@@ -191,16 +194,28 @@ class Cell
       this.updateCell();
     }
   }
-  checkBuildable( type: string )
+  checkBuildable( type2: string )
   {
-    if (this.buildable !== true && type !== "plant")
+    if (this.buildable === false)
     {
-      return "none";
+      if (type2 == "plant" || type2 == "road")
+      {
+        return true;
+      }
+      else
+      {
+        return false;
+      }
+    }
+    else
+    {
+      return true;
     }
   }
   addPlant()
   {
-    this.changeContent( cg["terrain"][this.type]["plant"] );
+    var plantType = this.type["plant"];
+    this.changeContent( cg["content"]["plants"][plantType] );
   }
   updateCell()
   {
@@ -264,7 +279,9 @@ class Board
         {
           var dataCell = data[i][j] || undefined;
         }
-        var cellType = dataCell ? dataCell["type"] : "grass";
+        var cellType = dataCell ?
+        cg["terrain"][ dataCell["type"] ] :
+        cg["terrain"]["grass"];
         var cell = this.cells[i][j] = new Cell([i, j], cellType);
         cell.buildable = dataCell ? dataCell.buildable : true;
 
@@ -374,8 +391,6 @@ class Game
       this.tools.plant = new PlantTool();
       this.tools.house = new HouseTool();
       this.tools.road = new RoadTool();
-
-      //this.tools.pineapple = new PineappleTool();
     }
 
     bindElements()
@@ -821,7 +836,7 @@ class WaterTool implements Tool
   {
     for (var i = 0; i < target.length; i++)
     {
-      target[i].replace( "water" );
+      target[i].replace( cg["terrain"]["water"] );
     };
   }
 }
@@ -839,7 +854,7 @@ class GrassTool implements Tool
   {
     for (var i = 0; i < target.length; i++)
     {
-      target[i].replace( "grass" );
+      target[i].replace( cg["terrain"]["grass"] );
     }
   }
 }
@@ -857,7 +872,7 @@ class SandTool implements Tool
   {
     for (var i = 0; i < target.length; i++)
     {
-      target[i].replace( "sand" );
+      target[i].replace( cg["terrain"]["sand"] );
     }
   }
 }
@@ -875,7 +890,7 @@ class SnowTool implements Tool
   {
     for (var i = 0; i < target.length; i++)
     {
-      target[i].replace( "snow" );
+      target[i].replace( cg["terrain"]["snow"] );
     }
   }
 }
@@ -928,7 +943,9 @@ class HouseTool implements Tool
   {
     for (var i = 0; i < target.length; i++)
     {
-      target[i].changeContent("house");
+      //target[i].changeContent("house");
+      target[i].changeContent(
+        getRandomProperty(cg["content"]["buildings"]) );
     }
   }
 }
@@ -945,7 +962,7 @@ class RoadTool implements Tool
   {
     for (var i = 0; i < target.length; i++)
     {
-      target[i].changeContent( "road_nesw" );
+      target[i].changeContent( cg["content"]["roads"]["road_nesw"] );
     }
   }
 }
@@ -989,30 +1006,10 @@ function getRoadConnections(target: Cell, depth:number)
   }
   if (target.content && target.content.type2 === "road")
   {
-    target.changeContent("road_" + dir, false);
+    var finalRoad = cg["content"]["roads"]["road_" + dir];
+    target.changeContent(finalRoad, false);
   }
 }
-
-
-/*
-class PineappleTool implements Tool
-{
-  selectType: any
-  tintColor: number;
-  constructor()
-  {
-    this.selectType = rectSelect;
-    this.tintColor = 0xF7B218;
-  }
-  activate(target)
-  {
-    for (var i = 0; i < target.length; i++)
-    {
-      target[i].changeContent("pineapple");
-    }
-  }
-}
-*/
 
 function rectSelect(a:number[], b:number[]): number[]
 {
@@ -1117,6 +1114,14 @@ function fround(x)
 {
   var f32 = new Float32Array(1);
   return f32[0] = x, f32[0];
+}
+
+function getRandomProperty( target )
+{
+  var _targetKeys = Object.keys(target);
+  var _rnd = Math.floor(Math.random() * (_targetKeys.length - 1));
+  var _rndProp = target[ _targetKeys[_rnd] ];
+  return _rndProp;
 }
 
 var game = new Game();

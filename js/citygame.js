@@ -1,11 +1,12 @@
 /// <reference path="../js/lib/pixi.d.ts" />
-/// <reference path="../data/js/cg.d.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
     d.prototype = new __();
 };
+
+cg = JSON.parse(JSON.stringify(cg)); //dumb
 
 var container;
 var SCREEN_WIDTH, SCREEN_HEIGHT, TILE_WIDTH, TILE_HEIGHT, TILES, WORLD_WIDTH, WORLD_HEIGHT;
@@ -38,7 +39,7 @@ var GroundSprite = (function (_super) {
     __extends(GroundSprite, _super);
     function GroundSprite(type, cell) {
         this.cell = cell;
-        _super.call(this, cg["terrain"][type]);
+        _super.call(this, type);
     }
     return GroundSprite;
 })(Sprite);
@@ -47,7 +48,7 @@ var ContentSprite = (function (_super) {
     __extends(ContentSprite, _super);
     function ContentSprite(type, content) {
         this.content = content;
-        _super.call(this, cg["content"][type]);
+        _super.call(this, type);
     }
     return ContentSprite;
 })(Sprite);
@@ -55,8 +56,8 @@ var ContentSprite = (function (_super) {
 var Content = (function () {
     function Content(cell, type, data) {
         this.cell = cell;
-        this.type = cg["content"][type]["type"];
-        this.type2 = cg["content"][type]["type2"] || undefined;
+        this.type = type;
+        this.type2 = type["type2"] || undefined;
 
         this.init(type);
 
@@ -87,9 +88,8 @@ var Cell = (function () {
         this.init(type);
     }
     Cell.prototype.init = function (type) {
-        var template = cg["terrain"][type];
         var _s = this.sprite = new GroundSprite(type, this);
-        this.buildable = template["buildable"];
+        this.buildable = type["buildable"];
 
         _s.mousedown = function (event) {
             game.mouseEventHandler.cellStart(event.target["cell"].gridPos);
@@ -121,37 +121,44 @@ var Cell = (function () {
         return neighbors;
     };
     Cell.prototype.replace = function (type) {
-        var template = cg["terrain"][type];
-        var _texture = template["texture"];
+        var _texture = type["texture"];
         this.sprite.setTexture(PIXI.Texture.fromImage(_texture));
-        this.sprite.type = type;
-        this.type = type;
-        this.buildable = template["buildable"];
+        this.sprite.type = this.type = type;
+        this.buildable = type["buildable"];
         if (this.content && this.content.type2 === "plant") {
             this.addPlant();
+        } else if (this.content) {
+            this.changeContent(this.content.type);
         }
     };
     Cell.prototype.changeContent = function (type, update, data) {
         if (typeof update === "undefined") { update = true; }
-        var type2 = cg["content"][type] ? cg["content"][type]["type2"] : "none";
-        this.checkBuildable(type2);
+        var type2 = type["type2"] ? type["type2"] : "none";
+        var buildable = this.checkBuildable(type2);
 
         this.removeContent();
 
-        if (type !== "none") {
+        if (type !== "none" && buildable !== false) {
             this.content = new Content(this, type, data);
         }
         if (update) {
             this.updateCell();
         }
     };
-    Cell.prototype.checkBuildable = function (type) {
-        if (this.buildable !== true && type !== "plant") {
-            return "none";
+    Cell.prototype.checkBuildable = function (type2) {
+        if (this.buildable === false) {
+            if (type2 == "plant" || type2 == "road") {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return true;
         }
     };
     Cell.prototype.addPlant = function () {
-        this.changeContent(cg["terrain"][this.type]["plant"]);
+        var plantType = this.type["plant"];
+        this.changeContent(cg["content"]["plants"][plantType]);
     };
     Cell.prototype.updateCell = function () {
         getRoadConnections(this, 1);
@@ -202,7 +209,7 @@ var Board = (function () {
                 if (data) {
                     var dataCell = data[i][j] || undefined;
                 }
-                var cellType = dataCell ? dataCell["type"] : "grass";
+                var cellType = dataCell ? cg["terrain"][dataCell["type"]] : cg["terrain"]["grass"];
                 var cell = this.cells[i][j] = new Cell([i, j], cellType);
                 cell.buildable = dataCell ? dataCell.buildable : true;
 
@@ -286,7 +293,6 @@ var Game = (function () {
         this.tools.plant = new PlantTool();
         this.tools.house = new HouseTool();
         this.tools.road = new RoadTool();
-        //this.tools.pineapple = new PineappleTool();
     };
 
     Game.prototype.bindElements = function () {
@@ -623,7 +629,7 @@ var WaterTool = (function () {
     }
     WaterTool.prototype.activate = function (target) {
         for (var i = 0; i < target.length; i++) {
-            target[i].replace("water");
+            target[i].replace(cg["terrain"]["water"]);
         }
         ;
     };
@@ -637,7 +643,7 @@ var GrassTool = (function () {
     }
     GrassTool.prototype.activate = function (target) {
         for (var i = 0; i < target.length; i++) {
-            target[i].replace("grass");
+            target[i].replace(cg["terrain"]["grass"]);
         }
     };
     return GrassTool;
@@ -650,7 +656,7 @@ var SandTool = (function () {
     }
     SandTool.prototype.activate = function (target) {
         for (var i = 0; i < target.length; i++) {
-            target[i].replace("sand");
+            target[i].replace(cg["terrain"]["sand"]);
         }
     };
     return SandTool;
@@ -663,7 +669,7 @@ var SnowTool = (function () {
     }
     SnowTool.prototype.activate = function (target) {
         for (var i = 0; i < target.length; i++) {
-            target[i].replace("snow");
+            target[i].replace(cg["terrain"]["snow"]);
         }
     };
     return SnowTool;
@@ -701,7 +707,8 @@ var HouseTool = (function () {
     }
     HouseTool.prototype.activate = function (target) {
         for (var i = 0; i < target.length; i++) {
-            target[i].changeContent("house");
+            //target[i].changeContent("house");
+            target[i].changeContent(getRandomProperty(cg["content"]["buildings"]));
         }
     };
     return HouseTool;
@@ -713,7 +720,7 @@ var RoadTool = (function () {
     }
     RoadTool.prototype.activate = function (target) {
         for (var i = 0; i < target.length; i++) {
-            target[i].changeContent("road_nesw");
+            target[i].changeContent(cg["content"]["roads"]["road_nesw"]);
         }
     };
     return RoadTool;
@@ -745,29 +752,11 @@ function getRoadConnections(target, depth) {
         dir = "h";
     }
     if (target.content && target.content.type2 === "road") {
-        target.changeContent("road_" + dir, false);
+        var finalRoad = cg["content"]["roads"]["road_" + dir];
+        target.changeContent(finalRoad, false);
     }
 }
 
-/*
-class PineappleTool implements Tool
-{
-selectType: any
-tintColor: number;
-constructor()
-{
-this.selectType = rectSelect;
-this.tintColor = 0xF7B218;
-}
-activate(target)
-{
-for (var i = 0; i < target.length; i++)
-{
-target[i].changeContent("pineapple");
-}
-}
-}
-*/
 function rectSelect(a, b) {
     var cells = [];
     var xLen = Math.abs(a[0] - b[0]);
@@ -850,6 +839,13 @@ function getIsoCoord(x, y, width, height, offset) {
 function fround(x) {
     var f32 = new Float32Array(1);
     return f32[0] = x, f32[0];
+}
+
+function getRandomProperty(target) {
+    var _targetKeys = Object.keys(target);
+    var _rnd = Math.floor(Math.random() * (_targetKeys.length - 1));
+    var _rndProp = target[_targetKeys[_rnd]];
+    return _rndProp;
 }
 
 var game = new Game();

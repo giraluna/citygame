@@ -1,6 +1,6 @@
 /// <reference path="lib/pixi.d.ts" />
-/// <reference path="../data/js/cg.d.ts" />
 declare var LZString: any;
+declare var cg: any;
 declare var container: any;
 declare var SCREEN_WIDTH: any, SCREEN_HEIGHT: any, TILE_WIDTH: any, TILE_HEIGHT: any, TILES: any, WORLD_WIDTH: any, WORLD_HEIGHT: any;
 declare class Sprite extends PIXI.Sprite {
@@ -43,7 +43,7 @@ declare class Cell {
     public getNeighbors(): neighborCells;
     public replace(type: string): void;
     public changeContent(type: string, update?: boolean, data?: any): void;
-    public checkBuildable(type: string): string;
+    public checkBuildable(type2: string): boolean;
     public addPlant(): void;
     public updateCell(): void;
     public removeContent(): void;
@@ -193,4 +193,5 @@ declare function arrayToPolygon(points: any): PIXI.Polygon;
 declare function arrayToPoint(point: any): PIXI.Point;
 declare function getIsoCoord(x: number, y: number, width: number, height: number, offset?: number[]): number[];
 declare function fround(x: any): number;
+declare function getRandomProperty(target: any): any;
 declare var game: Game;

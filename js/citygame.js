@@ -209,7 +209,7 @@ var Board = (function () {
                 if (data) {
                     var dataCell = data[i][j] || undefined;
                 }
-                var cellType = dataCell ? cg["terrain"][dataCell["type"]] : cg["terrain"]["grass"];
+                var cellType = dataCell ? dataCell["type"] : cg["terrain"]["grass"];
                 var cell = this.cells[i][j] = new Cell([i, j], cellType);
                 cell.buildable = dataCell ? dataCell.buildable : true;
 

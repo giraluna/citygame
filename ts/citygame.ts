@@ -1,7 +1,9 @@
 /// <reference path="../js/lib/pixi.d.ts" />
+/// <reference path="../js/lib/tween.js.d.ts" />
 
 declare var LZString: any;
 declare var cg:any;
+declare var WebFont:any;
 declare var WebFontConfig:any;
 
 
@@ -133,15 +135,15 @@ class Cell
 
     _s.mousedown = function(event)
     { 
-      game.mouseEventHandler.cellDown(event.target["cell"]);
+      game.mouseEventHandler.cellDown(event);
     }
     _s.mouseover = function(event)
     {
-      game.mouseEventHandler.cellOver(event.target["cell"]);
+      game.mouseEventHandler.cellOver(event);
     }
     _s.mouseup = function(event)
     {
-      game.mouseEventHandler.cellUp(event.target["cell"]);
+      game.mouseEventHandler.cellUp(event);
     }
   }
   getNeighbors(): neighborCells
@@ -516,8 +518,8 @@ class Game
   }
   render()
   {
+    TWEEN.update();
     this.renderer.render(this.stage);
-
     requestAnimFrame( this.render.bind(this) );
   }
   resetLayers()
@@ -781,8 +783,9 @@ class MouseEventHandler
       this.currAction = undefined;
     }
   }
-  cellDown(cell: Cell)
+  cellDown(event)
   {
+    var cell = event.target["cell"]
     var pos = cell.gridPos;
     if (this.currAction === undefined)
     {
@@ -790,8 +793,9 @@ class MouseEventHandler
       this.startCell = pos;
     }
   }
-  cellOver(cell: Cell)
+  cellOver(event)
   {
+    var cell = event.target["cell"]
     var pos = cell.gridPos;
     if (this.currAction === "cellAction")
     {
@@ -804,11 +808,14 @@ class MouseEventHandler
     }
     else if (this.currAction === undefined)
     {
-
+      var _text = game.uiDrawer.addFadeyText(
+        pos, "base", 2000, 500);
+      _text.position = event.global.clone();
     }
   }
-  cellUp(cell: Cell)
+  cellUp(event)
   {
+    var cell = event.target["cell"]
     var pos = cell.gridPos;
     if (this.currAction === "cellAction")
     {
@@ -830,17 +837,18 @@ class UIDrawer
   constructor()
   {
     this.layer = game.layers["tooltips"];
+    this.init();
   }
   init()
   {
     this.registerFont( "base",
     {
       font: "35px Snippet",
-      fill: "white",
+      fill: "#f5b118",
       align: "left",
       stroke: "#000000",
-      strokeThickness: 7
-    })
+      strokeThickness: 2
+    });
   }
 
   registerFont( name: string, fontObject: any )
@@ -850,6 +858,7 @@ class UIDrawer
 
   addText( text: string, font: string )
   {
+    console.log(this.fonts[font]);
     var textObject = new PIXI.Text(text, this.fonts[font]);
     this.layer.addChild( textObject );
     return textObject;
@@ -858,14 +867,24 @@ class UIDrawer
   {
     this.layer.removeChild( textObject );
   }
-  addFadeyText( text, font, timeout )
+  addFadeyText( text: string, font: string,
+    timeout: number, delay: number )
   {
     var textObject = this.addText(text, font);
     var self = this;
-    window.setTimeout( function fadeyTextFN()
+    var tween = new TWEEN.Tween( {alpha: 1} )
+    .to( {alpha: 0}, timeout )
+    .delay(delay)
+    .onUpdate( function()
     {
-      self.removeText( textObject )
-    }, timeout);
+      textObject.alpha = this.alpha;
+      })
+    .onComplete(function()
+    {
+      self.removeText(textObject)
+      });
+    tween.start();
+    return textObject;
   }
   clearLayer()
   {
@@ -1239,29 +1258,26 @@ document.addEventListener('DOMContentLoaded', function()
   // temp
   // Load fonts
   WebFontConfig = {
-      google:
-      {
-        families: ["Snippet"]
-      },
-      active: function()
-      {
-        // do something
-        game.init();
-      }
-    };
+    google: {
+      families: [ 'Snippet', 'Arvo:700italic', 'Podkova:700' ]
+    },
 
-    (function() {
-      var wf = document.createElement('script');
-      wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
-                '://ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js';
-      wf.type = 'text/javascript';
-      wf.async = true;
-      var s = document.getElementsByTagName('script')[0];
-      s.parentNode.insertBefore(wf, s);
-      console.log(wf);
-    })();
+    active: function() {
+      // do something
+      game.init();
+    }
 
-    var textSample = new PIXI.Text("Pixi.js can has\nmultiline text!", {font: "35px Snippet", fill: "white", align: "left"});
+  };
+  (function() {
+        var wf = document.createElement('script');
+        wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+            '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+        wf.type = 'text/javascript';
+        wf.async = true;
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(wf, s);
+      })();
+
   // end temp
 });
 

@@ -1,6 +1,8 @@
 /// <reference path="lib/pixi.d.ts" />
+/// <reference path="lib/tween.js.d.ts" />
 declare var LZString: any;
 declare var cg: any;
+declare var WebFont: any;
 declare var WebFontConfig: any;
 declare var container: any;
 declare var SCREEN_WIDTH: any, SCREEN_HEIGHT: any, TILE_WIDTH: any, TILE_HEIGHT: any, TILES: any, WORLD_WIDTH: any, WORLD_HEIGHT: any;
@@ -124,9 +126,9 @@ declare class MouseEventHandler {
     public zoomStart(event: any): void;
     public stageMove(event: any): void;
     public stageEnd(event: any): void;
-    public cellDown(cell: Cell): void;
-    public cellOver(cell: Cell): void;
-    public cellUp(cell: Cell): void;
+    public cellDown(event: any): void;
+    public cellOver(event: any): void;
+    public cellUp(event: any): void;
 }
 declare class UIDrawer {
     public layer: PIXI.DisplayObjectContainer;
@@ -136,7 +138,7 @@ declare class UIDrawer {
     public registerFont(name: string, fontObject: any): void;
     public addText(text: string, font: string): PIXI.Text;
     public removeText(textObject: PIXI.Text): void;
-    public addFadeyText(text: any, font: any, timeout: any): void;
+    public addFadeyText(text: string, font: string, timeout: number, delay: number): PIXI.Text;
     public clearLayer(): void;
 }
 declare class Highlighter {

@@ -1,4 +1,5 @@
 /// <reference path="../js/lib/pixi.d.ts" />
+/// <reference path="../js/lib/tween.js.d.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -92,13 +93,13 @@ var Cell = (function () {
         this.buildable = type["buildable"];
 
         _s.mousedown = function (event) {
-            game.mouseEventHandler.cellDown(event.target["cell"]);
+            game.mouseEventHandler.cellDown(event);
         };
         _s.mouseover = function (event) {
-            game.mouseEventHandler.cellOver(event.target["cell"]);
+            game.mouseEventHandler.cellOver(event);
         };
         _s.mouseup = function (event) {
-            game.mouseEventHandler.cellUp(event.target["cell"]);
+            game.mouseEventHandler.cellUp(event);
         };
     };
     Cell.prototype.getNeighbors = function () {
@@ -393,8 +394,8 @@ var Game = (function () {
         board.makeMap(parsed["cells"]);
     };
     Game.prototype.render = function () {
+        TWEEN.update();
         this.renderer.render(this.stage);
-
         requestAnimFrame(this.render.bind(this));
     };
     Game.prototype.resetLayers = function () {
@@ -591,14 +592,16 @@ var MouseEventHandler = (function () {
             this.currAction = undefined;
         }
     };
-    MouseEventHandler.prototype.cellDown = function (cell) {
+    MouseEventHandler.prototype.cellDown = function (event) {
+        var cell = event.target["cell"];
         var pos = cell.gridPos;
         if (this.currAction === undefined) {
             this.currAction = "cellAction";
             this.startCell = pos;
         }
     };
-    MouseEventHandler.prototype.cellOver = function (cell) {
+    MouseEventHandler.prototype.cellOver = function (event) {
+        var cell = event.target["cell"];
         var pos = cell.gridPos;
         if (this.currAction === "cellAction") {
             this.currCell = pos;
@@ -607,9 +610,12 @@ var MouseEventHandler = (function () {
             game.highlighter.clearSprites();
             game.highlighter.tintCells(selectedCells, game.activeTool.tintColor);
         } else if (this.currAction === undefined) {
+            var _text = game.uiDrawer.addFadeyText(pos, "base", 2000, 500);
+            _text.position = event.global.clone();
         }
     };
-    MouseEventHandler.prototype.cellUp = function (cell) {
+    MouseEventHandler.prototype.cellUp = function (event) {
+        var cell = event.target["cell"];
         var pos = cell.gridPos;
         if (this.currAction === "cellAction") {
             this.currCell = pos;
@@ -626,14 +632,15 @@ var UIDrawer = (function () {
     function UIDrawer() {
         this.fonts = {};
         this.layer = game.layers["tooltips"];
+        this.init();
     }
     UIDrawer.prototype.init = function () {
         this.registerFont("base", {
             font: "35px Snippet",
-            fill: "white",
+            fill: "#f5b118",
             align: "left",
             stroke: "#000000",
-            strokeThickness: 7
+            strokeThickness: 2
         });
     };
 
@@ -642,6 +649,7 @@ var UIDrawer = (function () {
     };
 
     UIDrawer.prototype.addText = function (text, font) {
+        console.log(this.fonts[font]);
         var textObject = new PIXI.Text(text, this.fonts[font]);
         this.layer.addChild(textObject);
         return textObject;
@@ -649,12 +657,16 @@ var UIDrawer = (function () {
     UIDrawer.prototype.removeText = function (textObject) {
         this.layer.removeChild(textObject);
     };
-    UIDrawer.prototype.addFadeyText = function (text, font, timeout) {
+    UIDrawer.prototype.addFadeyText = function (text, font, timeout, delay) {
         var textObject = this.addText(text, font);
         var self = this;
-        window.setTimeout(function fadeyTextFN() {
+        var tween = new TWEEN.Tween({ alpha: 1 }).to({ alpha: 0 }, timeout).delay(delay).onUpdate(function () {
+            textObject.alpha = this.alpha;
+        }).onComplete(function () {
             self.removeText(textObject);
-        }, timeout);
+        });
+        tween.start();
+        return textObject;
     };
     UIDrawer.prototype.clearLayer = function () {
         for (var i = this.layer.children.length - 1; i >= 0; i--) {
@@ -936,25 +948,21 @@ document.addEventListener('DOMContentLoaded', function () {
     // Load fonts
     WebFontConfig = {
         google: {
-            families: ["Snippet"]
+            families: ['Snippet', 'Arvo:700italic', 'Podkova:700']
         },
         active: function () {
             // do something
             game.init();
         }
     };
-
     (function () {
         var wf = document.createElement('script');
-        wf.src = ('https:' == document.location.protocol ? 'https' : 'http') + '://ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js';
+        wf.src = ('https:' == document.location.protocol ? 'https' : 'http') + '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
         wf.type = 'text/javascript';
         wf.async = true;
         var s = document.getElementsByTagName('script')[0];
         s.parentNode.insertBefore(wf, s);
-        console.log(wf);
     })();
-
-    var textSample = new PIXI.Text("Pixi.js can has\nmultiline text!", { font: "35px Snippet", fill: "white", align: "left" });
     // end temp
 });
 

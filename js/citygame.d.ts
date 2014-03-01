@@ -1,6 +1,7 @@
 /// <reference path="lib/pixi.d.ts" />
 declare var LZString: any;
 declare var cg: any;
+declare var WebFontConfig: any;
 declare var container: any;
 declare var SCREEN_WIDTH: any, SCREEN_HEIGHT: any, TILE_WIDTH: any, TILE_HEIGHT: any, TILES: any, WORLD_WIDTH: any, WORLD_HEIGHT: any;
 declare class Sprite extends PIXI.Sprite {
@@ -68,7 +69,7 @@ declare class Game {
     public stage: PIXI.Stage;
     public renderer: any;
     public layers: any;
-    public savedBoard: string;
+    public uiDrawer: UIDrawer;
     constructor();
     public init(): void;
     public initContainers(): void;
@@ -126,6 +127,17 @@ declare class MouseEventHandler {
     public cellDown(cell: Cell): void;
     public cellOver(cell: Cell): void;
     public cellUp(cell: Cell): void;
+}
+declare class UIDrawer {
+    public layer: PIXI.DisplayObjectContainer;
+    public fonts: any;
+    constructor();
+    public init(): void;
+    public registerFont(name: string, fontObject: any): void;
+    public addText(text: string, font: string): PIXI.Text;
+    public removeText(textObject: PIXI.Text): void;
+    public addFadeyText(text: any, font: any, timeout: any): void;
+    public clearLayer(): void;
 }
 declare class Highlighter {
     public currHighlighted: Sprite[];

@@ -2,6 +2,8 @@
 
 declare var LZString: any;
 declare var cg:any;
+declare var WebFontConfig:any;
+
 
 cg = JSON.parse(JSON.stringify(cg)); //dumb
 
@@ -345,7 +347,7 @@ class Game
   stage: PIXI.Stage;
   renderer: any;
   layers: any = {};
-  savedBoard: string;
+  uiDrawer: UIDrawer;
   constructor()
   {
   }
@@ -364,6 +366,10 @@ class Game
     this.mouseEventHandler = new MouseEventHandler();
     this.mouseEventHandler.scroller = new Scroller(this.layers["main"],
       SCREEN_WIDTH, SCREEN_HEIGHT, 0.5);
+
+    this.uiDrawer = new UIDrawer();
+
+    this.render();
     }
     initContainers()
     {
@@ -371,10 +377,14 @@ class Game
       var _stage = this.stage = new PIXI.Stage(0xFFFFFF);
       var _renderer = this.renderer =
         PIXI.autoDetectRenderer(SCREEN_WIDTH, SCREEN_HEIGHT, null, false, true);
+        
       var _main = this.layers["main"] = new PIXI.DisplayObjectContainer();
       _main.position.set(SCREEN_WIDTH / 2 - WORLD_WIDTH/2,
         SCREEN_HEIGHT / 2 - WORLD_HEIGHT/2);
       _stage.addChild(_main);
+
+      var _tooltips = this.layers["tooltips"] = new PIXI.DisplayObjectContainer();
+      _stage.addChild(_tooltips);
       this.initLayers();
 
       var _game = this;
@@ -810,7 +820,60 @@ class MouseEventHandler
       this.currAction = undefined;
     }
   }
-  
+}
+
+class UIDrawer
+{
+  layer: PIXI.DisplayObjectContainer;
+  fonts: any = {};
+
+  constructor()
+  {
+    this.layer = game.layers["tooltips"];
+  }
+  init()
+  {
+    this.registerFont( "base",
+    {
+      font: "35px Snippet",
+      fill: "white",
+      align: "left",
+      stroke: "#000000",
+      strokeThickness: 7
+    })
+  }
+
+  registerFont( name: string, fontObject: any )
+  {
+    this.fonts[name] = fontObject;
+  }
+
+  addText( text: string, font: string )
+  {
+    var textObject = new PIXI.Text(text, this.fonts[font]);
+    this.layer.addChild( textObject );
+    return textObject;
+  }
+  removeText( textObject: PIXI.Text )
+  {
+    this.layer.removeChild( textObject );
+  }
+  addFadeyText( text, font, timeout )
+  {
+    var textObject = this.addText(text, font);
+    var self = this;
+    window.setTimeout( function fadeyTextFN()
+    {
+      self.removeText( textObject )
+    }, timeout);
+  }
+  clearLayer()
+  {
+    for (var i = this.layer.children.length - 1; i >= 0; i--)
+    {
+      this.layer.removeChild(this.layer.children[i]);
+    }
+  }
 }
 
 class Highlighter
@@ -1163,7 +1226,6 @@ var game = new Game();
 
 document.addEventListener('DOMContentLoaded', function()
 {
-  game.init();
 
   /* check center
   var stage = game.stage;
@@ -1173,8 +1235,34 @@ document.addEventListener('DOMContentLoaded', function()
   gfx.endFill();
   stage.addChild(gfx);
   */
+ 
+  // temp
+  // Load fonts
+  WebFontConfig = {
+      google:
+      {
+        families: ["Snippet"]
+      },
+      active: function()
+      {
+        // do something
+        game.init();
+      }
+    };
 
-  game.render();
+    (function() {
+      var wf = document.createElement('script');
+      wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+                '://ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js';
+      wf.type = 'text/javascript';
+      wf.async = true;
+      var s = document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(wf, s);
+      console.log(wf);
+    })();
+
+    var textSample = new PIXI.Text("Pixi.js can has\nmultiline text!", {font: "35px Snippet", fill: "white", align: "left"});
+  // end temp
 });
 
 function pineapple()

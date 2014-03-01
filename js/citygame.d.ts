@@ -43,6 +43,7 @@ declare class Cell {
     public getNeighbors(): neighborCells;
     public replace(type: string): void;
     public changeContent(type: string, update?: boolean, data?: any): void;
+    public checkSameTypeExclusion(type2: string): boolean;
     public checkBuildable(type2: string): boolean;
     public addPlant(): void;
     public updateCell(): void;
@@ -122,9 +123,9 @@ declare class MouseEventHandler {
     public zoomStart(event: any): void;
     public stageMove(event: any): void;
     public stageEnd(event: any): void;
-    public cellStart(pos: number[]): void;
-    public cellOver(pos: number[]): void;
-    public cellEnd(pos: number[]): void;
+    public cellDown(cell: Cell): void;
+    public cellOver(cell: Cell): void;
+    public cellUp(cell: Cell): void;
 }
 declare class Highlighter {
     public currHighlighted: Sprite[];

@@ -92,13 +92,13 @@ var Cell = (function () {
         this.buildable = type["buildable"];
 
         _s.mousedown = function (event) {
-            game.mouseEventHandler.cellStart(event.target["cell"].gridPos);
+            game.mouseEventHandler.cellDown(event.target["cell"]);
         };
         _s.mouseover = function (event) {
-            game.mouseEventHandler.cellOver(event.target["cell"].gridPos);
+            game.mouseEventHandler.cellOver(event.target["cell"]);
         };
         _s.mouseup = function (event) {
-            game.mouseEventHandler.cellEnd(event.target["cell"].gridPos);
+            game.mouseEventHandler.cellUp(event.target["cell"]);
         };
     };
     Cell.prototype.getNeighbors = function () {
@@ -128,21 +128,38 @@ var Cell = (function () {
         if (this.content && this.content.type2 === "plant") {
             this.addPlant();
         } else if (this.content) {
-            this.changeContent(this.content.type);
+            if (!this.checkBuildable(this.content.type2)) {
+                this.changeContent("none");
+            } else {
+                this.changeContent(this.content.type);
+            }
         }
     };
     Cell.prototype.changeContent = function (type, update, data) {
         if (typeof update === "undefined") { update = true; }
         var type2 = type["type2"] ? type["type2"] : "none";
         var buildable = this.checkBuildable(type2);
+        var sameTypeExclusion = this.checkSameTypeExclusion(type2);
+        var toAdd = (type !== "none" && buildable !== false && !sameTypeExclusion);
+        var toRemove = (type === "none" || (!sameTypeExclusion && toAdd));
 
-        this.removeContent();
+        if (toRemove) {
+            this.removeContent();
+        }
 
-        if (type !== "none" && buildable !== false) {
+        if (toAdd) {
             this.content = new Content(this, type, data);
         }
         if (update) {
             this.updateCell();
+        }
+    };
+    Cell.prototype.checkSameTypeExclusion = function (type2) {
+        var contentType2 = this.content ? this.content["type2"] : "none";
+        if (contentType2 == type2 && type2 === "building") {
+            return true;
+        } else {
+            return false;
         }
     };
     Cell.prototype.checkBuildable = function (type2) {
@@ -566,22 +583,26 @@ var MouseEventHandler = (function () {
             this.currAction = undefined;
         }
     };
-    MouseEventHandler.prototype.cellStart = function (pos) {
+    MouseEventHandler.prototype.cellDown = function (cell) {
+        var pos = cell.gridPos;
         if (this.currAction === undefined) {
             this.currAction = "cellAction";
             this.startCell = pos;
         }
     };
-    MouseEventHandler.prototype.cellOver = function (pos) {
+    MouseEventHandler.prototype.cellOver = function (cell) {
+        var pos = cell.gridPos;
         if (this.currAction === "cellAction") {
             this.currCell = pos;
             var selectedCells = game.board.getCells(game.activeTool.selectType(this.startCell, this.currCell));
 
             game.highlighter.clearSprites();
             game.highlighter.tintCells(selectedCells, game.activeTool.tintColor);
+        } else if (this.currAction === undefined) {
         }
     };
-    MouseEventHandler.prototype.cellEnd = function (pos) {
+    MouseEventHandler.prototype.cellUp = function (cell) {
+        var pos = cell.gridPos;
         if (this.currAction === "cellAction") {
             this.currCell = pos;
             var selectedCells = game.board.getCells(game.activeTool.selectType(this.startCell, this.currCell));

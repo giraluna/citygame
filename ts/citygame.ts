@@ -131,15 +131,15 @@ class Cell
 
     _s.mousedown = function(event)
     { 
-      game.mouseEventHandler.cellStart(event.target["cell"].gridPos);
+      game.mouseEventHandler.cellDown(event.target["cell"]);
     }
     _s.mouseover = function(event)
     {
-      game.mouseEventHandler.cellOver(event.target["cell"].gridPos);
+      game.mouseEventHandler.cellOver(event.target["cell"]);
     }
     _s.mouseup = function(event)
     {
-      game.mouseEventHandler.cellEnd(event.target["cell"].gridPos);
+      game.mouseEventHandler.cellUp(event.target["cell"]);
     }
   }
   getNeighbors(): neighborCells
@@ -175,23 +175,50 @@ class Cell
     }
     else if(this.content)
     {
-      this.changeContent( this.content.type );
+      if ( !this.checkBuildable( this.content.type2 ) )
+      {
+        this.changeContent("none");
+      }
+      else
+      {
+        this.changeContent( this.content.type );
+      }
     }
   }
   changeContent( type:string, update:boolean=true, data? )
   {
     var type2 = type["type2"] ? type["type2"] : "none";
     var buildable = this.checkBuildable(type2);
+    var sameTypeExclusion = this.checkSameTypeExclusion( type2 );
+    var toAdd: boolean = ( type !== "none" && buildable !== false && !sameTypeExclusion );
+    var toRemove: boolean = ( type === "none" || 
+      (!sameTypeExclusion && toAdd)
+      );
 
-    this.removeContent();
+    if ( toRemove )
+    {
+      this.removeContent();
+    }
 
-    if (type !== "none" && buildable !== false )
+    if ( toAdd )
     {
       this.content = new Content( this, type, data );
     }
     if (update)
     {
       this.updateCell();
+    }
+  }
+  checkSameTypeExclusion( type2: string)
+  {
+    var contentType2 = this.content ? this.content["type2"] : "none";
+    if ( contentType2 == type2 && type2 === "building" )
+    {
+      return true;
+    }
+    else
+    {
+      return false;
     }
   }
   checkBuildable( type2: string )
@@ -744,16 +771,18 @@ class MouseEventHandler
       this.currAction = undefined;
     }
   }
-  cellStart(pos: number[])
+  cellDown(cell: Cell)
   {
+    var pos = cell.gridPos;
     if (this.currAction === undefined)
     {
       this.currAction = "cellAction";
       this.startCell = pos;
     }
   }
-  cellOver(pos: number[])
+  cellOver(cell: Cell)
   {
+    var pos = cell.gridPos;
     if (this.currAction === "cellAction")
     {
       this.currCell = pos;
@@ -763,9 +792,14 @@ class MouseEventHandler
       game.highlighter.clearSprites();
       game.highlighter.tintCells(selectedCells, game.activeTool.tintColor);
     }
+    else if (this.currAction === undefined)
+    {
+
+    }
   }
-  cellEnd(pos: number[])
+  cellUp(cell: Cell)
   {
+    var pos = cell.gridPos;
     if (this.currAction === "cellAction")
     {
       this.currCell = pos;

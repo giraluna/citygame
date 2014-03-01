@@ -157,8 +157,10 @@ var Cell = (function () {
         }
     };
     Cell.prototype.addPlant = function () {
-        var plantType = this.type["plant"];
-        this.changeContent(cg["content"]["plants"][plantType]);
+        var type = this.type["type"];
+        var plants = cg["content"]["plants"][type];
+
+        this.changeContent(getRandomProperty(plants));
     };
     Cell.prototype.updateCell = function () {
         getRoadConnections(this, 1);

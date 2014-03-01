@@ -5,49 +5,37 @@ var cg =
     "grass":
     {
       "type": "grass",
-      "width": 64,
-      "height": 32,
       "anchor": [0.5, 1],
       "texture": "img\/grass.png",
       "interactive": true,
       "hitArea": [[0, -32], [32, -16], [0, 0], [-32, -16]],
-      "plant": "tree",
       "buildable": true
     },
     "water":
     {
       "type": "water",
-      "width": 64,
-      "height": 32,
       "anchor": [0.5, 1],
       "texture": "img\/water.png",
       "interactive": true,
       "hitArea": [[0, -32], [32, -16], [0, 0], [-32, -16]],
-      "plant": "tentacle",
       "buildable": false
     },
     "sand":
     {
       "type": "sand",
-      "width": 64,
-      "height": 32,
       "anchor": [0.5, 1],
       "texture": "img\/sand.png",
       "interactive": true,
       "hitArea": [[0, -32], [32, -16], [0, 0], [-32, -16]],
-      "plant": "cactus",
       "buildable": true
     },
     "snow":
     {
       "type": "snow",
-      "width": 64,
-      "height": 32,
       "anchor": [0.5, 1],
       "texture": "img\/snow.png",
       "interactive": true,
       "hitArea": [[0, -32], [32, -16], [0, 0], [-32, -16]],
-      "plant": "snowman",
       "buildable": true
     }
   },
@@ -55,41 +43,73 @@ var cg =
   {
     "plants":
     {
-      "tree":
+      "grass":
       {
-        "type": "tree",
-        "type2": "plant",
-        "width": 16,
-        "height": 32,
-        "anchor": [0.5, 1.5],
-        "texture": "img\/tree.png",
+        "tree1":
+        {
+          "type": "tree1",
+          "type2": "plant",
+          "anchor": [0.5, 1],
+          "texture": "img\/tree1.png",
+        },
+        "tree2":
+        {
+          "type": "tree2",
+          "type2": "plant",
+          "anchor": [0.5, 1],
+          "texture": "img\/tree2.png",
+        },
+        "tree3":
+        {
+          "type": "tree3",
+          "type2": "plant",
+          "anchor": [0.5, 1],
+          "texture": "img\/tree3.png",
+        },
+        "tree4":
+        {
+          "type": "tree4",
+          "type2": "plant",
+          "anchor": [0.5, 1],
+          "texture": "img\/tree4.png",
+        },
+        "tree5":
+        {
+          "type": "tree5",
+          "type2": "plant",
+          "anchor": [0.5, 1],
+          "texture": "img\/tree5.png",
+        },
       },
-      "cactus":
+      "sand":
       {
-        "type": "cactus",
-        "type2": "plant",
-        "width": 16,
-        "height": 32,
-        "anchor": [0.5, 1.5],
-        "texture": "img\/cactus.png",
+        "cactus":
+        {
+          "type": "cactus",
+          "type2": "plant",
+          "anchor": [0.5, 1.5],
+          "texture": "img\/cactus.png",
+        }
       },
-      "tentacle":
+      "water":
       {
-        "type": "tentacle",
-        "type2": "plant",
-        "width": 16,
-        "height": 32,
-        "anchor": [0.5, 1.5],
-        "texture": "img\/tentacle.png",
+        "tentacle":
+        {
+          "type": "tentacle",
+          "type2": "plant",
+          "anchor": [0.5, 1.5],
+          "texture": "img\/tentacle.png",
+        }
       },
-      "snowman":
+      "snow":
       {
-        "type": "snowman",
-        "type2": "plant",
-        "width": 32,
-        "height": 64,
-        "anchor": [0.5, 1.25],
-        "texture": "img\/snowman.png",
+        "snowman":
+        {
+          "type": "snowman",
+          "type2": "plant",
+          "anchor": [0.5, 1.25],
+          "texture": "img\/snowman.png",
+        }
       }
     },
     "roads":
@@ -98,8 +118,6 @@ var cg =
       {
         "type": "road_h",
         "type2": "road",
-        "width": 64,
-        "height": 32,
         "anchor": [0.5, 1.0],
         "texture": "img\/road_h2.png"
       },
@@ -107,8 +125,6 @@ var cg =
       {
         "type": "road_v",
         "type2": "road",
-        "width": 64,
-        "height": 32,
         "anchor": [0.5, 1.0],
         "texture": "img\/road_v.png"
       },
@@ -116,8 +132,6 @@ var cg =
       {
         "type": "road_ne",
         "type2": "road",
-        "width": 64,
-        "height": 32,
         "anchor": [0.5, 1.0],
         "texture": "img\/road_ne.png"
       },
@@ -125,8 +139,6 @@ var cg =
       {
         "type": "road_nw",
         "type2": "road",
-        "width": 64,
-        "height": 32,
         "anchor": [0.5, 1.0],
         "texture": "img\/road_nw.png"
       },
@@ -134,8 +146,6 @@ var cg =
       {
         "type": "road_sw",
         "type2": "road",
-        "width": 64,
-        "height": 32,
         "anchor": [0.5, 1.0],
         "texture": "img\/road_sw.png"
       },
@@ -143,8 +153,6 @@ var cg =
       {
         "type": "road_es",
         "type2": "road",
-        "width": 64,
-        "height": 32,
         "anchor": [0.5, 1.0],
         "texture": "img\/road_se.png"
       },
@@ -152,8 +160,6 @@ var cg =
       {
         "type": "road_nesw",
         "type2": "road",
-        "width": 64,
-        "height": 32,
         "anchor": [0.5, 1.0],
         "texture": "img\/road_news.png"
       },
@@ -161,8 +167,6 @@ var cg =
       {
         "type": "road_new",
         "type2": "road",
-        "width": 64,
-        "height": 32,
         "anchor": [0.5, 1.0],
         "texture": "img\/road_new.png"
       },
@@ -170,8 +174,6 @@ var cg =
       {
         "type": "road_nsw",
         "type2": "road",
-        "width": 64,
-        "height": 32,
         "anchor": [0.5, 1.0],
         "texture": "img\/road_nsw.png"
       },
@@ -179,8 +181,6 @@ var cg =
       {
         "type": "road_esw",
         "type2": "road",
-        "width": 64,
-        "height": 32,
         "anchor": [0.5, 1.0],
         "texture": "img\/road_sew.png"
       },
@@ -188,8 +188,6 @@ var cg =
       {
         "type": "road_nes",
         "type2": "road",
-        "width": 64,
-        "height": 32,
         "anchor": [0.5, 1.0],
         "texture": "img\/road_nse.png"
       }
@@ -200,8 +198,6 @@ var cg =
       {
         "type": "house1",
         "type2": "building",
-        "width": 64,
-        "height": 128,
         "anchor": [0.5, 1],
         "texture": "img\/house1.png"
       },
@@ -209,8 +205,6 @@ var cg =
       {
         "type": "house2",
         "type2": "building",
-        "width": 64,
-        "height": 128,
         "anchor": [0.5, 1],
         "texture": "img\/house2.png"
       },
@@ -218,8 +212,6 @@ var cg =
       {
         "type": "house3",
         "type2": "building",
-        "width": 64,
-        "height": 128,
         "anchor": [0.5, 1],
         "texture": "img\/house3.png"
       },
@@ -227,8 +219,6 @@ var cg =
       {
         "type": "house4",
         "type2": "building",
-        "width": 64,
-        "height": 128,
         "anchor": [0.5, 1],
         "texture": "img\/house4.png"
       },
@@ -236,8 +226,6 @@ var cg =
       {
         "type": "house5",
         "type2": "building",
-        "width": 64,
-        "height": 128,
         "anchor": [0.5, 1],
         "texture": "img\/house5.png"
       },
@@ -245,8 +233,6 @@ var cg =
       {
         "type": "house6",
         "type2": "building",
-        "width": 64,
-        "height": 128,
         "anchor": [0.5, 1],
         "texture": "img\/house6.png"
       }

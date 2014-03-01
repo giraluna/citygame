@@ -214,8 +214,10 @@ class Cell
   }
   addPlant()
   {
-    var plantType = this.type["plant"];
-    this.changeContent( cg["content"]["plants"][plantType] );
+    var type = this.type["type"];
+    var plants = cg["content"]["plants"][type];
+
+    this.changeContent( getRandomProperty( plants ) );
   }
   updateCell()
   {

@@ -836,6 +836,7 @@ class UIDrawer
 {
   layer: PIXI.DisplayObjectContainer;
   fonts: any = {};
+  active: UIObject;
 
   constructor()
   {
@@ -859,9 +860,12 @@ class UIDrawer
 
   addText( text: string, font: string )
   {
-    console.log(this.fonts[font]);
-
-    var container = new UIObject( this.layer, 1000, 1000);
+    if (this.active)
+    {
+      this.active.remove();
+      this.active = undefined;
+    }
+    var container = this.active = new UIObject( this.layer, 1000, -1);
 
     var speechBubble = new PIXI.Graphics();
     container.addChild(speechBubble);

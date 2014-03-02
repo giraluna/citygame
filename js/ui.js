@@ -13,21 +13,37 @@ var UIObject = (function (_super) {
         this._parent = _parent;
         this.delay = delay;
         this.lifeTime = lifeTime;
+        this.timeouts = {};
+        this.visible = false;
+
         this.init();
     }
     UIObject.prototype.init = function () {
-        var self = this;
-        window.setTimeout(function UIObjectAddFN() {
-            console.log(self._parent);
-            self._parent.addChild(self);
+        this._parent.addChild(this);
 
-            window.setTimeout(function UIObjectDeathFN() {
-                self.remove();
-            }, self.lifeTime);
+        var self = this;
+        self.timeouts["add"] = window.setTimeout(function UIObjectAddFN() {
+            self.visible = true;
+
+            if (self.lifeTime > 0) {
+                self.timeouts["remove"] = window.setTimeout(function UIObjectRemoveFN() {
+                    self.remove();
+                }, self.lifeTime);
+            }
         }, self.delay);
     };
     UIObject.prototype.remove = function () {
-        this._parent.removeChild(this);
+        this.clearTimeouts();
+        console.log("_parent", this._parent);
+        console.log("parent", this.parent);
+        if (this.parent) {
+            this.parent.removeChild(this);
+        }
+    };
+    UIObject.prototype.clearTimeouts = function () {
+        for (var timeout in this.timeouts) {
+            window.clearTimeout(this.timeouts[timeout]);
+        }
     };
     return UIObject;
 })(PIXI.DisplayObjectContainer);

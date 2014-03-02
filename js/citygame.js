@@ -648,9 +648,11 @@ var UIDrawer = (function () {
     };
 
     UIDrawer.prototype.addText = function (text, font) {
-        console.log(this.fonts[font]);
-
-        var container = new UIObject(this.layer, 1000, 1000);
+        if (this.active) {
+            this.active.remove();
+            this.active = undefined;
+        }
+        var container = this.active = new UIObject(this.layer, 1000, -1);
 
         var speechBubble = new PIXI.Graphics();
         container.addChild(speechBubble);

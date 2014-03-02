@@ -134,6 +134,7 @@ declare class MouseEventHandler {
 declare class UIDrawer {
     public layer: PIXI.DisplayObjectContainer;
     public fonts: any;
+    public active: UIObject;
     constructor();
     public init(): void;
     public registerFont(name: string, fontObject: any): void;

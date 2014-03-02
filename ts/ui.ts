@@ -3,6 +3,7 @@
 
 class UIObject extends PIXI.DisplayObjectContainer
 {
+  timeouts: any = {};
 
   constructor(
     public _parent: PIXI.DisplayObjectContainer,
@@ -11,26 +12,47 @@ class UIObject extends PIXI.DisplayObjectContainer
     )
   {
     super();
+    this.visible = false;
+
     this.init()
     
   }
   init()
   {
-    var self = this;
-    window.setTimeout(function UIObjectAddFN()
-    {
-      console.log(self._parent);
-      self._parent.addChild(self);
+    this._parent.addChild(this);
 
-      window.setTimeout(function UIObjectDeathFN()
+    var self = this;
+    self.timeouts["add"] = window.setTimeout(
+      function UIObjectAddFN()
       {
-        self.remove();
-        }, self.lifeTime)
-    }, self.delay)
+        self.visible = true;
+
+        if (self.lifeTime > 0)
+        {
+          self.timeouts["remove"] = window.setTimeout(
+            function UIObjectRemoveFN()
+            {
+              self.remove();
+            }, self.lifeTime)
+        }
+      }, self.delay)
   }
   remove()
   {
-    this._parent.removeChild(this);
+    this.clearTimeouts();
+    console.log("_parent", this._parent);
+    console.log("parent", this.parent);
+    if (this.parent)
+    {
+      this.parent.removeChild(this);
+    }
+  }
+  clearTimeouts()
+  {
+    for (var timeout in this.timeouts)
+    {
+      window.clearTimeout( this.timeouts[timeout] );
+    }
   }
 
 }

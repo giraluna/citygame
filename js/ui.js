@@ -34,8 +34,6 @@ var UIObject = (function (_super) {
     };
     UIObject.prototype.remove = function () {
         this.clearTimeouts();
-        console.log("_parent", this._parent);
-        console.log("parent", this.parent);
         if (this.parent) {
             this.parent.removeChild(this);
         }

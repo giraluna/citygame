@@ -40,8 +40,6 @@ class UIObject extends PIXI.DisplayObjectContainer
   remove()
   {
     this.clearTimeouts();
-    console.log("_parent", this._parent);
-    console.log("parent", this.parent);
     if (this.parent)
     {
       this.parent.removeChild(this);
@@ -85,7 +83,6 @@ class UIDrawer
 
   addText( text: string, font: string )
   {
-    console.log(this.fonts[font]);
 
     var container = new UIObject( this.layer, 1000, 1000);
 

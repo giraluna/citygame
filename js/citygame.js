@@ -402,7 +402,7 @@ var Game = (function () {
     Game.prototype.resetLayers = function () {
         var main = this.layers["main"];
         for (var layer in this.layers) {
-            if (layer !== "main") {
+            if (layer !== "main" && layer !== "tooltips") {
                 var _l = this.layers[layer];
                 main.removeChild(_l);
                 this.layers[layer] = undefined;
@@ -611,8 +611,9 @@ var MouseEventHandler = (function () {
             game.highlighter.clearSprites();
             game.highlighter.tintCells(selectedCells, game.activeTool.tintColor);
         } else if (this.currAction === undefined) {
-            var _text = game.uiDrawer.addFadeyText("gridPos: " + pos + "\n" + "ground Type: " + cell.type["type"], "base", 2000, 500);
-            _text.position = event.global.clone();
+            var _text = game.uiDrawer.addFadeyText("Tile Position: " + pos + "\n" + "Ground Type: " + cell.type["type"], "base", 2000, 500);
+            var temp = cell.sprite.worldTransform;
+            _text.position.set(temp.tx, temp.ty - cell.sprite.height / 2);
         }
     };
     MouseEventHandler.prototype.cellUp = function (event) {
@@ -652,11 +653,11 @@ var UIDrawer = (function () {
             this.active.remove();
             this.active = undefined;
         }
-        var container = this.active = new UIObject(this.layer, 1000, -1);
+        var container = this.active = new UIObject(this.layer, 300, -1);
 
         var speechBubble = new PIXI.Graphics();
         container.addChild(speechBubble);
-        speechBubble.lineStyle(3, 0xB3C3C6, 1);
+        speechBubble.lineStyle(2, 0x587982, 1);
         speechBubble.beginFill(0xE8FBFF, 0.8);
 
         speechBubble.moveTo(0, 0);

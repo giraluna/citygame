@@ -1,5 +1,6 @@
 /// <reference path="../js/lib/pixi.d.ts" />
 /// <reference path="../js/lib/tween.js.d.ts" />
+/// <reference path="../js/ui.d.ts" />
 
 declare var LZString: any;
 declare var cg:any;
@@ -809,7 +810,9 @@ class MouseEventHandler
     else if (this.currAction === undefined)
     {
       var _text = game.uiDrawer.addFadeyText(
-        pos, "base", 2000, 500);
+        "gridPos: " + pos + "\n" +
+        "ground Type: " + cell.type["type"],
+        "base", 2000, 500);
       _text.position = event.global.clone();
     }
   }
@@ -843,11 +846,9 @@ class UIDrawer
   {
     this.registerFont( "base",
     {
-      font: "35px Snippet",
-      fill: "#f5b118",
+      font: "12px Snippet",
+      fill: "#61696B",
       align: "left",
-      stroke: "#000000",
-      strokeThickness: 2
     });
   }
 
@@ -859,32 +860,39 @@ class UIDrawer
   addText( text: string, font: string )
   {
     console.log(this.fonts[font]);
+
+    var container = new UIObject( this.layer, 1000, 1000);
+
+    var speechBubble = new PIXI.Graphics();
+    container.addChild(speechBubble);
+    speechBubble.lineStyle(3, 0xB3C3C6, 1);
+    speechBubble.beginFill(0xE8FBFF, 0.8);
+
+    speechBubble.moveTo(0, 0);
+    speechBubble.lineTo(10, -20);
+    speechBubble.lineTo(150, -20);
+    speechBubble.lineTo(150, -120);
+    speechBubble.lineTo(-50, -120);
+    speechBubble.lineTo(-50, -20);
+    speechBubble.lineTo(0, -20);
+    speechBubble.lineTo(0, 0);
+    speechBubble.endFill();
+    
+
     var textObject = new PIXI.Text(text, this.fonts[font]);
-    this.layer.addChild( textObject );
-    return textObject;
+    textObject.position.set(-40, -110)
+    container.addChild(textObject);
+    return container;
   }
-  removeText( textObject: PIXI.Text )
+  removeObject( uiObject: PIXI.DisplayObject )
   {
-    this.layer.removeChild( textObject );
+    //this.layer.removeChild( uiObject );
   }
   addFadeyText( text: string, font: string,
     timeout: number, delay: number )
   {
-    var textObject = this.addText(text, font);
-    var self = this;
-    var tween = new TWEEN.Tween( {alpha: 1} )
-    .to( {alpha: 0}, timeout )
-    .delay(delay)
-    .onUpdate( function()
-    {
-      textObject.alpha = this.alpha;
-      })
-    .onComplete(function()
-    {
-      self.removeText(textObject)
-      });
-    tween.start();
-    return textObject;
+    var uiObject = this.addText(text, font);
+    return uiObject;
   }
   clearLayer()
   {

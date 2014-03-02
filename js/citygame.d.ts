@@ -1,5 +1,6 @@
 /// <reference path="lib/pixi.d.ts" />
 /// <reference path="lib/tween.js.d.ts" />
+/// <reference path="ui.d.ts" />
 declare var LZString: any;
 declare var cg: any;
 declare var WebFont: any;
@@ -136,9 +137,9 @@ declare class UIDrawer {
     constructor();
     public init(): void;
     public registerFont(name: string, fontObject: any): void;
-    public addText(text: string, font: string): PIXI.Text;
-    public removeText(textObject: PIXI.Text): void;
-    public addFadeyText(text: string, font: string, timeout: number, delay: number): PIXI.Text;
+    public addText(text: string, font: string): UIObject;
+    public removeObject(uiObject: PIXI.DisplayObject): void;
+    public addFadeyText(text: string, font: string, timeout: number, delay: number): UIObject;
     public clearLayer(): void;
 }
 declare class Highlighter {

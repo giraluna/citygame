@@ -1,5 +1,6 @@
 /// <reference path="../js/lib/pixi.d.ts" />
 /// <reference path="../js/lib/tween.js.d.ts" />
+/// <reference path="../js/ui.d.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -610,7 +611,7 @@ var MouseEventHandler = (function () {
             game.highlighter.clearSprites();
             game.highlighter.tintCells(selectedCells, game.activeTool.tintColor);
         } else if (this.currAction === undefined) {
-            var _text = game.uiDrawer.addFadeyText(pos, "base", 2000, 500);
+            var _text = game.uiDrawer.addFadeyText("gridPos: " + pos + "\n" + "ground Type: " + cell.type["type"], "base", 2000, 500);
             _text.position = event.global.clone();
         }
     };
@@ -636,11 +637,9 @@ var UIDrawer = (function () {
     }
     UIDrawer.prototype.init = function () {
         this.registerFont("base", {
-            font: "35px Snippet",
-            fill: "#f5b118",
-            align: "left",
-            stroke: "#000000",
-            strokeThickness: 2
+            font: "12px Snippet",
+            fill: "#61696B",
+            align: "left"
         });
     };
 
@@ -650,23 +649,35 @@ var UIDrawer = (function () {
 
     UIDrawer.prototype.addText = function (text, font) {
         console.log(this.fonts[font]);
+
+        var container = new UIObject(this.layer, 1000, 1000);
+
+        var speechBubble = new PIXI.Graphics();
+        container.addChild(speechBubble);
+        speechBubble.lineStyle(3, 0xB3C3C6, 1);
+        speechBubble.beginFill(0xE8FBFF, 0.8);
+
+        speechBubble.moveTo(0, 0);
+        speechBubble.lineTo(10, -20);
+        speechBubble.lineTo(150, -20);
+        speechBubble.lineTo(150, -120);
+        speechBubble.lineTo(-50, -120);
+        speechBubble.lineTo(-50, -20);
+        speechBubble.lineTo(0, -20);
+        speechBubble.lineTo(0, 0);
+        speechBubble.endFill();
+
         var textObject = new PIXI.Text(text, this.fonts[font]);
-        this.layer.addChild(textObject);
-        return textObject;
+        textObject.position.set(-40, -110);
+        container.addChild(textObject);
+        return container;
     };
-    UIDrawer.prototype.removeText = function (textObject) {
-        this.layer.removeChild(textObject);
+    UIDrawer.prototype.removeObject = function (uiObject) {
+        //this.layer.removeChild( uiObject );
     };
     UIDrawer.prototype.addFadeyText = function (text, font, timeout, delay) {
-        var textObject = this.addText(text, font);
-        var self = this;
-        var tween = new TWEEN.Tween({ alpha: 1 }).to({ alpha: 0 }, timeout).delay(delay).onUpdate(function () {
-            textObject.alpha = this.alpha;
-        }).onComplete(function () {
-            self.removeText(textObject);
-        });
-        tween.start();
-        return textObject;
+        var uiObject = this.addText(text, font);
+        return uiObject;
     };
     UIDrawer.prototype.clearLayer = function () {
         for (var i = this.layer.children.length - 1; i >= 0; i--) {

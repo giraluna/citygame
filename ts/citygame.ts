@@ -866,22 +866,25 @@ class UIDrawer
       this.active.remove();
       this.active = undefined;
     }
-    var container = this.active = new UIObject( this.layer, 300, -1);
-
-    var speechBubble = new PIXI.Graphics();
-    container.addChild(speechBubble);
-    speechBubble.lineStyle(2, 0x587982, 1);
-    speechBubble.beginFill(0xE8FBFF, 0.8);
-
-    speechBubble.moveTo(0, 0);
-    speechBubble.lineTo(10, -20);
-    speechBubble.lineTo(150, -20);
-    speechBubble.lineTo(150, -120);
-    speechBubble.lineTo(-50, -120);
-    speechBubble.lineTo(-50, -20);
-    speechBubble.lineTo(0, -20);
-    speechBubble.lineTo(0, 0);
-    speechBubble.endFill();
+    var container = this.active = new ToolTip(
+      this.layer, 10, -1,
+      {
+        lineStyle:
+        {
+          width: 2,
+          color: 0xFF0000,
+          alpha: 1
+        },
+        fillStyle:
+        {
+          color: 0xE8FBFF,
+          alpha: 0.8
+        },
+        width: 200,
+        height: 100,
+        offset: 0.25
+      }
+      );
     
 
     var textObject = new PIXI.Text(text, this.fonts[font]);

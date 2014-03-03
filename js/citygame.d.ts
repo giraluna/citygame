@@ -138,9 +138,9 @@ declare class UIDrawer {
     constructor();
     public init(): void;
     public registerFont(name: string, fontObject: any): void;
-    public addText(text: string, font: string): UIObject;
+    public addText(text: string, font: string): ToolTip;
     public removeObject(uiObject: PIXI.DisplayObject): void;
-    public addFadeyText(text: string, font: string, timeout: number, delay: number): UIObject;
+    public addFadeyText(text: string, font: string, timeout: number, delay: number): ToolTip;
     public clearLayer(): void;
 }
 declare class Highlighter {

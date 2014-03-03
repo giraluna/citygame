@@ -78,7 +78,7 @@ var ToolTip = (function (_super) {
         var gfx = new PIXI.Graphics();
         this.addChild(gfx);
 
-        var a = drawPolygon(gfx, bubblePolygon, lineStyle, fillStyle);
+        drawPolygon(gfx, bubblePolygon, lineStyle, fillStyle);
     };
     return ToolTip;
 })(UIObject);

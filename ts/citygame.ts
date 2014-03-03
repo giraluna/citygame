@@ -872,7 +872,7 @@ class UIDrawer
         lineStyle:
         {
           width: 2,
-          color: 0xFF0000,
+          color: 0x587982,
           alpha: 1
         },
         fillStyle:

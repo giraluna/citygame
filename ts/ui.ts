@@ -52,7 +52,91 @@ class UIObject extends PIXI.DisplayObjectContainer
       window.clearTimeout( this.timeouts[timeout] );
     }
   }
+}
 
+class ToolTip extends UIObject
+{
+  constructor(
+    public _parent: PIXI.DisplayObjectContainer,
+    public delay: number,
+    public lifeTime: number,
+    public data: any
+    )
+  {
+    super(_parent, delay, lifeTime);
+
+    this.drawToolTip(data);
+
+    super.init();
+  }
+  drawToolTip(data: any)
+  {
+    var lineStyle = data.lineStyle ||
+    {
+      width: 1,
+      color: 0x000000,
+      alpha: 1
+    };
+    var fillStyle = data.fillStyle ||
+    {
+      color: 0xFFFFFF,
+      alpha: 1
+    }
+    var width = data.width || 200;
+    var height = data.height || 100;
+    var offset = data.offset || 0.25;
+
+    var bubblePolygon = makeSpeechBubble(width, height, offset);
+
+    var gfx = new PIXI.Graphics();
+    this.addChild(gfx);
+
+    var a = drawPolygon(gfx, bubblePolygon, lineStyle, fillStyle);
+
+
+  }
+}
+
+function drawPolygon(gfx: PIXI.Graphics,
+  polygon: number[][],
+  lineStyle: any,
+  fillStyle: any)
+{
+  gfx.lineStyle(lineStyle.width, lineStyle.color, lineStyle.alpha);
+  gfx.beginFill(fillStyle.color, fillStyle.alpha);
+  
+  gfx.moveTo(polygon[0][0], polygon[0][1]);
+  for (var i = 1; i < polygon.length; i++)
+  {
+    var x = polygon[i][0];
+    var y = polygon[i][1];
+    gfx.lineTo(x, y);
+  }
+  gfx.endFill();
+  return gfx;
+}
+
+function makeSpeechBubble(width = 200, height = 100,
+  offset = 0.25, tipWidth = 10, tipHeight = 20)
+{
+  var xMax = width * ( 1-offset );
+  var yMax = height + tipHeight;
+  var xMin = -width * offset;
+  var yMin = tipHeight
+
+  var resultPolygon =
+  [
+    [0, 0],
+    [tipWidth, -yMin],
+    [xMax, -yMin],
+    [xMax, -yMax],
+    [xMin, -yMax],
+    [xMin, -yMin],
+    [0, -yMin],
+    [0, 0],
+  ];
+
+  return resultPolygon;
 }
 
 /*
@@ -60,6 +144,7 @@ class UIDrawer
 {
   layer: PIXI.DisplayObjectContainer;
   fonts: any = {};
+  active: UIObject;
 
   constructor()
   {
@@ -83,23 +168,27 @@ class UIDrawer
 
   addText( text: string, font: string )
   {
+    if (this.active)
+    {
+      this.active.remove();
+      this.active = undefined;
+    }
+    var container = this.active = new UIObject( this.layer, 300, -1);
 
-    var container = new UIObject( this.layer, 1000, 1000);
+    var gfx = new PIXI.Graphics();
+    container.addChild(gfx);
+    gfx.lineStyle(2, 0x587982, 1);
+    gfx.beginFill(0xE8FBFF, 0.8);
 
-    var speechBubble = new PIXI.Graphics();
-    container.addChild(speechBubble);
-    speechBubble.lineStyle(3, 0xB3C3C6, 1);
-    speechBubble.beginFill(0xE8FBFF, 0.8);
-
-    speechBubble.moveTo(0, 0);
-    speechBubble.lineTo(10, -20);
-    speechBubble.lineTo(150, -20);
-    speechBubble.lineTo(150, -120);
-    speechBubble.lineTo(-50, -120);
-    speechBubble.lineTo(-50, -20);
-    speechBubble.lineTo(0, -20);
-    speechBubble.lineTo(0, 0);
-    speechBubble.endFill();
+    gfx.moveTo(0, 0);
+    gfx.lineTo(10, -20);
+    gfx.lineTo(150, -20);
+    gfx.lineTo(150, -120);
+    gfx.lineTo(-50, -120);
+    gfx.lineTo(-50, -20);
+    gfx.lineTo(0, -20);
+    gfx.lineTo(0, 0);
+    gfx.endFill();
     
 
     var textObject = new PIXI.Text(text, this.fonts[font]);
@@ -115,19 +204,6 @@ class UIDrawer
     timeout: number, delay: number )
   {
     var uiObject = this.addText(text, font);
-    var self = this;
-    var tween = new TWEEN.Tween( {alpha: 1} )
-    .to( {alpha: 0}, timeout )
-    .delay(delay)
-    .onUpdate( function()
-    {
-      uiObject.alpha = this.alpha;
-      })
-    .onComplete(function()
-    {
-      //self.removeObject(uiObject)
-      });
-    tween.start();
     return uiObject;
   }
   clearLayer()

@@ -621,15 +621,6 @@ var MouseEventHandler = (function () {
             game.highlighter.tintCells(selectedCells, game.activeTool.tintColor);
         } else if (this.currAction === undefined) {
             game.uiDrawer.makeCellTooltip(event);
-            /*
-            var _text = game.uiDrawer.addFadeyText(
-            cell.content ? cell.content.type["type"] : cell.type["type"],
-            "base", 2000, 500);
-            var temp = cell.sprite.worldTransform;
-            _text.position.set( temp.tx,
-            cell.content ? temp.ty - cell.content.sprite.height :
-            temp.ty - cell.sprite.height / 2);
-            */
         }
     };
     MouseEventHandler.prototype.cellUp = function (event) {
@@ -663,8 +654,8 @@ var UIDrawer = (function () {
         };
         this.styles["base"] = {
             lineStyle: {
-                width: 1,
-                color: 0x587982,
+                width: 2,
+                color: 0xFF0000,
                 alpha: 1
             },
             fillStyle: {
@@ -700,13 +691,12 @@ var UIDrawer = (function () {
 
         if (screenX + textObject.width + 100 > SCREEN_WIDTH) {
             tipDir = "left";
-            tipPos = 0.75;
+            tipPos = 1;
         } else {
             tipDir = "right";
-            tipPos = 0.25;
+            tipPos = 0;
         }
         var pointing = (screenY - textObject.height - 100 < 0) ? "up" : "down";
-        console.log(pointing);
 
         var toolTip = this.active = new ToolTip(this.layer, 500, -1, {
             style: this.styles["base"],

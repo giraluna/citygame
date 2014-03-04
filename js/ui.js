@@ -63,7 +63,7 @@ var ToolTip = (function (_super) {
         var lineStyle = data.style.lineStyle;
         var fillStyle = data.style.fillStyle;
 
-        var tipPos = data.tipPos || 0.25;
+        var tipPos = (data.tipPos !== undefined) ? data.tipPos : 0.25;
         var tipWidth = data.tipWidth || 10;
         var tipHeight = data.tipHeight || 20;
         var tipDir = data.tipDir || "right";
@@ -119,6 +119,17 @@ function makeSpeechRect(width, height, tipPos, tipWidth, tipHeight, tipDir, poin
     if (typeof tipHeight === "undefined") { tipHeight = 20; }
     if (typeof tipDir === "undefined") { tipDir = "right"; }
     if (typeof pointing === "undefined") { pointing = "down"; }
+    /*
+    4|---------------------------|3
+    |                           |
+    |                           |
+    |       1                   |
+    5|----|  /-------------------|2
+    6| /
+    |/
+    0, 7
+    
+    */
     var xMax = width * (1 - tipPos);
     var yMax = height + tipHeight;
     var xMin = -width * tipPos;
@@ -126,7 +137,6 @@ function makeSpeechRect(width, height, tipPos, tipWidth, tipHeight, tipDir, poin
 
     var resultPolygon;
     var topLeft;
-
     if (pointing === "down") {
         resultPolygon = [
             [0, 0],
@@ -155,10 +165,14 @@ function makeSpeechRect(width, height, tipPos, tipWidth, tipHeight, tipDir, poin
 
     if (tipDir === "right") {
         resultPolygon[1][0] = tipWidth;
-        resultPolygon[6][0] = 0;
+        if (tipPos <= 0) {
+            resultPolygon.splice(6, 1);
+        }
     } else if (tipDir === "left") {
-        resultPolygon[1][0] = 0;
         resultPolygon[6][0] = -tipWidth;
+        if (tipPos >= 1) {
+            resultPolygon.splice(1, 1);
+        }
     }
 
     return [resultPolygon, topLeft];

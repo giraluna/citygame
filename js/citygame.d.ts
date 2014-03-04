@@ -123,6 +123,7 @@ declare class MouseEventHandler {
     public currAction: string;
     public scroller: Scroller;
     constructor();
+    public mouseEventHelperFN(event: any): void;
     public scrollStart(event: any): void;
     public zoomStart(event: any): void;
     public stageMove(event: any): void;
@@ -138,9 +139,8 @@ declare class UIDrawer {
     public active: UIObject;
     constructor();
     public init(): void;
-    public addText(text: string, font: string): ToolTip;
-    public removeObject(uiObject: PIXI.DisplayObject): void;
-    public addFadeyText(text: string, font: string, timeout: number, delay: number): ToolTip;
+    public removeActive(): void;
+    public makeCellTooltip(event: any): ToolTip;
     public clearLayer(): void;
 }
 declare class Highlighter {

@@ -73,34 +73,23 @@ class ToolTip extends UIObject
   }
   drawToolTip(data: any)
   {
-    var lineStyle = data.style.lineStyle ||
-    {
-      width: 0,
-      color: 0x000000,
-      alpha: 1
-    };
-    var fillStyle = data.style.fillStyle ||
-    {
-      color: 0xFFFFFF,
-      alpha: 1
-    }
-    var width = data.width || 200;
-    var height = data.height || 100;
-    var tipPos = data.tipPos || 0.25;
-    var tipWidth = data.tipWidth || 10;
+    var lineStyle = data.style.lineStyle;
+    var fillStyle = data.style.fillStyle;
+
+    var tipPos    = data.tipPos    || 0.25;
+    var tipWidth  = data.tipWidth  || 10;
     var tipHeight = data.tipHeight || 20;    
-    var tipDir = data.tipDir;
-    var pointing = data.pointing;
+    var tipDir    = data.tipDir    || "right";
+    var pointing  = data.pointing  || "down";
 
 
-    var textObject = new PIXI.Text(data.text.text, data.text.font);
+    var textObject = data.textObject; // || new PIXI.Text(data.text.text, data.text.font);
+    var textWidth  = textObject.width  + data.padding[0] * 2;
+    var textHeight = textObject.height + data.padding[1] * 2;
 
-    //temp
-    if (data.autoSize)
-    {
-      width = textObject.width + data.text.padding[0] * 2;
-      height = textObject.height + data.text.padding[1] * 2;
-    }
+
+    var width  = (data.autoSize || !data.width)  ? textWidth  : data.width;
+    var height = (data.autoSize || !data.height) ? textHeight : data.height;
 
     var speechPoly = makeSpeechRect(width, height, tipPos,
     tipWidth, tipHeight, tipDir, pointing);
@@ -113,7 +102,7 @@ class ToolTip extends UIObject
 
     
 
-    this.setTextPos(textObject, data.text.padding);
+    this.setTextPos(textObject, data.padding);
     gfx.addChild(textObject);
 
   }

@@ -733,59 +733,70 @@ class MouseEventHandler
   {
     this.currAction = undefined;
   }
+  mouseEventHelperFN(event)
+  {
+    if (event.originalEvent)
+    {
+      event.originalEvent.stopPropagation();
+      event.originalEvent.preventDefault()
+    }
+    game.uiDrawer.removeActive();
+
+  }
   scrollStart(event)
   {
     if (this.currAction === undefined)
     {
+      this.mouseEventHelperFN(event);
       this.startPoint = [event.global.x, event.global.y];
       this.currAction = "scroll";
       this.scroller.startScroll(this.startPoint);
-      event.originalEvent.stopPropagation();
     }
   }
   zoomStart(event)
   {
     if (this.currAction === undefined)
     {
+      this.mouseEventHelperFN(event);
       this.startPoint = this.currPoint = [event.global.x, event.global.y];
       this.currAction = "zoom";
-      event.originalEvent.stopPropagation();
     }
   }
   stageMove(event)
   {
     if (this.currAction === "scroll")
     {   
+      this.mouseEventHelperFN(event);
       this.scroller.move([event.global.x, event.global.y]);
-      event.originalEvent.stopPropagation();
     }
     else if (this.currAction === "zoom")
     {
-      var delta = event.global.x + this.currPoint[1] - 
+      this.mouseEventHelperFN(event);
+      var delta = event.global.x + this.currPoint[1] -
         this.currPoint[0] - event.global.y;
       this.scroller.deltaZoom(delta, 0.005);
       this.currPoint = [event.global.x, event.global.y];
-      event.originalEvent.stopPropagation();
     }
   }
   stageEnd(event)
   {
     if (this.currAction === "scroll")
     {
+      this.mouseEventHelperFN(event);
       this.scroller.end();
-      event.originalEvent.stopPropagation();
       this.startPoint = undefined;
       this.currAction = undefined;
     }
     if (this.currAction === "zoom")
     {
-      event.originalEvent.stopPropagation();
+      this.mouseEventHelperFN(event);
       this.startPoint = undefined;
       this.currAction = undefined;
     }
   }
   cellDown(event)
   {
+    this.mouseEventHelperFN(event);
     var cell = event.target["cell"]
     var pos = cell.gridPos;
     if (this.currAction === undefined)
@@ -796,6 +807,7 @@ class MouseEventHandler
   }
   cellOver(event)
   {
+    this.mouseEventHelperFN(event);
     var cell = event.target["cell"]
     var pos = cell.gridPos;
     if (this.currAction === "cellAction")
@@ -809,16 +821,21 @@ class MouseEventHandler
     }
     else if (this.currAction === undefined)
     {
+      game.uiDrawer.makeCellTooltip(event);
+      /*
       var _text = game.uiDrawer.addFadeyText(
-        "Tile Position: " + pos + "\n" +
-        "Ground Type: " + cell.type["type"],
+        cell.content ? cell.content.type["type"] : cell.type["type"],
         "base", 2000, 500);
-      var temp = cell.sprite.worldTransform
-      _text.position.set( temp.tx, temp.ty - cell.sprite.height / 2);
+      var temp = cell.sprite.worldTransform;
+      _text.position.set( temp.tx,
+        cell.content ? temp.ty - cell.content.sprite.height :
+          temp.ty - cell.sprite.height / 2);
+*/
     }
   }
   cellUp(event)
   {
+    this.mouseEventHelperFN(event);
     var cell = event.target["cell"]
     var pos = cell.gridPos;
     if (this.currAction === "cellAction")
@@ -870,43 +887,66 @@ class UIDrawer
     };
 
   }
-
-  addText( text: string, font: string )
+  removeActive()
   {
     if (this.active)
     {
       this.active.remove();
       this.active = undefined;
     }
-    var container = this.active = new ToolTip(
+  }
+
+  makeCellTooltip( event )
+  {
+    var cell = event.target["cell"];
+    var cellX = cell.sprite.worldTransform.tx;
+    var cellY = cell.sprite.worldTransform.ty;
+
+    var x = cellX;
+    var y = cell.content ? cellY - cell.content.sprite.height
+      : cellY - cell.sprite.height / 2;
+
+    var screenX = event.global.x;
+    var screenY = event.global.y;
+
+
+    var text = cell.content ? cell.content.type["type"] : cell.type["type"];
+    var font = this.fonts["base"];
+
+    var textObject = new PIXI.Text(text, font);
+
+    var tipDir, tipPos;
+
+    if (screenX + textObject.width + 100 > SCREEN_WIDTH)
+    {
+      tipDir = "left"; tipPos = 0.75;
+    }
+    else
+    {
+      tipDir = "right"; tipPos = 0.25;
+    }
+    var pointing = (screenY - textObject.height - 100 < 0) ? "up" : "down";
+    console.log(pointing);
+
+
+    var toolTip = this.active = new ToolTip(
       this.layer, 500, -1,
       {
         style: this.styles["base"],
         autoSize: true,
-        tipPos: 0.25,
+        tipPos: tipPos,
         tipWidth: 10,
-        tipHeight: 50,
-
-        text:
-        {
-          text: text,
-          font: this.fonts[font],
-          padding: [10, 10]
-        }
+        tipHeight: 20,
+        tipDir: tipDir,
+        pointing: pointing,
+        textObject: textObject,
+        padding: [10, 10]
       }
       );
-    return container;
+    toolTip.position.set(x, y);
+    return toolTip;
   }
-  removeObject( uiObject: PIXI.DisplayObject )
-  {
-    //this.layer.removeChild( uiObject );
-  }
-  addFadeyText( text: string, font: string,
-    timeout: number, delay: number )
-  {
-    var uiObject = this.addText(text, font);
-    return uiObject;
-  }
+
   clearLayer()
   {
     for (var i = this.layer.children.length - 1; i >= 0; i--)

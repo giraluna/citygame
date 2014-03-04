@@ -554,46 +554,54 @@ var MouseEventHandler = (function () {
     function MouseEventHandler() {
         this.currAction = undefined;
     }
+    MouseEventHandler.prototype.mouseEventHelperFN = function (event) {
+        if (event.originalEvent) {
+            event.originalEvent.stopPropagation();
+            event.originalEvent.preventDefault();
+        }
+        game.uiDrawer.removeActive();
+    };
     MouseEventHandler.prototype.scrollStart = function (event) {
         if (this.currAction === undefined) {
+            this.mouseEventHelperFN(event);
             this.startPoint = [event.global.x, event.global.y];
             this.currAction = "scroll";
             this.scroller.startScroll(this.startPoint);
-            event.originalEvent.stopPropagation();
         }
     };
     MouseEventHandler.prototype.zoomStart = function (event) {
         if (this.currAction === undefined) {
+            this.mouseEventHelperFN(event);
             this.startPoint = this.currPoint = [event.global.x, event.global.y];
             this.currAction = "zoom";
-            event.originalEvent.stopPropagation();
         }
     };
     MouseEventHandler.prototype.stageMove = function (event) {
         if (this.currAction === "scroll") {
+            this.mouseEventHelperFN(event);
             this.scroller.move([event.global.x, event.global.y]);
-            event.originalEvent.stopPropagation();
         } else if (this.currAction === "zoom") {
+            this.mouseEventHelperFN(event);
             var delta = event.global.x + this.currPoint[1] - this.currPoint[0] - event.global.y;
             this.scroller.deltaZoom(delta, 0.005);
             this.currPoint = [event.global.x, event.global.y];
-            event.originalEvent.stopPropagation();
         }
     };
     MouseEventHandler.prototype.stageEnd = function (event) {
         if (this.currAction === "scroll") {
+            this.mouseEventHelperFN(event);
             this.scroller.end();
-            event.originalEvent.stopPropagation();
             this.startPoint = undefined;
             this.currAction = undefined;
         }
         if (this.currAction === "zoom") {
-            event.originalEvent.stopPropagation();
+            this.mouseEventHelperFN(event);
             this.startPoint = undefined;
             this.currAction = undefined;
         }
     };
     MouseEventHandler.prototype.cellDown = function (event) {
+        this.mouseEventHelperFN(event);
         var cell = event.target["cell"];
         var pos = cell.gridPos;
         if (this.currAction === undefined) {
@@ -602,6 +610,7 @@ var MouseEventHandler = (function () {
         }
     };
     MouseEventHandler.prototype.cellOver = function (event) {
+        this.mouseEventHelperFN(event);
         var cell = event.target["cell"];
         var pos = cell.gridPos;
         if (this.currAction === "cellAction") {
@@ -611,12 +620,20 @@ var MouseEventHandler = (function () {
             game.highlighter.clearSprites();
             game.highlighter.tintCells(selectedCells, game.activeTool.tintColor);
         } else if (this.currAction === undefined) {
-            var _text = game.uiDrawer.addFadeyText("Tile Position: " + pos + "\n" + "Ground Type: " + cell.type["type"], "base", 2000, 500);
+            game.uiDrawer.makeCellTooltip(event);
+            /*
+            var _text = game.uiDrawer.addFadeyText(
+            cell.content ? cell.content.type["type"] : cell.type["type"],
+            "base", 2000, 500);
             var temp = cell.sprite.worldTransform;
-            _text.position.set(temp.tx, temp.ty - cell.sprite.height / 2);
+            _text.position.set( temp.tx,
+            cell.content ? temp.ty - cell.content.sprite.height :
+            temp.ty - cell.sprite.height / 2);
+            */
         }
     };
     MouseEventHandler.prototype.cellUp = function (event) {
+        this.mouseEventHelperFN(event);
         var cell = event.target["cell"];
         var pos = cell.gridPos;
         if (this.currAction === "cellAction") {
@@ -656,33 +673,56 @@ var UIDrawer = (function () {
             }
         };
     };
-
-    UIDrawer.prototype.addText = function (text, font) {
+    UIDrawer.prototype.removeActive = function () {
         if (this.active) {
             this.active.remove();
             this.active = undefined;
         }
-        var container = this.active = new ToolTip(this.layer, 500, -1, {
+    };
+
+    UIDrawer.prototype.makeCellTooltip = function (event) {
+        var cell = event.target["cell"];
+        var cellX = cell.sprite.worldTransform.tx;
+        var cellY = cell.sprite.worldTransform.ty;
+
+        var x = cellX;
+        var y = cell.content ? cellY - cell.content.sprite.height : cellY - cell.sprite.height / 2;
+
+        var screenX = event.global.x;
+        var screenY = event.global.y;
+
+        var text = cell.content ? cell.content.type["type"] : cell.type["type"];
+        var font = this.fonts["base"];
+
+        var textObject = new PIXI.Text(text, font);
+
+        var tipDir, tipPos;
+
+        if (screenX + textObject.width + 100 > SCREEN_WIDTH) {
+            tipDir = "left";
+            tipPos = 0.75;
+        } else {
+            tipDir = "right";
+            tipPos = 0.25;
+        }
+        var pointing = (screenY - textObject.height - 100 < 0) ? "up" : "down";
+        console.log(pointing);
+
+        var toolTip = this.active = new ToolTip(this.layer, 500, -1, {
             style: this.styles["base"],
             autoSize: true,
-            tipPos: 0.25,
+            tipPos: tipPos,
             tipWidth: 10,
-            tipHeight: 50,
-            text: {
-                text: text,
-                font: this.fonts[font],
-                padding: [10, 10]
-            }
+            tipHeight: 20,
+            tipDir: tipDir,
+            pointing: pointing,
+            textObject: textObject,
+            padding: [10, 10]
         });
-        return container;
+        toolTip.position.set(x, y);
+        return toolTip;
     };
-    UIDrawer.prototype.removeObject = function (uiObject) {
-        //this.layer.removeChild( uiObject );
-    };
-    UIDrawer.prototype.addFadeyText = function (text, font, timeout, delay) {
-        var uiObject = this.addText(text, font);
-        return uiObject;
-    };
+
     UIDrawer.prototype.clearLayer = function () {
         for (var i = this.layer.children.length - 1; i >= 0; i--) {
             this.layer.removeChild(this.layer.children[i]);

@@ -102,10 +102,15 @@ function drawPolygon(gfx, polygon, lineStyle, fillStyle) {
     gfx.beginFill(fillStyle.color, fillStyle.alpha);
 
     gfx.moveTo(polygon[0][0], polygon[0][1]);
+
     for (var i = 1; i < polygon.length; i++) {
-        var x = polygon[i][0];
-        var y = polygon[i][1];
-        gfx.lineTo(x, y);
+        if (!(polygon[i][0] === polygon[i - 1][0] && polygon[i][1] === polygon[i - 1][1])) {
+            var x = polygon[i][0];
+            var y = polygon[i][1];
+            gfx.lineTo(x, y);
+        } else {
+            //skips to next one
+        }
     }
     gfx.endFill();
     return gfx;
@@ -140,24 +145,24 @@ function makeSpeechRect(width, height, tipPos, tipWidth, tipHeight, tipDir, poin
     if (pointing === "down") {
         resultPolygon = [
             [0, 0],
-            [undefined, -yMin],
+            [0, -yMin],
             [xMax, -yMin],
             [xMax, -yMax],
             [xMin, -yMax],
             [xMin, -yMin],
-            [undefined, -yMin],
+            [0, -yMin],
             [0, 0]
         ];
         topLeft = [xMin, -yMax];
     } else if (pointing === "up") {
         resultPolygon = [
             [0, 0],
-            [undefined, yMin],
+            [0, yMin],
             [xMax, yMin],
             [xMax, yMax],
             [xMin, yMax],
             [xMin, yMin],
-            [undefined, yMin],
+            [0, yMin],
             [0, 0]
         ];
         topLeft = [xMin, yMin];
@@ -165,14 +170,8 @@ function makeSpeechRect(width, height, tipPos, tipWidth, tipHeight, tipDir, poin
 
     if (tipDir === "right") {
         resultPolygon[1][0] = tipWidth;
-        if (tipPos <= 0) {
-            resultPolygon.splice(6, 1);
-        }
     } else if (tipDir === "left") {
         resultPolygon[6][0] = -tipWidth;
-        if (tipPos >= 1) {
-            resultPolygon.splice(1, 1);
-        }
     }
 
     return [resultPolygon, topLeft];

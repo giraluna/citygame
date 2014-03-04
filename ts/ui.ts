@@ -73,13 +73,13 @@ class ToolTip extends UIObject
   }
   drawToolTip(data: any)
   {
-    var lineStyle = data.lineStyle ||
+    var lineStyle = data.style.lineStyle ||
     {
       width: 0,
       color: 0x000000,
       alpha: 1
     };
-    var fillStyle = data.fillStyle ||
+    var fillStyle = data.style.fillStyle ||
     {
       color: 0xFFFFFF,
       alpha: 1
@@ -89,7 +89,8 @@ class ToolTip extends UIObject
     var tipPos = data.tipPos || 0.25;
     var tipWidth = data.tipWidth || 10;
     var tipHeight = data.tipHeight || 20;    
-    var tipDir = data.tipDir || "right";
+    var tipDir = data.tipDir;
+    var pointing = data.pointing;
 
 
     var textObject = new PIXI.Text(data.text.text, data.text.font);
@@ -102,7 +103,7 @@ class ToolTip extends UIObject
     }
 
     var speechPoly = makeSpeechRect(width, height, tipPos,
-    tipWidth, tipHeight, tipDir);
+    tipWidth, tipHeight, tipDir, pointing);
     this.topLeftCorner = speechPoly[1];
 
     var gfx = new PIXI.Graphics();
@@ -155,67 +156,53 @@ function makeSpeechRect(width = 200, height = 100,
   var yMin = tipHeight
 
   var resultPolygon;
+  var topLeft;
 
-  if (pointing = "down")
+  if (pointing === "down")
   {
     resultPolygon =
     [
       [0, 0],
-      [tipWidth, -yMin],
+      [undefined, -yMin],
       [xMax, -yMin],
       [xMax, -yMax],
       [xMin, -yMax],
       [xMin, -yMin],
-      [0, -yMin],
+      [undefined, -yMin],
       [0, 0],
     ];
+    topLeft = [xMin, -yMax];
   }
-  else if (pointing = "up")
+  else if (pointing === "up")
   {
-
+    resultPolygon =
+    [
+      [0, 0],
+      [undefined, yMin],
+      [xMax, yMin],
+      [xMax, yMax],
+      [xMin, yMax],
+      [xMin, yMin],
+      [undefined, yMin],
+      [0, 0],
+    ];
+    topLeft = [xMin, yMin];
   }
 
   if (tipDir === "right")
   {
     resultPolygon[1][0] = tipWidth;
     resultPolygon[6][0] = 0;
-
-    /*
-    resultPolygon =
-    [
-      [0, 0],
-      [tipWidth, -yMin],
-      [xMax, -yMin],
-      [xMax, -yMax],
-      [xMin, -yMax],
-      [xMin, -yMin],
-      [0, -yMin],
-      [0, 0],
-    ];
-    */
   }
   else if (tipDir === "left")
   {
 
     resultPolygon[1][0] = 0;
     resultPolygon[6][0] = -tipWidth;
-    /*
-    resultPolygon =
-    [
-      [0, 0],
-      [0, -yMin],
-      [xMax, -yMin],
-      [xMax, -yMax],
-      [xMin, -yMax],
-      [xMin, -yMin],
-      [-tipWidth, -yMin],
-      [0, 0],
-    ];
-    */
   }
 
 
-  return [resultPolygon, [xMin, -yMax] ]; //[0]: polygon, [1]: top left
+  return [resultPolygon, topLeft ]; //[0]: polygon, [1]: top left
 }
 
 /*

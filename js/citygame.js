@@ -633,28 +633,18 @@ var MouseEventHandler = (function () {
 var UIDrawer = (function () {
     function UIDrawer() {
         this.fonts = {};
+        this.styles = {};
         this.layer = game.layers["tooltips"];
         this.init();
     }
     UIDrawer.prototype.init = function () {
-        this.registerFont("base", {
-            font: "30px Snippet",
+        this.fonts["base"] = {
+            font: "18px Snippet",
             fill: "#444444",
             align: "left",
-            size: 30
-        });
-    };
-
-    UIDrawer.prototype.registerFont = function (name, fontObject) {
-        this.fonts[name] = fontObject;
-    };
-
-    UIDrawer.prototype.addText = function (text, font) {
-        if (this.active) {
-            this.active.remove();
-            this.active = undefined;
-        }
-        var container = this.active = new ToolTip(this.layer, 500, -1, {
+            size: 18
+        };
+        this.styles["base"] = {
             lineStyle: {
                 width: 1,
                 color: 0x587982,
@@ -663,10 +653,18 @@ var UIDrawer = (function () {
             fillStyle: {
                 color: 0xE8FBFF,
                 alpha: 0.8
-            },
+            }
+        };
+    };
+
+    UIDrawer.prototype.addText = function (text, font) {
+        if (this.active) {
+            this.active.remove();
+            this.active = undefined;
+        }
+        var container = this.active = new ToolTip(this.layer, 500, -1, {
+            style: this.styles["base"],
             autoSize: true,
-            width: 200,
-            height: 100,
             tipPos: 0.25,
             tipWidth: 10,
             tipHeight: 50,

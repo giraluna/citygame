@@ -134,10 +134,10 @@ declare class MouseEventHandler {
 declare class UIDrawer {
     public layer: PIXI.DisplayObjectContainer;
     public fonts: any;
+    public styles: any;
     public active: UIObject;
     constructor();
     public init(): void;
-    public registerFont(name: string, fontObject: any): void;
     public addText(text: string, font: string): ToolTip;
     public removeObject(uiObject: PIXI.DisplayObject): void;
     public addFadeyText(text: string, font: string, timeout: number, delay: number): ToolTip;

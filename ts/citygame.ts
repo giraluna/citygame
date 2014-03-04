@@ -837,6 +837,7 @@ class UIDrawer
 {
   layer: PIXI.DisplayObjectContainer;
   fonts: any = {};
+  styles: any = {};
   active: UIObject;
 
   constructor()
@@ -846,18 +847,28 @@ class UIDrawer
   }
   init()
   {
-    this.registerFont( "base",
+    this.fonts["base"] =
     {
-      font: "30px Snippet",
+      font: "18px Snippet",
       fill: "#444444",
       align: "left",
-      size: 30
-    });
-  }
+      size: 18
+    }
+    this.styles["base"] =
+    {
+      lineStyle:
+      {
+        width: 1,
+        color: 0x587982,
+        alpha: 1
+      },
+      fillStyle:
+      {
+        color: 0xE8FBFF,
+        alpha: 0.8
+      }
+    };
 
-  registerFont( name: string, fontObject: any )
-  {
-    this.fonts[name] = fontObject;
   }
 
   addText( text: string, font: string )
@@ -870,20 +881,8 @@ class UIDrawer
     var container = this.active = new ToolTip(
       this.layer, 500, -1,
       {
-        lineStyle:
-        {
-          width: 1,
-          color: 0x587982,
-          alpha: 1
-        },
-        fillStyle:
-        {
-          color: 0xE8FBFF,
-          alpha: 0.8
-        },
+        style: this.styles["base"],
         autoSize: true,
-        width: 200,
-        height: 100,
         tipPos: 0.25,
         tipWidth: 10,
         tipHeight: 50,

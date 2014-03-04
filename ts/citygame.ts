@@ -848,9 +848,10 @@ class UIDrawer
   {
     this.registerFont( "base",
     {
-      font: "12px Snippet",
-      fill: "#61696B",
+      font: "30px Snippet",
+      fill: "#444444",
       align: "left",
+      size: 30
     });
   }
 
@@ -871,7 +872,7 @@ class UIDrawer
       {
         lineStyle:
         {
-          width: 2,
+          width: 1,
           color: 0x587982,
           alpha: 1
         },
@@ -880,16 +881,21 @@ class UIDrawer
           color: 0xE8FBFF,
           alpha: 0.8
         },
+        autoSize: true,
         width: 200,
         height: 100,
-        offset: 0.25
+        tipPos: 0.25,
+        tipWidth: 10,
+        tipHeight: 50,
+
+        text:
+        {
+          text: text,
+          font: this.fonts[font],
+          padding: [10, 10]
+        }
       }
       );
-    
-
-    var textObject = new PIXI.Text(text, this.fonts[font]);
-    textObject.position.set(-40, -110)
-    container.addChild(textObject);
     return container;
   }
   removeObject( uiObject: PIXI.DisplayObject )

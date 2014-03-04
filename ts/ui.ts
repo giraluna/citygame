@@ -56,6 +56,8 @@ class UIObject extends PIXI.DisplayObjectContainer
 
 class ToolTip extends UIObject
 {
+  topLeftCorner: number[];
+
   constructor(
     public _parent: PIXI.DisplayObjectContainer,
     public delay: number,
@@ -73,7 +75,7 @@ class ToolTip extends UIObject
   {
     var lineStyle = data.lineStyle ||
     {
-      width: 1,
+      width: 0,
       color: 0x000000,
       alpha: 1
     };
@@ -84,16 +86,43 @@ class ToolTip extends UIObject
     }
     var width = data.width || 200;
     var height = data.height || 100;
-    var offset = data.offset || 0.25;
+    var tipPos = data.tipPos || 0.25;
+    var tipWidth = data.tipWidth || 10;
+    var tipHeight = data.tipHeight || 20;    
+    var tipDir = data.tipDir || "right";
 
-    var bubblePolygon = makeSpeechBubble(width, height, offset);
+
+    var textObject = new PIXI.Text(data.text.text, data.text.font);
+
+    //temp
+    if (data.autoSize)
+    {
+      width = textObject.width + data.text.padding[0] * 2;
+      height = textObject.height + data.text.padding[1] * 2;
+    }
+
+    var speechPoly = makeSpeechRect(width, height, tipPos,
+    tipWidth, tipHeight, tipDir);
+    this.topLeftCorner = speechPoly[1];
 
     var gfx = new PIXI.Graphics();
     this.addChild(gfx);
 
-    drawPolygon(gfx, bubblePolygon, lineStyle, fillStyle);
+    drawPolygon(gfx, speechPoly[0], lineStyle, fillStyle);
 
+    
 
+    this.setTextPos(textObject, data.text.padding);
+    gfx.addChild(textObject);
+
+  }
+  setTextPos(text: PIXI.Text, padding: number[])
+  {
+    var x = this.topLeftCorner[0] + padding[0];
+    var y = this.topLeftCorner[1] + padding[1];
+
+    text.position.set(x, y)
+    return text;
   }
 }
 
@@ -116,27 +145,77 @@ function drawPolygon(gfx: PIXI.Graphics,
   return gfx;
 }
 
-function makeSpeechBubble(width = 200, height = 100,
-  offset = 0.25, tipWidth = 10, tipHeight = 20)
+function makeSpeechRect(width = 200, height = 100,
+  tipPos = 0.25, tipWidth = 10, tipHeight = 20,
+  tipDir = "right", pointing = "down") : any[]
 {
-  var xMax = width * ( 1-offset );
+  var xMax = width * ( 1-tipPos );
   var yMax = height + tipHeight;
-  var xMin = -width * offset;
+  var xMin = -width * tipPos;
   var yMin = tipHeight
 
-  var resultPolygon =
-  [
-    [0, 0],
-    [tipWidth, -yMin],
-    [xMax, -yMin],
-    [xMax, -yMax],
-    [xMin, -yMax],
-    [xMin, -yMin],
-    [0, -yMin],
-    [0, 0],
-  ];
+  var resultPolygon;
 
-  return resultPolygon;
+  if (pointing = "down")
+  {
+    resultPolygon =
+    [
+      [0, 0],
+      [tipWidth, -yMin],
+      [xMax, -yMin],
+      [xMax, -yMax],
+      [xMin, -yMax],
+      [xMin, -yMin],
+      [0, -yMin],
+      [0, 0],
+    ];
+  }
+  else if (pointing = "up")
+  {
+
+  }
+
+  if (tipDir === "right")
+  {
+    resultPolygon[1][0] = tipWidth;
+    resultPolygon[6][0] = 0;
+
+    /*
+    resultPolygon =
+    [
+      [0, 0],
+      [tipWidth, -yMin],
+      [xMax, -yMin],
+      [xMax, -yMax],
+      [xMin, -yMax],
+      [xMin, -yMin],
+      [0, -yMin],
+      [0, 0],
+    ];
+    */
+  }
+  else if (tipDir === "left")
+  {
+
+    resultPolygon[1][0] = 0;
+    resultPolygon[6][0] = -tipWidth;
+    /*
+    resultPolygon =
+    [
+      [0, 0],
+      [0, -yMin],
+      [xMax, -yMin],
+      [xMax, -yMax],
+      [xMin, -yMax],
+      [xMin, -yMin],
+      [-tipWidth, -yMin],
+      [0, 0],
+    ];
+    */
+  }
+
+
+  return [resultPolygon, [xMin, -yMax] ]; //[0]: polygon, [1]: top left
 }
 
 /*

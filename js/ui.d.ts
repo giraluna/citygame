@@ -15,8 +15,10 @@ declare class ToolTip extends UIObject {
     public delay: number;
     public lifeTime: number;
     public data: any;
+    public topLeftCorner: number[];
     constructor(_parent: PIXI.DisplayObjectContainer, delay: number, lifeTime: number, data: any);
     public drawToolTip(data: any): void;
+    public setTextPos(text: PIXI.Text, padding: number[]): PIXI.Text;
 }
 declare function drawPolygon(gfx: PIXI.Graphics, polygon: number[][], lineStyle: any, fillStyle: any): PIXI.Graphics;
-declare function makeSpeechBubble(width?: number, height?: number, offset?: number, tipWidth?: number, tipHeight?: number): number[][];
+declare function makeSpeechRect(width?: number, height?: number, tipPos?: number, tipWidth?: number, tipHeight?: number, tipDir?: string, pointing?: string): any[];

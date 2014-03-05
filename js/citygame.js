@@ -655,7 +655,7 @@ var UIDrawer = (function () {
         this.styles["base"] = {
             lineStyle: {
                 width: 2,
-                color: 0xFF0000,
+                color: 0x587982,
                 alpha: 1
             },
             fillStyle: {
@@ -689,13 +689,17 @@ var UIDrawer = (function () {
 
         var tipDir, tipPos;
 
+        // change slant of the tip based on screen position
+        // 100 pix buffer is arbitrary for now
         if (screenX + textObject.width + 100 > SCREEN_WIDTH) {
             tipDir = "left";
-            tipPos = 1;
+            tipPos = 0.75;
         } else {
             tipDir = "right";
-            tipPos = 0;
+            tipPos = 0.25;
         }
+
+        // same for vertical pos
         var pointing = (screenY - textObject.height - 100 < 0) ? "up" : "down";
 
         var toolTip = this.active = new ToolTip(this.layer, 500, -1, {

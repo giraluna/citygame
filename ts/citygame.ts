@@ -867,7 +867,7 @@ class UIDrawer
       lineStyle:
       {
         width: 2,
-        color: 0xFF0000,
+        color: 0x587982,
         alpha: 1
       },
       fillStyle:
@@ -908,14 +908,17 @@ class UIDrawer
 
     var tipDir, tipPos;
 
+    // change slant of the tip based on screen position
+    // 100 pix buffer is arbitrary for now
     if (screenX + textObject.width + 100 > SCREEN_WIDTH)
     {
-      tipDir = "left"; tipPos = 1;
+      tipDir = "left"; tipPos = 0.75;
     }
     else
     {
-      tipDir = "right"; tipPos = 0;
+      tipDir = "right"; tipPos = 0.25;
     }
+    // same for vertical pos
     var pointing = (screenY - textObject.height - 100 < 0) ? "up" : "down";
 
 

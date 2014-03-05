@@ -98,6 +98,8 @@ var ToolTip = (function (_super) {
 })(UIObject);
 
 function drawPolygon(gfx, polygon, lineStyle, fillStyle) {
+    // BUG : floating point errors
+    // TODO : round them maybe
     gfx.lineStyle(lineStyle.width, lineStyle.color, lineStyle.alpha);
     gfx.beginFill(fillStyle.color, fillStyle.alpha);
 
@@ -108,11 +110,19 @@ function drawPolygon(gfx, polygon, lineStyle, fillStyle) {
             var x = polygon[i][0];
             var y = polygon[i][1];
             gfx.lineTo(x, y);
-        } else {
-            //skips to next one
         }
     }
     gfx.endFill();
+
+    // draw dots at the corners
+    /*
+    for (var i = 1; i < polygon.length; i++)
+    {
+    gfx.beginFill();
+    gfx.drawEllipse(polygon[i][0], polygon[i][1], 3, 3);
+    gfx.endFill();
+    }
+    */
     return gfx;
 }
 
@@ -134,16 +144,27 @@ function makeSpeechRect(width, height, tipPos, tipWidth, tipHeight, tipDir, poin
     |/
     0, 7
     
+    0,7
+    |\
+    6| \ 1
+    5|----|  \-------------------|2
+    |                           |
+    |                           |
+    |                           |
+    4|---------------------------|3
     */
     var xMax = width * (1 - tipPos);
     var yMax = height + tipHeight;
     var xMin = -width * tipPos;
     var yMin = tipHeight;
+    var dir = (pointing === "down") ? -1 : 1;
 
-    var resultPolygon;
+    var polygon;
     var topLeft;
+
+    // make base polygon
     if (pointing === "down") {
-        resultPolygon = [
+        polygon = [
             [0, 0],
             [0, -yMin],
             [xMax, -yMin],
@@ -155,7 +176,7 @@ function makeSpeechRect(width, height, tipPos, tipWidth, tipHeight, tipDir, poin
         ];
         topLeft = [xMin, -yMax];
     } else if (pointing === "up") {
-        resultPolygon = [
+        polygon = [
             [0, 0],
             [0, yMin],
             [xMax, yMin],
@@ -168,12 +189,22 @@ function makeSpeechRect(width, height, tipPos, tipWidth, tipHeight, tipDir, poin
         topLeft = [xMin, yMin];
     }
 
+    // adjust direction tip slants in
     if (tipDir === "right") {
-        resultPolygon[1][0] = tipWidth;
+        polygon[1][0] = tipWidth;
     } else if (tipDir === "left") {
-        resultPolygon[6][0] = -tipWidth;
+        polygon[6][0] = -tipWidth;
     }
 
-    return [resultPolygon, topLeft];
+    // adjust for extreme tip position
+    if (tipPos < 0) {
+        polygon[1][0] = polygon[5][0] + tipWidth;
+        polygon[5] = polygon[6] = [polygon[5][0], polygon[5][1] + tipWidth * dir];
+    } else if (tipPos > 1) {
+        polygon[6][0] = polygon[2][0] - tipWidth;
+        polygon[2] = polygon[1] = [polygon[2][0], polygon[2][1] + tipWidth * dir];
+    }
+
+    return [polygon, topLeft];
 }
 //# sourceMappingURL=ui.js.map

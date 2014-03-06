@@ -1,5 +1,10 @@
+html,
+body {
+  height: 100%;
+}
 #main {
   display: flex;
+  height: 100%;
 }
 #pixi-container {
   display: flex;
@@ -11,5 +16,20 @@
   display: flex;
   flex-flow: row;
   order: 2;
-  width: 100px;
+  width: 70px;
+  position: relative;
+}
+#side-menu button {
+  width: 70px;
+}
+#side-menu input {
+  width: 64px;
+}
+#side-menu #tool-buttons {
+  margin-top: 20px;
+}
+#side-menu #other-buttons {
+  position: absolute;
+  bottom: 20px;
+  left: 0px;
 }

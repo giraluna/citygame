@@ -35,9 +35,15 @@
   overflow-x: hidden;
 }
 
+html, body
+{
+  height: 100%;
+}
+
 #main
 {
   display: flex;
+  height: 100%;
 }
 
 #pixi-container
@@ -53,5 +59,27 @@
   display: flex;
   flex-flow: row;
   order: 2;
-  width: 100px;
+  width: 70px;
+  position: relative;
+
+  button
+  {
+    width: 70px;
+  }
+  input
+  {
+    width: 64px;
+  }
+
+  #tool-buttons
+  {
+    margin-top: 20px;
+  }
+
+  #other-buttons
+  {
+    position: absolute;
+    bottom: 20px;
+    left: 0px;
+  }
 }

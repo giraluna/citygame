@@ -1,5 +1,5 @@
-/// <reference path="../js/lib/pixi.d.ts" />
-/// <reference path="../js/lib/tween.js.d.ts" />
+/// <reference path="../lib/pixi.d.ts" />
+/// <reference path="../lib/tween.js.d.ts" />
 
 class UIObject extends PIXI.DisplayObjectContainer
 {

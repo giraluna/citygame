@@ -1,10 +1,8 @@
-/// <reference path="lib/pixi.d.ts" />
-/// <reference path="lib/tween.js.d.ts" />
+/// <reference path="../lib/pixi.d.ts" />
+/// <reference path="../lib/tween.js.d.ts" />
 /// <reference path="ui.d.ts" />
-declare var LZString: any;
+/// <reference path="loader.d.ts" />
 declare var cg: any;
-declare var WebFont: any;
-declare var WebFontConfig: any;
 declare var container: any;
 declare var SCREEN_WIDTH: any, SCREEN_HEIGHT: any, TILE_WIDTH: any, TILE_HEIGHT: any, TILES: any, WORLD_WIDTH: any, WORLD_HEIGHT: any;
 declare class Sprite extends PIXI.Sprite {
@@ -211,5 +209,6 @@ declare function arrayToPoint(point: any): PIXI.Point;
 declare function getIsoCoord(x: number, y: number, width: number, height: number, offset?: number[]): number[];
 declare function fround(x: any): number;
 declare function getRandomProperty(target: any): any;
-declare var game: Game;
 declare function pineapple(): void;
+declare var game: Game;
+declare var loader: Loader;

@@ -1,5 +1,5 @@
-/// <reference path="../js/lib/pixi.d.ts" />
-/// <reference path="../js/lib/tween.js.d.ts" />
+/// <reference path="../lib/pixi.d.ts" />
+/// <reference path="../lib/tween.js.d.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }

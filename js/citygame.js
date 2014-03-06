@@ -1,6 +1,7 @@
-/// <reference path="../js/lib/pixi.d.ts" />
-/// <reference path="../js/lib/tween.js.d.ts" />
+/// <reference path="../lib/pixi.d.ts" />
+/// <reference path="../lib/tween.js.d.ts" />
 /// <reference path="../js/ui.d.ts" />
+/// <reference path="../js/loader.d.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -23,7 +24,7 @@ WORLD_HEIGHT = TILES * TILE_HEIGHT;
 var Sprite = (function (_super) {
     __extends(Sprite, _super);
     function Sprite(template) {
-        var _texture = PIXI.Texture.fromImage(template.texture, false, 1);
+        var _texture = PIXI.Texture.fromFrame(template.frame);
         _super.call(this, _texture); //pixi caches and reuses the texture as needed
 
         this.type = template.type;
@@ -123,8 +124,8 @@ var Cell = (function () {
         return neighbors;
     };
     Cell.prototype.replace = function (type) {
-        var _texture = type["texture"];
-        this.sprite.setTexture(PIXI.Texture.fromImage(_texture));
+        var _texture = type["frame"];
+        this.sprite.setTexture(PIXI.Texture.fromFrame(_texture));
         this.sprite.type = this.type = type;
         this.buildable = type["buildable"];
         if (this.content && this.content.type2 === "plant") {
@@ -374,23 +375,23 @@ var Game = (function () {
                             "id": this.content.id
                         };
                         return replaced;
+
                     case "sprite":
                         return this.sprite.type;
+
                     default:
                         return value;
                 }
             }
             return value;
         });
-        var compressed = LZString.compressToUTF16(data);
-        localStorage.setItem("board", compressed);
+        localStorage.setItem("board", data);
     };
     Game.prototype.loadBoard = function () {
         this.resetLayers();
 
         //var parsed = JSON.parse(this.savedBoard);
-        var decompressed = LZString.decompressFromUTF16(localStorage.getItem("board"));
-        var parsed = JSON.parse(decompressed);
+        var parsed = JSON.parse(localStorage.getItem("board"));
         var board = this.board = new Board(parsed["width"], parsed["height"]);
         board.makeMap(parsed["cells"]);
     };
@@ -676,9 +677,6 @@ var UIDrawer = (function () {
         var cellX = cell.sprite.worldTransform.tx;
         var cellY = cell.sprite.worldTransform.ty;
 
-        var x = cellX;
-        var y = cell.content ? cellY - cell.content.sprite.height : cellY - cell.sprite.height / 2;
-
         var screenX = event.global.x;
         var screenY = event.global.y;
 
@@ -701,6 +699,9 @@ var UIDrawer = (function () {
 
         // same for vertical pos
         var pointing = (screenY - textObject.height - 100 < 0) ? "up" : "down";
+
+        var x = cellX;
+        var y = (cell.content && pointing === "down") ? cellY - cell.content.sprite.height / 2 : cellY - cell.sprite.height / 2;
 
         var toolTip = this.active = new ToolTip(this.layer, 500, -1, {
             style: this.styles["base"],
@@ -982,39 +983,48 @@ function getRandomProperty(target) {
     return _rndProp;
 }
 
-var game = new Game();
-
-document.addEventListener('DOMContentLoaded', function () {
-    /* check center
-    var stage = game.stage;
-    var gfx = new PIXI.Graphics();
-    gfx.beginFill();
-    gfx.drawEllipse(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 3, 3);
-    gfx.endFill();
-    stage.addChild(gfx);
-    */
-    // temp
-    // Load fonts
-    WebFontConfig = {
-        google: {
-            families: ['Snippet', 'Arvo:700italic', 'Podkova:700']
-        },
-        active: function () {
-            // do something
-            game.init();
-        }
-    };
-    (function () {
-        var wf = document.createElement('script');
-        wf.src = ('https:' == document.location.protocol ? 'https' : 'http') + '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
-        wf.type = 'text/javascript';
-        wf.async = true;
-        var s = document.getElementsByTagName('script')[0];
-        s.parentNode.insertBefore(wf, s);
-    })();
-    // end temp
-});
-
+/*
+/* check center
+var stage = game.stage;
+var gfx = new PIXI.Graphics();
+gfx.beginFill();
+gfx.drawEllipse(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 3, 3);
+gfx.endFill();
+stage.addChild(gfx);
+*/
+/* temp
+var fontsLoaded, spritesLoaded;
+// create an array of assets to load
+var assetsToLoader = [ "img\/sprites.json"];
+// create a new loader
+var loader = new PIXI.AssetLoader(assetsToLoader);
+// use callback
+loader.onComplete = function()
+{
+spritesLoaded = true;
+if (fontsLoaded && spritesLoaded)
+{
+game.init();
+}
+}
+//begin load
+loader.load();
+// temp
+// Load fonts
+WebFontConfig = {
+google: {
+families: [ 'Snippet', 'Arvo:700italic', 'Podkova:700' ]
+},
+active: function() {
+// do something
+fontsLoaded = true;
+if (fontsLoaded && spritesLoaded)
+{
+game.init();
+}
+}
+}; // end temp
+*/
 function pineapple() {
     cg["content"]["buildings"]["pineapple"] = {
         "type": "pineapple",
@@ -1022,7 +1032,10 @@ function pineapple() {
         "width": 64,
         "height": 128,
         "anchor": [0.5, 1.25],
-        "texture": "img\/pineapple2.png"
+        "frame": "pineapple2.png"
     };
 }
+
+var game = new Game();
+var loader = new Loader(game);
 //# sourceMappingURL=citygame.js.map

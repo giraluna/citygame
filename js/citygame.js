@@ -13,7 +13,7 @@ cg = JSON.parse(JSON.stringify(cg)); //dumb
 
 var container;
 var SCREEN_WIDTH, SCREEN_HEIGHT, TILE_WIDTH, TILE_HEIGHT, TILES, WORLD_WIDTH, WORLD_HEIGHT;
-SCREEN_WIDTH = 940;
+SCREEN_WIDTH = 720;
 SCREEN_HEIGHT = 480;
 TILE_WIDTH = 64;
 TILE_HEIGHT = 32;
@@ -260,6 +260,7 @@ var Game = (function () {
         this.layers = {};
     }
     Game.prototype.init = function () {
+        this.resize();
         this.initContainers();
         this.initTools();
         this.changeTool("grass");
@@ -271,7 +272,7 @@ var Game = (function () {
         this.highlighter = new Highlighter();
 
         this.mouseEventHandler = new MouseEventHandler();
-        this.mouseEventHandler.scroller = new Scroller(this.layers["main"], SCREEN_WIDTH, SCREEN_HEIGHT, 0.5);
+        this.mouseEventHandler.scroller = new Scroller(this.layers["main"], 0.5);
 
         this.uiDrawer = new UIDrawer();
 
@@ -356,11 +357,23 @@ var Game = (function () {
 
         //renderer
         this.bindRenderer();
+
+        //resize
+        window.addEventListener('resize', game.resize, false);
     };
     Game.prototype.bindRenderer = function () {
         var _canvas = document.getElementById("pixi-container");
         _canvas.appendChild(this.renderer.view);
     };
+    Game.prototype.resize = function () {
+        var container = window.getComputedStyle(document.getElementById("pixi-container"), null);
+        SCREEN_WIDTH = parseInt(container.width);
+        SCREEN_HEIGHT = parseInt(container.height);
+        if (game.renderer) {
+            game.renderer.resize(SCREEN_WIDTH, SCREEN_HEIGHT);
+        }
+    };
+
     Game.prototype.changeTool = function (tool) {
         this.activeTool = this.tools[tool];
     };
@@ -452,14 +465,13 @@ var SortedDisplayObjectContainer = (function (_super) {
 })(PIXI.DisplayObjectContainer);
 
 var Scroller = (function () {
-    function Scroller(container, width, height, bound) {
+    function Scroller(container, bound) {
         this.bounds = {};
         this.currZoom = 1;
         this.container = container;
-        this.width = width;
-        this.height = height;
         this.bounds.min = bound; // sets clamp limit to percentage of screen from 0.0 to 1.0
         this.bounds.max = fround(1 - bound);
+        this.setBounds();
         this.zoomField = document.getElementById("zoom-amount");
     }
     Scroller.prototype.startScroll = function (mousePos) {
@@ -472,6 +484,8 @@ var Scroller = (function () {
     };
     Scroller.prototype.setBounds = function () {
         var rect = this.container.getLocalBounds();
+        this.width = SCREEN_WIDTH;
+        this.height = SCREEN_HEIGHT;
         this.bounds = {
             xMin: (this.width * this.bounds.min) - rect.width * this.container.scale.x,
             xMax: (this.width * this.bounds.max),
@@ -983,15 +997,14 @@ function getRandomProperty(target) {
     return _rndProp;
 }
 
+//check center
 /*
-/* check center
 var stage = game.stage;
 var gfx = new PIXI.Graphics();
 gfx.beginFill();
 gfx.drawEllipse(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 3, 3);
 gfx.endFill();
 stage.addChild(gfx);
-*/
 /* temp
 var fontsLoaded, spritesLoaded;
 // create an array of assets to load
@@ -1017,11 +1030,8 @@ families: [ 'Snippet', 'Arvo:700italic', 'Podkova:700' ]
 },
 active: function() {
 // do something
-fontsLoaded = true;
-if (fontsLoaded && spritesLoaded)
-{
-game.init();
-}
+self.loaded.fonts = true;
+self.checkLoaded();
 }
 }; // end temp
 */

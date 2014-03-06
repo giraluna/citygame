@@ -1,0 +1,57 @@
+.single-gradient(@dir, @col1, @col2)
+{
+  background: linear-gradient(@dir, @col1, @col2);
+}
+
+.simple-gloss(@dir, @base)
+{
+  background: linear-gradient(@dir,
+    lighten(@base, 25%) 0%,
+    lighten(@base, 15%) 50%,
+    lighten(@base, 5%) 50%,
+    lighten(@base, 0%) 100%,)
+}
+
+.double-gloss(@dir, @base)
+{
+  background: linear-gradient(@dir,
+    lighten(@base, 25%) 0%,
+    lighten(@base, 15%) 25%,
+    lighten(@base, 5%) 25%,
+    lighten(@base, 0%) 50%,
+    lighten(@base, 25%) 50%,
+    lighten(@base, 15%) 75%,
+    lighten(@base, 5%) 75%,
+    lighten(@base, 0%) 100%,)
+}
+
+.grid (@width, @margin: 0)
+{
+  float: left;
+  width: @width;
+  margin-left: @margin;
+  margin-right: -100%;
+  text-align: left;
+  overflow-x: hidden;
+}
+
+#main
+{
+  display: flex;
+}
+
+#pixi-container
+{
+  display: flex;
+  flex-flow: row;
+  order: 1;
+  flex: 2 1 auto;
+}
+
+#side-menu
+{
+  display: flex;
+  flex-flow: row;
+  order: 2;
+  width: 100px;
+}

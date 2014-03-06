@@ -15,6 +15,7 @@ declare module PIXI
 	export var TextureCache: {};
 	export var FrameCache: {};
 	export var blendModes:{ NORMAL:number; SCREEN:number; };
+	export var scaleModes:{DEFAULT:number; LINEAR:number; NEAREST:number;};
 
 
 	/* MODULE FUNCTIONS */

@@ -1,0 +1,15 @@
+#main {
+  display: flex;
+}
+#pixi-container {
+  display: flex;
+  flex-flow: row;
+  order: 1;
+  flex: 2 1 auto;
+}
+#side-menu {
+  display: flex;
+  flex-flow: row;
+  order: 2;
+  width: 100px;
+}

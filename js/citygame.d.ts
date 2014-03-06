@@ -78,6 +78,7 @@ declare class Game {
     public initTools(): void;
     public bindElements(): void;
     public bindRenderer(): void;
+    public resize(): void;
     public changeTool(tool: any): void;
     public saveBoard(): void;
     public loadBoard(): void;
@@ -103,7 +104,7 @@ declare class Scroller {
     public startClick: number[];
     public currZoom: number;
     public zoomField: any;
-    constructor(container: PIXI.DisplayObjectContainer, width: any, height: any, bound: any);
+    constructor(container: PIXI.DisplayObjectContainer, bound: any);
     public startScroll(mousePos: any): void;
     public end(): void;
     public setBounds(): void;

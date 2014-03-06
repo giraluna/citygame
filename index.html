@@ -3,6 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <title>a</title>
+
+  <link rel="stylesheet" type="text/css" href="../css/normalize.css">
+  <link rel="stylesheet" type="text/css" href="../css/main.css">
+
+
   <script src="lib/pixi.dev.js"></script>
   <script src="lib/tween.min.js"></script>
 
@@ -13,8 +18,11 @@
 
 </head>
 <body>
-<div id="main" style="height: 100%">
-  <div id="pixi-container"></div>
+<div id="main">
+
+<div id="pixi-container"></div>
+ 
+<div id="side-menu">
   <div id="tool-buttons">
     <button id="grassBtn">grass</button>
     <button id="waterBtn">water</button>
@@ -25,21 +33,23 @@
     <button id="houseBtn">house</button>
     <button id="roadBtn">road</button>
   </div>
+
+  <div id="other-buttons">
+    <div id="zoom">
+      <input type="number" id="zoom-amount" value=1 step=0.1>
+      <button id="zoomBtn">zoom</button>
+    </div>
+    <br>
+    <div id ="load-buttons">
+      <button id="saveBtn">save</button>
+      <br>
+      <button id="loadBtn">load</button>
+    </div>
+  </div>
 </div>
 
-<div>
-  <div id="zoom">
-    ctrl+click to scroll
-    <br>
-    shift+click to zoom
-    <br>
-    <input type="number" id="zoom-amount" value=1 step=0.1>
-    <button id="zoomBtn">zoom</button>
-  </div>
-  <div id ="load-buttons">
-    save to localstorage
-    <button id="saveBtn">save</button>
-    <button id="loadBtn">load</button>
-  </div>
+</div>
+<div id="test">
+  ctrl + drag to scroll, shift + drag to zoom
 </div>
 </body>

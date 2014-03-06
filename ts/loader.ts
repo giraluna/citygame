@@ -56,6 +56,7 @@ class Loader
   }
   loadSprites()
   {
+    PIXI.scaleModes.DEFAULT = 1; //nearest
     var self = this;
     var assetsToLoad = [ "img\/sprites.json"];
     var loader = new PIXI.AssetLoader(assetsToLoad);

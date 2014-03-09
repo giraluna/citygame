@@ -14,10 +14,11 @@ body {
 }
 #side-menu {
   display: flex;
-  flex-flow: row;
+  flex-flow: column;
   order: 2;
   width: 70px;
   position: relative;
+  margin: 20px 0;
 }
 #side-menu button {
   width: 70px;
@@ -26,10 +27,16 @@ body {
   width: 64px;
 }
 #side-menu #tool-buttons {
+  display: flex;
+  flex-flow: column;
+}
+#side-menu #player {
+  display: flex;
+  flex-flow: column;
   margin-top: 20px;
 }
 #side-menu #other-buttons {
   position: absolute;
-  bottom: 20px;
+  bottom: 0px;
   left: 0px;
 }

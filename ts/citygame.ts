@@ -2,6 +2,9 @@
 /// <reference path="../lib/tween.js.d.ts" />
 /// <reference path="../js/ui.d.ts" />
 /// <reference path="../js/loader.d.ts" />
+/// 
+/// <reference path="../js/player.d.ts" />
+/// <reference path="../js/systems.d.ts" />
 
 declare var cg:any;
 
@@ -259,6 +262,7 @@ class Cell
     {
       return;
     }
+
     game.layers["content"].removeChildAt(this.content.sprite,
       this.gridPos[0] + this.gridPos[1]);
     this.content = undefined;
@@ -270,7 +274,7 @@ class Board
   width: number;
   height: number;
   cells: Cell[][];
-  constructor(width, height)
+  constructor(width= TILES, height= TILES)
   {
     this.width = width;
     this.height = height
@@ -349,6 +353,7 @@ class Game
   renderer: any;
   layers: any = {};
   uiDrawer: UIDrawer;
+  systemsManager: SystemsManager;
   constructor()
   {
   }
@@ -370,7 +375,8 @@ class Game
 
     this.uiDrawer = new UIDrawer();
 
-    
+    //this.systemsManager = new SystemsManager(1000);
+
     this.render();
     }
     initContainers()
@@ -526,15 +532,15 @@ class Game
   loadBoard()
   {
     this.resetLayers();
-    //var parsed = JSON.parse(this.savedBoard);
     var parsed = JSON.parse( localStorage.getItem("board") );
     var board = this.board = new Board(parsed["width"], parsed["height"]);
     board.makeMap( parsed["cells"] );
   }
   render()
   {
-    TWEEN.update();
     this.renderer.render(this.stage);
+
+    //this.systemsManager.update();
     requestAnimFrame( this.render.bind(this) );
   }
   resetLayers()
@@ -547,9 +553,10 @@ class Game
         var _l = this.layers[layer];
         main.removeChild(_l);
         this.layers[layer] = undefined;
-        this.initLayers();
+        
       }
     }
+    this.initLayers();
   }
 }
 
@@ -611,7 +618,7 @@ class Scroller
   startPos: number[];
   startClick: number[];
   currZoom: number = 1;
-  zoomField: any; //TEMP
+  zoomField: any;
 
   constructor( container:PIXI.DisplayObjectContainer, bound)
   {
@@ -1129,7 +1136,6 @@ class HouseTool implements Tool
   {
     for (var i = 0; i < target.length; i++)
     {
-      //target[i].changeContent("house");
       target[i].changeContent(
         getRandomProperty(cg["content"]["buildings"]) );
     }

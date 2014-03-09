@@ -2,6 +2,8 @@
 /// <reference path="../lib/tween.js.d.ts" />
 /// <reference path="ui.d.ts" />
 /// <reference path="loader.d.ts" />
+/// <reference path="player.d.ts" />
+/// <reference path="systems.d.ts" />
 declare var cg: any;
 declare var container: any;
 declare var SCREEN_WIDTH: any, SCREEN_HEIGHT: any, TILE_WIDTH: any, TILE_HEIGHT: any, TILES: any, WORLD_WIDTH: any, WORLD_HEIGHT: any;
@@ -55,7 +57,7 @@ declare class Board {
     public width: number;
     public height: number;
     public cells: Cell[][];
-    constructor(width: any, height: any);
+    constructor(width?: any, height?: any);
     public init(): void;
     public makeMap(data?: any): void;
     public getCell(arr: number[]): Cell;
@@ -71,6 +73,7 @@ declare class Game {
     public renderer: any;
     public layers: any;
     public uiDrawer: UIDrawer;
+    public systemsManager: SystemsManager;
     constructor();
     public init(): void;
     public initContainers(): void;

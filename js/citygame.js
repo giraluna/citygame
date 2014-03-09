@@ -2,6 +2,9 @@
 /// <reference path="../lib/tween.js.d.ts" />
 /// <reference path="../js/ui.d.ts" />
 /// <reference path="../js/loader.d.ts" />
+///
+/// <reference path="../js/player.d.ts" />
+/// <reference path="../js/systems.d.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -189,6 +192,7 @@ var Cell = (function () {
         if (this.content === undefined) {
             return;
         }
+
         game.layers["content"].removeChildAt(this.content.sprite, this.gridPos[0] + this.gridPos[1]);
         this.content = undefined;
     };
@@ -197,6 +201,8 @@ var Cell = (function () {
 
 var Board = (function () {
     function Board(width, height) {
+        if (typeof width === "undefined") { width = TILES; }
+        if (typeof height === "undefined") { height = TILES; }
         this.width = width;
         this.height = height;
         this.cells = [];
@@ -276,6 +282,7 @@ var Game = (function () {
 
         this.uiDrawer = new UIDrawer();
 
+        //this.systemsManager = new SystemsManager(1000);
         this.render();
     };
     Game.prototype.initContainers = function () {
@@ -402,15 +409,14 @@ var Game = (function () {
     };
     Game.prototype.loadBoard = function () {
         this.resetLayers();
-
-        //var parsed = JSON.parse(this.savedBoard);
         var parsed = JSON.parse(localStorage.getItem("board"));
         var board = this.board = new Board(parsed["width"], parsed["height"]);
         board.makeMap(parsed["cells"]);
     };
     Game.prototype.render = function () {
-        TWEEN.update();
         this.renderer.render(this.stage);
+
+        //this.systemsManager.update();
         requestAnimFrame(this.render.bind(this));
     };
     Game.prototype.resetLayers = function () {
@@ -420,9 +426,9 @@ var Game = (function () {
                 var _l = this.layers[layer];
                 main.removeChild(_l);
                 this.layers[layer] = undefined;
-                this.initLayers();
             }
         }
+        this.initLayers();
     };
     return Game;
 })();
@@ -856,7 +862,6 @@ var HouseTool = (function () {
     }
     HouseTool.prototype.activate = function (target) {
         for (var i = 0; i < target.length; i++) {
-            //target[i].changeContent("house");
             target[i].changeContent(getRandomProperty(cg["content"]["buildings"]));
         }
     };

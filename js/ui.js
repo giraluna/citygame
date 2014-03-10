@@ -8,29 +8,66 @@ var __extends = this.__extends || function (d, b) {
 };
 var UIObject = (function (_super) {
     __extends(UIObject, _super);
-    function UIObject(_parent, delay, lifeTime) {
+    function UIObject(parent) {
         _super.call(this);
-        this._parent = _parent;
-        this.delay = delay;
-        this.lifeTime = lifeTime;
-        this.timeouts = {};
+        this._timeouts = {};
+        this._callbacks = {
+            start: [],
+            added: [],
+            complete: []
+        };
+        this._delay = 0;
+        this._lifeTime = -1;
         this.visible = false;
+        this.setParent(parent);
 
-        this.init();
+        return this;
     }
-    UIObject.prototype.init = function () {
-        this._parent.addChild(this);
-
+    UIObject.prototype.start = function () {
         var self = this;
-        self.timeouts["add"] = window.setTimeout(function UIObjectAddFN() {
-            self.visible = true;
 
-            if (self.lifeTime > 0) {
-                self.timeouts["remove"] = window.setTimeout(function UIObjectRemoveFN() {
+        self.fireCallbacks("start");
+        self._timeouts["add"] = window.setTimeout(function UIObjectAddFN() {
+            self._parent.addChild(self);
+            self.visible = true;
+            self.fireCallbacks("added");
+
+            if (self._lifeTime > 0) {
+                self._timeouts["remove"] = window.setTimeout(function UIObjectRemoveFN() {
                     self.remove();
-                }, self.lifeTime);
+                    this.fireCallbacks("complete");
+                }, self._lifeTime);
             }
-        }, self.delay);
+        }, self._delay);
+        return this;
+    };
+    UIObject.prototype.setParent = function (parent) {
+        this._parent = parent;
+        return this;
+    };
+    UIObject.prototype.delay = function (time) {
+        this._delay = time;
+        return this;
+    };
+    UIObject.prototype.lifeTime = function (time) {
+        this._lifeTime = time;
+        return this;
+    };
+    UIObject.prototype.addChild = function (child) {
+        _super.prototype.addChild.call(this, child);
+        return this;
+    };
+    UIObject.prototype.fireCallbacks = function (id) {
+        if (!this._callbacks[id]) {
+            throw new Error("UIObject fired callbacks with id: " + id);
+            return;
+        }
+        var callbacks = this._callbacks[id];
+
+        for (var i = 0; i < callbacks.length; i++) {
+            callbacks[i].call();
+        }
+        return this;
     };
     UIObject.prototype.remove = function () {
         this.clearTimeouts();
@@ -38,64 +75,48 @@ var UIObject = (function (_super) {
             this.parent.removeChild(this);
         }
     };
+    UIObject.prototype.onStart = function (callback) {
+        this._callbacks["start"].push(callback);
+        return this;
+    };
+    UIObject.prototype.onAdded = function (callback) {
+        this._callbacks["added"].push(callback);
+        return this;
+    };
+    UIObject.prototype.onComplete = function (callback) {
+        this._callbacks["complete"].push(callback);
+        return this;
+    };
     UIObject.prototype.clearTimeouts = function () {
-        for (var timeout in this.timeouts) {
-            window.clearTimeout(this.timeouts[timeout]);
+        for (var timeout in this._timeouts) {
+            window.clearTimeout(this._timeouts[timeout]);
         }
     };
     return UIObject;
 })(PIXI.DisplayObjectContainer);
 
-var ToolTip = (function (_super) {
-    __extends(ToolTip, _super);
-    function ToolTip(_parent, delay, lifeTime, data) {
-        _super.call(this, _parent, delay, lifeTime);
-        this._parent = _parent;
-        this.delay = delay;
-        this.lifeTime = lifeTime;
-        this.data = data;
+function makeToolTip(data, text) {
+    var toolTip = new PIXI.DisplayObjectContainer;
+    var speechRect;
 
-        this.drawToolTip(data);
-
-        _super.prototype.init.call(this);
+    if (data.autoSize || !data.width) {
+        speechRect = makeSpeechRect(data, text);
+    } else {
+        speechRect = makeSpeechRect(data);
     }
-    ToolTip.prototype.drawToolTip = function (data) {
-        var lineStyle = data.style.lineStyle;
-        var fillStyle = data.style.fillStyle;
+    var speechPoly = speechRect[0];
+    var topLeft = speechRect[1];
 
-        var tipPos = (data.tipPos !== undefined) ? data.tipPos : 0.25;
-        var tipWidth = data.tipWidth || 10;
-        var tipHeight = data.tipHeight || 20;
-        var tipDir = data.tipDir || "right";
-        var pointing = data.pointing || "down";
+    var gfx = new PIXI.Graphics();
+    drawPolygon(gfx, speechPoly, data.style.lineStyle, data.style.fillStyle);
 
-        var textObject = data.textObject;
-        var textWidth = textObject.width + data.padding[0] * 2;
-        var textHeight = textObject.height + data.padding[1] * 2;
+    text.position.set(topLeft[0] + data.padding[0], topLeft[1] + data.padding[1]);
 
-        var width = (data.autoSize || !data.width) ? textWidth : data.width;
-        var height = (data.autoSize || !data.height) ? textHeight : data.height;
+    toolTip.addChild(gfx);
+    toolTip.addChild(text);
 
-        var speechPoly = makeSpeechRect(width, height, tipPos, tipWidth, tipHeight, tipDir, pointing);
-        this.topLeftCorner = speechPoly[1];
-
-        var gfx = new PIXI.Graphics();
-        this.addChild(gfx);
-
-        drawPolygon(gfx, speechPoly[0], lineStyle, fillStyle);
-
-        this.setTextPos(textObject, data.padding);
-        gfx.addChild(textObject);
-    };
-    ToolTip.prototype.setTextPos = function (text, padding) {
-        var x = this.topLeftCorner[0] + padding[0];
-        var y = this.topLeftCorner[1] + padding[1];
-
-        text.position.set(x, y);
-        return text;
-    };
-    return ToolTip;
-})(UIObject);
+    return toolTip;
+}
 
 function drawPolygon(gfx, polygon, lineStyle, fillStyle) {
     // BUG : floating point errors
@@ -126,14 +147,7 @@ function drawPolygon(gfx, polygon, lineStyle, fillStyle) {
     return gfx;
 }
 
-function makeSpeechRect(width, height, tipPos, tipWidth, tipHeight, tipDir, pointing) {
-    if (typeof width === "undefined") { width = 200; }
-    if (typeof height === "undefined") { height = 100; }
-    if (typeof tipPos === "undefined") { tipPos = 0.25; }
-    if (typeof tipWidth === "undefined") { tipWidth = 10; }
-    if (typeof tipHeight === "undefined") { tipHeight = 20; }
-    if (typeof tipDir === "undefined") { tipDir = "right"; }
-    if (typeof pointing === "undefined") { pointing = "down"; }
+function makeSpeechRect(data, text) {
     /*
     4|---------------------------|3
     |                           |
@@ -153,6 +167,21 @@ function makeSpeechRect(width, height, tipPos, tipWidth, tipHeight, tipDir, poin
     |                           |
     4|---------------------------|3
     */
+    var width = data.width || 200;
+    var height = data.height || 100;
+    var padding = data.padding || 10;
+
+    var tipPos = data.tipPos || 0.25;
+    var tipWidth = data.tipWidth || 10;
+    var tipHeight = data.tipHeight || 20;
+    var tipDir = data.tipDir || "right";
+    var pointing = data.pointing || "down";
+
+    if (text) {
+        width = text.width + padding[0] * 2;
+        height = text.height + padding[1] * 2;
+    }
+
     var xMax = width * (1 - tipPos);
     var yMax = height + tipHeight;
     var xMin = -width * tipPos;

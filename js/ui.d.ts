@@ -1,24 +1,24 @@
 /// <reference path="../lib/pixi.d.ts" />
 /// <reference path="../lib/tween.js.d.ts" />
 declare class UIObject extends PIXI.DisplayObjectContainer {
+    public _timeouts: any;
+    public _callbacks: any;
+    public _delay: number;
+    public _lifeTime: number;
     public _parent: PIXI.DisplayObjectContainer;
-    public delay: number;
-    public lifeTime: number;
-    public timeouts: any;
-    constructor(_parent: PIXI.DisplayObjectContainer, delay: number, lifeTime: number);
-    public init(): void;
+    constructor(parent: any);
+    public start(): UIObject;
+    public setParent(parent: PIXI.DisplayObjectContainer): UIObject;
+    public delay(time: number): UIObject;
+    public lifeTime(time: number): UIObject;
+    public addChild(child: any): UIObject;
+    public fireCallbacks(id: string): UIObject;
     public remove(): void;
-    public clearTimeouts(): void;
+    public onStart(callback: any): UIObject;
+    public onAdded(callback: any): UIObject;
+    public onComplete(callback: any): UIObject;
+    private clearTimeouts();
 }
-declare class ToolTip extends UIObject {
-    public _parent: PIXI.DisplayObjectContainer;
-    public delay: number;
-    public lifeTime: number;
-    public data: any;
-    public topLeftCorner: number[];
-    constructor(_parent: PIXI.DisplayObjectContainer, delay: number, lifeTime: number, data: any);
-    public drawToolTip(data: any): void;
-    public setTextPos(text: PIXI.Text, padding: number[]): PIXI.Text;
-}
+declare function makeToolTip(data: any, text: PIXI.Text): PIXI.DisplayObjectContainer;
 declare function drawPolygon(gfx: PIXI.Graphics, polygon: number[][], lineStyle: any, fillStyle: any): PIXI.Graphics;
-declare function makeSpeechRect(width?: number, height?: number, tipPos?: number, tipWidth?: number, tipHeight?: number, tipDir?: string, pointing?: string): any[];
+declare function makeSpeechRect(data: any, text?: PIXI.Text): number[][];

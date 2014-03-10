@@ -149,7 +149,7 @@ declare class UIDrawer {
     constructor();
     public init(): void;
     public removeActive(): void;
-    public makeCellTooltip(event: any): ToolTip;
+    public makeCellTooltip(event: any): PIXI.DisplayObjectContainer;
     public clearLayer(): void;
 }
 declare class Highlighter {

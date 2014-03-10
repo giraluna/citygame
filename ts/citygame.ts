@@ -917,9 +917,6 @@ class MouseEventHandler
 
       game.highlighter.clearSprites();
 
-      // TEMP
-      selectedCells = cell.getArea(5, "nw");
-
       game.highlighter.tintCells(selectedCells, game.activeTool.tintColor);
     }
     else if (this.currAction === undefined)
@@ -937,9 +934,6 @@ class MouseEventHandler
       this.currCell = pos;
       var selectedCells = game.board.getCells(
         game.activeTool.selectType(this.startCell, this.currCell));
-
-      // TEMP
-      selectedCells = cell.getArea(5, "nw");
 
       game.activeTool.activate(selectedCells);
       game.highlighter.clearSprites();
@@ -1029,9 +1023,11 @@ class UIDrawer
       ? cellY - cell.content.sprite.height / 2
       : cellY - cell.sprite.height / 2;
 
+    var uiObj = this.active = new UIObject(this.layer)
+    .delay( 500 )
+    .lifeTime( -1 );
 
-    var toolTip = this.active = new ToolTip(
-      this.layer, 500, -1,
+    var toolTip = makeToolTip(
       {
         style: this.styles["base"],
         autoSize: true,
@@ -1040,11 +1036,15 @@ class UIDrawer
         tipHeight: 20,
         tipDir: tipDir,
         pointing: pointing,
-        textObject: textObject,
         padding: [10, 10]
-      }
+      }, 
+      textObject
       );
-    toolTip.position.set(x, y);
+    uiObj.position.set(x, y);
+
+    uiObj.addChild(toolTip);
+    uiObj.start();
+
     return toolTip;
   }
 

@@ -476,6 +476,8 @@ var Game = (function () {
     Game.prototype.render = function () {
         this.renderer.render(this.stage);
 
+        TWEEN.update();
+
         this.systemsManager.update();
         requestAnimFrame(this.render.bind(this));
     };
@@ -716,6 +718,10 @@ var MouseEventHandler = (function () {
             game.activeTool.activate(selectedCells);
             game.highlighter.clearSprites();
             this.currAction = undefined;
+
+            for (var i = 0; i < selectedCells.length; i++) {
+                game.uiDrawer.makeCellPopup(selectedCells[i]);
+            }
         }
     };
     return MouseEventHandler;
@@ -729,11 +735,19 @@ var UIDrawer = (function () {
         this.init();
     }
     UIDrawer.prototype.init = function () {
-        this.fonts["base"] = {
-            font: "18px Snippet",
-            fill: "#444444",
-            align: "left",
-            size: 18
+        this.fonts = {
+            base: {
+                font: "12px Snippet",
+                fill: "#FF0000",
+                align: "left",
+                size: 12
+            },
+            black: {
+                font: "bold 20pt Arial",
+                fill: "000000",
+                align: "left",
+                size: 20
+            }
         };
         this.styles["base"] = {
             lineStyle: {
@@ -783,7 +797,7 @@ var UIDrawer = (function () {
         var pointing = (screenY - textObject.height - 100 < 0) ? "up" : "down";
 
         var x = cellX;
-        var y = (cell.content && pointing === "down") ? cellY - cell.content.sprite.height / 2 : cellY - cell.sprite.height / 2;
+        var y = (cell.content && pointing === "down") ? cellY - cell.content.sprite.height * cell.content.sprite.worldTransform.a / 2 : cellY - cell.sprite.height * cell.sprite.worldTransform.a / 2;
 
         var uiObj = this.active = new UIObject(this.layer).delay(500).lifeTime(-1);
 
@@ -802,7 +816,50 @@ var UIDrawer = (function () {
         uiObj.addChild(toolTip);
         uiObj.start();
 
-        return toolTip;
+        return uiObj;
+    };
+    UIDrawer.prototype.makeCellPopup = function (cell) {
+        var cellX = cell.sprite.worldTransform.tx;
+        var cellY = cell.sprite.worldTransform.ty;
+
+        var x = cellX;
+        var y = (cell.content) ? cellY - cell.content.sprite.height * cell.content.sprite.worldTransform.a : cellY - cell.sprite.height * cell.sprite.worldTransform.a;
+
+        this.makeFadeyPopup([x, y], [0, -20], 2000);
+    };
+    UIDrawer.prototype.makeFadeyPopup = function (pos, drift, lifeTime) {
+        var tween = new TWEEN.Tween({
+            alpha: 1,
+            x: pos[0],
+            y: pos[1]
+        });
+
+        var uiObj = new UIObject(this.layer).lifeTime(lifeTime).onAdded(function () {
+            tween.start();
+        }).onComplete(function () {
+            TWEEN.remove(tween);
+        });
+
+        tween.to({
+            alpha: 0,
+            x: pos[0] + drift[0],
+            y: pos[1] + drift[1]
+        }, lifeTime).onUpdate(function () {
+            uiObj.alpha = this.alpha;
+            uiObj.position.set(this.x, this.y);
+        });
+
+        var content = new PIXI.Text("A", this.fonts["base"]);
+
+        uiObj.position.set(pos[0], pos[1]);
+
+        if (content.width) {
+            content.position.set(content.position.x -= content.width / 2, content.position.y -= content.height / 2);
+        }
+
+        uiObj.addChild(content);
+
+        uiObj.start();
     };
 
     UIDrawer.prototype.clearLayer = function () {

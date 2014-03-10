@@ -1,5 +1,7 @@
 /// <reference path="../lib/pixi.d.ts" />
 /// <reference path="../lib/tween.js.d.ts" />
+///
+/// <reference path="../js/utility.d.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -34,8 +36,8 @@ var UIObject = (function (_super) {
 
             if (self._lifeTime > 0) {
                 self._timeouts["remove"] = window.setTimeout(function UIObjectRemoveFN() {
-                    self.remove();
-                    this.fireCallbacks("complete");
+                    self.remove.call(self);
+                    self.fireCallbacks("complete");
                 }, self._lifeTime);
             }
         }, self._delay);
@@ -74,6 +76,7 @@ var UIObject = (function (_super) {
         if (this.parent) {
             this.parent.removeChild(this);
         }
+        deepRemoveFromCache(this);
     };
     UIObject.prototype.onStart = function (callback) {
         this._callbacks["start"].push(callback);

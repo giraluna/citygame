@@ -1,5 +1,6 @@
 /// <reference path="../lib/pixi.d.ts" />
 /// <reference path="../lib/tween.js.d.ts" />
+/// <reference path="utility.d.ts" />
 declare class UIObject extends PIXI.DisplayObjectContainer {
     public _timeouts: any;
     public _callbacks: any;

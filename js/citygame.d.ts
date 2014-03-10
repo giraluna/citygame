@@ -149,7 +149,9 @@ declare class UIDrawer {
     constructor();
     public init(): void;
     public removeActive(): void;
-    public makeCellTooltip(event: any): PIXI.DisplayObjectContainer;
+    public makeCellTooltip(event: any): UIObject;
+    public makeCellPopup(cell: Cell): void;
+    public makeFadeyPopup(pos: number[], drift: number[], lifeTime: number): void;
     public clearLayer(): void;
 }
 declare class Highlighter {

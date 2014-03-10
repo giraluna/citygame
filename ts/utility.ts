@@ -1,3 +1,5 @@
+/// <reference path="../lib/pixi.d.ts" />
+
 function getFrom2dArray(target, arr: number[]): any
 {
   var result = [];
@@ -69,3 +71,24 @@ function iterativeSetDeepProperties(baseObj, target, props)
   }
 }
 */
+
+function deepRemoveFromCache(object)
+{
+  if (object.texture)
+  {
+   //PIXI.Texture.removeTextureFromCacheByReference(object.texture);
+    PIXI.Texture.removeTextureFromCache(object.texture.baseTexture.id);
+  }
+
+  if ( !object.children || object.children.length <= 0)
+  {
+    return;
+  }
+  else
+  {
+    for (var i = 0; i < object.children.length; i++)
+    {
+      deepRemoveFromCache(object.children[i]);
+    }
+  }
+}

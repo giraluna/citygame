@@ -166,6 +166,7 @@ declare module PIXI
 		stage: Stage;
 		visible: boolean;
 		worldAlpha: number;
+		worldTransform: any;
 		constructor();
 		static autoDetectRenderer(width: number, height: number, view?: HTMLCanvasElement, transparent?: boolean): IPixiRenderer;
 		click: IInteractionDataCallback;
@@ -386,6 +387,7 @@ declare module PIXI
 	export class Text extends Sprite
 	{
 		constructor(text: string, style: ITextStyle);
+		canvas: HTMLCanvasElement;
 		destroy(destroyTexture:boolean):void;
 		setText(text: string): void;
 		setStyle(style: ITextStyle): void;

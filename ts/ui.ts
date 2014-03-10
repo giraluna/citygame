@@ -1,5 +1,7 @@
 /// <reference path="../lib/pixi.d.ts" />
 /// <reference path="../lib/tween.js.d.ts" />
+/// 
+/// <reference path="../js/utility.d.ts" />
 
 class UIObject extends PIXI.DisplayObjectContainer
 {
@@ -41,8 +43,8 @@ class UIObject extends PIXI.DisplayObjectContainer
           self._timeouts["remove"] = window.setTimeout(
             function UIObjectRemoveFN()
             {
-              self.remove();
-              this.fireCallbacks("complete");
+              self.remove.call(self);
+              self.fireCallbacks("complete");
             }, self._lifeTime)
         }
       }, self._delay)
@@ -90,6 +92,7 @@ class UIObject extends PIXI.DisplayObjectContainer
     {
       this.parent.removeChild(this);
     }
+    deepRemoveFromCache(this);
   }
   onStart(callback)
   {

@@ -5,6 +5,8 @@
 /// 
 /// <reference path="../js/player.d.ts" />
 /// <reference path="../js/systems.d.ts" />
+/// 
+/// <reference path="../js/utility.d.ts" />
 
 declare var cg:any;
 
@@ -12,15 +14,13 @@ declare var cg:any;
 cg = JSON.parse(JSON.stringify(cg)); //dumb
 
 var container;
-var SCREEN_WIDTH, SCREEN_HEIGHT, TILE_WIDTH,TILE_HEIGHT,
-TILES, WORLD_WIDTH, WORLD_HEIGHT;
-SCREEN_WIDTH = 720
-SCREEN_HEIGHT = 480
-TILE_WIDTH = 64
-TILE_HEIGHT = 32
-TILES = 30
-WORLD_WIDTH = TILES * TILE_WIDTH;
-WORLD_HEIGHT = TILES * TILE_HEIGHT;
+var SCREEN_WIDTH = 720,
+    SCREEN_HEIGHT = 480,
+    TILE_WIDTH = 64,
+    TILE_HEIGHT = 32,
+    TILES = 30,
+    WORLD_WIDTH = TILES * TILE_WIDTH,
+    WORLD_HEIGHT = TILES * TILE_HEIGHT;
 
 
 
@@ -72,7 +72,8 @@ class ContentSprite extends Sprite
 class Content
 {
   type: string;
-  type2: string;
+  baseType: string;
+  categoryType: string;
   id: number;
   sprite: Sprite;
   cell: Cell;
@@ -81,7 +82,8 @@ class Content
   {
     this.cell = cell;
     this.type = type;
-    this.type2 = type["type2"] || undefined;
+    this.baseType = type["baseType"] || undefined;
+    this.categoryType = type["categoryType"] || undefined;
 
     this.init( type );
 
@@ -89,7 +91,6 @@ class Content
     {
       this.applyData(data);
     }
-
   }
   init( type )
   {
@@ -106,14 +107,19 @@ class Content
       this[key] = data[key];
     }
   }
-
 }
+
+
 interface neighborCells
 {
   n: Cell;
   e: Cell;
   s: Cell;
   w: Cell;
+  ne: Cell;
+  nw: Cell;
+  se: Cell;
+  sw: Cell;
 }
 class Cell
 {
@@ -148,9 +154,20 @@ class Cell
       game.mouseEventHandler.cellUp(event);
     }
   }
-  getNeighbors(): neighborCells
+  getNeighbors(diagonal:boolean = false): neighborCells
   {
     var neighbors: neighborCells =
+    {
+      n: undefined,
+      e: undefined,
+      s: undefined,
+      w: undefined,
+      ne: undefined,
+      nw: undefined,
+      se: undefined,
+      sw: undefined
+    };
+    var hasNeighbor =
     {
       n: undefined,
       e: undefined,
@@ -162,26 +179,86 @@ class Cell
     var x = this.gridPos[0];
     var y = this.gridPos[1];
 
-    neighbors.s = (y+1 < size) ? cells[x]  [y+1] : undefined;
-    neighbors.e = (x+1 < size) ? cells[x+1][y]   : undefined;
-    neighbors.n = (-1 < y-1)   ? cells[x]  [y-1] : undefined;
-    neighbors.w = (-1 < x-1)   ? cells[x-1][y]   : undefined; 
+
+    hasNeighbor.s = (y+1 < size) ? true : false;
+    hasNeighbor.e = (x+1 < size) ? true : false;
+    hasNeighbor.n = (y-1 >= 0)   ? true : false;
+    hasNeighbor.w = (x-1 >= 0)   ? true : false;
+
+
+    neighbors.s = hasNeighbor["s"] ? cells[x]  [y+1] : undefined;
+    neighbors.e = hasNeighbor["e"] ? cells[x+1][y]   : undefined;
+    neighbors.n = hasNeighbor["n"] ? cells[x]  [y-1] : undefined;
+    neighbors.w = hasNeighbor["w"] ? cells[x-1][y]   : undefined;
+
+    if (diagonal === true)
+    {
+      neighbors.ne = (hasNeighbor["n"] && hasNeighbor["e"]) ?
+        cells[x+1][y-1] : undefined;
+      neighbors.nw = (hasNeighbor["n"] && hasNeighbor["w"]) ?
+        cells[x-1][y-1] : undefined;
+      neighbors.se = (hasNeighbor["s"] && hasNeighbor["e"]) ?
+        cells[x+1][y+1] : undefined;
+      neighbors.sw = (hasNeighbor["s"] && hasNeighbor["w"]) ?
+        cells[x-1][y+1] : undefined;
+    }
 
     return neighbors; 
   }
+  getArea(size: number, anchor:string="center")
+    {
+      var gridPos = this.gridPos;
+
+      var start = [gridPos[0], gridPos[1]];
+      var end = [gridPos[0], gridPos[1]];
+      var boardSize = game.board.width;
+
+      var adjust = [[0,0], [0,0]];
+
+      if (anchor === "center")
+      {
+        adjust = [[-1, -1], [1, 1]];
+      };
+      if (anchor === "ne")    
+      {
+        adjust[1] = [-1, 1];
+      };
+      if (anchor === "se")    
+      {
+        adjust[1] = [-1, -1];
+      };
+      if (anchor === "sw")    
+      {
+        adjust[1] = [1, -1];
+      };
+      if (anchor === "nw")    
+      {
+        adjust[1] = [1, 1];
+      };
+
+      for (var i = 0; i < size - 1; i++)
+      {
+        start[0] += adjust[0][0];
+        start[1] += adjust[0][1];
+        end[0] += adjust[1][0];
+        end[1] += adjust[1][1];
+      }
+      var rect = rectSelect(start, end);
+      return game.board.getCells(rect);
+    }
   replace( type:string ) //change base type of tile
   {
     var _texture = type["frame"];
     this.sprite.setTexture( PIXI.Texture.fromFrame( _texture ));
     this.sprite.type = this.type = type;
     this.buildable = type["buildable"];
-    if (this.content && this.content.type2 === "plant")
+    if (this.content && this.content.baseType === "plant")
     {
       this.addPlant();
     }
     else if(this.content)
     {
-      if ( !this.checkBuildable( this.content.type2 ) )
+      if ( !this.checkBuildable( this.content.baseType ) )
       {
         this.changeContent("none");
       }
@@ -193,9 +270,9 @@ class Cell
   }
   changeContent( type:string, update:boolean=true, data? )
   {
-    var type2 = type["type2"] ? type["type2"] : "none";
-    var buildable = this.checkBuildable(type2);
-    var sameTypeExclusion = this.checkSameTypeExclusion( type2 );
+    var baseType = type["baseType"] ? type["baseType"] : "none";
+    var buildable = this.checkBuildable(baseType);
+    var sameTypeExclusion = this.checkSameTypeExclusion( baseType );
     var toAdd: boolean = ( type !== "none" && buildable !== false && !sameTypeExclusion );
     var toRemove: boolean = ( type === "none" || 
       (!sameTypeExclusion && toAdd)
@@ -215,10 +292,10 @@ class Cell
       this.updateCell();
     }
   }
-  checkSameTypeExclusion( type2: string)
+  checkSameTypeExclusion( baseType: string)
   {
-    var contentType2 = this.content ? this.content["type2"] : "none";
-    if ( contentType2 == type2 && type2 === "building" )
+    var contentbaseType = this.content ? this.content["baseType"] : "none";
+    if ( contentbaseType == baseType && baseType === "building" )
     {
       return true;
     }
@@ -227,11 +304,11 @@ class Cell
       return false;
     }
   }
-  checkBuildable( type2: string )
+  checkBuildable( baseType: string )
   {
     if (this.buildable === false)
     {
-      if (type2 == "plant" || type2 == "road")
+      if (baseType == "plant" || baseType == "road")
       {
         return true;
       }
@@ -375,7 +452,7 @@ class Game
 
     this.uiDrawer = new UIDrawer();
 
-    //this.systemsManager = new SystemsManager(1000);
+    this.systemsManager = new SystemsManager(1000);
 
     this.render();
     }
@@ -540,7 +617,7 @@ class Game
   {
     this.renderer.render(this.stage);
 
-    //this.systemsManager.update();
+    this.systemsManager.update();
     requestAnimFrame( this.render.bind(this) );
   }
   resetLayers()
@@ -624,7 +701,7 @@ class Scroller
   {
     this.container = container;
     this.bounds.min = bound;  // sets clamp limit to percentage of screen from 0.0 to 1.0
-    this.bounds.max = fround(1 - bound);
+    this.bounds.max = Number( (1 - bound).toFixed(1) );
     this.setBounds();
     this.zoomField = document.getElementById("zoom-amount");
   }
@@ -839,6 +916,10 @@ class MouseEventHandler
         game.activeTool.selectType(this.startCell, this.currCell));
 
       game.highlighter.clearSprites();
+
+      // TEMP
+      selectedCells = cell.getArea(5, "nw");
+
       game.highlighter.tintCells(selectedCells, game.activeTool.tintColor);
     }
     else if (this.currAction === undefined)
@@ -856,6 +937,10 @@ class MouseEventHandler
       this.currCell = pos;
       var selectedCells = game.board.getCells(
         game.activeTool.selectType(this.startCell, this.currCell));
+
+      // TEMP
+      selectedCells = cell.getArea(5, "nw");
+
       game.activeTool.activate(selectedCells);
       game.highlighter.clearSprites();
       this.currAction = undefined;
@@ -1162,11 +1247,11 @@ function getRoadConnections(target: Cell, depth:number)
 {
   var connections = {};
   var dir = "";
-  var neighbors = target.getNeighbors();
+  var neighbors = target.getNeighbors(false);
   for ( var cell in neighbors )
   {
     if (neighbors[cell] && neighbors[cell].content
-      && neighbors[cell].content.type2 === "road")
+      && neighbors[cell].content.baseType === "road")
     {
       connections[cell] = true;
     }
@@ -1196,7 +1281,7 @@ function getRoadConnections(target: Cell, depth:number)
   {
     dir = "h";
   }
-  if (target.content && target.content.type2 === "road")
+  if (target.content && target.content.baseType === "road")
   {
     var finalRoad = cg["content"]["roads"]["road_" + dir];
     target.changeContent(finalRoad, false);
@@ -1259,18 +1344,6 @@ function manhattanSelect(a, b) : number[]
   }
   return cells;
 }
-
-
-function getFrom2dArray(target, arr: number[]): any
-{
-  var result = [];
-  for (var i = 0; i < arr.length; i++)
-  {
-    result.push( target[arr[i][0]][arr[i][1]] );
-  };
-  return result;
-}
-
 function arrayToPolygon(points)
 {
   var _points = [];
@@ -1300,20 +1373,6 @@ function getIsoCoord(x: number, y: number,
     _isoY += offset[1];
   }
   return [_isoX, _isoY];
-}
-
-function fround(x)
-{
-  var f32 = new Float32Array(1);
-  return f32[0] = x, f32[0];
-}
-
-function getRandomProperty( target )
-{
-  var _targetKeys = Object.keys(target);
-  var _rnd = Math.floor(Math.random() * (_targetKeys.length));
-  var _rndProp = target[ _targetKeys[_rnd] ];
-  return _rndProp;
 }
 
 
@@ -1369,7 +1428,7 @@ function pineapple()
   cg["content"]["buildings"]["pineapple"] =
   {
     "type": "pineapple",
-    "type2": "building",
+    "baseType": "building",
     "width": 64,
     "height": 128,
     "anchor": [0.5, 1.25],

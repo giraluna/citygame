@@ -11,7 +11,7 @@ var Player = (function () {
     };
     Player.prototype.updateElements = function () {
         this.moneySpan.innerHTML = this.money + "$";
-        this.incomeSpan.innerHTML = "+" + this.income + "/tick";
+        this.incomeSpan.innerHTML = "+" + this.income + "/s";
     };
     Player.prototype.addMoney = function (amount) {
         this.money += amount;

@@ -4,9 +4,10 @@
 /// <reference path="loader.d.ts" />
 /// <reference path="player.d.ts" />
 /// <reference path="systems.d.ts" />
+/// <reference path="utility.d.ts" />
 declare var cg: any;
 declare var container: any;
-declare var SCREEN_WIDTH: any, SCREEN_HEIGHT: any, TILE_WIDTH: any, TILE_HEIGHT: any, TILES: any, WORLD_WIDTH: any, WORLD_HEIGHT: any;
+declare var SCREEN_WIDTH: number, SCREEN_HEIGHT: number, TILE_WIDTH: number, TILE_HEIGHT: number, TILES: number, WORLD_WIDTH: number, WORLD_HEIGHT: number;
 declare class Sprite extends PIXI.Sprite {
     public type: string;
     public content: Content;
@@ -22,7 +23,8 @@ declare class ContentSprite extends Sprite {
 }
 declare class Content {
     public type: string;
-    public type2: string;
+    public baseType: string;
+    public categoryType: string;
     public id: number;
     public sprite: Sprite;
     public cell: Cell;
@@ -35,6 +37,10 @@ interface neighborCells {
     e: Cell;
     s: Cell;
     w: Cell;
+    ne: Cell;
+    nw: Cell;
+    se: Cell;
+    sw: Cell;
 }
 declare class Cell {
     public type: string;
@@ -44,11 +50,12 @@ declare class Cell {
     public buildable: boolean;
     constructor(gridPos: any, type: any);
     public init(type: string): void;
-    public getNeighbors(): neighborCells;
+    public getNeighbors(diagonal?: boolean): neighborCells;
+    public getArea(size: number, anchor?: string): any;
     public replace(type: string): void;
     public changeContent(type: string, update?: boolean, data?: any): void;
-    public checkSameTypeExclusion(type2: string): boolean;
-    public checkBuildable(type2: string): boolean;
+    public checkSameTypeExclusion(baseType: string): boolean;
+    public checkBuildable(baseType: string): boolean;
     public addPlant(): void;
     public updateCell(): void;
     public removeContent(): void;
@@ -57,7 +64,7 @@ declare class Board {
     public width: number;
     public height: number;
     public cells: Cell[][];
-    constructor(width?: any, height?: any);
+    constructor(width?: number, height?: number);
     public init(): void;
     public makeMap(data?: any): void;
     public getCell(arr: number[]): Cell;
@@ -207,12 +214,9 @@ declare class RoadTool implements Tool {
 declare function getRoadConnections(target: Cell, depth: number): any;
 declare function rectSelect(a: number[], b: number[]): number[];
 declare function manhattanSelect(a: any, b: any): number[];
-declare function getFrom2dArray(target: any, arr: number[]): any;
 declare function arrayToPolygon(points: any): PIXI.Polygon;
 declare function arrayToPoint(point: any): PIXI.Point;
 declare function getIsoCoord(x: number, y: number, width: number, height: number, offset?: number[]): number[];
-declare function fround(x: any): number;
-declare function getRandomProperty(target: any): any;
 declare function pineapple(): void;
 declare var game: Game;
 declare var loader: Loader;

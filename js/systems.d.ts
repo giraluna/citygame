@@ -14,7 +14,7 @@
 * @property accumulated Amount of time banked towards next tick
 *
 */
-declare class SystemsManager extends PIXI.EventTarget {
+declare class SystemsManager {
     public systems: any;
     public timer: Strawb.Timer;
     public tickTime: number;
@@ -24,4 +24,17 @@ declare class SystemsManager extends PIXI.EventTarget {
     public addSystem(name: any, system: any): void;
     public tick(): void;
     public update(): void;
+}
+declare class System {
+    public activationRate: number;
+    public lastTick: number;
+    public nextTick: number;
+    public activate: () => any;
+    constructor(activationRate: number, currTick: number);
+    public updateTicks(currTick: number): void;
+    public tick(currTick: number): void;
+}
+declare class HouseSystem extends System {
+    public targets: any[];
+    constructor(activationRate: number, currTick: number);
 }

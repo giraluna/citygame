@@ -19,7 +19,7 @@ class Player
   updateElements()
   {
     this.moneySpan.innerHTML = this.money + "$";
-    this.incomeSpan.innerHTML = "+" + this.income + "/tick";
+    this.incomeSpan.innerHTML = "+" + this.income + "/s";
   }
   addMoney(amount)
   {
@@ -32,3 +32,4 @@ class Player
     this.updateElements();
   }
 }
+

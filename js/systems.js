@@ -20,14 +20,11 @@ var __extends = this.__extends || function (d, b) {
 * @property accumulated Amount of time banked towards next tick
 *
 */
-var SystemsManager = (function (_super) {
-    __extends(SystemsManager, _super);
+var SystemsManager = (function () {
     function SystemsManager(tickTime) {
-        _super.call(this);
         this.systems = {};
         this.tickNumber = 0;
         this.accumulated = 0;
-
         this.timer = new Strawb.Timer();
         this.tickTime = tickTime / 1000;
     }
@@ -48,5 +45,39 @@ var SystemsManager = (function (_super) {
         }
     };
     return SystemsManager;
-})(PIXI.EventTarget);
+})();
+
+var System = (function () {
+    function System(activationRate, currTick) {
+        this.activationRate = activationRate;
+        this.updateTicks(currTick);
+
+        if (activationRate < 1) {
+            console.log("<1 activationRate on system", this);
+        }
+    }
+    System.prototype.updateTicks = function (currTick) {
+        this.lastTick = currTick;
+        this.nextTick = currTick + this.activationRate;
+    };
+
+    System.prototype.tick = function (currTick) {
+        if (currTick + this.activationRate >= this.nextTick) {
+            // do something
+            this.activate();
+
+            this.updateTicks(currTick);
+        }
+    };
+    return System;
+})();
+
+var HouseSystem = (function (_super) {
+    __extends(HouseSystem, _super);
+    function HouseSystem(activationRate, currTick) {
+        _super.call(this, activationRate, currTick);
+        this.targets = [];
+    }
+    return HouseSystem;
+})(System);
 //# sourceMappingURL=systems.js.map

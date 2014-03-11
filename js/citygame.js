@@ -823,9 +823,11 @@ var UIDrawer = (function () {
         var x = cellX;
         var y = (cell.content) ? cellY - cell.content.sprite.height * cell.content.sprite.worldTransform.a : cellY - cell.sprite.height * cell.sprite.worldTransform.a;
 
-        this.makeFadeyPopup([x, y], [0, -20], 2000);
+        var content = new PIXI.Text("+1", this.fonts["black"]);
+
+        this.makeFadeyPopup([x, y], [0, -20], 2000, content);
     };
-    UIDrawer.prototype.makeFadeyPopup = function (pos, drift, lifeTime) {
+    UIDrawer.prototype.makeFadeyPopup = function (pos, drift, lifeTime, content) {
         var tween = new TWEEN.Tween({
             alpha: 1,
             x: pos[0],
@@ -847,12 +849,11 @@ var UIDrawer = (function () {
             uiObj.position.set(this.x, this.y);
         });
 
-        var content = new PIXI.Text("+1", this.fonts["black"]);
-
         uiObj.position.set(pos[0], pos[1]);
 
         if (content.width) {
-            content.position.set(content.position.x -= content.width / 2, content.position.y -= content.height / 2);
+            content.position.x -= content.width / 2;
+            content.position.y -= content.height / 2;
         }
 
         uiObj.addChild(content);

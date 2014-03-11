@@ -151,7 +151,7 @@ declare class UIDrawer {
     public removeActive(): void;
     public makeCellTooltip(event: any): UIObject;
     public makeCellPopup(cell: Cell): void;
-    public makeFadeyPopup(pos: number[], drift: number[], lifeTime: number): void;
+    public makeFadeyPopup(pos: number[], drift: number[], lifeTime: number, content: any): void;
     public clearLayer(): void;
 }
 declare class Highlighter {

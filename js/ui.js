@@ -76,7 +76,7 @@ var UIObject = (function (_super) {
         if (this.parent) {
             this.parent.removeChild(this);
         }
-        deepRemoveFromCache(this);
+        deepDestroy(this);
     };
     UIObject.prototype.onStart = function (callback) {
         this._callbacks["start"].push(callback);

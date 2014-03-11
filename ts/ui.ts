@@ -92,7 +92,7 @@ class UIObject extends PIXI.DisplayObjectContainer
     {
       this.parent.removeChild(this);
     }
-    deepRemoveFromCache(this);
+    deepDestroy(this);
   }
   onStart(callback)
   {
@@ -289,3 +289,4 @@ function makeSpeechRect(data:any, text?: PIXI.Text) : number[][]
 
   return [polygon, topLeft ]; //[0]: polygon, [1]: top left
 }
+

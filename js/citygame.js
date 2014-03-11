@@ -737,16 +737,14 @@ var UIDrawer = (function () {
     UIDrawer.prototype.init = function () {
         this.fonts = {
             base: {
-                font: "12px Snippet",
-                fill: "#FF0000",
-                align: "left",
-                size: 12
+                font: "18px Snippet",
+                fill: "#444444",
+                align: "left"
             },
             black: {
                 font: "bold 20pt Arial",
                 fill: "000000",
-                align: "left",
-                size: 20
+                align: "left"
             }
         };
         this.styles["base"] = {
@@ -849,7 +847,7 @@ var UIDrawer = (function () {
             uiObj.position.set(this.x, this.y);
         });
 
-        var content = new PIXI.Text("A", this.fonts["base"]);
+        var content = new PIXI.Text("+1", this.fonts["black"]);
 
         uiObj.position.set(pos[0], pos[1]);
 

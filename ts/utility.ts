@@ -51,33 +51,11 @@ function setDeepProperties(baseObj, target: any[], props)
   }
 }
 
-/*
-function iterativeSetDeepProperties(baseObj, target, props)
-{
-  var currObj = baseObj;
-  var targetProp;
-  for (var i = 0; i < target.length; i++)
-  {
-    targetProp = target[i];
-    if ( !currObj.hasOwnProperty(targetProp) )
-    {
-      currObj[targetProp] = {};
-    }
-    currObj = currObj[targetProp];
-  }
-  for (var prop in props)
-  {
-    currObj[prop] = props[prop];
-  }
-}
-*/
-
-function deepRemoveFromCache(object)
+function deepDestroy(object)
 {
   if (object.texture)
   {
-   //PIXI.Texture.removeTextureFromCacheByReference(object.texture);
-    PIXI.Texture.removeTextureFromCache(object.texture.baseTexture.id);
+    object.texture.destroy(true);
   }
 
   if ( !object.children || object.children.length <= 0)
@@ -88,7 +66,7 @@ function deepRemoveFromCache(object)
   {
     for (var i = 0; i < object.children.length; i++)
     {
-      deepRemoveFromCache(object.children[i]);
+      deepDestroy(object.children[i]);
     }
   }
 }

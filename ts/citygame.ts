@@ -20,7 +20,8 @@ var SCREEN_WIDTH = 720,
     TILE_HEIGHT = 32,
     TILES = 30,
     WORLD_WIDTH = TILES * TILE_WIDTH,
-    WORLD_HEIGHT = TILES * TILE_HEIGHT;
+    WORLD_HEIGHT = TILES * TILE_HEIGHT,
+    ZOOM_LEVELS = [1];
 
 
 
@@ -416,6 +417,65 @@ class Board
   getCells(arr:number[]): Cell[]
   {
     return getFrom2dArray(this.cells, arr);
+  }
+}
+
+class WorldRenderer extends PIXI.EventTarget
+{
+  layers: any;
+  renderTexture: PIXI.RenderTexture;
+  zoomLevel: number;
+  constructor(width, height)
+  {
+    super();
+    this.renderTexture = new PIXI.RenderTexture(width, height);
+
+    for (var i = 0; i < ZOOM_LEVELS.length; i++)
+    {
+      var zoomStr = "zoom" + ZOOM_LEVELS[i];
+
+      var zoomLayer = this.layers[zoomStr] = {};
+      var main = zoomLayer["main"] = new PIXI.DisplayObjectContainer();
+
+      var ground  = zoomLayer["ground"]  = new PIXI.DisplayObjectContainer();
+      var content = zoomLayer["content"] = new SortedDisplayObjectContainer(TILES * 2);
+    }
+  }
+  initContainers(width, height)
+  {
+    this.renderTexture = new PIXI.RenderTexture(width, height);
+
+    for (var i = 0; i < ZOOM_LEVELS.length; i++)
+    {
+      var zoomStr = "zoom" + ZOOM_LEVELS[i];
+      var zoomLayer = this.layers[zoomStr] = {};
+
+      var main = zoomLayer["main"] = new PIXI.DisplayObjectContainer();
+    }
+  }
+  initLayers()
+  {
+    for (var i = 0; i < ZOOM_LEVELS.length; i++)
+    {
+      var zoomStr = "zoom" + ZOOM_LEVELS[i];
+      var zoomLayer = this.layers[zoomStr];
+      var main = zoomLayer["main"];
+
+      var ground  = zoomLayer["ground"]  = new PIXI.SpriteBatch();
+      var content = zoomLayer["content"] = new SortedDisplayObjectContainer(TILES * 2);
+
+      main.addChild(ground);
+      main.addChild(content);
+    }
+  }
+  changeZoomLevel(level)
+  {
+    this.zoomLevel = level;
+  }
+  update()
+  {
+    var activeMainLayer = this.layers[this.zoomLevel]["main"]
+    this.renderTexture.render(activeMainLayer);
   }
 }
 

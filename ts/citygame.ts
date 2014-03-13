@@ -422,24 +422,24 @@ class Board
 
 class WorldRenderer extends PIXI.EventTarget
 {
-  layers: any;
+  layers: any = {};
   renderTexture: PIXI.RenderTexture;
-  zoomLevel: number;
+  zoomLevel: number = ZOOM_LEVELS[0];
   constructor(width, height)
   {
     super();
-    this.renderTexture = new PIXI.RenderTexture(width, height);
+    this.addEventListeners();
 
-    for (var i = 0; i < ZOOM_LEVELS.length; i++)
+    this.initContainers(width, height);
+    this.initLayers();
+  }
+  addEventListeners()
+  {
+    var self = this;
+    this.addEventListener("changeZoomLevel", function(event)
     {
-      var zoomStr = "zoom" + ZOOM_LEVELS[i];
-
-      var zoomLayer = this.layers[zoomStr] = {};
-      var main = zoomLayer["main"] = new PIXI.DisplayObjectContainer();
-
-      var ground  = zoomLayer["ground"]  = new PIXI.DisplayObjectContainer();
-      var content = zoomLayer["content"] = new SortedDisplayObjectContainer(TILES * 2);
-    }
+      self.changeZoomLevel(event.content.zoomLevel);
+      })
   }
   initContainers(width, height)
   {
@@ -471,6 +471,7 @@ class WorldRenderer extends PIXI.EventTarget
   changeZoomLevel(level)
   {
     this.zoomLevel = level;
+    this.update();
   }
   update()
   {

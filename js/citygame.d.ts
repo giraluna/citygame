@@ -7,7 +7,7 @@
 /// <reference path="utility.d.ts" />
 declare var cg: any;
 declare var container: any;
-declare var SCREEN_WIDTH: number, SCREEN_HEIGHT: number, TILE_WIDTH: number, TILE_HEIGHT: number, TILES: number, WORLD_WIDTH: number, WORLD_HEIGHT: number;
+declare var SCREEN_WIDTH: number, SCREEN_HEIGHT: number, TILE_WIDTH: number, TILE_HEIGHT: number, TILES: number, WORLD_WIDTH: number, WORLD_HEIGHT: number, ZOOM_LEVELS: number[];
 declare class Sprite extends PIXI.Sprite {
     public type: string;
     public content: Content;
@@ -69,6 +69,17 @@ declare class Board {
     public makeMap(data?: any): void;
     public getCell(arr: number[]): Cell;
     public getCells(arr: number[]): Cell[];
+}
+declare class WorldRenderer extends PIXI.EventTarget {
+    public layers: any;
+    public renderTexture: PIXI.RenderTexture;
+    public zoomLevel: number;
+    constructor(width: any, height: any);
+    public addEventListeners(): void;
+    public initContainers(width: any, height: any): void;
+    public initLayers(): void;
+    public changeZoomLevel(level: any): void;
+    public update(): void;
 }
 declare class Game {
     public board: Board;

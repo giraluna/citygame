@@ -17,7 +17,7 @@ var __extends = this.__extends || function (d, b) {
 cg = JSON.parse(JSON.stringify(cg)); //dumb
 
 var container;
-var SCREEN_WIDTH = 720, SCREEN_HEIGHT = 480, TILE_WIDTH = 64, TILE_HEIGHT = 32, TILES = 30, WORLD_WIDTH = TILES * TILE_WIDTH, WORLD_HEIGHT = TILES * TILE_HEIGHT;
+var SCREEN_WIDTH = 720, SCREEN_HEIGHT = 480, TILE_WIDTH = 64, TILE_HEIGHT = 32, TILES = 30, WORLD_WIDTH = TILES * TILE_WIDTH, WORLD_HEIGHT = TILES * TILE_HEIGHT, ZOOM_LEVELS = [1];
 
 var Sprite = (function (_super) {
     __extends(Sprite, _super);
@@ -318,6 +318,57 @@ var Board = (function () {
     };
     return Board;
 })();
+
+var WorldRenderer = (function (_super) {
+    __extends(WorldRenderer, _super);
+    function WorldRenderer(width, height) {
+        _super.call(this);
+        this.layers = {};
+        this.zoomLevel = ZOOM_LEVELS[0];
+        this.addEventListeners();
+
+        this.initContainers(width, height);
+        this.initLayers();
+    }
+    WorldRenderer.prototype.addEventListeners = function () {
+        var self = this;
+        this.addEventListener("changeZoomLevel", function (event) {
+            self.changeZoomLevel(event.content.zoomLevel);
+        });
+    };
+    WorldRenderer.prototype.initContainers = function (width, height) {
+        this.renderTexture = new PIXI.RenderTexture(width, height);
+
+        for (var i = 0; i < ZOOM_LEVELS.length; i++) {
+            var zoomStr = "zoom" + ZOOM_LEVELS[i];
+            var zoomLayer = this.layers[zoomStr] = {};
+
+            var main = zoomLayer["main"] = new PIXI.DisplayObjectContainer();
+        }
+    };
+    WorldRenderer.prototype.initLayers = function () {
+        for (var i = 0; i < ZOOM_LEVELS.length; i++) {
+            var zoomStr = "zoom" + ZOOM_LEVELS[i];
+            var zoomLayer = this.layers[zoomStr];
+            var main = zoomLayer["main"];
+
+            var ground = zoomLayer["ground"] = new PIXI.SpriteBatch();
+            var content = zoomLayer["content"] = new SortedDisplayObjectContainer(TILES * 2);
+
+            main.addChild(ground);
+            main.addChild(content);
+        }
+    };
+    WorldRenderer.prototype.changeZoomLevel = function (level) {
+        this.zoomLevel = level;
+        this.update();
+    };
+    WorldRenderer.prototype.update = function () {
+        var activeMainLayer = this.layers[this.zoomLevel]["main"];
+        this.renderTexture.render(activeMainLayer);
+    };
+    return WorldRenderer;
+})(PIXI.EventTarget);
 
 var Game = (function () {
     function Game() {

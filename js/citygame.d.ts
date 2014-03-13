@@ -70,16 +70,17 @@ declare class Board {
     public getCell(arr: number[]): Cell;
     public getCells(arr: number[]): Cell[];
 }
-declare class WorldRenderer extends PIXI.EventTarget {
+declare class WorldRenderer {
     public layers: any;
     public renderTexture: PIXI.RenderTexture;
+    public worldSprite: PIXI.Sprite;
     public zoomLevel: number;
     constructor(width: any, height: any);
-    public addEventListeners(): void;
+    public addEventListeners(listener: any): void;
     public initContainers(width: any, height: any): void;
     public initLayers(): void;
     public changeZoomLevel(level: any): void;
-    public update(): void;
+    public render(): void;
 }
 declare class Game {
     public board: Board;
@@ -92,6 +93,8 @@ declare class Game {
     public layers: any;
     public uiDrawer: UIDrawer;
     public systemsManager: SystemsManager;
+    public worldRenderer: WorldRenderer;
+    public eventListener: PIXI.EventTarget;
     constructor();
     public init(): void;
     public initContainers(): void;
@@ -99,6 +102,7 @@ declare class Game {
     public initTools(): void;
     public bindElements(): void;
     public bindRenderer(): void;
+    public updateWorld(): void;
     public resize(): void;
     public changeTool(tool: any): void;
     public saveBoard(): void;

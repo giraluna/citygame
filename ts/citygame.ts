@@ -420,30 +420,35 @@ class Board
   }
 }
 
-class WorldRenderer extends PIXI.EventTarget
+class WorldRenderer
 {
   layers: any = {};
   renderTexture: PIXI.RenderTexture;
+  worldSprite: PIXI.Sprite;
   zoomLevel: number = ZOOM_LEVELS[0];
+  
   constructor(width, height)
   {
-    super();
-    this.addEventListeners();
-
     this.initContainers(width, height);
     this.initLayers();
   }
-  addEventListeners()
+
+  addEventListeners(listener)
   {
     var self = this;
-    this.addEventListener("changeZoomLevel", function(event)
+    listener.addEventListener("changeZoomLevel", function(event)
     {
       self.changeZoomLevel(event.content.zoomLevel);
-      })
+    });
+    listener.addEventListener("updateWorld", function(event)
+    {
+      self.render();
+    });
   }
   initContainers(width, height)
   {
     this.renderTexture = new PIXI.RenderTexture(width, height);
+    this.worldSprite = new PIXI.Sprite(this.renderTexture);
 
     for (var i = 0; i < ZOOM_LEVELS.length; i++)
     {
@@ -471,11 +476,12 @@ class WorldRenderer extends PIXI.EventTarget
   changeZoomLevel(level)
   {
     this.zoomLevel = level;
-    this.update();
+    this.render();
   }
-  update()
+  render()
   {
-    var activeMainLayer = this.layers[this.zoomLevel]["main"]
+    var zoomStr = "zoom" + this.zoomLevel;
+    var activeMainLayer = this.layers[zoomStr]["main"]
     this.renderTexture.render(activeMainLayer);
   }
 }
@@ -492,12 +498,17 @@ class Game
   layers: any = {};
   uiDrawer: UIDrawer;
   systemsManager: SystemsManager;
+  worldRenderer: WorldRenderer;
+  eventListener: PIXI.EventTarget;
   constructor()
   {
   }
   init()
   {
     this.resize();
+
+    this.eventListener = new PIXI.EventTarget();
+
     this.initContainers();
     this.initTools();
     this.changeTool("grass");
@@ -515,11 +526,12 @@ class Game
 
     this.systemsManager = new SystemsManager(1000);
 
+
     this.render();
+    this.updateWorld();
     }
     initContainers()
     {
-
       var _stage = this.stage = new PIXI.Stage(0xFFFFFF);
       var _renderer = this.renderer =
         PIXI.autoDetectRenderer(SCREEN_WIDTH, SCREEN_HEIGHT, null, false, true);
@@ -531,7 +543,13 @@ class Game
 
       var _tooltips = this.layers["tooltips"] = new PIXI.DisplayObjectContainer();
       _stage.addChild(_tooltips);
+
+      this.worldRenderer = new WorldRenderer(WORLD_WIDTH, WORLD_HEIGHT);
+      this.worldRenderer.addEventListeners(this.eventListener);
+      _main.addChild(this.worldRenderer.worldSprite);
+
       this.initLayers();
+
 
       var _game = this;
 
@@ -557,12 +575,9 @@ class Game
     }
     initLayers()
     {
-      var _main = this.layers["main"];
-      var _ground = this.layers["ground"] = new PIXI.DisplayObjectContainer();
-      _ground.interactive = true;
-      _main.addChild(_ground);
-      var _content = this.layers["content"] = new SortedDisplayObjectContainer(TILES * 2);
-      _main.addChild(_content);
+      this.layers["ground"] = this.worldRenderer.layers["zoom1"]["ground"];
+      this.layers["content"] = this.worldRenderer.layers["zoom1"]["content"];
+      this.updateWorld();
     }
     initTools()
     {
@@ -621,6 +636,10 @@ class Game
   {
     var _canvas = document.getElementById("pixi-container");
     _canvas.appendChild(this.renderer.view);
+  }
+  updateWorld()
+  {
+    this.eventListener.dispatchEvent({type: "updateWorld", content:""});
   }
   resize()
   {

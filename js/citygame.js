@@ -319,25 +319,25 @@ var Board = (function () {
     return Board;
 })();
 
-var WorldRenderer = (function (_super) {
-    __extends(WorldRenderer, _super);
+var WorldRenderer = (function () {
     function WorldRenderer(width, height) {
-        _super.call(this);
         this.layers = {};
         this.zoomLevel = ZOOM_LEVELS[0];
-        this.addEventListeners();
-
         this.initContainers(width, height);
         this.initLayers();
     }
-    WorldRenderer.prototype.addEventListeners = function () {
+    WorldRenderer.prototype.addEventListeners = function (listener) {
         var self = this;
-        this.addEventListener("changeZoomLevel", function (event) {
+        listener.addEventListener("changeZoomLevel", function (event) {
             self.changeZoomLevel(event.content.zoomLevel);
+        });
+        listener.addEventListener("updateWorld", function (event) {
+            self.render();
         });
     };
     WorldRenderer.prototype.initContainers = function (width, height) {
         this.renderTexture = new PIXI.RenderTexture(width, height);
+        this.worldSprite = new PIXI.Sprite(this.renderTexture);
 
         for (var i = 0; i < ZOOM_LEVELS.length; i++) {
             var zoomStr = "zoom" + ZOOM_LEVELS[i];
@@ -361,14 +361,15 @@ var WorldRenderer = (function (_super) {
     };
     WorldRenderer.prototype.changeZoomLevel = function (level) {
         this.zoomLevel = level;
-        this.update();
+        this.render();
     };
-    WorldRenderer.prototype.update = function () {
-        var activeMainLayer = this.layers[this.zoomLevel]["main"];
+    WorldRenderer.prototype.render = function () {
+        var zoomStr = "zoom" + this.zoomLevel;
+        var activeMainLayer = this.layers[zoomStr]["main"];
         this.renderTexture.render(activeMainLayer);
     };
     return WorldRenderer;
-})(PIXI.EventTarget);
+})();
 
 var Game = (function () {
     function Game() {
@@ -377,6 +378,9 @@ var Game = (function () {
     }
     Game.prototype.init = function () {
         this.resize();
+
+        this.eventListener = new PIXI.EventTarget();
+
         this.initContainers();
         this.initTools();
         this.changeTool("grass");
@@ -395,6 +399,7 @@ var Game = (function () {
         this.systemsManager = new SystemsManager(1000);
 
         this.render();
+        this.updateWorld();
     };
     Game.prototype.initContainers = function () {
         var _stage = this.stage = new PIXI.Stage(0xFFFFFF);
@@ -406,6 +411,11 @@ var Game = (function () {
 
         var _tooltips = this.layers["tooltips"] = new PIXI.DisplayObjectContainer();
         _stage.addChild(_tooltips);
+
+        this.worldRenderer = new WorldRenderer(WORLD_WIDTH, WORLD_HEIGHT);
+        this.worldRenderer.addEventListeners(this.eventListener);
+        _main.addChild(this.worldRenderer.worldSprite);
+
         this.initLayers();
 
         var _game = this;
@@ -426,12 +436,9 @@ var Game = (function () {
         };
     };
     Game.prototype.initLayers = function () {
-        var _main = this.layers["main"];
-        var _ground = this.layers["ground"] = new PIXI.DisplayObjectContainer();
-        _ground.interactive = true;
-        _main.addChild(_ground);
-        var _content = this.layers["content"] = new SortedDisplayObjectContainer(TILES * 2);
-        _main.addChild(_content);
+        this.layers["ground"] = this.worldRenderer.layers["zoom1"]["ground"];
+        this.layers["content"] = this.worldRenderer.layers["zoom1"]["content"];
+        this.updateWorld();
     };
     Game.prototype.initTools = function () {
         this.tools.water = new WaterTool();
@@ -482,6 +489,9 @@ var Game = (function () {
     Game.prototype.bindRenderer = function () {
         var _canvas = document.getElementById("pixi-container");
         _canvas.appendChild(this.renderer.view);
+    };
+    Game.prototype.updateWorld = function () {
+        this.eventListener.dispatchEvent({ type: "updateWorld", content: "" });
     };
     Game.prototype.resize = function () {
         var container = window.getComputedStyle(document.getElementById("pixi-container"), null);

@@ -18,7 +18,7 @@ var SCREEN_WIDTH = 720,
     SCREEN_HEIGHT = 480,
     TILE_WIDTH = 64,
     TILE_HEIGHT = 32,
-    TILES = 30,
+    TILES = 128,
     WORLD_WIDTH = TILES * TILE_WIDTH,
     WORLD_HEIGHT = TILES * TILE_HEIGHT,
     ZOOM_LEVELS = [1];
@@ -448,7 +448,15 @@ class WorldRenderer
   initContainers(width, height)
   {
     this.renderTexture = new PIXI.RenderTexture(width, height);
-    this.worldSprite = new PIXI.Sprite(this.renderTexture);
+    var _ws = this.worldSprite = new PIXI.Sprite(this.renderTexture);
+
+    // TEMP
+    _ws.hitArea = arrayToPolygon(rectToIso(_ws.width, _ws.height));
+    _ws.interactive = true;
+    _ws.mousedown = function(event)
+    {
+      console.log(event);
+    }
 
     for (var i = 0; i < ZOOM_LEVELS.length; i++)
     {
@@ -704,18 +712,7 @@ class Game
   }
   resetLayers()
   {
-    var main = this.layers["main"]
-    for (var layer in this.layers)
-    {
-      if (layer !== "main" && layer !== "tooltips")
-      {
-        var _l = this.layers[layer];
-        main.removeChild(_l);
-        this.layers[layer] = undefined;
-        
-      }
-    }
-    this.initLayers();
+    this.worldRenderer.initLayers();
   }
 }
 
@@ -827,6 +824,11 @@ class Scroller
   }
   zoom( zoomAmount: number)
   {
+    if (zoomAmount > 1)
+    {
+      zoomAmount = 1;
+    }
+
     var container = this.container;
     var oldZoom = this.currZoom;
     var zoomDelta = oldZoom - zoomAmount;

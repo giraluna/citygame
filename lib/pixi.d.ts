@@ -92,6 +92,7 @@ declare module PIXI
 		height: number;
 		width: number;
 		source: string;
+		scaleMode: number;
 
 		constructor(source: HTMLImageElement);
 		constructor(source: HTMLCanvasElement);

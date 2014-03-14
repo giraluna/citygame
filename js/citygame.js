@@ -327,17 +327,21 @@ var WorldRenderer = (function () {
         this.initLayers();
     }
     WorldRenderer.prototype.addEventListeners = function (listener) {
+        this.listener = listener;
         var self = this;
         listener.addEventListener("changeZoomLevel", function (event) {
             self.changeZoomLevel(event.content.zoomLevel);
         });
         listener.addEventListener("updateWorld", function (event) {
             self.render();
+            console.log("update");
         });
     };
     WorldRenderer.prototype.initContainers = function (width, height) {
         this.renderTexture = new PIXI.RenderTexture(width, height);
         var _ws = this.worldSprite = new PIXI.Sprite(this.renderTexture);
+        _ws.hitArea = arrayToPolygon(rectToIso(_ws.width, _ws.height));
+        _ws.interactive = true;
 
         for (var i = 0; i < ZOOM_LEVELS.length; i++) {
             var zoomStr = "zoom" + ZOOM_LEVELS[i];
@@ -347,14 +351,22 @@ var WorldRenderer = (function () {
         }
 
         // TEMP
-        console.log(_ws.getLocalBounds());
-        console.log(this.layers["zoom1"]["main"].getLocalBounds());
-        _ws.hitArea = arrayToPolygon(rectToIso(_ws.width, _ws.height));
-        _ws.interactive = true;
+        var self = this;
         _ws.mousedown = function (event) {
             var pos = event.getLocalPosition(_ws);
-            var ortho = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT]);
-            console.log(ortho[0], ortho[1]);
+            var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT]);
+            console.log(gridPos);
+            game.mouseEventHandler.cellDown(event, gridPos);
+        };
+        _ws.mousemove = function (event) {
+            var pos = event.getLocalPosition(_ws);
+            var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT]);
+            game.mouseEventHandler.cellOver(event, gridPos);
+        };
+        _ws.mouseup = function (event) {
+            var pos = event.getLocalPosition(_ws);
+            var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT]);
+            game.mouseEventHandler.cellUp(event, gridPos);
         };
     };
     WorldRenderer.prototype.initLayers = function () {
@@ -751,41 +763,39 @@ var MouseEventHandler = (function () {
             this.currAction = undefined;
         }
     };
-    MouseEventHandler.prototype.cellDown = function (event) {
+    MouseEventHandler.prototype.cellDown = function (event, gridPos) {
         this.mouseEventHelperFN(event);
-        var cell = event.target["cell"];
-        var pos = cell.gridPos;
+        var cell = game.board.getCell(gridPos);
         if (this.currAction === undefined) {
             this.currAction = "cellAction";
-            this.startCell = pos;
+            this.startCell = gridPos;
+            game.eventListener.dispatchEvent({ type: "updateWorld", content: "" });
         }
     };
-    MouseEventHandler.prototype.cellOver = function (event) {
+    MouseEventHandler.prototype.cellOver = function (event, gridPos) {
         this.mouseEventHelperFN(event);
-        var cell = event.target["cell"];
-        var pos = cell.gridPos;
+        var cell = game.board.getCell(gridPos);
         if (this.currAction === "cellAction") {
-            this.currCell = pos;
+            this.currCell = gridPos;
             var selectedCells = game.board.getCells(game.activeTool.selectType(this.startCell, this.currCell));
 
             game.highlighter.clearSprites();
 
             game.highlighter.tintCells(selectedCells, game.activeTool.tintColor);
-        } else if (this.currAction === undefined) {
-            game.uiDrawer.makeCellTooltip(event);
+            game.eventListener.dispatchEvent({ type: "updateWorld", content: "" });
         }
     };
-    MouseEventHandler.prototype.cellUp = function (event) {
+    MouseEventHandler.prototype.cellUp = function (event, gridPos) {
         this.mouseEventHelperFN(event);
-        var cell = event.target["cell"];
-        var pos = cell.gridPos;
+        var cell = game.board.getCell(gridPos);
         if (this.currAction === "cellAction") {
-            this.currCell = pos;
+            this.currCell = gridPos;
             var selectedCells = game.board.getCells(game.activeTool.selectType(this.startCell, this.currCell));
 
             game.activeTool.activate(selectedCells);
             game.highlighter.clearSprites();
             this.currAction = undefined;
+            game.eventListener.dispatchEvent({ type: "updateWorld", content: "" });
 
             for (var i = 0; i < selectedCells.length; i++) {
                 game.uiDrawer.makeCellPopup(selectedCells[i]);

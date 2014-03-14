@@ -75,6 +75,7 @@ declare class WorldRenderer {
     public renderTexture: PIXI.RenderTexture;
     public worldSprite: PIXI.Sprite;
     public zoomLevel: number;
+    public listener: PIXI.EventTarget;
     constructor(width: any, height: any);
     public addEventListeners(listener: any): void;
     public initContainers(width: any, height: any): void;
@@ -152,9 +153,9 @@ declare class MouseEventHandler {
     public zoomStart(event: any): void;
     public stageMove(event: any): void;
     public stageEnd(event: any): void;
-    public cellDown(event: any): void;
-    public cellOver(event: any): void;
-    public cellUp(event: any): void;
+    public cellDown(event: any, gridPos: any): void;
+    public cellOver(event: any, gridPos: any): void;
+    public cellUp(event: any, gridPos: any): void;
 }
 declare class UIDrawer {
     public layer: PIXI.DisplayObjectContainer;

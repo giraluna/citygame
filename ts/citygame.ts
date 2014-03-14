@@ -450,20 +450,24 @@ class WorldRenderer
     this.renderTexture = new PIXI.RenderTexture(width, height);
     var _ws = this.worldSprite = new PIXI.Sprite(this.renderTexture);
 
-    // TEMP
-    _ws.hitArea = arrayToPolygon(rectToIso(_ws.width, _ws.height));
-    _ws.interactive = true;
-    _ws.mousedown = function(event)
-    {
-      console.log(event);
-    }
-
     for (var i = 0; i < ZOOM_LEVELS.length; i++)
     {
       var zoomStr = "zoom" + ZOOM_LEVELS[i];
       var zoomLayer = this.layers[zoomStr] = {};
 
       var main = zoomLayer["main"] = new PIXI.DisplayObjectContainer();
+    }
+
+    // TEMP
+    console.log(_ws.getLocalBounds());
+    console.log(this.layers["zoom1"]["main"].getLocalBounds());
+    _ws.hitArea = arrayToPolygon(rectToIso(_ws.width, _ws.height));
+    _ws.interactive = true;
+    _ws.mousedown = function(event)
+    {
+      var pos = event.getLocalPosition(_ws);
+      var ortho = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT]);
+      console.log(ortho[0], ortho[1]);
     }
   }
   initLayers()

@@ -57,4 +57,11 @@ function rectToIso(width, height) {
 
     return [top, right, bot, left];
 }
+
+function getOrthoCoord(click, tileSize) {
+    var tileX = click[0] / tileSize[0] + click[1] / tileSize[1] - tileSize[0];
+    var tileY = click[1] / tileSize[1] - click[0] / tileSize[0] + tileSize[0];
+
+    return [Math.floor(tileX), Math.floor(tileY)];
+}
 //# sourceMappingURL=utility.js.map

@@ -357,7 +357,7 @@ var WorldRenderer = (function () {
             var zoomLayer = this.layers[zoomStr];
             var main = zoomLayer["main"];
 
-            var ground = zoomLayer["ground"] = new PIXI.SpriteBatch();
+            var ground = zoomLayer["ground"] = new PIXI.DisplayObjectContainer();
             var content = zoomLayer["content"] = new SortedDisplayObjectContainer(TILES * 2);
 
             main.addChild(ground);

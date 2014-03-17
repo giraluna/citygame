@@ -148,14 +148,16 @@ declare class MouseEventHandler {
     public currAction: string;
     public scroller: Scroller;
     constructor();
-    public mouseEventHelperFN(event: any): void;
-    public scrollStart(event: any): void;
-    public zoomStart(event: any): void;
+    public mouseDown(event: any, targetType: string): void;
+    public mouseMove(event: any, targetType: string): void;
+    public mouseUp(event: any, targetType: string): void;
+    public startScroll(event: any): void;
+    public startZoom(event: any): void;
     public stageMove(event: any): void;
     public stageEnd(event: any): void;
-    public cellDown(event: any, gridPos: any): void;
-    public cellOver(event: any, gridPos: any): void;
-    public cellUp(event: any, gridPos: any): void;
+    public startCellAction(event: any): void;
+    public worldMove(event: any): void;
+    public worldEnd(event: any): void;
 }
 declare class UIDrawer {
     public layer: PIXI.DisplayObjectContainer;

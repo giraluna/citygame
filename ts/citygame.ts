@@ -141,19 +141,6 @@ class Cell
   {
     var _s = this.sprite = new GroundSprite( type, this );
     this.buildable = type["buildable"];
-
-    _s.mousedown = function(event)
-    { 
-      game.mouseEventHandler.cellDown(event);
-    }
-    _s.mouseover = function(event)
-    {
-      game.mouseEventHandler.cellOver(event);
-    }
-    _s.mouseup = function(event)
-    {
-      game.mouseEventHandler.cellUp(event);
-    }
   }
   getNeighbors(diagonal:boolean = false): neighborCells
   {
@@ -445,7 +432,6 @@ class WorldRenderer
     listener.addEventListener("updateWorld", function(event)
     {
       self.render();
-      console.log("update");
     });
   }
   initContainers(width, height)
@@ -468,22 +454,15 @@ class WorldRenderer
     var self = this;
     _ws.mousedown = function(event)
     {
-      var pos = event.getLocalPosition(_ws);
-      var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT]);
-      console.log(gridPos);
-      game.mouseEventHandler.cellDown(event, gridPos);
+      game.mouseEventHandler.mouseDown(event, "world");
     }
     _ws.mousemove = function(event)
     {
-      var pos = event.getLocalPosition(_ws);
-      var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT]);
-      game.mouseEventHandler.cellOver(event, gridPos);
+      game.mouseEventHandler.mouseMove(event, "world");
     }
     _ws.mouseup = function(event)
     {
-      var pos = event.getLocalPosition(_ws);
-      var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT]);
-      game.mouseEventHandler.cellUp(event, gridPos);
+      game.mouseEventHandler.mouseUp(event, "world");
     }
   }
   initLayers()
@@ -578,28 +557,21 @@ class Game
 
       this.initLayers();
 
-
       var _game = this;
 
       _stage.mousedown = function(event)
       {
-        if (event.originalEvent.ctrlKey === true)
-        {
-          _game.mouseEventHandler.scrollStart(event);
-        }
-        if (event.originalEvent.shiftKey === true)
-        {
-          _game.mouseEventHandler.zoomStart(event);
-        }
+        _game.mouseEventHandler.mouseDown(event, "stage");
       }
       _stage.mousemove = function(event)
       {
-        _game.mouseEventHandler.stageMove(event);
+        _game.mouseEventHandler.mouseMove(event, "stage");
       }
       _stage.mouseup = function(event)
       {
-        _game.mouseEventHandler.stageEnd(event);
+        _game.mouseEventHandler.mouseUp(event, "stage");
       }
+
     }
     initLayers()
     {
@@ -936,45 +908,70 @@ class MouseEventHandler
   {
     this.currAction = undefined;
   }
-  mouseEventHelperFN(event)
+  mouseDown(event, targetType: string)
   {
-    if (event.originalEvent)
+    if (event.originalEvent.ctrlKey)
     {
-      event.originalEvent.stopPropagation();
-      event.originalEvent.preventDefault()
+      this.startScroll(event);
     }
-    game.uiDrawer.removeActive();
+    else if (event.originalEvent.shiftKey)
+    {
+      this.startZoom(event);
+    }
+    else if (targetType === "world")
+    {
+      this.startCellAction(event);
+    }
+  }
+
+  mouseMove(event, targetType: string)
+  {
+    if (this.currAction === undefined) return;
+
+    else if (targetType === "stage" &&
+      (this.currAction === "zoom" || this.currAction === "scroll"))
+    {
+      this.stageMove(event);
+    }
+    else if (targetType === "world" && this.currAction === "cellAction")
+    {
+      this.worldMove(event);
+    }
+  }
+  mouseUp(event, targetType: string)
+  {
+    if (this.currAction === undefined) return;
+    else if (targetType === "stage" &&
+      (this.currAction === "zoom" || this.currAction === "scroll"))
+    {
+      this.stageEnd(event);
+    }
+    else if (targetType === "world" && this.currAction === "cellAction")
+    {
+      this.worldEnd(event);
+    }
 
   }
-  scrollStart(event)
+
+  startScroll(event)
   {
-    if (this.currAction === undefined)
-    {
-      this.mouseEventHelperFN(event);
-      this.startPoint = [event.global.x, event.global.y];
-      this.currAction = "scroll";
-      this.scroller.startScroll(this.startPoint);
-    }
+    this.currAction = "scroll";
+    this.startPoint = [event.global.x, event.global.y];
+    this.scroller.startScroll(this.startPoint);
   }
-  zoomStart(event)
+  startZoom(event)
   {
-    if (this.currAction === undefined)
-    {
-      this.mouseEventHelperFN(event);
-      this.startPoint = this.currPoint = [event.global.x, event.global.y];
-      this.currAction = "zoom";
-    }
+    this.currAction = "zoom";
+    this.startPoint = this.currPoint = [event.global.x, event.global.y];
   }
   stageMove(event)
   {
     if (this.currAction === "scroll")
-    {   
-      this.mouseEventHelperFN(event);
+    {
       this.scroller.move([event.global.x, event.global.y]);
     }
     else if (this.currAction === "zoom")
     {
-      this.mouseEventHelperFN(event);
       var delta = event.global.x + this.currPoint[1] -
         this.currPoint[0] - event.global.y;
       this.scroller.deltaZoom(delta, 0.005);
@@ -985,68 +982,54 @@ class MouseEventHandler
   {
     if (this.currAction === "scroll")
     {
-      this.mouseEventHelperFN(event);
       this.scroller.end();
       this.startPoint = undefined;
       this.currAction = undefined;
     }
     if (this.currAction === "zoom")
     {
-      this.mouseEventHelperFN(event);
       this.startPoint = undefined;
       this.currAction = undefined;
     }
   }
-  cellDown(event, gridPos)
+
+  startCellAction(event)
   {
-    this.mouseEventHelperFN(event);
-    var cell = game.board.getCell(gridPos);
-    if (this.currAction === undefined)
-    {
-      this.currAction = "cellAction";
-      this.startCell = gridPos;
-      game.eventListener.dispatchEvent({type: "updateWorld", content: ""});
-    }
+    var pos = event.getLocalPosition(event.target);
+    var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT]);
+
+    this.currAction = "cellAction";
+    this.startCell = gridPos;
   }
-  cellOver(event, gridPos)
+  worldMove(event)
   {
-    this.mouseEventHelperFN(event);
-    var cell = game.board.getCell(gridPos);
-    if (this.currAction === "cellAction")
-    {
-      this.currCell = gridPos;
-      var selectedCells = game.board.getCells(
+    var pos = event.getLocalPosition(event.target);
+    var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT]);
+
+    this.currCell = gridPos;
+    var selectedCells = game.board.getCells(
         game.activeTool.selectType(this.startCell, this.currCell));
 
-      game.highlighter.clearSprites();
-
-
-      game.highlighter.tintCells(selectedCells, game.activeTool.tintColor);
-      game.eventListener.dispatchEvent({type: "updateWorld", content: ""});
-    }
+    game.highlighter.clearSprites();
+    game.highlighter.tintCells(selectedCells, game.activeTool.tintColor);
+    game.eventListener.dispatchEvent({type: "updateWorld", content: ""});
   }
-  cellUp(event, gridPos)
+  worldEnd(event)
   {
-    this.mouseEventHelperFN(event);
-    var cell = game.board.getCell(gridPos);
-    if (this.currAction === "cellAction")
-    {
-      this.currCell = gridPos;
-      var selectedCells = game.board.getCells(
+    var pos = event.getLocalPosition(event.target);
+    var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT]);
+
+    this.currCell = gridPos;
+    var selectedCells = game.board.getCells(
         game.activeTool.selectType(this.startCell, this.currCell));
 
-      game.activeTool.activate(selectedCells);
-      game.highlighter.clearSprites();
-      this.currAction = undefined;
-      game.eventListener.dispatchEvent({type: "updateWorld", content: ""});
+    game.activeTool.activate(selectedCells);
 
-      // TEMP
-      for (var i = 0; i < selectedCells.length; i++)
-      {
-        game.uiDrawer.makeCellPopup(selectedCells[i]);
-      }
-    }
+    game.highlighter.clearSprites();
+    this.currAction = undefined;
+    game.eventListener.dispatchEvent({type: "updateWorld", content: ""});
   }
+
 }
 
 class UIDrawer
@@ -1550,53 +1533,6 @@ function getIsoCoord(x: number, y: number,
   return [_isoX, _isoY];
 }
 
-
-  //check center
-  /*
-  var stage = game.stage;
-  var gfx = new PIXI.Graphics();
-  gfx.beginFill();
-  gfx.drawEllipse(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 3, 3);
-  gfx.endFill();
-  stage.addChild(gfx);
-  
- 
-  /* temp
-  var fontsLoaded, spritesLoaded;
-
-  // create an array of assets to load
-  var assetsToLoader = [ "img\/sprites.json"];
-  
-  // create a new loader
-  var loader = new PIXI.AssetLoader(assetsToLoader);
-  
-  // use callback
-  loader.onComplete = function()
-  {
-    spritesLoaded = true;
-    if (fontsLoaded && spritesLoaded)
-    {
-      game.init();
-    }
-  }
-  
-  //begin load
-  loader.load();
- 
-  // temp
-  // Load fonts
-  WebFontConfig = {
-    google: {
-      families: [ 'Snippet', 'Arvo:700italic', 'Podkova:700' ]
-    },
-
-    active: function() {
-      // do something
-      self.loaded.fonts = true;
-      self.checkLoaded();
-    }
-  }; // end temp
-*/
 
 function pineapple()
 {

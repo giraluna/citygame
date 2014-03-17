@@ -92,16 +92,6 @@ var Cell = (function () {
     Cell.prototype.init = function (type) {
         var _s = this.sprite = new GroundSprite(type, this);
         this.buildable = type["buildable"];
-
-        _s.mousedown = function (event) {
-            game.mouseEventHandler.cellDown(event);
-        };
-        _s.mouseover = function (event) {
-            game.mouseEventHandler.cellOver(event);
-        };
-        _s.mouseup = function (event) {
-            game.mouseEventHandler.cellUp(event);
-        };
     };
     Cell.prototype.getNeighbors = function (diagonal) {
         if (typeof diagonal === "undefined") { diagonal = false; }
@@ -334,7 +324,6 @@ var WorldRenderer = (function () {
         });
         listener.addEventListener("updateWorld", function (event) {
             self.render();
-            console.log("update");
         });
     };
     WorldRenderer.prototype.initContainers = function (width, height) {
@@ -353,20 +342,13 @@ var WorldRenderer = (function () {
         // TEMP
         var self = this;
         _ws.mousedown = function (event) {
-            var pos = event.getLocalPosition(_ws);
-            var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT]);
-            console.log(gridPos);
-            game.mouseEventHandler.cellDown(event, gridPos);
+            game.mouseEventHandler.mouseDown(event, "world");
         };
         _ws.mousemove = function (event) {
-            var pos = event.getLocalPosition(_ws);
-            var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT]);
-            game.mouseEventHandler.cellOver(event, gridPos);
+            game.mouseEventHandler.mouseMove(event, "world");
         };
         _ws.mouseup = function (event) {
-            var pos = event.getLocalPosition(_ws);
-            var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT]);
-            game.mouseEventHandler.cellUp(event, gridPos);
+            game.mouseEventHandler.mouseUp(event, "world");
         };
     };
     WorldRenderer.prototype.initLayers = function () {
@@ -444,18 +426,13 @@ var Game = (function () {
         var _game = this;
 
         _stage.mousedown = function (event) {
-            if (event.originalEvent.ctrlKey === true) {
-                _game.mouseEventHandler.scrollStart(event);
-            }
-            if (event.originalEvent.shiftKey === true) {
-                _game.mouseEventHandler.zoomStart(event);
-            }
+            _game.mouseEventHandler.mouseDown(event, "stage");
         };
         _stage.mousemove = function (event) {
-            _game.mouseEventHandler.stageMove(event);
+            _game.mouseEventHandler.mouseMove(event, "stage");
         };
         _stage.mouseup = function (event) {
-            _game.mouseEventHandler.stageEnd(event);
+            _game.mouseEventHandler.mouseUp(event, "stage");
         };
     };
     Game.prototype.initLayers = function () {
@@ -717,34 +694,48 @@ var MouseEventHandler = (function () {
     function MouseEventHandler() {
         this.currAction = undefined;
     }
-    MouseEventHandler.prototype.mouseEventHelperFN = function (event) {
-        if (event.originalEvent) {
-            event.originalEvent.stopPropagation();
-            event.originalEvent.preventDefault();
-        }
-        game.uiDrawer.removeActive();
-    };
-    MouseEventHandler.prototype.scrollStart = function (event) {
-        if (this.currAction === undefined) {
-            this.mouseEventHelperFN(event);
-            this.startPoint = [event.global.x, event.global.y];
-            this.currAction = "scroll";
-            this.scroller.startScroll(this.startPoint);
+    MouseEventHandler.prototype.mouseDown = function (event, targetType) {
+        if (event.originalEvent.ctrlKey) {
+            this.startScroll(event);
+        } else if (event.originalEvent.shiftKey) {
+            this.startZoom(event);
+        } else if (targetType === "world") {
+            this.startCellAction(event);
         }
     };
-    MouseEventHandler.prototype.zoomStart = function (event) {
-        if (this.currAction === undefined) {
-            this.mouseEventHelperFN(event);
-            this.startPoint = this.currPoint = [event.global.x, event.global.y];
-            this.currAction = "zoom";
+
+    MouseEventHandler.prototype.mouseMove = function (event, targetType) {
+        if (this.currAction === undefined)
+            return;
+        else if (targetType === "stage" && (this.currAction === "zoom" || this.currAction === "scroll")) {
+            this.stageMove(event);
+        } else if (targetType === "world" && this.currAction === "cellAction") {
+            this.worldMove(event);
         }
+    };
+    MouseEventHandler.prototype.mouseUp = function (event, targetType) {
+        if (this.currAction === undefined)
+            return;
+        else if (targetType === "stage" && (this.currAction === "zoom" || this.currAction === "scroll")) {
+            this.stageEnd(event);
+        } else if (targetType === "world" && this.currAction === "cellAction") {
+            this.worldEnd(event);
+        }
+    };
+
+    MouseEventHandler.prototype.startScroll = function (event) {
+        this.currAction = "scroll";
+        this.startPoint = [event.global.x, event.global.y];
+        this.scroller.startScroll(this.startPoint);
+    };
+    MouseEventHandler.prototype.startZoom = function (event) {
+        this.currAction = "zoom";
+        this.startPoint = this.currPoint = [event.global.x, event.global.y];
     };
     MouseEventHandler.prototype.stageMove = function (event) {
         if (this.currAction === "scroll") {
-            this.mouseEventHelperFN(event);
             this.scroller.move([event.global.x, event.global.y]);
         } else if (this.currAction === "zoom") {
-            this.mouseEventHelperFN(event);
             var delta = event.global.x + this.currPoint[1] - this.currPoint[0] - event.global.y;
             this.scroller.deltaZoom(delta, 0.005);
             this.currPoint = [event.global.x, event.global.y];
@@ -752,55 +743,46 @@ var MouseEventHandler = (function () {
     };
     MouseEventHandler.prototype.stageEnd = function (event) {
         if (this.currAction === "scroll") {
-            this.mouseEventHelperFN(event);
             this.scroller.end();
             this.startPoint = undefined;
             this.currAction = undefined;
         }
         if (this.currAction === "zoom") {
-            this.mouseEventHelperFN(event);
             this.startPoint = undefined;
             this.currAction = undefined;
         }
     };
-    MouseEventHandler.prototype.cellDown = function (event, gridPos) {
-        this.mouseEventHelperFN(event);
-        var cell = game.board.getCell(gridPos);
-        if (this.currAction === undefined) {
-            this.currAction = "cellAction";
-            this.startCell = gridPos;
-            game.eventListener.dispatchEvent({ type: "updateWorld", content: "" });
-        }
+
+    MouseEventHandler.prototype.startCellAction = function (event) {
+        var pos = event.getLocalPosition(event.target);
+        var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT]);
+
+        this.currAction = "cellAction";
+        this.startCell = gridPos;
     };
-    MouseEventHandler.prototype.cellOver = function (event, gridPos) {
-        this.mouseEventHelperFN(event);
-        var cell = game.board.getCell(gridPos);
-        if (this.currAction === "cellAction") {
-            this.currCell = gridPos;
-            var selectedCells = game.board.getCells(game.activeTool.selectType(this.startCell, this.currCell));
+    MouseEventHandler.prototype.worldMove = function (event) {
+        var pos = event.getLocalPosition(event.target);
+        var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT]);
 
-            game.highlighter.clearSprites();
+        this.currCell = gridPos;
+        var selectedCells = game.board.getCells(game.activeTool.selectType(this.startCell, this.currCell));
 
-            game.highlighter.tintCells(selectedCells, game.activeTool.tintColor);
-            game.eventListener.dispatchEvent({ type: "updateWorld", content: "" });
-        }
+        game.highlighter.clearSprites();
+        game.highlighter.tintCells(selectedCells, game.activeTool.tintColor);
+        game.eventListener.dispatchEvent({ type: "updateWorld", content: "" });
     };
-    MouseEventHandler.prototype.cellUp = function (event, gridPos) {
-        this.mouseEventHelperFN(event);
-        var cell = game.board.getCell(gridPos);
-        if (this.currAction === "cellAction") {
-            this.currCell = gridPos;
-            var selectedCells = game.board.getCells(game.activeTool.selectType(this.startCell, this.currCell));
+    MouseEventHandler.prototype.worldEnd = function (event) {
+        var pos = event.getLocalPosition(event.target);
+        var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT]);
 
-            game.activeTool.activate(selectedCells);
-            game.highlighter.clearSprites();
-            this.currAction = undefined;
-            game.eventListener.dispatchEvent({ type: "updateWorld", content: "" });
+        this.currCell = gridPos;
+        var selectedCells = game.board.getCells(game.activeTool.selectType(this.startCell, this.currCell));
 
-            for (var i = 0; i < selectedCells.length; i++) {
-                game.uiDrawer.makeCellPopup(selectedCells[i]);
-            }
-        }
+        game.activeTool.activate(selectedCells);
+
+        game.highlighter.clearSprites();
+        this.currAction = undefined;
+        game.eventListener.dispatchEvent({ type: "updateWorld", content: "" });
     };
     return MouseEventHandler;
 })();
@@ -1181,44 +1163,6 @@ function getIsoCoord(x, y, width, height, offset) {
     return [_isoX, _isoY];
 }
 
-//check center
-/*
-var stage = game.stage;
-var gfx = new PIXI.Graphics();
-gfx.beginFill();
-gfx.drawEllipse(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 3, 3);
-gfx.endFill();
-stage.addChild(gfx);
-/* temp
-var fontsLoaded, spritesLoaded;
-// create an array of assets to load
-var assetsToLoader = [ "img\/sprites.json"];
-// create a new loader
-var loader = new PIXI.AssetLoader(assetsToLoader);
-// use callback
-loader.onComplete = function()
-{
-spritesLoaded = true;
-if (fontsLoaded && spritesLoaded)
-{
-game.init();
-}
-}
-//begin load
-loader.load();
-// temp
-// Load fonts
-WebFontConfig = {
-google: {
-families: [ 'Snippet', 'Arvo:700italic', 'Podkova:700' ]
-},
-active: function() {
-// do something
-self.loaded.fonts = true;
-self.checkLoaded();
-}
-}; // end temp
-*/
 function pineapple() {
     cg["content"]["buildings"]["pineapple"] = {
         "type": "pineapple",

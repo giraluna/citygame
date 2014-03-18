@@ -328,6 +328,7 @@ var WorldRenderer = (function () {
     };
     WorldRenderer.prototype.initContainers = function (width, height) {
         this.renderTexture = new PIXI.RenderTexture(width, height);
+        this.renderTexture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
         var _ws = this.worldSprite = new PIXI.Sprite(this.renderTexture);
         _ws.hitArea = arrayToPolygon(rectToIso(_ws.width, _ws.height));
         _ws.interactive = true;
@@ -629,7 +630,7 @@ var Scroller = (function () {
     };
     Scroller.prototype.zoom = function (zoomAmount) {
         if (zoomAmount > 1) {
-            zoomAmount = 1;
+            //zoomAmount = 1;
         }
 
         var container = this.container;
@@ -693,9 +694,22 @@ var Scroller = (function () {
 var MouseEventHandler = (function () {
     function MouseEventHandler() {
         this.currAction = undefined;
+        window.oncontextmenu = function (event) {
+            var eventTarget = event.target;
+            if (eventTarget.localName !== "canvas")
+                return;
+            event.preventDefault();
+            event.stopPropagation();
+        };
     }
     MouseEventHandler.prototype.mouseDown = function (event, targetType) {
-        if (event.originalEvent.ctrlKey) {
+        if (event.originalEvent.button === 2 && this.currAction !== undefined) {
+            this.currAction = undefined;
+            this.startPoint = undefined;
+            this.scroller.end();
+            game.highlighter.clearSprites();
+            game.eventListener.dispatchEvent({ type: "updateWorld", content: "" });
+        } else if (event.originalEvent.ctrlKey || event.originalEvent.metaKey || event.originalEvent.button === 2) {
             this.startScroll(event);
         } else if (event.originalEvent.shiftKey) {
             this.startZoom(event);

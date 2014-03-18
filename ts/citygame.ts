@@ -437,6 +437,7 @@ class WorldRenderer
   initContainers(width, height)
   {
     this.renderTexture = new PIXI.RenderTexture(width, height);
+    this.renderTexture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
     var _ws = this.worldSprite = new PIXI.Sprite(this.renderTexture);
     _ws.hitArea = arrayToPolygon(rectToIso(_ws.width, _ws.height));
     _ws.interactive = true;
@@ -818,7 +819,7 @@ class Scroller
   {
     if (zoomAmount > 1)
     {
-      zoomAmount = 1;
+      //zoomAmount = 1;
     }
 
     var container = this.container;
@@ -907,10 +908,28 @@ class MouseEventHandler
   constructor()
   {
     this.currAction = undefined;
+    window.oncontextmenu = function(event)
+    {
+      var eventTarget = <HTMLElement> event.target;
+      if (eventTarget.localName !== "canvas") return;
+      event.preventDefault();
+      event.stopPropagation();
+    };
   }
   mouseDown(event, targetType: string)
   {
-    if (event.originalEvent.ctrlKey)
+    if (event.originalEvent.button === 2 &&
+      this.currAction !== undefined)
+    {
+      this.currAction = undefined;
+      this.startPoint = undefined;
+      this.scroller.end();
+      game.highlighter.clearSprites();
+      game.eventListener.dispatchEvent({type: "updateWorld", content: ""});
+    }
+    else if (event.originalEvent.ctrlKey ||
+      event.originalEvent.metaKey ||
+      event.originalEvent.button === 2)
     {
       this.startScroll(event);
     }
@@ -926,6 +945,7 @@ class MouseEventHandler
 
   mouseMove(event, targetType: string)
   {
+
     if (this.currAction === undefined) return;
 
     else if (targetType === "stage" &&

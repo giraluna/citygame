@@ -26,13 +26,7 @@ body {
 #side-menu input {
   width: 64px;
 }
-#side-menu #tool-buttons {
-  display: flex;
-  flex-flow: column;
-}
 #side-menu #player {
-  display: flex;
-  flex-flow: column;
   margin-top: 20px;
 }
 #side-menu #other-buttons {

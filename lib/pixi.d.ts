@@ -337,7 +337,7 @@ declare module PIXI
 
 	export class RenderTexture extends Texture
 	{
-		constructor(width: number, height: number);
+		constructor(width: number, height: number, renderer?: IPixiRenderer, scaleMode?: number);
 		resize(width: number, height: number): void;
 		render(DisplayObject): void;
 	}

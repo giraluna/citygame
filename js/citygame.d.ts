@@ -113,13 +113,13 @@ declare class Game {
 }
 declare class SortedDisplayObjectContainer extends PIXI.DisplayObjectContainer {
     public container: PIXI.DisplayObjectContainer;
-    public indexes: number[];
+    public _sortingIndexes: number[];
     constructor(layers: number);
     public init(): void;
     public incrementIndexes(start: number): void;
     public decrementIndexes(start: number): void;
-    public addChildAt(element: PIXI.DisplayObject, index: number): void;
-    public removeChildAt(element: PIXI.DisplayObject, index: number): void;
+    public _addChildAt(element: PIXI.DisplayObject, index: number): void;
+    public _removeChildAt(element: PIXI.DisplayObject, index: number): void;
 }
 declare class Scroller {
     public container: PIXI.DisplayObjectContainer;

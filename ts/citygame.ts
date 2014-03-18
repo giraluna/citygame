@@ -99,7 +99,7 @@ class Content
     var cellSprite = this.cell.sprite;
     var gridPos = this.cell.gridPos;
     _s.position = this.cell.sprite.position.clone();
-    game.layers["content"].addChildAt(_s, gridPos[0] + gridPos[1]);
+    game.layers["content"]._addChildAt(_s, gridPos[0] + gridPos[1]);
   }
   applyData( data )
   {
@@ -328,7 +328,7 @@ class Cell
       return;
     }
 
-    game.layers["content"].removeChildAt(this.content.sprite,
+    game.layers["content"]._removeChildAt(this.content.sprite,
       this.gridPos[0] + this.gridPos[1]);
     this.content = undefined;
   }
@@ -436,9 +436,10 @@ class WorldRenderer
   }
   initContainers(width, height)
   {
-    this.renderTexture = new PIXI.RenderTexture(width, height);
-    this.renderTexture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
+    this.renderTexture = new PIXI.RenderTexture(width, height, game.renderer, PIXI.scaleModes.NEAREST);
+    
     var _ws = this.worldSprite = new PIXI.Sprite(this.renderTexture);
+
     _ws.hitArea = arrayToPolygon(rectToIso(_ws.width, _ws.height));
     _ws.interactive = true;
 
@@ -491,6 +492,7 @@ class WorldRenderer
     var zoomStr = "zoom" + this.zoomLevel;
     var activeMainLayer = this.layers[zoomStr]["main"]
     this.renderTexture.render(activeMainLayer);
+    console.log(this.renderTexture.baseTexture.scaleMode);
   }
 }
 
@@ -712,46 +714,46 @@ class Game
 class SortedDisplayObjectContainer extends PIXI.DisplayObjectContainer
 {
   container: PIXI.DisplayObjectContainer;
-  indexes: number[];
+  _sortingIndexes: number[];
   // arr[1] = index 1
   // when adding new displayobject increment following indexes
   
   constructor( layers:number)
   {
-    this.indexes = new Array(layers);
+    this._sortingIndexes = new Array(layers);
     super();
     this.init();
   }
   
   init()
   {
-    for (var i = 0; i < this.indexes.length; i++)
+    for (var i = 0; i < this._sortingIndexes.length; i++)
     {
-      this.indexes[i] = 0;
+      this._sortingIndexes[i] = 0;
     };
   }
   incrementIndexes(start:number)
   {
-    for (var i = start + 1; i < this.indexes.length; i++)
+    for (var i = start + 1; i < this._sortingIndexes.length; i++)
     {
-      this.indexes[i]++
+      this._sortingIndexes[i]++
     }
   }
   decrementIndexes(start:number)
   {
-    for (var i = start + 1; i < this.indexes.length; i++)
+    for (var i = start + 1; i < this._sortingIndexes.length; i++)
     {
-      this.indexes[i]--
+      this._sortingIndexes[i]--
     }
   }
 
   
-  addChildAt(element:PIXI.DisplayObject, index:number)
+  _addChildAt(element:PIXI.DisplayObject, index:number)
   {
-    super.addChildAt( element, this.indexes[index] );
+    super.addChildAt( element, this._sortingIndexes[index] );
     this.incrementIndexes(index);
   }
-  removeChildAt(element:PIXI.DisplayObject, index:number)
+  _removeChildAt(element:PIXI.DisplayObject, index:number)
   {
     super.removeChild(element);
     this.decrementIndexes(index);

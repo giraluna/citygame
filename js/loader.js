@@ -15,6 +15,7 @@ var Loader = (function () {
             self.checkLoaded();
         });
 
+        //PIXI.scaleModes.DEFAULT = PIXI.scaleModes.NEAREST;
         this.loadFonts();
         this.loadSprites();
     }

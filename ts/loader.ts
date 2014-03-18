@@ -25,6 +25,7 @@ class Loader
       self.loaded.dom = true;
       self.checkLoaded();
     });
+    //PIXI.scaleModes.DEFAULT = PIXI.scaleModes.NEAREST;
 
     this.loadFonts();
     this.loadSprites();

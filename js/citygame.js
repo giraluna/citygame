@@ -72,7 +72,7 @@ var Content = (function () {
         var cellSprite = this.cell.sprite;
         var gridPos = this.cell.gridPos;
         _s.position = this.cell.sprite.position.clone();
-        game.layers["content"].addChildAt(_s, gridPos[0] + gridPos[1]);
+        game.layers["content"]._addChildAt(_s, gridPos[0] + gridPos[1]);
     };
     Content.prototype.applyData = function (data) {
         for (var key in data) {
@@ -242,7 +242,7 @@ var Cell = (function () {
             return;
         }
 
-        game.layers["content"].removeChildAt(this.content.sprite, this.gridPos[0] + this.gridPos[1]);
+        game.layers["content"]._removeChildAt(this.content.sprite, this.gridPos[0] + this.gridPos[1]);
         this.content = undefined;
     };
     return Cell;
@@ -327,9 +327,10 @@ var WorldRenderer = (function () {
         });
     };
     WorldRenderer.prototype.initContainers = function (width, height) {
-        this.renderTexture = new PIXI.RenderTexture(width, height);
-        this.renderTexture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
+        this.renderTexture = new PIXI.RenderTexture(width, height, game.renderer, PIXI.scaleModes.NEAREST);
+
         var _ws = this.worldSprite = new PIXI.Sprite(this.renderTexture);
+
         _ws.hitArea = arrayToPolygon(rectToIso(_ws.width, _ws.height));
         _ws.interactive = true;
 
@@ -373,6 +374,7 @@ var WorldRenderer = (function () {
         var zoomStr = "zoom" + this.zoomLevel;
         var activeMainLayer = this.layers[zoomStr]["main"];
         this.renderTexture.render(activeMainLayer);
+        console.log(this.renderTexture.baseTexture.scaleMode);
     };
     return WorldRenderer;
 })();
@@ -554,32 +556,32 @@ var SortedDisplayObjectContainer = (function (_super) {
     // arr[1] = index 1
     // when adding new displayobject increment following indexes
     function SortedDisplayObjectContainer(layers) {
-        this.indexes = new Array(layers);
+        this._sortingIndexes = new Array(layers);
         _super.call(this);
         this.init();
     }
     SortedDisplayObjectContainer.prototype.init = function () {
-        for (var i = 0; i < this.indexes.length; i++) {
-            this.indexes[i] = 0;
+        for (var i = 0; i < this._sortingIndexes.length; i++) {
+            this._sortingIndexes[i] = 0;
         }
         ;
     };
     SortedDisplayObjectContainer.prototype.incrementIndexes = function (start) {
-        for (var i = start + 1; i < this.indexes.length; i++) {
-            this.indexes[i]++;
+        for (var i = start + 1; i < this._sortingIndexes.length; i++) {
+            this._sortingIndexes[i]++;
         }
     };
     SortedDisplayObjectContainer.prototype.decrementIndexes = function (start) {
-        for (var i = start + 1; i < this.indexes.length; i++) {
-            this.indexes[i]--;
+        for (var i = start + 1; i < this._sortingIndexes.length; i++) {
+            this._sortingIndexes[i]--;
         }
     };
 
-    SortedDisplayObjectContainer.prototype.addChildAt = function (element, index) {
-        _super.prototype.addChildAt.call(this, element, this.indexes[index]);
+    SortedDisplayObjectContainer.prototype._addChildAt = function (element, index) {
+        _super.prototype.addChildAt.call(this, element, this._sortingIndexes[index]);
         this.incrementIndexes(index);
     };
-    SortedDisplayObjectContainer.prototype.removeChildAt = function (element, index) {
+    SortedDisplayObjectContainer.prototype._removeChildAt = function (element, index) {
         _super.prototype.removeChild.call(this, element);
         this.decrementIndexes(index);
     };

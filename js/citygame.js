@@ -17,7 +17,7 @@ var __extends = this.__extends || function (d, b) {
 cg = JSON.parse(JSON.stringify(cg)); //dumb
 
 var container;
-var SCREEN_WIDTH = 720, SCREEN_HEIGHT = 480, TILE_WIDTH = 64, TILE_HEIGHT = 32, TILES = 128, WORLD_WIDTH = TILES * TILE_WIDTH, WORLD_HEIGHT = TILES * TILE_HEIGHT, ZOOM_LEVELS = [1];
+var SCREEN_WIDTH = 720, SCREEN_HEIGHT = 480, TILE_WIDTH = 64, TILE_HEIGHT = 32, TILES = 32, WORLD_WIDTH = TILES * TILE_WIDTH, WORLD_HEIGHT = TILES * TILE_HEIGHT, ZOOM_LEVELS = [1];
 
 var Sprite = (function (_super) {
     __extends(Sprite, _super);
@@ -374,7 +374,6 @@ var WorldRenderer = (function () {
         var zoomStr = "zoom" + this.zoomLevel;
         var activeMainLayer = this.layers[zoomStr]["main"];
         this.renderTexture.render(activeMainLayer);
-        console.log(this.renderTexture.baseTexture.scaleMode);
     };
     return WorldRenderer;
 })();
@@ -710,7 +709,7 @@ var MouseEventHandler = (function () {
             this.startPoint = undefined;
             this.scroller.end();
             game.highlighter.clearSprites();
-            game.eventListener.dispatchEvent({ type: "updateWorld", content: "" });
+            game.updateWorld();
         } else if (event.originalEvent.ctrlKey || event.originalEvent.metaKey || event.originalEvent.button === 2) {
             this.startScroll(event);
         } else if (event.originalEvent.shiftKey) {
@@ -771,25 +770,28 @@ var MouseEventHandler = (function () {
 
     MouseEventHandler.prototype.startCellAction = function (event) {
         var pos = event.getLocalPosition(event.target);
-        var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT]);
+        var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
 
         this.currAction = "cellAction";
         this.startCell = gridPos;
     };
     MouseEventHandler.prototype.worldMove = function (event) {
         var pos = event.getLocalPosition(event.target);
-        var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT]);
+        var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
 
-        this.currCell = gridPos;
-        var selectedCells = game.board.getCells(game.activeTool.selectType(this.startCell, this.currCell));
+        if (!this.currCell || gridPos[0] !== this.currCell[0] || gridPos[1] !== this.currCell[1]) {
+            console.log(this.startCell, gridPos);
+            this.currCell = gridPos;
+            var selectedCells = game.board.getCells(game.activeTool.selectType(this.startCell, this.currCell));
 
-        game.highlighter.clearSprites();
-        game.highlighter.tintCells(selectedCells, game.activeTool.tintColor);
-        game.eventListener.dispatchEvent({ type: "updateWorld", content: "" });
+            game.highlighter.clearSprites();
+            game.highlighter.tintCells(selectedCells, game.activeTool.tintColor);
+            game.updateWorld();
+        }
     };
     MouseEventHandler.prototype.worldEnd = function (event) {
         var pos = event.getLocalPosition(event.target);
-        var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT]);
+        var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
 
         this.currCell = gridPos;
         var selectedCells = game.board.getCells(game.activeTool.selectType(this.startCell, this.currCell));
@@ -798,7 +800,7 @@ var MouseEventHandler = (function () {
 
         game.highlighter.clearSprites();
         this.currAction = undefined;
-        game.eventListener.dispatchEvent({ type: "updateWorld", content: "" });
+        game.updateWorld();
     };
     return MouseEventHandler;
 })();

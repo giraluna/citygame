@@ -81,10 +81,10 @@ function rectToIso(width: number, height: number)
   return [top, right, bot, left];
 }
 
-function getOrthoCoord(click: number[], tileSize: number[])
+function getOrthoCoord(click: number[], tileSize: number[], worldSize: number[])
 {
-  var tileX = click[0] / tileSize[0] + click[1] / tileSize[1] - tileSize[0];
-  var tileY = click[1] / tileSize[1] - click[0] / tileSize[0] + tileSize[0];
+  var tileX = click[0] / tileSize[0] + click[1] / tileSize[1] - worldSize[0] / 2;
+  var tileY = click[1] / tileSize[1] - click[0] / tileSize[0] + worldSize[1] / 2;
 
   return [Math.floor(tileX), Math.floor(tileY)];
 }

@@ -780,7 +780,6 @@ var MouseEventHandler = (function () {
         var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
 
         if (!this.currCell || gridPos[0] !== this.currCell[0] || gridPos[1] !== this.currCell[1]) {
-            console.log(this.startCell, gridPos);
             this.currCell = gridPos;
             var selectedCells = game.board.getCells(game.activeTool.selectType(this.startCell, this.currCell));
 
@@ -801,6 +800,16 @@ var MouseEventHandler = (function () {
         game.highlighter.clearSprites();
         this.currAction = undefined;
         game.updateWorld();
+
+        // temp
+        var cell = game.board.getCell(this.currCell);
+        var neighs = cell.getNeighbors();
+        game.uiDrawer.makeCellPopup(cell);
+        for (var neigh in neighs) {
+            if (neighs[neigh]) {
+                game.uiDrawer.makeCellPopup(neighs[neigh]);
+            }
+        }
     };
     return MouseEventHandler;
 })();

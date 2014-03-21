@@ -142,6 +142,14 @@ class Cell
     var _s = this.sprite = new GroundSprite( type, this );
     this.buildable = type["buildable"];
   }
+  getScreenPos(container)
+  {
+    var wt = container.worldTransform;
+    var zoom = wt.a;
+    var offset = [wt.tx + WORLD_WIDTH/2 * zoom, wt.ty + TILE_HEIGHT/2 * zoom];
+    
+    return getIsoCoord(this.gridPos[0], this.gridPos[1], TILE_WIDTH * zoom, TILE_HEIGHT * zoom, offset)
+  }
   getNeighbors(diagonal:boolean = false): neighborCells
   {
     var neighbors: neighborCells =
@@ -194,46 +202,46 @@ class Cell
     return neighbors; 
   }
   getArea(size: number, anchor:string="center")
+  {
+    var gridPos = this.gridPos;
+
+    var start = [gridPos[0], gridPos[1]];
+    var end = [gridPos[0], gridPos[1]];
+    var boardSize = game.board.width;
+
+    var adjust = [[0,0], [0,0]];
+
+    if (anchor === "center")
     {
-      var gridPos = this.gridPos;
+      adjust = [[-1, -1], [1, 1]];
+    };
+    if (anchor === "ne")    
+    {
+      adjust[1] = [-1, 1];
+    };
+    if (anchor === "se")    
+    {
+      adjust[1] = [-1, -1];
+    };
+    if (anchor === "sw")    
+    {
+      adjust[1] = [1, -1];
+    };
+    if (anchor === "nw")    
+    {
+      adjust[1] = [1, 1];
+    };
 
-      var start = [gridPos[0], gridPos[1]];
-      var end = [gridPos[0], gridPos[1]];
-      var boardSize = game.board.width;
-
-      var adjust = [[0,0], [0,0]];
-
-      if (anchor === "center")
-      {
-        adjust = [[-1, -1], [1, 1]];
-      };
-      if (anchor === "ne")    
-      {
-        adjust[1] = [-1, 1];
-      };
-      if (anchor === "se")    
-      {
-        adjust[1] = [-1, -1];
-      };
-      if (anchor === "sw")    
-      {
-        adjust[1] = [1, -1];
-      };
-      if (anchor === "nw")    
-      {
-        adjust[1] = [1, 1];
-      };
-
-      for (var i = 0; i < size - 1; i++)
-      {
-        start[0] += adjust[0][0];
-        start[1] += adjust[0][1];
-        end[0] += adjust[1][0];
-        end[1] += adjust[1][1];
-      }
-      var rect = rectSelect(start, end);
-      return game.board.getCells(rect);
+    for (var i = 0; i < size - 1; i++)
+    {
+      start[0] += adjust[0][0];
+      start[1] += adjust[0][1];
+      end[0] += adjust[1][0];
+      end[1] += adjust[1][1];
     }
+    var rect = rectSelect(start, end);
+    return game.board.getCells(rect);
+  }
   replace( type:string ) //change base type of tile
   {
     var _texture = type["frame"];
@@ -1055,12 +1063,12 @@ class MouseEventHandler
     // temp
     var cell = game.board.getCell(this.currCell);
     var neighs = cell.getNeighbors()
-    game.uiDrawer.makeCellPopup(cell);
+    game.uiDrawer.makeCellPopup(cell, event.target);
     for (var neigh in neighs)
     {
       if (neighs[neigh])
       {
-        game.uiDrawer.makeCellPopup(neighs[neigh]);
+        game.uiDrawer.makeCellPopup(neighs[neigh], event.target);
       }
     }
   }
@@ -1121,11 +1129,11 @@ class UIDrawer
     }
   }
 
-  makeCellTooltip( event )
+  makeCellTooltip( event, cell: Cell, container: PIXI.DisplayObjectContainer )
   {
-    var cell = event.target["cell"];
-    var cellX = cell.sprite.worldTransform.tx;
-    var cellY = cell.sprite.worldTransform.ty;
+    var screenPos = cell.getScreenPos(container);
+    var cellX = screenPos[0];
+    var cellY = screenPos[1];
 
     var screenX = event.global.x;
     var screenY = event.global.y;
@@ -1154,7 +1162,7 @@ class UIDrawer
     var x = cellX;
     var y = (cell.content && pointing === "down")
       ? cellY - cell.content.sprite.height * cell.content.sprite.worldTransform.a / 2
-      : cellY - cell.sprite.height * cell.sprite.worldTransform.a / 2;
+      : cellY;
 
     var uiObj = this.active = new UIObject(this.layer)
     .delay( 500 )
@@ -1180,19 +1188,12 @@ class UIDrawer
 
     return uiObj;
   }
-  makeCellPopup(cell: Cell)
+  makeCellPopup(cell: Cell, container: PIXI.DisplayObjectContainer)
   {
-    var cellX = cell.sprite.worldTransform.tx;
-    var cellY = cell.sprite.worldTransform.ty;
-
-    var x = cellX;
-    var y = (cell.content)
-      ? cellY - cell.content.sprite.height * cell.content.sprite.worldTransform.a
-      : cellY - cell.sprite.height * cell.sprite.worldTransform.a;
-
+    var pos = cell.getScreenPos(container);
     var content = new PIXI.Text("+1", this.fonts["black"]);
 
-    this.makeFadeyPopup([x, y], [0, -20], 2000, content);
+    this.makeFadeyPopup([pos[0], pos[1]], [0, -20], 2000, content);
   }
   makeFadeyPopup(pos: number[], drift: number[], lifeTime: number, content)
   {
@@ -1552,22 +1553,6 @@ function arrayToPoint(point)
   return new PIXI.Point(point[0], point[1]);
 }
 
-function getIsoCoord(x: number, y: number,
-  width: number, height: number,
-  offset?: number[])
-{
-  var _w2 = width / 2;
-  var _h2 = height / 2;
-  var _isoX = (x - y) * _w2;
-  var _isoY = (x + y) * _h2;
-  if (offset)
-  { 
-    _isoX += offset[0];
-    _isoY += offset[1];
-  }
-  return [_isoX, _isoY];
-}
-
 
 function pineapple()
 {
@@ -1584,3 +1569,10 @@ function pineapple()
 
 var game = new Game();
 var loader = new Loader(game);
+
+game.uiDrawer.makeFadeyPopup([SCREEN_WIDTH / 2, SCREEN_HEIGHT/2],
+  [0, 0], 5000, new PIXI.Text("ctrl+click to scroll\nshift+click to zoom",{
+        font: "bold 50px Snippet",
+        fill: "#222222",
+        align: "center"
+      }));

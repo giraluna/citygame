@@ -88,3 +88,32 @@ function getOrthoCoord(click: number[], tileSize: number[], worldSize: number[])
 
   return [Math.floor(tileX), Math.floor(tileY)];
 }
+
+function getIsoCoord(x: number, y: number,
+  width: number, height: number,
+  offset?: number[])
+{
+  var _w2 = width / 2;
+  var _h2 = height / 2;
+  var _isoX = (x - y) * _w2;
+  var _isoY = (x + y) * _h2;
+  if (offset)
+  { 
+    _isoX += offset[0];
+    _isoY += offset[1];
+  }
+  return [_isoX, _isoY];
+}
+
+function getTileScreenPosition(x: number, y:number, tileSize: number[], worldSize: number[],
+  container: PIXI.DisplayObjectContainer)
+{
+  var wt = container.worldTransform;
+  var zoom = wt.a;
+  var offset = [wt.tx + worldSize[0]/2 * zoom,
+    wt.ty + tileSize[1]/2 * zoom];
+  tileSize[0] *= zoom;
+  tileSize[1] *= zoom;
+
+  console.log(getIsoCoord(x, y, tileSize[0], tileSize[1], offset));
+}

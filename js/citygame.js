@@ -93,6 +93,13 @@ var Cell = (function () {
         var _s = this.sprite = new GroundSprite(type, this);
         this.buildable = type["buildable"];
     };
+    Cell.prototype.getScreenPos = function (container) {
+        var wt = container.worldTransform;
+        var zoom = wt.a;
+        var offset = [wt.tx + WORLD_WIDTH / 2 * zoom, wt.ty + TILE_HEIGHT / 2 * zoom];
+
+        return getIsoCoord(this.gridPos[0], this.gridPos[1], TILE_WIDTH * zoom, TILE_HEIGHT * zoom, offset);
+    };
     Cell.prototype.getNeighbors = function (diagonal) {
         if (typeof diagonal === "undefined") { diagonal = false; }
         var neighbors = {
@@ -804,10 +811,10 @@ var MouseEventHandler = (function () {
         // temp
         var cell = game.board.getCell(this.currCell);
         var neighs = cell.getNeighbors();
-        game.uiDrawer.makeCellPopup(cell);
+        game.uiDrawer.makeCellPopup(cell, event.target);
         for (var neigh in neighs) {
             if (neighs[neigh]) {
-                game.uiDrawer.makeCellPopup(neighs[neigh]);
+                game.uiDrawer.makeCellPopup(neighs[neigh], event.target);
             }
         }
     };
@@ -853,10 +860,10 @@ var UIDrawer = (function () {
         }
     };
 
-    UIDrawer.prototype.makeCellTooltip = function (event) {
-        var cell = event.target["cell"];
-        var cellX = cell.sprite.worldTransform.tx;
-        var cellY = cell.sprite.worldTransform.ty;
+    UIDrawer.prototype.makeCellTooltip = function (event, cell, container) {
+        var screenPos = cell.getScreenPos(container);
+        var cellX = screenPos[0];
+        var cellY = screenPos[1];
 
         var screenX = event.global.x;
         var screenY = event.global.y;
@@ -882,7 +889,7 @@ var UIDrawer = (function () {
         var pointing = (screenY - textObject.height - 100 < 0) ? "up" : "down";
 
         var x = cellX;
-        var y = (cell.content && pointing === "down") ? cellY - cell.content.sprite.height * cell.content.sprite.worldTransform.a / 2 : cellY - cell.sprite.height * cell.sprite.worldTransform.a / 2;
+        var y = (cell.content && pointing === "down") ? cellY - cell.content.sprite.height * cell.content.sprite.worldTransform.a / 2 : cellY;
 
         var uiObj = this.active = new UIObject(this.layer).delay(500).lifeTime(-1);
 
@@ -903,16 +910,11 @@ var UIDrawer = (function () {
 
         return uiObj;
     };
-    UIDrawer.prototype.makeCellPopup = function (cell) {
-        var cellX = cell.sprite.worldTransform.tx;
-        var cellY = cell.sprite.worldTransform.ty;
-
-        var x = cellX;
-        var y = (cell.content) ? cellY - cell.content.sprite.height * cell.content.sprite.worldTransform.a : cellY - cell.sprite.height * cell.sprite.worldTransform.a;
-
+    UIDrawer.prototype.makeCellPopup = function (cell, container) {
+        var pos = cell.getScreenPos(container);
         var content = new PIXI.Text("+1", this.fonts["black"]);
 
-        this.makeFadeyPopup([x, y], [0, -20], 2000, content);
+        this.makeFadeyPopup([pos[0], pos[1]], [0, -20], 2000, content);
     };
     UIDrawer.prototype.makeFadeyPopup = function (pos, drift, lifeTime, content) {
         var tween = new TWEEN.Tween({
@@ -1178,18 +1180,6 @@ function arrayToPoint(point) {
     return new PIXI.Point(point[0], point[1]);
 }
 
-function getIsoCoord(x, y, width, height, offset) {
-    var _w2 = width / 2;
-    var _h2 = height / 2;
-    var _isoX = (x - y) * _w2;
-    var _isoY = (x + y) * _h2;
-    if (offset) {
-        _isoX += offset[0];
-        _isoY += offset[1];
-    }
-    return [_isoX, _isoY];
-}
-
 function pineapple() {
     cg["content"]["buildings"]["pineapple"] = {
         "type": "pineapple",
@@ -1203,4 +1193,10 @@ function pineapple() {
 
 var game = new Game();
 var loader = new Loader(game);
+
+game.uiDrawer.makeFadeyPopup([SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2], [0, 0], 5000, new PIXI.Text("ctrl+click to scroll\nshift+click to zoom", {
+    font: "bold 50px Snippet",
+    fill: "#222222",
+    align: "center"
+}));
 //# sourceMappingURL=citygame.js.map

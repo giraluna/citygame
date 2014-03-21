@@ -50,6 +50,7 @@ declare class Cell {
     public buildable: boolean;
     constructor(gridPos: any, type: any);
     public init(type: string): void;
+    public getScreenPos(container: any): number[];
     public getNeighbors(diagonal?: boolean): neighborCells;
     public getArea(size: number, anchor?: string): any;
     public replace(type: string): void;
@@ -167,8 +168,8 @@ declare class UIDrawer {
     constructor();
     public init(): void;
     public removeActive(): void;
-    public makeCellTooltip(event: any): UIObject;
-    public makeCellPopup(cell: Cell): void;
+    public makeCellTooltip(event: any, cell: Cell, container: PIXI.DisplayObjectContainer): UIObject;
+    public makeCellPopup(cell: Cell, container: PIXI.DisplayObjectContainer): void;
     public makeFadeyPopup(pos: number[], drift: number[], lifeTime: number, content: any): void;
     public clearLayer(): void;
 }
@@ -236,7 +237,6 @@ declare function rectSelect(a: number[], b: number[]): number[];
 declare function manhattanSelect(a: any, b: any): number[];
 declare function arrayToPolygon(points: any): PIXI.Polygon;
 declare function arrayToPoint(point: any): PIXI.Point;
-declare function getIsoCoord(x: number, y: number, width: number, height: number, offset?: number[]): number[];
 declare function pineapple(): void;
 declare var game: Game;
 declare var loader: Loader;

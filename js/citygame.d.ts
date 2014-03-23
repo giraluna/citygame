@@ -146,6 +146,7 @@ declare class MouseEventHandler {
     public currPoint: number[];
     public startCell: number[];
     public currCell: number[];
+    public hoverCell: number[];
     public currAction: string;
     public scroller: Scroller;
     constructor();
@@ -159,6 +160,7 @@ declare class MouseEventHandler {
     public startCellAction(event: any): void;
     public worldMove(event: any): void;
     public worldEnd(event: any): void;
+    public hover(event: any): void;
 }
 declare class UIDrawer {
     public layer: PIXI.DisplayObjectContainer;

@@ -716,6 +716,7 @@ var MouseEventHandler = (function () {
             this.startPoint = undefined;
             this.scroller.end();
             game.highlighter.clearSprites();
+            game.uiDrawer.removeActive();
             game.updateWorld();
         } else if (event.originalEvent.ctrlKey || event.originalEvent.metaKey || event.originalEvent.button === 2) {
             this.startScroll(event);
@@ -727,12 +728,13 @@ var MouseEventHandler = (function () {
     };
 
     MouseEventHandler.prototype.mouseMove = function (event, targetType) {
-        if (this.currAction === undefined)
-            return;
-        else if (targetType === "stage" && (this.currAction === "zoom" || this.currAction === "scroll")) {
+        if (targetType === "stage" && (this.currAction === "zoom" || this.currAction === "scroll")) {
             this.stageMove(event);
         } else if (targetType === "world" && this.currAction === "cellAction") {
             this.worldMove(event);
+        } else if (targetType === "world" && this.currAction === undefined) {
+            this.hover(event);
+            console.log(event.target);
         }
     };
     MouseEventHandler.prototype.mouseUp = function (event, targetType) {
@@ -816,6 +818,18 @@ var MouseEventHandler = (function () {
             if (neighs[neigh]) {
                 game.uiDrawer.makeCellPopup(neighs[neigh], event.target);
             }
+        }
+    };
+    MouseEventHandler.prototype.hover = function (event) {
+        var pos = event.getLocalPosition(event.target);
+        var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
+
+        if (!this.hoverCell)
+            this.hoverCell = gridPos;
+        if (gridPos[0] !== this.hoverCell[0] || gridPos[1] !== this.hoverCell[1]) {
+            this.hoverCell = gridPos;
+            game.uiDrawer.removeActive();
+            game.uiDrawer.makeCellTooltip(event, game.board.getCell(gridPos), event.target);
         }
     };
     return MouseEventHandler;

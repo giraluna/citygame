@@ -910,6 +910,7 @@ class MouseEventHandler
 
   startCell: number[];
   currCell: number[];
+  hoverCell: number[];
 
   currAction: string;
 
@@ -934,6 +935,7 @@ class MouseEventHandler
       this.startPoint = undefined;
       this.scroller.end();
       game.highlighter.clearSprites();
+      game.uiDrawer.removeActive();
       game.updateWorld();
     }
     else if (event.originalEvent.ctrlKey ||
@@ -954,10 +956,7 @@ class MouseEventHandler
 
   mouseMove(event, targetType: string)
   {
-
-    if (this.currAction === undefined) return;
-
-    else if (targetType === "stage" &&
+    if (targetType === "stage" &&
       (this.currAction === "zoom" || this.currAction === "scroll"))
     {
       this.stageMove(event);
@@ -965,6 +964,11 @@ class MouseEventHandler
     else if (targetType === "world" && this.currAction === "cellAction")
     {
       this.worldMove(event);
+    }
+    else if (targetType === "world" && this.currAction === undefined)
+    {
+      this.hover(event);
+      console.log(event.target);
     }
   }
   mouseUp(event, targetType: string)
@@ -1070,6 +1074,19 @@ class MouseEventHandler
       {
         game.uiDrawer.makeCellPopup(neighs[neigh], event.target);
       }
+    }
+  }
+  hover(event)
+  {
+    var pos = event.getLocalPosition(event.target);
+    var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
+
+    if (!this.hoverCell) this.hoverCell = gridPos;
+    if (gridPos[0] !== this.hoverCell[0] || gridPos[1] !== this.hoverCell[1])
+    {
+      this.hoverCell = gridPos;
+      game.uiDrawer.removeActive();
+      game.uiDrawer.makeCellTooltip(event, game.board.getCell(gridPos), event.target);
     }
   }
 

@@ -470,6 +470,7 @@ class WorldRenderer
     {
       game.mouseEventHandler.mouseMove(event, "world");
     }
+
     _ws.mouseup = function(event)
     {
       game.mouseEventHandler.mouseUp(event, "world");
@@ -968,7 +969,6 @@ class MouseEventHandler
     else if (targetType === "world" && this.currAction === undefined)
     {
       this.hover(event);
-      console.log(event.target);
     }
   }
   mouseUp(event, targetType: string)
@@ -1064,7 +1064,7 @@ class MouseEventHandler
     game.highlighter.clearSprites();
     this.currAction = undefined;
     game.updateWorld();
-    // temp
+    /* temp
     var cell = game.board.getCell(this.currCell);
     var neighs = cell.getNeighbors()
     game.uiDrawer.makeCellPopup(cell, event.target);
@@ -1075,6 +1075,7 @@ class MouseEventHandler
         game.uiDrawer.makeCellPopup(neighs[neigh], event.target);
       }
     }
+    */
   }
   hover(event)
   {

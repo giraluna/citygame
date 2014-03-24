@@ -356,6 +356,7 @@ var WorldRenderer = (function () {
         _ws.mousemove = function (event) {
             game.mouseEventHandler.mouseMove(event, "world");
         };
+
         _ws.mouseup = function (event) {
             game.mouseEventHandler.mouseUp(event, "world");
         };
@@ -734,7 +735,6 @@ var MouseEventHandler = (function () {
             this.worldMove(event);
         } else if (targetType === "world" && this.currAction === undefined) {
             this.hover(event);
-            console.log(event.target);
         }
     };
     MouseEventHandler.prototype.mouseUp = function (event, targetType) {
@@ -809,16 +809,18 @@ var MouseEventHandler = (function () {
         game.highlighter.clearSprites();
         this.currAction = undefined;
         game.updateWorld();
-
-        // temp
+        /* temp
         var cell = game.board.getCell(this.currCell);
-        var neighs = cell.getNeighbors();
+        var neighs = cell.getNeighbors()
         game.uiDrawer.makeCellPopup(cell, event.target);
-        for (var neigh in neighs) {
-            if (neighs[neigh]) {
-                game.uiDrawer.makeCellPopup(neighs[neigh], event.target);
-            }
+        for (var neigh in neighs)
+        {
+        if (neighs[neigh])
+        {
+        game.uiDrawer.makeCellPopup(neighs[neigh], event.target);
         }
+        }
+        */
     };
     MouseEventHandler.prototype.hover = function (event) {
         var pos = event.getLocalPosition(event.target);

@@ -9,7 +9,7 @@ var cg =
       "frame": "grass.png",
       "interactive": true,
       "hitArea": [[0, -32], [32, -16], [0, 0], [-32, -16]],
-      "buildable": true
+      "flags": ["ground", "grass"]
     },
     "water":
     {
@@ -18,7 +18,7 @@ var cg =
       "frame": "water.png",
       "interactive": true,
       "hitArea": [[0, -32], [32, -16], [0, 0], [-32, -16]],
-      "buildable": false
+      "flags": ["water"]
     },
     "sand":
     {
@@ -27,7 +27,7 @@ var cg =
       "frame": "sand.png",
       "interactive": true,
       "hitArea": [[0, -32], [32, -16], [0, 0], [-32, -16]],
-      "buildable": true
+      "flags": ["ground", "sand"]
     },
     "snow":
     {
@@ -36,7 +36,7 @@ var cg =
       "frame": "snow.png",
       "interactive": true,
       "hitArea": [[0, -32], [32, -16], [0, 0], [-32, -16]],
-      "buildable": true
+      "flags": ["ground", "snow"]
     }
   },
   "content":
@@ -51,6 +51,7 @@ var cg =
           "baseType": "plant",
           "anchor": [0.5, 1],
           "frame": "tree1.png",
+          "canBuildOn": ["grass"]
         },
         "tree2":
         {
@@ -58,6 +59,7 @@ var cg =
           "baseType": "plant",
           "anchor": [0.5, 1],
           "frame": "tree2.png",
+          "canBuildOn": ["grass"]
         },
         "tree3":
         {
@@ -65,6 +67,7 @@ var cg =
           "baseType": "plant",
           "anchor": [0.5, 1],
           "frame": "tree3.png",
+          "canBuildOn": ["grass"]
         },
         "tree4":
         {
@@ -72,6 +75,7 @@ var cg =
           "baseType": "plant",
           "anchor": [0.5, 1],
           "frame": "tree4.png",
+          "canBuildOn": ["grass"]
         },
         "tree5":
         {
@@ -79,6 +83,7 @@ var cg =
           "baseType": "plant",
           "anchor": [0.5, 1],
           "frame": "tree5.png",
+          "canBuildOn": ["grass"]
         },
       },
       "sand":
@@ -89,6 +94,7 @@ var cg =
           "baseType": "plant",
           "anchor": [0.5, 1.5],
           "frame": "cactus.png",
+          "canBuildOn": ["sand"]
         }
       },
       "water":
@@ -99,6 +105,7 @@ var cg =
           "baseType": "plant",
           "anchor": [0.5, 1.5],
           "frame": "tentacle.png",
+          "canBuildOn": ["water"]
         }
       },
       "snow":
@@ -109,6 +116,7 @@ var cg =
           "baseType": "plant",
           "anchor": [0.5, 1.25],
           "frame": "snowman.png",
+          "canBuildOn": ["snow"]
         }
       }
     },
@@ -200,7 +208,8 @@ var cg =
         "baseType": "building",
         "categoryType": "apartment",
         "anchor": [0.5, 1],
-        "frame": "house1.png"
+        "frame": "house1.png",
+        "canNotBuildOn": ["water", "building", "road"]
       },
       "house2":
       {
@@ -208,7 +217,8 @@ var cg =
         "baseType": "building",
         "categoryType": "apartment",
         "anchor": [0.5, 1],
-        "frame": "house2.png"
+        "frame": "house2.png",
+        "canNotBuildOn": ["water", "building", "road"]
       },
       "house3":
       {
@@ -216,7 +226,8 @@ var cg =
         "baseType": "building",
         "categoryType": "apartment",
         "anchor": [0.5, 1],
-        "frame": "house3.png"
+        "frame": "house3.png",
+        "canNotBuildOn": ["water", "building", "road"]
       },
       "house4":
       {
@@ -224,7 +235,8 @@ var cg =
         "baseType": "building",
         "categoryType": "apartment",
         "anchor": [0.5, 1],
-        "frame": "house4.png"
+        "frame": "house4.png",
+        "canNotBuildOn": ["water", "building", "road"]
       },
       "house5":
       {
@@ -232,7 +244,8 @@ var cg =
         "baseType": "building",
         "categoryType": "apartment",
         "anchor": [0.5, 1],
-        "frame": "house5.png"
+        "frame": "house5.png",
+        "canNotBuildOn": ["water", "building", "road"]
       },
       "house6":
       {
@@ -240,7 +253,8 @@ var cg =
         "baseType": "building",
         "categoryType": "apartment",
         "anchor": [0.5, 1],
-        "frame": "house6.png"
+        "frame": "house6.png",
+        "canNotBuildOn": ["water", "building", "road"]
       }
     }
   }

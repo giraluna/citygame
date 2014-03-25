@@ -1,5 +1,7 @@
 /// <reference path="../lib/pixi.d.ts" />
 /// <reference path="../lib/tween.js.d.ts" />
+///
+///
 /// <reference path="../js/ui.d.ts" />
 /// <reference path="../js/loader.d.ts" />
 ///
@@ -60,6 +62,8 @@ var Content = (function () {
         this.type = type;
         this.baseType = type["baseType"] || undefined;
         this.categoryType = type["categoryType"] || undefined;
+        this.flags = type["flags"] || [];
+        this.flags.push(this.baseType);
 
         this.init(type);
 
@@ -91,7 +95,7 @@ var Cell = (function () {
     }
     Cell.prototype.init = function (type) {
         var _s = this.sprite = new GroundSprite(type, this);
-        this.buildable = type["buildable"];
+        this.flags = type["flags"];
     };
     Cell.prototype.getScreenPos = function (container) {
         var wt = container.worldTransform;
@@ -186,11 +190,12 @@ var Cell = (function () {
         var _texture = type["frame"];
         this.sprite.setTexture(PIXI.Texture.fromFrame(_texture));
         this.sprite.type = this.type = type;
-        this.buildable = type["buildable"];
+        this.flags = type["flags"];
         if (this.content && this.content.baseType === "plant") {
             this.addPlant();
         } else if (this.content) {
-            if (!this.checkBuildable(this.content.baseType)) {
+            if (!this.checkBuildable(this.content.type, false)) {
+                console.log(this.content.type, this.flags);
                 this.changeContent("none");
             } else {
                 this.changeContent(this.content.type);
@@ -199,40 +204,52 @@ var Cell = (function () {
     };
     Cell.prototype.changeContent = function (type, update, data) {
         if (typeof update === "undefined") { update = true; }
-        var baseType = type["baseType"] ? type["baseType"] : "none";
-        var buildable = this.checkBuildable(baseType);
-        var sameTypeExclusion = this.checkSameTypeExclusion(baseType);
-        var toAdd = (type !== "none" && buildable !== false && !sameTypeExclusion);
-        var toRemove = (type === "none" || (!sameTypeExclusion && toAdd));
+        var buildable = this.checkBuildable(type);
+        var toAdd = (type !== "none" && buildable !== false);
+        var toRemove = (type === "none" || toAdd);
 
         if (toRemove) {
             this.removeContent();
         }
 
         if (toAdd) {
-            this.content = new Content(this, type, data);
+            this.addContent(type, data);
         }
         if (update) {
             this.updateCell();
         }
     };
-    Cell.prototype.checkSameTypeExclusion = function (baseType) {
-        var contentbaseType = this.content ? this.content["baseType"] : "none";
-        if (contentbaseType == baseType && baseType === "building") {
+    Cell.prototype.checkBuildable = function (type, checkContent) {
+        if (typeof checkContent === "undefined") { checkContent = true; }
+        if (type === "none")
             return true;
-        } else {
-            return false;
-        }
-    };
-    Cell.prototype.checkBuildable = function (baseType) {
-        if (this.buildable === false) {
-            if (baseType == "plant" || baseType == "road") {
-                return true;
-            } else {
-                return false;
+
+        // implicitly true
+        var canBuild = true;
+
+        // check invalid
+        if (type.canNotBuildOn) {
+            // check if any flags in cell conflict with type.canNotBuildOn
+            canBuild = arrayLogic.not(this.flags, type.canNotBuildOn);
+
+            // same with content
+            if (checkContent && canBuild !== false && this.content) {
+                canBuild = arrayLogic.not(this.content.flags, type.canNotBuildOn);
             }
+        }
+
+        if (canBuild === false) {
+            return false;
         } else {
-            return true;
+            var valid = true;
+
+            if (type.canBuildOn) {
+                valid = arrayLogic.or(this.flags, type.canBuildOn);
+                if (checkContent && !valid && this.content) {
+                    valid = arrayLogic.or(this.content.flags, type.canBuildOn);
+                }
+            }
+            return valid;
         }
     };
     Cell.prototype.addPlant = function () {
@@ -243,6 +260,10 @@ var Cell = (function () {
     };
     Cell.prototype.updateCell = function () {
         getRoadConnections(this, 1);
+    };
+    Cell.prototype.addContent = function (type, data) {
+        this.content = new Content(this, type, data);
+        return this.content;
     };
     Cell.prototype.removeContent = function () {
         if (this.content === undefined) {
@@ -295,7 +316,7 @@ var Board = (function () {
                 }
                 var cellType = dataCell ? dataCell["type"] : cg["terrain"]["grass"];
                 var cell = this.cells[i][j] = new Cell([i, j], cellType);
-                cell.buildable = dataCell ? dataCell.buildable : true;
+                cell.flags = dataCell ? dataCell.flags : cellType["flags"];
 
                 var sprite = cell.sprite;
                 sprite.position = arrayToPoint(getIsoCoord(i, j, TILE_WIDTH, TILE_HEIGHT, [WORLD_WIDTH / 2, TILE_HEIGHT]));

@@ -6,6 +6,7 @@
 /// <reference path="systems.d.ts" />
 /// <reference path="utility.d.ts" />
 declare var cg: any;
+declare var arrayLogic: any;
 declare var container: any;
 declare var SCREEN_WIDTH: number, SCREEN_HEIGHT: number, TILE_WIDTH: number, TILE_HEIGHT: number, TILES: number, WORLD_WIDTH: number, WORLD_HEIGHT: number, ZOOM_LEVELS: number[];
 declare class Sprite extends PIXI.Sprite {
@@ -28,6 +29,7 @@ declare class Content {
     public id: number;
     public sprite: Sprite;
     public cell: Cell;
+    public flags: string[];
     constructor(cell: Cell, type: any, data?: any);
     public init(type: any): void;
     public applyData(data: any): void;
@@ -47,7 +49,7 @@ declare class Cell {
     public sprite: Sprite;
     public content: Content;
     public gridPos: number[];
-    public buildable: boolean;
+    public flags: string[];
     constructor(gridPos: any, type: any);
     public init(type: string): void;
     public getScreenPos(container: any): number[];
@@ -55,10 +57,10 @@ declare class Cell {
     public getArea(size: number, anchor?: string): any;
     public replace(type: string): void;
     public changeContent(type: string, update?: boolean, data?: any): void;
-    public checkSameTypeExclusion(baseType: string): boolean;
-    public checkBuildable(baseType: string): boolean;
+    public checkBuildable(type: any, checkContent?: boolean): boolean;
     public addPlant(): void;
     public updateCell(): void;
+    public addContent(type: string, data?: any): Content;
     public removeContent(): void;
 }
 declare class Board {

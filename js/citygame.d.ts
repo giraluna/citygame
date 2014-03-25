@@ -174,7 +174,7 @@ declare class UIDrawer {
     public removeActive(): void;
     public makeCellTooltip(event: any, cell: Cell, container: PIXI.DisplayObjectContainer): UIObject;
     public makeCellPopup(cell: Cell, container: PIXI.DisplayObjectContainer): void;
-    public makeFadeyPopup(pos: number[], drift: number[], lifeTime: number, content: any): void;
+    public makeFadeyPopup(pos: number[], drift: number[], lifeTime: number, content: any, easing?: (k: number) => number): void;
     public clearLayer(): void;
 }
 declare class Highlighter {

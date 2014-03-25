@@ -479,7 +479,7 @@ class WorldRenderer
       var main = zoomLayer["main"] = new PIXI.DisplayObjectContainer();
     }
 
-    // TEMP
+    // TEMPORARY
     var self = this;
     _ws.mousedown = function(event)
     {
@@ -566,6 +566,19 @@ class Game
 
     this.render();
     this.updateWorld();
+
+    // TEMPORARY
+    game.uiDrawer.makeFadeyPopup(
+      [SCREEN_WIDTH / 2, SCREEN_HEIGHT/2],
+      [0, 0],
+      5000,
+      new PIXI.Text("ctrl+click to scroll\nshift+click to zoom",{
+        font: "bold 50px Snippet",
+        fill: "#222222",
+        align: "center"
+      }),
+      TWEEN.Easing.Quartic.In
+      );
     }
     initContainers()
     {
@@ -722,6 +735,7 @@ class Game
     var parsed = JSON.parse( localStorage.getItem("board") );
     var board = this.board = new Board(parsed["width"], parsed["height"]);
     board.makeMap( parsed["cells"] );
+    this.updateWorld();
   }
   render()
   {
@@ -1083,7 +1097,7 @@ class MouseEventHandler
     game.highlighter.clearSprites();
     this.currAction = undefined;
     game.updateWorld();
-    /* temp
+    /* TEMPORARY
     var cell = game.board.getCell(this.currCell);
     var neighs = cell.getNeighbors()
     game.uiDrawer.makeCellPopup(cell, event.target);
@@ -1100,6 +1114,10 @@ class MouseEventHandler
   {
     var pos = event.getLocalPosition(event.target);
     var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
+    // TEMPORARY
+    if (!gridPos) return;
+    if (gridPos[0] >= TILES || gridPos[1] >= TILES) return;
+    else if (gridPos[0] < 0 || gridPos[1] < 0) return;
 
     if (!this.hoverCell) this.hoverCell = gridPos;
     if (gridPos[0] !== this.hoverCell[0] || gridPos[1] !== this.hoverCell[1])
@@ -1232,7 +1250,8 @@ class UIDrawer
 
     this.makeFadeyPopup([pos[0], pos[1]], [0, -20], 2000, content);
   }
-  makeFadeyPopup(pos: number[], drift: number[], lifeTime: number, content)
+  makeFadeyPopup(pos: number[], drift: number[], lifeTime: number, content,
+    easing = TWEEN.Easing.Linear.None)
   {
     var tween = new TWEEN.Tween(
       {
@@ -1240,6 +1259,7 @@ class UIDrawer
         x: pos[0],
         y: pos[1]
         });
+    tween.easing(easing);
     
 
     var uiObj = new UIObject(this.layer)
@@ -1606,10 +1626,3 @@ function pineapple()
 
 var game = new Game();
 var loader = new Loader(game);
-
-game.uiDrawer.makeFadeyPopup([SCREEN_WIDTH / 2, SCREEN_HEIGHT/2],
-  [0, 0], 5000, new PIXI.Text("ctrl+click to scroll\nshift+click to zoom",{
-        font: "bold 50px Snippet",
-        fill: "#222222",
-        align: "center"
-      }));

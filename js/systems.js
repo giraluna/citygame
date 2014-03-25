@@ -23,13 +23,32 @@ var __extends = this.__extends || function (d, b) {
 var SystemsManager = (function () {
     function SystemsManager(tickTime) {
         this.systems = {};
+        this.entities = {};
         this.tickNumber = 0;
         this.accumulated = 0;
         this.timer = new Strawb.Timer();
         this.tickTime = tickTime / 1000;
+
+        this.init();
     }
+    SystemsManager.prototype.init = function () {
+        var e = this.entities;
+        e.ownedBuildings = [];
+    };
     SystemsManager.prototype.addSystem = function (name, system) {
         this.systems[name] = system;
+    };
+    SystemsManager.prototype.addEventListeners = function (listener) {
+        this.eventListener = listener;
+        var self = this;
+        listener.addEventListener("builtBuilding", function (event) {
+            // TEMPORARY
+            self.entities.ownedBuildings.push("temp");
+        });
+        listener.addEventListener("destroyBuilding", function (event) {
+            // TEMPORARY
+            self.entities.ownedBuildings.pop();
+        });
     };
     SystemsManager.prototype.tick = function () {
         this.accumulated -= this.tickTime;
@@ -53,9 +72,12 @@ var System = (function () {
         this.updateTicks(currTick);
 
         if (activationRate < 1) {
-            console.log("<1 activationRate on system", this);
+            console.warn("<1 activationRate on system", this);
         }
     }
+    System.prototype.activate = function () {
+    };
+
     System.prototype.updateTicks = function (currTick) {
         this.lastTick = currTick;
         this.nextTick = currTick + this.activationRate;
@@ -72,12 +94,21 @@ var System = (function () {
     return System;
 })();
 
-var HouseSystem = (function (_super) {
-    __extends(HouseSystem, _super);
-    function HouseSystem(activationRate, currTick) {
-        _super.call(this, activationRate, currTick);
+var ProfitSystem = (function (_super) {
+    __extends(ProfitSystem, _super);
+    function ProfitSystem(activationRate, systemsManager, player) {
+        _super.call(this, activationRate, systemsManager.tickNumber);
         this.targets = [];
+        this.systemsManager = systemsManager;
+        this.targets = systemsManager.entities.ownedBuildings;
+        this.player = player;
     }
-    return HouseSystem;
+    ProfitSystem.prototype.activate = function () {
+        this.player.setIncome(this.targets.length);
+        for (var i = 0; i < this.targets.length; i++) {
+            this.player.addMoney(1);
+        }
+    };
+    return ProfitSystem;
 })(System);
 //# sourceMappingURL=systems.js.map

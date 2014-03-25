@@ -7,5 +7,5 @@ declare class Player {
     public bindElements(): void;
     public updateElements(): void;
     public addMoney(amount: any): void;
-    public addIncome(amount: any): void;
+    public setIncome(amount: any): void;
 }

@@ -18,6 +18,8 @@
 class SystemsManager
 {
   systems: any = {};
+  entities: any = {};
+  eventListener: PIXI.EventTarget;
   timer: Strawb.Timer;
   tickTime: number;
   tickNumber: number = 0;
@@ -27,10 +29,32 @@ class SystemsManager
   {
     this.timer = new Strawb.Timer();
     this.tickTime = tickTime / 1000;
+
+    this.init();
   }
-  addSystem(name, system)
+  init()
+  {
+    var e = this.entities;
+    e.ownedBuildings = [];
+  }
+  addSystem(name: string, system: System)
   {
     this.systems[name] = system;
+  }
+  addEventListeners(listener)
+  {
+    this.eventListener = listener;
+    var self = this;
+    listener.addEventListener("builtBuilding", function(event)
+    {
+      // TEMPORARY
+      self.entities.ownedBuildings.push("temp");
+    });
+    listener.addEventListener("destroyBuilding", function(event)
+    {
+      // TEMPORARY
+      self.entities.ownedBuildings.pop();
+    });
   }
   tick()
   {
@@ -57,7 +81,7 @@ class System
   lastTick: number;
   nextTick: number;
 
-  activate: () => any;
+  activate(){}
 
   constructor(activationRate: number, currTick: number)
   {
@@ -66,7 +90,7 @@ class System
 
     if (activationRate < 1)
     {
-      console.log("<1 activationRate on system", this);
+      console.warn("<1 activationRate on system", this);
     }
   }
   updateTicks(currTick: number)
@@ -90,14 +114,23 @@ class System
 class ProfitSystem extends System
 {
   targets: any[] = [];
+  systemsManager: SystemsManager;
+  player: Player;
 
-  constructor(activationRate: number, currTick: number)
+  constructor(activationRate: number, systemsManager: SystemsManager, player: Player)
   {
-    super(activationRate, currTick);
+    super(activationRate, systemsManager.tickNumber);
+    this.systemsManager = systemsManager;
+    this.targets = systemsManager.entities.ownedBuildings;
+    this.player = player;
   }
 
   activate()
   {
-    
+    this.player.setIncome(this.targets.length);
+    for (var i = 0; i < this.targets.length; i++)
+    {
+      this.player.addMoney(1);
+    }
   }
 }

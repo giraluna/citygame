@@ -60,7 +60,7 @@ declare class Cell {
     public checkBuildable(type: any, checkContent?: boolean): boolean;
     public addPlant(): void;
     public updateCell(): void;
-    public addContent(type: string, data?: any): Content;
+    public addContent(type: any, data?: any): Content;
     public removeContent(): void;
 }
 declare class Board {

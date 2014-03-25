@@ -17,8 +17,8 @@ var Player = (function () {
         this.money += amount;
         this.updateElements();
     };
-    Player.prototype.addIncome = function (amount) {
-        this.income += amount;
+    Player.prototype.setIncome = function (amount) {
+        this.income = amount;
         this.updateElements();
     };
     return Player;

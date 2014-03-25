@@ -195,7 +195,6 @@ var Cell = (function () {
             this.addPlant();
         } else if (this.content) {
             if (!this.checkBuildable(this.content.type, false)) {
-                console.log(this.content.type, this.flags);
                 this.changeContent("none");
             } else {
                 this.changeContent(this.content.type);
@@ -263,11 +262,22 @@ var Cell = (function () {
     };
     Cell.prototype.addContent = function (type, data) {
         this.content = new Content(this, type, data);
+
+        // TEMPORARY
+        if (type.baseType === "building") {
+            game.eventListener.dispatchEvent({ type: "builtBuilding", data: "" });
+        }
+
         return this.content;
     };
     Cell.prototype.removeContent = function () {
         if (this.content === undefined) {
             return;
+        }
+
+        // TEMPORARY
+        if (this.content.baseType === "building") {
+            game.eventListener.dispatchEvent({ type: "destroyBuilding", data: "" });
         }
 
         game.layers["content"]._removeChildAt(this.content.sprite, this.gridPos[0] + this.gridPos[1]);
@@ -433,6 +443,10 @@ var Game = (function () {
         this.uiDrawer = new UIDrawer();
 
         this.systemsManager = new SystemsManager(1000);
+        this.systemsManager.addEventListeners(this.eventListener);
+        var player = new Player();
+        var profitSystem = new ProfitSystem(1, this.systemsManager, player);
+        this.systemsManager.addSystem("profit", profitSystem);
 
         this.render();
         this.updateWorld();

@@ -262,7 +262,6 @@ class Cell
     {
       if ( !this.checkBuildable(this.content.type, false) )
       {
-        console.log(this.content.type, this.flags);
         this.changeContent("none");
       }
       else
@@ -343,9 +342,16 @@ class Cell
   {
     getRoadConnections(this, 1);
   }
-  addContent( type: string, data? )
+  addContent( type, data? )
   {
     this.content = new Content( this, type, data );
+
+    // TEMPORARY
+    if (type.baseType === "building")
+    {
+      game.eventListener.dispatchEvent({type: "builtBuilding", data:""});
+    }
+
     return this.content;
   }
   removeContent()
@@ -353,6 +359,12 @@ class Cell
     if (this.content === undefined)
     {
       return;
+    }
+
+    // TEMPORARY
+    if (this.content.baseType === "building")
+    {
+      game.eventListener.dispatchEvent({type: "destroyBuilding", data:""});
     }
 
     game.layers["content"]._removeChildAt(this.content.sprite,
@@ -562,6 +574,10 @@ class Game
     this.uiDrawer = new UIDrawer();
 
     this.systemsManager = new SystemsManager(1000);
+    this.systemsManager.addEventListeners(this.eventListener);
+    var player = new Player();
+    var profitSystem = new ProfitSystem(1, this.systemsManager, player);
+    this.systemsManager.addSystem("profit", profitSystem);
 
 
     this.render();

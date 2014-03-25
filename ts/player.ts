@@ -26,9 +26,9 @@ class Player
     this.money += amount;
     this.updateElements();
   }
-  addIncome(amount)
+  setIncome(amount)
   {
-    this.income += amount;
+    this.income = amount;
     this.updateElements();
   }
 }

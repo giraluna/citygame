@@ -117,3 +117,8 @@ function getTileScreenPosition(x: number, y:number, tileSize: number[], worldSiz
 
   console.log(getIsoCoord(x, y, tileSize[0], tileSize[1], offset));
 }
+
+function randInt(min, max)
+{
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}

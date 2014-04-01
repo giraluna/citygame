@@ -1,5 +1,6 @@
 var Player = (function () {
     function Player() {
+        this.id = "player1";
         this.money = 0;
         this.income = 0;
         this.bindElements();

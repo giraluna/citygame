@@ -1,5 +1,6 @@
 class Player
 {
+  id: string = "player1";
   money: number = 0;
   income: number = 0;
   moneySpan: HTMLElement;

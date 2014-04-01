@@ -88,4 +88,8 @@ function getTileScreenPosition(x, y, tileSize, worldSize, container) {
 
     console.log(getIsoCoord(x, y, tileSize[0], tileSize[1], offset));
 }
+
+function randInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 //# sourceMappingURL=utility.js.map

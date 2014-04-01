@@ -1,4 +1,5 @@
 declare class Player {
+    public id: string;
     public money: number;
     public income: number;
     public moneySpan: HTMLElement;

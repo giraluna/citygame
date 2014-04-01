@@ -89,7 +89,7 @@ class Content
     this.type = type;
     this.baseType = type["baseType"] || undefined;
     this.categoryType = type["categoryType"] || undefined;
-    this.flags = type["flags"] || [];
+    this.flags = type["flags"] ? type["flags"].slice(0) : [];
     this.flags.push(this.baseType);
 
     this.init( type );
@@ -133,6 +133,7 @@ class Cell
   type: string;
   sprite: Sprite;
   content: Content;
+  landValue: number;
   gridPos: number[];
   flags: string[];
 
@@ -140,13 +141,14 @@ class Cell
   {
     this.gridPos = gridPos;
     this.type = type;
+    this.landValue = randInt(40, 50);
 
     this.init(type);
   }
   init( type:string )
   {
     var _s = this.sprite = new GroundSprite( type, this );
-    this.flags = type["flags"];
+    this.flags = type["flags"].slice(0);
   }
   getScreenPos(container)
   {
@@ -253,7 +255,7 @@ class Cell
     var _texture = type["frame"];
     this.sprite.setTexture( PIXI.Texture.fromFrame( _texture ));
     this.sprite.type = this.type = type;
-    this.flags = type["flags"];
+    this.flags = type["flags"].slice(0);
     if (this.content && this.content.baseType === "plant")
     {
       this.addPlant();
@@ -370,6 +372,17 @@ class Cell
     game.layers["content"]._removeChildAt(this.content.sprite,
       this.gridPos[0] + this.gridPos[1]);
     this.content = undefined;
+  }
+  buyCell(player: Player)
+  {
+    if (player.money < this.landValue) return;
+    //else if (this.flags.indexOf(player.id) > -1 ) return;
+
+    player.addMoney(-this.landValue);
+
+    console.log(player.money);
+    this.flags.push(player.id);
+    console.log(this.flags);
   }
 }
 
@@ -579,6 +592,10 @@ class Game
     var profitSystem = new ProfitSystem(1, this.systemsManager, player);
     this.systemsManager.addSystem("profit", profitSystem);
 
+    var dateSystem = new DateSystem(1, this.systemsManager,
+      document.getElementById("date") );
+    this.systemsManager.addSystem("date", dateSystem);
+
 
     this.render();
     this.updateWorld();
@@ -648,6 +665,7 @@ class Game
       this.tools.plant = new PlantTool();
       this.tools.house = new HouseTool();
       this.tools.road = new RoadTool();
+      this.tools.buy = new BuyTool();
     }
 
     bindElements()
@@ -1360,156 +1378,161 @@ class Highlighter
   }
 }
 
+/*
 interface Tool
-{
-  selectType: any
-  tintColor: number;
-
-  activate(target:Cell[]);
-}
-
-class WaterTool implements Tool
 {
   selectType: any;
   tintColor: number;
+  activateCost: number;
+
+  activate(target:Cell[]);
+}
+*/
+
+class Tool
+{
+  selectType: any;//
+  tintColor: number;
+  activateCost: number;
+
+  activate(target:Cell[])
+  {
+    for (var i = 0; i < target.length; i++)
+    {
+      this.onActivate(target[i]);
+    }
+  }
+  onActivate(target:Cell){}
+}
+
+
+class WaterTool extends Tool
+{
   constructor()
   {
+    super();
     this.selectType = manhattanSelect;
     this.tintColor = 0x4444FF;
-  }
-  activate(target)
+  } 
+  onActivate(target: Cell)
   {
-    for (var i = 0; i < target.length; i++)
-    {
-      target[i].replace( cg["terrain"]["water"] );
-    };
+    target.replace( cg["terrain"]["water"] );
   }
 }
 
-class GrassTool implements Tool
+class GrassTool extends Tool
 {
-  selectType: any
-  tintColor: number;
   constructor()
   {
+    super();
     this.selectType = rectSelect;
     this.tintColor = 0x617A4E;
-  }
-  activate(target)
+  } 
+  onActivate(target: Cell)
   {
-    for (var i = 0; i < target.length; i++)
-    {
-      target[i].replace( cg["terrain"]["grass"] );
-    }
+    target.replace( cg["terrain"]["grass"] );
   }
 }
 
-class SandTool implements Tool
+class SandTool extends Tool
 {
-  selectType: any
-  tintColor: number;
   constructor()
   {
+    super();
     this.selectType = rectSelect;
     this.tintColor = 0xE2BF93;
-  }
-  activate(target)
+  } 
+  onActivate(target: Cell)
   {
-    for (var i = 0; i < target.length; i++)
-    {
-      target[i].replace( cg["terrain"]["sand"] );
-    }
+    target.replace( cg["terrain"]["sand"] );
   }
 }
 
-class SnowTool implements Tool
+class SnowTool extends Tool
 {
-  selectType: any
-  tintColor: number;
   constructor()
   {
+    super();
     this.selectType = rectSelect;
     this.tintColor = 0xBBDFD7;
-  }
-  activate(target)
+  } 
+  onActivate(target: Cell)
   {
-    for (var i = 0; i < target.length; i++)
-    {
-      target[i].replace( cg["terrain"]["snow"] );
-    }
+    target.replace( cg["terrain"]["snow"] );
   }
 }
-class RemoveTool implements Tool
+class RemoveTool extends Tool
 {
-  selectType: any
-  tintColor: number;
   constructor()
   {
+    super();
     this.selectType = rectSelect;
     this.tintColor = 0xFF5555;
-  }
-  activate(target)
+  } 
+  onActivate(target: Cell)
   {
-    for (var i = 0; i < target.length; i++)
-    {
-      target[i].changeContent("none");
-    }
+    target.changeContent("none");
   }
 }
 
-class PlantTool implements Tool
+class PlantTool extends Tool
 {
-  selectType: any
-  tintColor: number;
   constructor()
   {
+    super();
     this.selectType = rectSelect;
     this.tintColor = 0x338833;
-  }
-  activate(target)
+  } 
+  onActivate(target: Cell)
   {
-    for (var i = 0; i < target.length; i++)
-    {
-      target[i].addPlant();
-    }
+    target.addPlant();
   }
 }
 
-class HouseTool implements Tool
+class HouseTool extends Tool
 {
-  selectType: any
-  tintColor: number;
   constructor()
   {
+    super();
     this.selectType = rectSelect;
     this.tintColor = 0x696969;
-  }
-  activate(target)
+  } 
+  onActivate(target: Cell)
   {
-    for (var i = 0; i < target.length; i++)
-    {
-      target[i].changeContent(
-        getRandomProperty(cg["content"]["buildings"]) );
-    }
+    target.changeContent(
+      getRandomProperty(cg["content"]["buildings"]) );
   }
 }
-class RoadTool implements Tool
+class RoadTool extends Tool
 {
-  selectType: any
-  tintColor: number;
   constructor()
   {
+    super();
     this.selectType = manhattanSelect;
     this.tintColor = 0x696969;
-  }
-  activate(target)
+  } 
+  onActivate(target: Cell)
   {
-    for (var i = 0; i < target.length; i++)
-    {
-      target[i].changeContent( cg["content"]["roads"]["road_nesw"] );
-    }
+    target.changeContent( cg["content"]["roads"]["road_nesw"] );
   }
 }
+
+class BuyTool extends Tool
+{
+  player: Player;
+  constructor()
+  {
+    super();
+    this.selectType = rectSelect;
+    this.tintColor = 0x22EE22;
+  }
+  onActivate(target: Cell)
+  {
+    target.buyCell(this.player);
+  }
+}
+
+
 function getRoadConnections(target: Cell, depth:number)
 {
   var connections = {};

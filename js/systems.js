@@ -15,7 +15,7 @@ var __extends = this.__extends || function (d, b) {
 *
 * @property systems     List of systems registered with this
 * @property timer
-* @property tickTime    Amount of time for single tick
+* @property tickTime    Amount of time for single tick in ms
 * @property tickNumber  Counter for total ticks so far
 * @property accumulated Amount of time banked towards next tick
 *
@@ -75,7 +75,7 @@ var System = (function () {
             console.warn("<1 activationRate on system", this);
         }
     }
-    System.prototype.activate = function () {
+    System.prototype.activate = function (currTick) {
     };
 
     System.prototype.updateTicks = function (currTick) {
@@ -86,7 +86,7 @@ var System = (function () {
     System.prototype.tick = function (currTick) {
         if (currTick + this.activationRate >= this.nextTick) {
             // do something
-            this.activate();
+            this.activate(currTick);
 
             this.updateTicks(currTick);
         }
@@ -110,5 +110,72 @@ var ProfitSystem = (function (_super) {
         }
     };
     return ProfitSystem;
+})(System);
+
+var DateSystem = (function (_super) {
+    __extends(DateSystem, _super);
+    function DateSystem(activationRate, systemsManager, dateElem, startDate) {
+        _super.call(this, activationRate, systemsManager.tickNumber);
+        this.year = startDate ? startDate.year : 2000;
+        this.month = startDate ? startDate.month : 1;
+        this.day = startDate ? startDate.day : 1;
+
+        this.dateElem = dateElem;
+
+        this.updateDate();
+    }
+    DateSystem.prototype.activate = function () {
+        this.incrementDate();
+    };
+    DateSystem.prototype.incrementDate = function () {
+        this.day++;
+
+        this.fireCallbacks(this.onDayChange, this.day);
+
+        this.calculateDate();
+    };
+    DateSystem.prototype.calculateDate = function () {
+        if (this.day > 30) {
+            this.day -= 30;
+            this.month++;
+
+            this.fireCallbacks(this.onMonthChange, this.month);
+        }
+        if (this.month > 12) {
+            this.month -= 12;
+            this.year++;
+
+            this.fireCallbacks(this.onYearChange, this.year);
+        }
+        if (this.day > 30 || this.month > 12) {
+            this.calculateDate();
+        } else {
+            this.updateDate();
+        }
+    };
+
+    DateSystem.prototype.fireCallbacks = function (targets, date) {
+        if (!targets)
+            return;
+        for (var i = 0; i < targets.length; i++) {
+            targets[i].call(date);
+        }
+    };
+
+    DateSystem.prototype.getDate = function () {
+        var dateObj = {
+            year: this.year,
+            month: this.month,
+            day: this.day
+        };
+        return dateObj;
+    };
+    DateSystem.prototype.toString = function () {
+        return "" + this.day + "." + this.month + "." + this.year;
+    };
+    DateSystem.prototype.updateDate = function () {
+        this.dateElem.innerHTML = this.toString();
+    };
+    return DateSystem;
 })(System);
 //# sourceMappingURL=systems.js.map

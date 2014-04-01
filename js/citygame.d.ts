@@ -48,6 +48,7 @@ declare class Cell {
     public type: string;
     public sprite: Sprite;
     public content: Content;
+    public landValue: number;
     public gridPos: number[];
     public flags: string[];
     constructor(gridPos: any, type: any);
@@ -62,6 +63,7 @@ declare class Cell {
     public updateCell(): void;
     public addContent(type: any, data?: any): Content;
     public removeContent(): void;
+    public buyCell(player: Player): void;
 }
 declare class Board {
     public width: number;
@@ -183,58 +185,49 @@ declare class Highlighter {
     public clearSprites(): void;
     public tintCells(cells: Cell[], color: number): void;
 }
-interface Tool {
-    selectType: any;
-    tintColor: number;
-    activate(target: Cell[]): any;
-}
-declare class WaterTool implements Tool {
+declare class Tool {
     public selectType: any;
     public tintColor: number;
-    constructor();
-    public activate(target: any): void;
+    public activateCost: number;
+    public activate(target: Cell[]): void;
+    public onActivate(target: Cell): void;
 }
-declare class GrassTool implements Tool {
-    public selectType: any;
-    public tintColor: number;
+declare class WaterTool extends Tool {
     constructor();
-    public activate(target: any): void;
+    public onActivate(target: Cell): void;
 }
-declare class SandTool implements Tool {
-    public selectType: any;
-    public tintColor: number;
+declare class GrassTool extends Tool {
     constructor();
-    public activate(target: any): void;
+    public onActivate(target: Cell): void;
 }
-declare class SnowTool implements Tool {
-    public selectType: any;
-    public tintColor: number;
+declare class SandTool extends Tool {
     constructor();
-    public activate(target: any): void;
+    public onActivate(target: Cell): void;
 }
-declare class RemoveTool implements Tool {
-    public selectType: any;
-    public tintColor: number;
+declare class SnowTool extends Tool {
     constructor();
-    public activate(target: any): void;
+    public onActivate(target: Cell): void;
 }
-declare class PlantTool implements Tool {
-    public selectType: any;
-    public tintColor: number;
+declare class RemoveTool extends Tool {
     constructor();
-    public activate(target: any): void;
+    public onActivate(target: Cell): void;
 }
-declare class HouseTool implements Tool {
-    public selectType: any;
-    public tintColor: number;
+declare class PlantTool extends Tool {
     constructor();
-    public activate(target: any): void;
+    public onActivate(target: Cell): void;
 }
-declare class RoadTool implements Tool {
-    public selectType: any;
-    public tintColor: number;
+declare class HouseTool extends Tool {
     constructor();
-    public activate(target: any): void;
+    public onActivate(target: Cell): void;
+}
+declare class RoadTool extends Tool {
+    constructor();
+    public onActivate(target: Cell): void;
+}
+declare class BuyTool extends Tool {
+    public player: Player;
+    constructor();
+    public onActivate(target: Cell): void;
 }
 declare function getRoadConnections(target: Cell, depth: number): any;
 declare function rectSelect(a: number[], b: number[]): number[];

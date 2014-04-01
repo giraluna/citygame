@@ -10,7 +10,7 @@
   *
   * @property systems     List of systems registered with this
   * @property timer      
-  * @property tickTime    Amount of time for single tick
+  * @property tickTime    Amount of time for single tick in ms
   * @property tickNumber  Counter for total ticks so far
   * @property accumulated Amount of time banked towards next tick
   * 
@@ -77,11 +77,12 @@ class SystemsManager
 
 class System
 {
+  systemsManager: SystemsManager;
   activationRate: number;
   lastTick: number;
   nextTick: number;
 
-  activate(){}
+  activate(currTick?){}
 
   constructor(activationRate: number, currTick: number)
   {
@@ -104,7 +105,7 @@ class System
     if (currTick + this.activationRate >= this.nextTick)
     {
       // do something
-      this.activate();
+      this.activate(currTick);
       
       this.updateTicks(currTick);
     }
@@ -114,7 +115,6 @@ class System
 class ProfitSystem extends System
 {
   targets: any[] = [];
-  systemsManager: SystemsManager;
   player: Player;
 
   constructor(activationRate: number, systemsManager: SystemsManager, player: Player)
@@ -132,5 +132,103 @@ class ProfitSystem extends System
     {
       this.player.addMoney(1);
     }
+  }
+}
+
+interface IDateObj
+{
+  year: number;
+  month: number;
+  day: number;
+}
+
+class DateSystem extends System
+{
+  year: number;
+  month: number;
+  day: number;
+
+  dateElem: HTMLElement;
+
+  onDayChange: { (): any; }[];
+  onMonthChange: { (): any; }[];
+  onYearChange: { (): any; }[];
+
+  constructor(activationRate: number, systemsManager: SystemsManager,
+    dateElem: HTMLElement, startDate?: IDateObj)
+  {
+    super(activationRate, systemsManager.tickNumber);
+    this.year  = startDate ? startDate.year  : 2000;
+    this.month = startDate ? startDate.month : 1;
+    this.day   = startDate ? startDate.day   : 1;
+
+    this.dateElem = dateElem;
+
+    this.updateDate();
+  }
+  activate()
+  {
+    this.incrementDate();
+  }
+  incrementDate()
+  {
+    this.day++;
+
+    this.fireCallbacks(this.onDayChange, this.day);
+
+    this.calculateDate();
+  }
+  calculateDate()
+  {
+    if (this.day > 30)
+    {
+      this.day -= 30;
+      this.month++;
+
+      this.fireCallbacks(this.onMonthChange, this.month);
+    }
+    if (this.month > 12)
+    {
+      this.month -= 12;
+      this.year++;
+      
+      this.fireCallbacks(this.onYearChange, this.year);
+    }
+    if (this.day > 30 || this.month > 12)
+    {
+      this.calculateDate();
+    }
+    else
+    {
+      this.updateDate();
+    }
+  }
+
+  fireCallbacks(targets: { (): any; }[], date: number)
+  {
+    if (!targets) return;
+    for (var i = 0; i < targets.length; i++)
+    {
+      targets[i].call(date);
+    }
+  }
+
+  getDate() :IDateObj
+  {
+    var dateObj =
+    {
+      year: this.year,
+      month: this.month,
+      day: this.day
+    };
+    return dateObj;
+  }
+  toString()
+  {
+    return "" + this.day + "." + this.month + "." + this.year;
+  }
+  updateDate()
+  {
+    this.dateElem.innerHTML = this.toString();
   }
 }

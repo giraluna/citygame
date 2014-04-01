@@ -62,7 +62,7 @@ var Content = (function () {
         this.type = type;
         this.baseType = type["baseType"] || undefined;
         this.categoryType = type["categoryType"] || undefined;
-        this.flags = type["flags"] || [];
+        this.flags = type["flags"] ? type["flags"].slice(0) : [];
         this.flags.push(this.baseType);
 
         this.init(type);
@@ -90,12 +90,13 @@ var Cell = (function () {
     function Cell(gridPos, type) {
         this.gridPos = gridPos;
         this.type = type;
+        this.landValue = randInt(40, 50);
 
         this.init(type);
     }
     Cell.prototype.init = function (type) {
         var _s = this.sprite = new GroundSprite(type, this);
-        this.flags = type["flags"];
+        this.flags = type["flags"].slice(0);
     };
     Cell.prototype.getScreenPos = function (container) {
         var wt = container.worldTransform;
@@ -190,7 +191,7 @@ var Cell = (function () {
         var _texture = type["frame"];
         this.sprite.setTexture(PIXI.Texture.fromFrame(_texture));
         this.sprite.type = this.type = type;
-        this.flags = type["flags"];
+        this.flags = type["flags"].slice(0);
         if (this.content && this.content.baseType === "plant") {
             this.addPlant();
         } else if (this.content) {
@@ -282,6 +283,17 @@ var Cell = (function () {
 
         game.layers["content"]._removeChildAt(this.content.sprite, this.gridPos[0] + this.gridPos[1]);
         this.content = undefined;
+    };
+    Cell.prototype.buyCell = function (player) {
+        if (player.money < this.landValue)
+            return;
+
+        //else if (this.flags.indexOf(player.id) > -1 ) return;
+        player.addMoney(-this.landValue);
+
+        console.log(player.money);
+        this.flags.push(player.id);
+        console.log(this.flags);
     };
     return Cell;
 })();
@@ -448,6 +460,9 @@ var Game = (function () {
         var profitSystem = new ProfitSystem(1, this.systemsManager, player);
         this.systemsManager.addSystem("profit", profitSystem);
 
+        var dateSystem = new DateSystem(1, this.systemsManager, document.getElementById("date"));
+        this.systemsManager.addSystem("date", dateSystem);
+
         this.render();
         this.updateWorld();
 
@@ -501,6 +516,7 @@ var Game = (function () {
         this.tools.plant = new PlantTool();
         this.tools.house = new HouseTool();
         this.tools.road = new RoadTool();
+        this.tools.buy = new BuyTool();
     };
 
     Game.prototype.bindElements = function () {
@@ -1058,108 +1074,143 @@ var Highlighter = (function () {
     return Highlighter;
 })();
 
-var WaterTool = (function () {
+/*
+interface Tool
+{
+selectType: any;
+tintColor: number;
+activateCost: number;
+activate(target:Cell[]);
+}
+*/
+var Tool = (function () {
+    function Tool() {
+    }
+    Tool.prototype.activate = function (target) {
+        for (var i = 0; i < target.length; i++) {
+            this.onActivate(target[i]);
+        }
+    };
+    Tool.prototype.onActivate = function (target) {
+    };
+    return Tool;
+})();
+
+var WaterTool = (function (_super) {
+    __extends(WaterTool, _super);
     function WaterTool() {
+        _super.call(this);
         this.selectType = manhattanSelect;
         this.tintColor = 0x4444FF;
     }
-    WaterTool.prototype.activate = function (target) {
-        for (var i = 0; i < target.length; i++) {
-            target[i].replace(cg["terrain"]["water"]);
-        }
-        ;
+    WaterTool.prototype.onActivate = function (target) {
+        target.replace(cg["terrain"]["water"]);
     };
     return WaterTool;
-})();
+})(Tool);
 
-var GrassTool = (function () {
+var GrassTool = (function (_super) {
+    __extends(GrassTool, _super);
     function GrassTool() {
+        _super.call(this);
         this.selectType = rectSelect;
         this.tintColor = 0x617A4E;
     }
-    GrassTool.prototype.activate = function (target) {
-        for (var i = 0; i < target.length; i++) {
-            target[i].replace(cg["terrain"]["grass"]);
-        }
+    GrassTool.prototype.onActivate = function (target) {
+        target.replace(cg["terrain"]["grass"]);
     };
     return GrassTool;
-})();
+})(Tool);
 
-var SandTool = (function () {
+var SandTool = (function (_super) {
+    __extends(SandTool, _super);
     function SandTool() {
+        _super.call(this);
         this.selectType = rectSelect;
         this.tintColor = 0xE2BF93;
     }
-    SandTool.prototype.activate = function (target) {
-        for (var i = 0; i < target.length; i++) {
-            target[i].replace(cg["terrain"]["sand"]);
-        }
+    SandTool.prototype.onActivate = function (target) {
+        target.replace(cg["terrain"]["sand"]);
     };
     return SandTool;
-})();
+})(Tool);
 
-var SnowTool = (function () {
+var SnowTool = (function (_super) {
+    __extends(SnowTool, _super);
     function SnowTool() {
+        _super.call(this);
         this.selectType = rectSelect;
         this.tintColor = 0xBBDFD7;
     }
-    SnowTool.prototype.activate = function (target) {
-        for (var i = 0; i < target.length; i++) {
-            target[i].replace(cg["terrain"]["snow"]);
-        }
+    SnowTool.prototype.onActivate = function (target) {
+        target.replace(cg["terrain"]["snow"]);
     };
     return SnowTool;
-})();
-var RemoveTool = (function () {
+})(Tool);
+var RemoveTool = (function (_super) {
+    __extends(RemoveTool, _super);
     function RemoveTool() {
+        _super.call(this);
         this.selectType = rectSelect;
         this.tintColor = 0xFF5555;
     }
-    RemoveTool.prototype.activate = function (target) {
-        for (var i = 0; i < target.length; i++) {
-            target[i].changeContent("none");
-        }
+    RemoveTool.prototype.onActivate = function (target) {
+        target.changeContent("none");
     };
     return RemoveTool;
-})();
+})(Tool);
 
-var PlantTool = (function () {
+var PlantTool = (function (_super) {
+    __extends(PlantTool, _super);
     function PlantTool() {
+        _super.call(this);
         this.selectType = rectSelect;
         this.tintColor = 0x338833;
     }
-    PlantTool.prototype.activate = function (target) {
-        for (var i = 0; i < target.length; i++) {
-            target[i].addPlant();
-        }
+    PlantTool.prototype.onActivate = function (target) {
+        target.addPlant();
     };
     return PlantTool;
-})();
+})(Tool);
 
-var HouseTool = (function () {
+var HouseTool = (function (_super) {
+    __extends(HouseTool, _super);
     function HouseTool() {
+        _super.call(this);
         this.selectType = rectSelect;
         this.tintColor = 0x696969;
     }
-    HouseTool.prototype.activate = function (target) {
-        for (var i = 0; i < target.length; i++) {
-            target[i].changeContent(getRandomProperty(cg["content"]["buildings"]));
-        }
+    HouseTool.prototype.onActivate = function (target) {
+        target.changeContent(getRandomProperty(cg["content"]["buildings"]));
     };
     return HouseTool;
-})();
-var RoadTool = (function () {
+})(Tool);
+var RoadTool = (function (_super) {
+    __extends(RoadTool, _super);
     function RoadTool() {
+        _super.call(this);
         this.selectType = manhattanSelect;
         this.tintColor = 0x696969;
     }
-    RoadTool.prototype.activate = function (target) {
-        for (var i = 0; i < target.length; i++) {
-            target[i].changeContent(cg["content"]["roads"]["road_nesw"]);
-        }
+    RoadTool.prototype.onActivate = function (target) {
+        target.changeContent(cg["content"]["roads"]["road_nesw"]);
     };
     return RoadTool;
-})();
+})(Tool);
+
+var BuyTool = (function (_super) {
+    __extends(BuyTool, _super);
+    function BuyTool() {
+        _super.call(this);
+        this.selectType = rectSelect;
+        this.tintColor = 0x22EE22;
+    }
+    BuyTool.prototype.onActivate = function (target) {
+        target.buyCell(this.player);
+    };
+    return BuyTool;
+})(Tool);
+
 function getRoadConnections(target, depth) {
     var connections = {};
     var dir = "";

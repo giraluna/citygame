@@ -24,6 +24,7 @@ class SystemsManager
   tickTime: number;
   tickNumber: number = 0;
   accumulated: number = 0;
+  paused: boolean = false;
 
   constructor(tickTime)
   {
@@ -55,6 +56,22 @@ class SystemsManager
       // TEMPORARY
       self.entities.ownedBuildings.pop();
     });
+    var slider = <HTMLInputElement> document.getElementById("speed-control");
+
+    slider.addEventListener("change", function()
+    {
+      if (slider.value === "0")
+      {
+        self.timer.stop();
+        self.paused = true;
+      }
+      else
+      {
+        self.timer.start();
+        self.paused = false;
+        self.tickTime = 1 / Math.pow(parseInt(slider.value), 2);
+      }
+    });
   }
   tick()
   {
@@ -67,6 +84,7 @@ class SystemsManager
   }
   update()
   {
+    if (this.paused) return;
     this.accumulated += this.timer.getDelta();
     if (this.accumulated >= this.tickTime)
     {

@@ -22,6 +22,7 @@ declare class SystemsManager {
     public tickTime: number;
     public tickNumber: number;
     public accumulated: number;
+    public paused: boolean;
     constructor(tickTime: any);
     public init(): void;
     public addSystem(name: string, system: System): void;

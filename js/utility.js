@@ -10,11 +10,20 @@ function getFrom2dArray(target, arr) {
     return result;
 }
 
-function getRandomProperty(target) {
+function getRandomKey(target) {
     var _targetKeys = Object.keys(target);
     var _rnd = Math.floor(Math.random() * (_targetKeys.length));
-    var _rndProp = target[_targetKeys[_rnd]];
+    return _targetKeys[_rnd];
+}
+
+function getRandomProperty(target) {
+    var _rndProp = target[getRandomKey(target)];
     return _rndProp;
+}
+
+function getRandomArrayItem(target) {
+    var _rnd = Math.floor(Math.random() * (target.length));
+    return target[_rnd];
 }
 
 function setDeepProperties(baseObj, target, props) {

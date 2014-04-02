@@ -44,7 +44,6 @@ var Strawb;
         */
         Timer.prototype.start = function () {
             if (this.running) {
-                window.console.log("clock already running");
                 return;
             }
             var now = this.getTime();

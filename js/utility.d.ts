@@ -1,6 +1,8 @@
 /// <reference path="../lib/pixi.d.ts" />
 declare function getFrom2dArray(target: any, arr: number[]): any;
+declare function getRandomKey(target: any): string;
 declare function getRandomProperty(target: any): any;
+declare function getRandomArrayItem(target: any[]): any;
 declare function setDeepProperties(baseObj: any, target: any[], props: any): any;
 declare function deepDestroy(object: any): void;
 declare function rectToIso(width: number, height: number): number[][];

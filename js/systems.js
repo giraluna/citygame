@@ -26,6 +26,7 @@ var SystemsManager = (function () {
         this.entities = {};
         this.tickNumber = 0;
         this.accumulated = 0;
+        this.paused = false;
         this.timer = new Strawb.Timer();
         this.tickTime = tickTime / 1000;
 
@@ -49,6 +50,18 @@ var SystemsManager = (function () {
             // TEMPORARY
             self.entities.ownedBuildings.pop();
         });
+        var slider = document.getElementById("speed-control");
+
+        slider.addEventListener("change", function () {
+            if (slider.value === "0") {
+                self.timer.stop();
+                self.paused = true;
+            } else {
+                self.timer.start();
+                self.paused = false;
+                self.tickTime = 1 / Math.pow(parseInt(slider.value), 2);
+            }
+        });
     };
     SystemsManager.prototype.tick = function () {
         this.accumulated -= this.tickTime;
@@ -58,6 +71,8 @@ var SystemsManager = (function () {
         }
     };
     SystemsManager.prototype.update = function () {
+        if (this.paused)
+            return;
         this.accumulated += this.timer.getDelta();
         if (this.accumulated >= this.tickTime) {
             this.tick();

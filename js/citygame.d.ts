@@ -9,6 +9,10 @@ declare var cg: any;
 declare var arrayLogic: any;
 declare var container: any;
 declare var SCREEN_WIDTH: number, SCREEN_HEIGHT: number, TILE_WIDTH: number, TILE_HEIGHT: number, TILES: number, WORLD_WIDTH: number, WORLD_HEIGHT: number, ZOOM_LEVELS: number[];
+declare var idGenerator: {
+    content: number;
+    player: number;
+};
 declare class Sprite extends PIXI.Sprite {
     public type: string;
     public content: Content;
@@ -101,6 +105,9 @@ declare class Game {
     public systemsManager: SystemsManager;
     public worldRenderer: WorldRenderer;
     public eventListener: PIXI.EventTarget;
+    public players: {
+        [id: string]: Player;
+    };
     constructor();
     public init(): void;
     public initContainers(): void;

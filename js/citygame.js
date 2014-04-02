@@ -21,6 +21,11 @@ cg = JSON.parse(JSON.stringify(cg)); //dumb
 var container;
 var SCREEN_WIDTH = 720, SCREEN_HEIGHT = 480, TILE_WIDTH = 64, TILE_HEIGHT = 32, TILES = 32, WORLD_WIDTH = TILES * TILE_WIDTH, WORLD_HEIGHT = TILES * TILE_HEIGHT, ZOOM_LEVELS = [1];
 
+var idGenerator = {
+    content: 0,
+    player: 0
+};
+
 var Sprite = (function (_super) {
     __extends(Sprite, _super);
     function Sprite(template) {
@@ -433,6 +438,7 @@ var Game = (function () {
     function Game() {
         this.tools = {};
         this.layers = {};
+        this.players = {};
     }
     Game.prototype.init = function () {
         this.resize();
@@ -456,7 +462,8 @@ var Game = (function () {
 
         this.systemsManager = new SystemsManager(1000);
         this.systemsManager.addEventListeners(this.eventListener);
-        var player = new Player();
+        var player = new Player(idGenerator.player++);
+        this.players[player.id] = player;
         var profitSystem = new ProfitSystem(1, this.systemsManager, player);
         this.systemsManager.addSystem("profit", profitSystem);
 

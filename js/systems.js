@@ -104,7 +104,6 @@ var ProfitSystem = (function (_super) {
         this.player = player;
     }
     ProfitSystem.prototype.activate = function () {
-        this.player.setIncome(this.targets.length);
         for (var i = 0; i < this.targets.length; i++) {
             this.player.addMoney(1);
         }

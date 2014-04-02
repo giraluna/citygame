@@ -1,16 +1,22 @@
 class Player
 {
-  id: string = "player1";
+  id: string;
   money: number = 0;
-  income: number = 0;
+
+  ownedContent: any = {};
+  ownedCells: any = {};
+
+  employees: any = {};
+  modifiers: any = {};
+
   moneySpan: HTMLElement;
   incomeSpan: HTMLElement;
 
-  constructor()
+  constructor(id: number)
   {
+    this.id = "player" + id;
     this.bindElements();
   }
-
   bindElements()
   {
     this.moneySpan = document.getElementById("money");
@@ -20,16 +26,33 @@ class Player
   updateElements()
   {
     this.moneySpan.innerHTML = this.money + "$";
-    this.incomeSpan.innerHTML = "+" + this.income + "/s";
+    //this.incomeSpan.innerHTML = "+" + this.income + "/s";
+  }
+  addCell( cell )
+  {
+    if (!this.ownedCells[cell.gridPos])
+    {
+      this.ownedCells[cell.gridPos] = cell;
+    }
+  }
+  removeCell( cell )
+  {
+    if (this.ownedCells[cell.gridPos])
+    {
+      delete this.ownedCells[cell.gridPos];
+    }
+  }
+  addContent( type, content )
+  {
+    if (!this.ownedContent[type])
+    {
+      this.ownedContent[type] = {};
+    }
+    this.ownedContent[type][content.id] = content;
   }
   addMoney(amount)
   {
     this.money += amount;
-    this.updateElements();
-  }
-  setIncome(amount)
-  {
-    this.income = amount;
     this.updateElements();
   }
 }

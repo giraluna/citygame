@@ -26,7 +26,11 @@ var SCREEN_WIDTH = 720,
     WORLD_HEIGHT = TILES * TILE_HEIGHT,
     ZOOM_LEVELS = [1];
 
-
+var idGenerator =
+{
+  content: 0,
+  player: 0
+}
 
 
 class Sprite extends PIXI.Sprite
@@ -562,6 +566,7 @@ class Game
   systemsManager: SystemsManager;
   worldRenderer: WorldRenderer;
   eventListener: PIXI.EventTarget;
+  players: {[id: string]: Player;} = {};
   constructor()
   {
   }
@@ -588,7 +593,8 @@ class Game
 
     this.systemsManager = new SystemsManager(1000);
     this.systemsManager.addEventListeners(this.eventListener);
-    var player = new Player();
+    var player = new Player(idGenerator.player++);
+    this.players[player.id] = player;
     var profitSystem = new ProfitSystem(1, this.systemsManager, player);
     this.systemsManager.addSystem("profit", profitSystem);
 

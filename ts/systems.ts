@@ -127,7 +127,6 @@ class ProfitSystem extends System
 
   activate()
   {
-    this.player.setIncome(this.targets.length);
     for (var i = 0; i < this.targets.length; i++)
     {
       this.player.addMoney(1);

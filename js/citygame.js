@@ -1209,11 +1209,11 @@ var BuyTool = (function (_super) {
     __extends(BuyTool, _super);
     function BuyTool() {
         _super.call(this);
-        this.selectType = rectSelect;
+        this.selectType = singleSelect;
         this.tintColor = 0x22EE22;
     }
     BuyTool.prototype.onActivate = function (target) {
-        target.buyCell(this.player);
+        this.player.buyCell(target);
     };
     return BuyTool;
 })(Tool);
@@ -1248,6 +1248,10 @@ function getRoadConnections(target, depth) {
         var finalRoad = cg["content"]["roads"]["road_" + dir];
         target.changeContent(finalRoad, false);
     }
+}
+
+function singleSelect(a, b) {
+    return [a];
 }
 
 function rectSelect(a, b) {

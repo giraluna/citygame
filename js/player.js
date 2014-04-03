@@ -1,3 +1,4 @@
+/// <reference path="../js/employee.d.ts" />
 var Player = (function () {
     function Player(id) {
         this.money = 0;
@@ -17,6 +18,13 @@ var Player = (function () {
         this.moneySpan.innerHTML = this.money + "$";
         //this.incomeSpan.innerHTML = "+" + this.income + "/s";
     };
+
+    Player.prototype.addEmployee = function (employee) {
+        this.employees[employee.id] = employee;
+    };
+    Player.prototype.buyCell = function (cell) {
+    };
+
     Player.prototype.addCell = function (cell) {
         if (!this.ownedCells[cell.gridPos]) {
             this.ownedCells[cell.gridPos] = cell;

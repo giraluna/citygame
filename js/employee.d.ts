@@ -22,7 +22,7 @@ declare class Employee {
     public skillTotal: number;
     public potential: number;
     public traits: any;
-    constructor(id: string, names: any, name?: string, gender?: string, ethnicity?: string, skills?: ISkillsObj, growth?: ISkillsObj, potential?: number, traits?: any);
+    constructor(id: number, names: any, name?: string, gender?: string, ethnicity?: string, skills?: ISkillsObj, growth?: ISkillsObj, potential?: number, traits?: any);
     public getName(names: any, gender: string, ethnicity: string): string;
     public setSkillTotal(): void;
     public trainSkill(skill: string): void;

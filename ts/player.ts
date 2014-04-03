@@ -1,3 +1,5 @@
+/// <reference path="../js/employee.d.ts" />
+
 class Player
 {
   id: string;
@@ -28,6 +30,16 @@ class Player
     this.moneySpan.innerHTML = this.money + "$";
     //this.incomeSpan.innerHTML = "+" + this.income + "/s";
   }
+
+  addEmployee(employee: Employee)
+  {
+    this.employees[employee.id] = employee;
+  }
+  buyCell( cell )
+  {
+    
+  }
+
   addCell( cell )
   {
     if (!this.ownedCells[cell.gridPos])

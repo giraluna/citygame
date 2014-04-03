@@ -237,6 +237,7 @@ declare class BuyTool extends Tool {
     public onActivate(target: Cell): void;
 }
 declare function getRoadConnections(target: Cell, depth: number): any;
+declare function singleSelect(a: number[], b: number[]): number[][];
 declare function rectSelect(a: number[], b: number[]): number[];
 declare function manhattanSelect(a: any, b: any): number[];
 declare function arrayToPolygon(points: any): PIXI.Polygon;

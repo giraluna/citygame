@@ -1,3 +1,4 @@
+/// <reference path="employee.d.ts" />
 declare class Player {
     public id: string;
     public money: number;
@@ -10,6 +11,8 @@ declare class Player {
     constructor(id: number);
     public bindElements(): void;
     public updateElements(): void;
+    public addEmployee(employee: Employee): void;
+    public buyCell(cell: any): void;
     public addCell(cell: any): void;
     public removeCell(cell: any): void;
     public addContent(type: any, content: any): void;

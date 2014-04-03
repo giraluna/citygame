@@ -40,7 +40,7 @@ class Employee
   potential: number;
   traits: any = {};
 
-  constructor( id: string,
+  constructor( id: number,
     names: any,
     name?: string,
     gender?: string,
@@ -50,7 +50,7 @@ class Employee
     potential?: number,
     traits?: any )
   {
-    this.id = id;
+    this.id = "employee" + id;
 
     this.gender = gender || getRandomArrayItem(["male", "female"]);
     this.ethnicity = ethnicity || getRandomKey(names);

@@ -1529,12 +1529,12 @@ class BuyTool extends Tool
   constructor()
   {
     super();
-    this.selectType = rectSelect;
+    this.selectType = singleSelect;
     this.tintColor = 0x22EE22;
   }
   onActivate(target: Cell)
   {
-    target.buyCell(this.player);
+    this.player.buyCell(target);
   }
 }
 
@@ -1582,6 +1582,11 @@ function getRoadConnections(target: Cell, depth:number)
     var finalRoad = cg["content"]["roads"]["road_" + dir];
     target.changeContent(finalRoad, false);
   }
+}
+
+function singleSelect(a:number[], b: number[])
+{
+  return [a];
 }
 
 function rectSelect(a:number[], b:number[]): number[]

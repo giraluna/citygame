@@ -17,7 +17,7 @@ var TEMPNAMES = {
 var Employee = (function () {
     function Employee(id, names, name, gender, ethnicity, skills, growth, potential, traits) {
         this.traits = {};
-        this.id = id;
+        this.id = "employee" + id;
 
         this.gender = gender || getRandomArrayItem(["male", "female"]);
         this.ethnicity = ethnicity || getRandomKey(names);

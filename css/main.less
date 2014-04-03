@@ -55,6 +55,7 @@ html, body
 #pixi-container
 {
   display: flex;
+  position: relative;
   flex-flow: row;
   order: 1;
   flex: 1;
@@ -63,6 +64,8 @@ html, body
   {
     width: 100%;
     height: 100%;
+
+    z-index: 0;
   }
 }
 
@@ -106,3 +109,41 @@ html, body
     margin-right: 50px;
   }
 }
+
+// REACT START
+
+#react-container
+{
+  position: absolute;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+
+  align-items: center;
+  justify-content: center;
+
+  pointer-events: none;
+
+  *
+  {
+    pointer-events: auto;
+  }
+}
+
+.popup
+{
+  padding: 5px;
+
+  border: 1px solid rgb(88, 121, 130);
+  background-color: rgba(232, 251, 255, 0.6);
+  .popup-close
+  {
+    display: inline-block;
+    float: right;
+    top: 0px;
+  }
+}
+
+
+// REACT END

@@ -12,6 +12,7 @@ body {
 }
 #pixi-container {
   display: flex;
+  position: relative;
   flex-flow: row;
   order: 1;
   flex: 1;
@@ -19,6 +20,7 @@ body {
 #pixi-container canvas {
   width: 100%;
   height: 100%;
+  z-index: 0;
 }
 #side-menu {
   order: 2;
@@ -47,4 +49,27 @@ body {
 }
 #bottom-menu #player {
   margin-right: 50px;
+}
+#react-container {
+  position: absolute;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+#react-container * {
+  pointer-events: auto;
+}
+.popup {
+  padding: 5px;
+  border: 1px solid #587982;
+  background-color: rgba(232, 251, 255, 0.6);
+}
+.popup .popup-close {
+  display: inline-block;
+  float: right;
+  top: 0px;
 }

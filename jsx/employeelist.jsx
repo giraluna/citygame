@@ -5,10 +5,9 @@ var EmployeeList = React.createClass({
   render: function()
   {
     var rows = [];
-    console.log(this);
     this.props.employees.forEach(function(employee)
     {
-      rows.push(<Employee employee={employee}/>);
+      rows.push(<Employee key={employee.id} employee={employee}/>);
     });
     return(
       <table>

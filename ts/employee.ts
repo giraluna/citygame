@@ -42,37 +42,35 @@ class Employee
 
   constructor( id: number,
     names: any,
-    name?: string,
-    gender?: string,
-    ethnicity?: string,
-    skills?: ISkillsObj,
-    growth?: ISkillsObj,
-    potential?: number,
-    traits?: any )
+    params?: {
+      name?: string;
+      gender?: string;
+      ethnicity?: string;
+
+      skillLevel?: number;
+      growthLevel?: number;
+
+      growth?: ISkillsObj;
+      potential?: number;
+      skills?: ISkillsObj;
+      traits?: any;
+    })
   {
     this.id = "employee" + id;
 
-    this.gender = gender || getRandomArrayItem(["male", "female"]);
-    this.ethnicity = ethnicity || getRandomKey(names);
-    this.name = name || this.getName( names, this.gender, this.ethnicity );
+    // lets us do cleaner || check instead of (params && param.x) ? x : y
+    var _params = params || {};
 
-    // TODO
-    this.skills = skills ||
-    {
-      negotiation: 10,
-      management: 10,
-      recruitment: 10,
-      constuction: 10
-    }
-    this.growth = growth ||
-    {
-      negotiation: 0.5,
-      management: 0.5,
-      recruitment: 0.5,
-      constuction: 0.5
-    }
-    this.potential = 40;
-    // END TODO
+    this.gender = _params.gender || getRandomArrayItem(["male", "female"]);
+    this.ethnicity = _params.ethnicity || getRandomKey(names);
+    this.name = _params.name || this.getName( names, this.gender, this.ethnicity );
+
+
+    this.skills = _params.skills || this.setSkillsByLevel(_params.skillLevel);
+    this.growth = _params.growth || this.setGrowthByLevel(_params.growthLevel);
+    this.potential = _params.potential ||
+      50 * _params.skillLevel + 30 * Math.random();
+
     
     this.setSkillTotal();
   }
@@ -83,6 +81,41 @@ class Employee
     var last = getRandomArrayItem(names[ethnicity]["surnames"]);
 
     return "" + first + " " + last;
+  }
+  setSkillsByLevel(skillLevel)
+  {
+    var skills: ISkillsObj =
+    {
+      negotiation: 1,
+      management: 1,
+      recruitment: 1,
+      constuction: 1
+    }
+    var min = 8 * skillLevel + 1;
+    var max = 16 * skillLevel + 2;
+
+    for (var skill in skills)
+    {
+      skills[skill] = randInt(min, max);
+    }
+    return skills;
+  }
+  setGrowthByLevel(growthLevel)
+  {
+    var skills: ISkillsObj =
+    {
+      negotiation: 1,
+      management: 1,
+      recruitment: 1,
+      constuction: 1
+    }
+
+    for (var skill in skills)
+    {
+      var _growth = Math.random() * growthLevel
+      skills[skill] = _growth > 0.1 ? _growth : 0.1;
+    }
+    return skills;
   }
   setSkillTotal()
   {

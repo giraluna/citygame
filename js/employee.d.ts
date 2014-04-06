@@ -22,8 +22,20 @@ declare class Employee {
     public skillTotal: number;
     public potential: number;
     public traits: any;
-    constructor(id: number, names: any, name?: string, gender?: string, ethnicity?: string, skills?: ISkillsObj, growth?: ISkillsObj, potential?: number, traits?: any);
+    constructor(id: number, names: any, params?: {
+        name?: string;
+        gender?: string;
+        ethnicity?: string;
+        skillLevel?: number;
+        growthLevel?: number;
+        growth?: ISkillsObj;
+        potential?: number;
+        skills?: ISkillsObj;
+        traits?: any;
+    });
     public getName(names: any, gender: string, ethnicity: string): string;
+    public setSkillsByLevel(skillLevel: any): ISkillsObj;
+    public setGrowthByLevel(growthLevel: any): ISkillsObj;
     public setSkillTotal(): void;
     public trainSkill(skill: string): void;
 }

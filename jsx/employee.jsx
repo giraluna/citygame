@@ -1,44 +1,48 @@
 /** @jsx React.DOM */
 /*jshint ignore:start */
 
-var Employee = React.createClass({
-  getDefaultProps: function()
-  {
-    var defs =
+var ReactUI = ReactUI || {};
+(function ()
+{
+  var Employee = React.createClass({
+    getDefaultProps: function()
     {
-      name: "UNDEFINED",
-      skills:
+      var defs =
       {
-        neg: -1,
-        man: -1,
-        rec: -1,
-        con: -1
-      }
-    };
+        name: "UNDEFINED",
+        skills:
+        {
+          neg: -1,
+          man: -1,
+          rec: -1,
+          con: -1
+        }
+      };
 
-    return defs;
-    
-  },
-  render: function()
-  {
-    var name = this.props.employee.name;
-    var skills =
+      return defs;
+      
+    },
+    render: function()
     {
-      neg: this.props.employee.skills["neg"],
-      man: this.props.employee.skills["man"],
-      rec: this.props.employee.skills["rec"],
-      con: this.props.employee.skills["con"]
+      var name = this.props.employee.name;
+      var skills =
+      {
+        neg: this.props.employee.skills["neg"],
+        man: this.props.employee.skills["man"],
+        rec: this.props.employee.skills["rec"],
+        con: this.props.employee.skills["con"]
+      }
+
+      return(
+        <tr>
+          <td>{name}</td>
+
+          <td>{skills["neg"]}</td>
+          <td>{skills["man"]}</td>
+          <td>{skills["rec"]}</td>
+          <td>{skills["con"]}</td>
+        </tr>
+      );
     }
-
-    return(
-      <tr>
-        <td>{name}</td>
-
-        <td>{skills["neg"]}</td>
-        <td>{skills["man"]}</td>
-        <td>{skills["rec"]}</td>
-        <td>{skills["con"]}</td>
-      </tr>
-    );
-  }
-});
+  });
+})();

@@ -1,6 +1,9 @@
 /** @jsx React.DOM */
 /*jshint ignore:start */
 
+var ReactUI = ReactUI || {};
+(function ()
+{
 var Stage = React.createClass(
 {
   getDefaultProps: function()

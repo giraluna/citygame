@@ -133,3 +133,19 @@ function randInt(min, max)
 {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
+function rollDice(dice, sides)
+{
+  var total = 0;
+  for (var i = 0; i < dice; i++)
+  {
+    total += randInt(1, sides);
+  }
+  return total;
+}
+
+1   5
+3   8
+5   11
+7   14
+9   17

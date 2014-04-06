@@ -1,9 +1,7 @@
 /** @jsx React.DOM */
 /*jshint ignore:start */
 
-var ReactUI = ReactUI || {};
-(function ()
-{
+
 var Stage = React.createClass(
 {
   getDefaultProps: function()
@@ -65,7 +63,14 @@ var EMPLOYEES =
   }
 ];
 
-var popuplist =[];
+document.getElementById("popupBtn").addEventListener('click',
+  function()
+  {
+    newPopup(EMPLOYEES);
+  });
+
+
+var popuplist = [];
 var popupIdGenerator = 0;
 
 function newPopup(_employees)
@@ -98,11 +103,5 @@ function updateReact()
     document.getElementById("pixi-container")
   );
 }
-
-document.getElementById("popupBtn").addEventListener('click',
-  function()
-  {
-    newPopup(EMPLOYEES);
-  });
 
 updateReact();

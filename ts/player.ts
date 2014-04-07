@@ -35,6 +35,15 @@ class Player
   {
     this.employees[employee.id] = employee;
   }
+  getActiveEmployees()
+  {
+    var activeEmployees = this.employees.filter( function(employee)
+    {
+      return employee.active !== false;
+    });
+
+    return activeEmployees;
+  }
   buyCell( cell )
   {
     

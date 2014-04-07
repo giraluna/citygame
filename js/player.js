@@ -22,6 +22,13 @@ var Player = (function () {
     Player.prototype.addEmployee = function (employee) {
         this.employees[employee.id] = employee;
     };
+    Player.prototype.getActiveEmployees = function () {
+        var activeEmployees = this.employees.filter(function (employee) {
+            return employee.active !== false;
+        });
+
+        return activeEmployees;
+    };
     Player.prototype.buyCell = function (cell) {
     };
 

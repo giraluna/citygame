@@ -1,8 +1,9 @@
 /** @jsx React.DOM */
 /*jshint ignore:start */
 
+var UIComponents = UIComponents || {};
 
-var Employee = React.createClass({
+UIComponents.Employee = React.createClass({
   getDefaultProps: function()
   {
     var defs =

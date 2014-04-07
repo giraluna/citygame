@@ -64,6 +64,7 @@ body {
   pointer-events: auto;
 }
 .popup {
+  position: absolute;
   padding: 5px;
   border: 1px solid #587982;
   background-color: rgba(232, 251, 255, 0.8);
@@ -73,4 +74,8 @@ body {
   float: right;
   clear: both;
   top: 0px;
+}
+.popup .popup-buttons {
+  display: table;
+  margin: 0 auto;
 }

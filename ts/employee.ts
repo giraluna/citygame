@@ -39,6 +39,7 @@ class Employee
   skillTotal: number;
   potential: number;
   traits: any = {};
+  active: boolean = true;
 
   constructor( id: number,
     names: any,

@@ -22,6 +22,7 @@ declare class Employee {
     public skillTotal: number;
     public potential: number;
     public traits: any;
+    public active: boolean;
     constructor(id: number, names: any, params?: {
         name?: string;
         gender?: string;

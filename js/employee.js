@@ -17,6 +17,7 @@ var TEMPNAMES = {
 var Employee = (function () {
     function Employee(id, names, params) {
         this.traits = {};
+        this.active = true;
         this.id = "employee" + id;
 
         // lets us do cleaner || check instead of (params && param.x) ? x : y

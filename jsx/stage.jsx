@@ -1,8 +1,9 @@
 /** @jsx React.DOM */
 /*jshint ignore:start */
 
+var UIComponents = UIComponents || {};
 
-var Stage = React.createClass(
+UIComponents.Stage = React.createClass(
 {
   getDefaultProps: function()
   {
@@ -14,8 +15,8 @@ var Stage = React.createClass(
 
   newEmployeePopup: function(employees)
   {
-    var el = <EmployeeList employees={employees}/>;
-    var popup = <Popup content={el} key={this.props.popupIdGenerator++} />;
+    var el = <UIComponents.EmployeeList employees={employees}/>;
+    var popup = <UIComponents.Popup content={el} key={this.props.popupIdGenerator++} />;
     this.props.popups.push(popup);
   },
 
@@ -73,12 +74,15 @@ document.getElementById("popupBtn").addEventListener('click',
 var popuplist = [];
 var popupIdGenerator = 0;
 
+
 function newPopup(_employees)
 {
-  var el = EmployeeList({employees: _employees});
+  var el = UIComponents.EmployeeList({employees: _employees});
   var popup = Popup (
     {
       content: el,
+      okText: "ok",
+      closeText: "close",
       key: popupIdGenerator++,
 
     });
@@ -99,7 +103,7 @@ function destroyPopup(key)
 function updateReact()
 {
   React.renderComponent(
-    <Stage popups={popuplist}/>,
+    <UIComponents.Stage popups={popuplist}/>,
     document.getElementById("pixi-container")
   );
 }

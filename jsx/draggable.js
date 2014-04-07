@@ -12,7 +12,7 @@ var Draggable =
     {
       x: e.layerX,
       y: e.layerY
-    }
+    };
     this.props.DOMNode.style["z-index"] = ++topZIndex;
   },
   handleDrag: function(e)

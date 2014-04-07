@@ -12,6 +12,7 @@ declare class Player {
     public bindElements(): void;
     public updateElements(): void;
     public addEmployee(employee: Employee): void;
+    public getActiveEmployees(): any;
     public buyCell(cell: any): void;
     public addCell(cell: any): void;
     public removeCell(cell: any): void;

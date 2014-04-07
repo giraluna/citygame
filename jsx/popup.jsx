@@ -4,6 +4,7 @@
 
 
 var Popup = React.createClass({
+  mixins: [Draggable],
   close: function()
   {
     destroyPopup(this.props.key);

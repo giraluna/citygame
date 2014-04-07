@@ -8,7 +8,8 @@ class Loader
 {
   loaded: any =
   {
-    fonts: false,
+    fonts: true,
+    //fonts: false,
     sprites: false,
     dom: false
   };
@@ -33,13 +34,15 @@ class Loader
 
   loadFonts()
   {
+    // TODO
+    return;
     var self = this;
     WebFontConfig = {
       google: {
         families: ['Snippet']
       },
-      active: function () {
-        // do something
+      active: function ()
+      {
         self.loaded.fonts = true;
         self.checkLoaded();
       }

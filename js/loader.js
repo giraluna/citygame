@@ -3,7 +3,8 @@
 var Loader = (function () {
     function Loader(game) {
         this.loaded = {
-            fonts: false,
+            fonts: true,
+            //fonts: false,
             sprites: false,
             dom: false
         };
@@ -20,13 +21,14 @@ var Loader = (function () {
         this.loadSprites();
     }
     Loader.prototype.loadFonts = function () {
+        // TODO
+        return;
         var self = this;
         WebFontConfig = {
             google: {
                 families: ['Snippet']
             },
             active: function () {
-                // do something
                 self.loaded.fonts = true;
                 self.checkLoaded();
             }

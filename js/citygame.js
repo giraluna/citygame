@@ -475,7 +475,7 @@ var Game = (function () {
 
         // TEMPORARY
         game.uiDrawer.makeFadeyPopup([SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2], [0, 0], 5000, new PIXI.Text("ctrl+click to scroll\nshift+click to zoom", {
-            font: "bold 50px Snippet",
+            font: "bold 50px Arial",
             fill: "#222222",
             align: "center"
         }), TWEEN.Easing.Quartic.In);
@@ -921,7 +921,7 @@ var UIDrawer = (function () {
     UIDrawer.prototype.init = function () {
         this.fonts = {
             base: {
-                font: "18px Snippet",
+                font: "18px Arial",
                 fill: "#444444",
                 align: "left"
             },

@@ -67,9 +67,12 @@ class SystemsManager
       }
       else
       {
+        var value = Math.pow(parseInt(slider.value), 2)
+
         self.timer.start();
         self.paused = false;
-        self.tickTime = 1 / Math.pow(parseInt(slider.value), 2);
+        self.tickTime = 1 / value;
+        self.accumulated = self.accumulated / value;
       }
     });
   }

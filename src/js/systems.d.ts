@@ -27,8 +27,8 @@ declare class SystemsManager {
     public init(): void;
     public addSystem(name: string, system: System): void;
     public addEventListeners(listener: any): void;
-    public tick(): void;
     public update(): void;
+    public tick(): void;
 }
 declare class System {
     public systemsManager: SystemsManager;

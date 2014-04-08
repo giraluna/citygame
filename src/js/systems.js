@@ -57,18 +57,14 @@ var SystemsManager = (function () {
                 self.timer.stop();
                 self.paused = true;
             } else {
+                var value = Math.pow(parseInt(slider.value), 2);
+
                 self.timer.start();
                 self.paused = false;
-                self.tickTime = 1 / Math.pow(parseInt(slider.value), 2);
+                self.tickTime = 1 / value;
+                self.accumulated = self.accumulated / value;
             }
         });
-    };
-    SystemsManager.prototype.tick = function () {
-        this.accumulated -= this.tickTime;
-        this.tickNumber++;
-        for (var system in this.systems) {
-            this.systems[system].tick(this.tickNumber);
-        }
     };
     SystemsManager.prototype.update = function () {
         if (this.paused)
@@ -76,6 +72,13 @@ var SystemsManager = (function () {
         this.accumulated += this.timer.getDelta();
         if (this.accumulated >= this.tickTime) {
             this.tick();
+        }
+    };
+    SystemsManager.prototype.tick = function () {
+        this.accumulated -= this.tickTime;
+        this.tickNumber++;
+        for (var system in this.systems) {
+            this.systems[system].tick(this.tickNumber);
         }
     };
     return SystemsManager;

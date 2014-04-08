@@ -73,15 +73,6 @@ class SystemsManager
       }
     });
   }
-  tick()
-  {
-    this.accumulated -= this.tickTime;
-    this.tickNumber++;
-    for (var system in this.systems)
-    {
-      this.systems[system].tick(this.tickNumber);
-    }
-  }
   update()
   {
     if (this.paused) return;
@@ -89,6 +80,15 @@ class SystemsManager
     if (this.accumulated >= this.tickTime)
     {
       this.tick();
+    }
+  }
+  tick()
+  {
+    this.accumulated -= this.tickTime;
+    this.tickNumber++;
+    for (var system in this.systems)
+    {
+      this.systems[system].tick(this.tickNumber);
     }
   }
 }

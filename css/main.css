@@ -87,5 +87,8 @@ body {
 }
 .popup .popup-buttons {
   display: table;
-  margin: 0 auto;
+  margin: 10px auto;
+}
+.popup .popup-buttons button {
+  margin: 0 20px;
 }

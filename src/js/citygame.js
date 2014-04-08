@@ -559,6 +559,13 @@ var Game = (function () {
             self.loadBoard();
         });
 
+        // TODO
+        //recruit
+        var recruitBtn = document.getElementById("recruitBtn");
+        recruitBtn.addEventListener("click", function () {
+            game.players["player0"].addEmployee(new Employee(idGenerator.player++, TEMPNAMES, { skillLevel: 1, growthLevel: 1 }));
+        });
+
         //renderer
         this.bindRenderer();
 

@@ -18,12 +18,6 @@ class Player
   {
     this.id = "player" + id;
     this.bindElements();
-
-    // TODO
-    for (var i = 0; i < 5; i++)
-    {
-      this.addEmployee(new Employee(i, TEMPNAMES, {skillLevel: 1, growthLevel: 1}));
-    }
   }
   bindElements()
   {

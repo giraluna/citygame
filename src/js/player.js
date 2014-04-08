@@ -8,10 +8,6 @@ var Player = (function () {
         this.modifiers = {};
         this.id = "player" + id;
         this.bindElements();
-
-        for (var i = 0; i < 5; i++) {
-            this.addEmployee(new Employee(i, TEMPNAMES, { skillLevel: 1, growthLevel: 1 }));
-        }
     }
     Player.prototype.bindElements = function () {
         this.moneySpan = document.getElementById("money");

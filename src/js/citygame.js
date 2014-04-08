@@ -1,7 +1,7 @@
 /// <reference path="../lib/pixi.d.ts" />
 /// <reference path="../lib/tween.js.d.ts" />
 ///
-///
+/// <reference path="reactui/js/reactui.d.ts" />
 /// <reference path="js/ui.d.ts" />
 /// <reference path="js/loader.d.ts" />
 ///
@@ -459,11 +459,15 @@ var Game = (function () {
         this.mouseEventHandler.scroller = new Scroller(this.layers["main"], 0.5);
 
         this.uiDrawer = new UIDrawer();
+        this.reactUI = new ReactUI();
 
         this.systemsManager = new SystemsManager(1000);
         this.systemsManager.addEventListeners(this.eventListener);
         var player = new Player(idGenerator.player++);
         this.players[player.id] = player;
+
+        // TODO
+        this.tools.buy.player = player;
         var profitSystem = new ProfitSystem(1, this.systemsManager, player);
         this.systemsManager.addSystem("profit", profitSystem);
 
@@ -1213,7 +1217,9 @@ var BuyTool = (function (_super) {
         this.tintColor = 0x22EE22;
     }
     BuyTool.prototype.onActivate = function (target) {
-        this.player.buyCell(target);
+        // TODO
+        //this.player.buyCell(target);
+        game.reactUI.makeCellBuyPopup(this.player, target);
     };
     return BuyTool;
 })(Tool);

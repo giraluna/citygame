@@ -20,10 +20,10 @@ var UIComponents;
         render: function () {
             var name = this.props.employee.name;
             var skills = {
-                neg: this.props.employee.skills["neg"],
-                man: this.props.employee.skills["man"],
-                rec: this.props.employee.skills["rec"],
-                con: this.props.employee.skills["con"]
+                neg: this.props.employee.skills["negotiation"],
+                man: this.props.employee.skills["management"],
+                rec: this.props.employee.skills["recruitment"],
+                con: this.props.employee.skills["constuction"]
             };
 
             return (React.DOM.tr(null, React.DOM.td(null, name), React.DOM.td(null, skills["neg"]), React.DOM.td(null, skills["man"]), React.DOM.td(null, skills["rec"]), React.DOM.td(null, skills["con"])));

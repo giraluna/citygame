@@ -6,16 +6,13 @@ var UIComponents;
     UIComponents.EmployeeList = React.createClass({
         render: function () {
             var rows = [];
-            for (var employee in this.props.employees) {
-                console.log(employee);
+            this.props.employees.forEach(function (employee) {
                 rows.push(UIComponents.Employee({
-                    key: this.props.employees[employee].id,
-                    employee: this.props.employees[employee]
+                    key: employee.id,
+                    employee: employee
                 }));
-            }
-            ;
-            console.log(rows);
-            return (React.DOM.table(null, React.DOM.tbody(null, rows)));
+            });
+            return (React.DOM.table(null, React.DOM.thead(null, React.DOM.tr(null, React.DOM.th(null, "Name"), React.DOM.th(null, "neg"), React.DOM.th(null, "mgt"), React.DOM.th(null, "rec"), React.DOM.th(null, "con"))), React.DOM.tbody(null, rows)));
         }
     });
 })(UIComponents || (UIComponents = {}));

@@ -1,5 +1,6 @@
 /// <reference path="../../lib/pixi.d.ts" />
 /// <reference path="../../lib/tween.js.d.ts" />
+/// <reference path="../reactui/js/reactui.d.ts" />
 /// <reference path="ui.d.ts" />
 /// <reference path="loader.d.ts" />
 /// <reference path="player.d.ts" />
@@ -102,6 +103,7 @@ declare class Game {
     public renderer: any;
     public layers: any;
     public uiDrawer: UIDrawer;
+    public reactUI: ReactUI;
     public systemsManager: SystemsManager;
     public worldRenderer: WorldRenderer;
     public eventListener: PIXI.EventTarget;

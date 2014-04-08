@@ -3,13 +3,13 @@
 var TEMPNAMES = {
     english: {
         male: [
-            "bob"
+            "Robin"
         ],
         female: [
-            "bobby"
+            "Robin \"Frontsideollie\""
         ],
         surnames: [
-            "bobsson"
+            "Packalen"
         ]
     }
 };

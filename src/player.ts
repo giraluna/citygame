@@ -8,7 +8,7 @@ class Player
   ownedContent: any = {};
   ownedCells: any = {};
 
-  employees: any = {};
+  employees: any = [];
   modifiers: any = {};
 
   moneySpan: HTMLElement;
@@ -18,6 +18,12 @@ class Player
   {
     this.id = "player" + id;
     this.bindElements();
+
+    // TODO
+    for (var i = 0; i < 5; i++)
+    {
+      this.addEmployee(new Employee(i, TEMPNAMES, {skillLevel: 1, growthLevel: 1}));
+    }
   }
   bindElements()
   {
@@ -33,7 +39,7 @@ class Player
 
   addEmployee(employee: Employee)
   {
-    this.employees[employee.id] = employee;
+    this.employees.push(employee);
   }
   getActiveEmployees()
   {

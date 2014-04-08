@@ -14,7 +14,7 @@ export var Draggable =
       x: e.layerX,
       y: e.layerY
     };
-    this.props.DOMNode.style["z-index"] = ++this.props.zIndexCounter;
+    this.props.DOMNode.style["z-index"] = this.props.incrementZIndex();
   },
   handleDrag: function(e)
   {

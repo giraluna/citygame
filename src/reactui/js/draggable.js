@@ -8,7 +8,7 @@ var UIComponents;
                 x: e.layerX,
                 y: e.layerY
             };
-            this.props.DOMNode.style["z-index"] = ++this.props.zIndexCounter;
+            this.props.DOMNode.style["z-index"] = this.props.incrementZIndex();
         },
         handleDrag: function (e) {
             if (e.x === 0 && e.y === 0)

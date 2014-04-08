@@ -13,7 +13,7 @@ declare class ReactUI {
     constructor();
     public init(): void;
     public makeCellBuyPopup(player: Player, cell: any): void;
-    public newPopup(_employees: any[]): void;
+    public incrementZIndex(): number;
     public destroyPopup(key: any): void;
     public updateReact(): void;
 }

@@ -10,7 +10,7 @@ var ReactUI = (function () {
     function ReactUI() {
         this.idGenerator = 0;
         this.popups = [];
-        this.topZIndex = 0;
+        this.topZIndex = 15;
         this.init();
     }
     ReactUI.prototype.init = function () {
@@ -18,31 +18,36 @@ var ReactUI = (function () {
     };
 
     ReactUI.prototype.makeCellBuyPopup = function (player, cell) {
-        var activeEmployees = player.getActiveEmployees();
+        var self = this;
 
-        var content = React.DOM.div(null, UIComponents.EmployeeList({ employees: activeEmployees }), UIComponents.CellInfo({ cell: cell }));
+        var activeEmployees = player.getActiveEmployees();
+        var key = this.idGenerator++;
+
+        var content = React.DOM.div({ className: "popup-content" }, UIComponents.EmployeeList({ employees: activeEmployees }), UIComponents.CellInfo({ cell: cell }));
+
+        var boundDestroyPopup = this.destroyPopup.bind(this, key);
+        var boundIncrementZIndex = this.incrementZIndex.bind(this);
 
         var popup = UIComponents.Popup({
             content: content,
             okText: "ok",
             closeText: "close",
-            key: this.idGenerator++
+            key: key,
+            handleOk: boundDestroyPopup,
+            handleClose: boundDestroyPopup,
+            incrementZIndex: boundIncrementZIndex
         });
 
-        this.popups.push(popup);
-    };
-
-    ReactUI.prototype.newPopup = function (_employees) {
-        var el = UIComponents.EmployeeList({ employees: _employees });
-        var popup = UIComponents.Popup({
-            content: el,
-            key: this.idGenerator++
-        });
         this.popups.push(popup);
         this.updateReact();
     };
 
+    ReactUI.prototype.incrementZIndex = function () {
+        return this.topZIndex++;
+    };
+
     ReactUI.prototype.destroyPopup = function (key) {
+        console.log(this);
         this.popups = this.popups.filter(function (popup) {
             return popup.props.key !== key;
         });
@@ -55,11 +60,4 @@ var ReactUI = (function () {
     };
     return ReactUI;
 })();
-
-function ABA() {
-    var abaa = new ReactUI();
-    game.players.player0.addEmployee(new Employee("lolol", TEMPNAMES, { skillLevel: 1, growthLevel: 1 }));
-
-    abaa.newPopup(game.players.player0.employees);
-}
 //# sourceMappingURL=reactui.js.map

@@ -12,7 +12,7 @@ class ReactUI
 {
   idGenerator: number = 0;
   popups: any[] = [];
-  topZIndex: number = 0;
+  topZIndex: number = 15;
   stage: any;
 
   constructor()
@@ -27,40 +27,45 @@ class ReactUI
 
   makeCellBuyPopup(player: Player, cell)
   {
+    var self = this;
+
     var activeEmployees = player.getActiveEmployees();
+    var key = this.idGenerator++;
 
     var content = React.DOM.div(
-      null,
+      {className: "popup-content"},
       UIComponents.EmployeeList({employees: activeEmployees}),
       UIComponents.CellInfo({cell: cell})
     );
+
+    var boundDestroyPopup = this.destroyPopup.bind(this, key);
+    var boundIncrementZIndex = this.incrementZIndex.bind(this);
 
     var popup = UIComponents.Popup(
     {
       content: content,
       okText: "ok",
       closeText: "close",
-      key: this.idGenerator++,
+      key: key,
+      handleOk: boundDestroyPopup,
+      handleClose: boundDestroyPopup,
+
+      incrementZIndex: boundIncrementZIndex
     });
 
-    this.popups.push(popup);
-  }
 
-  newPopup(_employees: any[])
-  {
-    var el = UIComponents.EmployeeList({employees: _employees});
-    var popup = UIComponents.Popup (
-      {
-        content: el,
-        key: this.idGenerator++,
-
-      });
     this.popups.push(popup);
     this.updateReact();
   }
 
+  incrementZIndex()
+  {
+    return this.topZIndex++;
+  }
+
   destroyPopup(key)
   {
+    console.log(this);
     this.popups = this.popups.filter(function(popup)
     {
       return popup.props.key !== key;
@@ -76,12 +81,4 @@ class ReactUI
       document.getElementById("react-container")
     );
   }
-}
-
-function ABA()
-{
-  var abaa = new ReactUI();
-  game.players.player0.addEmployee(new Employee("lolol", TEMPNAMES, {skillLevel: 1, growthLevel: 1}));
-
-  abaa.newPopup(game.players.player0.employees);
 }

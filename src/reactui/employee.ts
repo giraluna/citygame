@@ -29,10 +29,10 @@ export var Employee = React.createClass({
     var name = this.props.employee.name;
     var skills =
     {
-      neg: this.props.employee.skills["neg"],
-      man: this.props.employee.skills["man"],
-      rec: this.props.employee.skills["rec"],
-      con: this.props.employee.skills["con"]
+      neg: this.props.employee.skills["negotiation"],
+      man: this.props.employee.skills["management"],
+      rec: this.props.employee.skills["recruitment"],
+      con: this.props.employee.skills["constuction"]
     }
 
     return(
@@ -50,8 +50,3 @@ export var Employee = React.createClass({
 });
 
 }
-
-var aba = game.players.player0;
-var abaaa = new ReactUI();
-aba.addEmployee(new Employee("lolol", TEMPNAMES, {skillLevel: 1, growthLevel: 1}));
-abaaa.newPopup(aba.employees);

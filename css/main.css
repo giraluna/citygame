@@ -75,6 +75,16 @@ body {
   clear: both;
   top: 0px;
 }
+.popup .popup-content {
+  display: flex;
+  flex-flow: row;
+}
+.popup .popup-content > * {
+  border: 1px solid #587982;
+}
+.popup .popup-content .cellinfo {
+  margin-left: 12px;
+}
 .popup .popup-buttons {
   display: table;
   margin: 0 auto;

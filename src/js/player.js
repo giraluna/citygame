@@ -4,10 +4,14 @@ var Player = (function () {
         this.money = 0;
         this.ownedContent = {};
         this.ownedCells = {};
-        this.employees = {};
+        this.employees = [];
         this.modifiers = {};
         this.id = "player" + id;
         this.bindElements();
+
+        for (var i = 0; i < 5; i++) {
+            this.addEmployee(new Employee(i, TEMPNAMES, { skillLevel: 1, growthLevel: 1 }));
+        }
     }
     Player.prototype.bindElements = function () {
         this.moneySpan = document.getElementById("money");
@@ -20,7 +24,7 @@ var Player = (function () {
     };
 
     Player.prototype.addEmployee = function (employee) {
-        this.employees[employee.id] = employee;
+        this.employees.push(employee);
     };
     Player.prototype.getActiveEmployees = function () {
         var activeEmployees = this.employees.filter(function (employee) {

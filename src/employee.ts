@@ -3,7 +3,7 @@
 // TODO
 var TEMPNAMES =
 {
-  english:
+  american:
   {
     male:
     [

@@ -22,8 +22,9 @@ export var Employee = React.createClass({
     };
 
     return defs;
-    
   },
+
+
   render: function()
   {
     var name = this.props.employee.name;
@@ -37,7 +38,7 @@ export var Employee = React.createClass({
 
     return(
 
-      React.DOM.tr(null, 
+      React.DOM.tr(this.props.rowProps, 
         React.DOM.td(null, name),
 
         React.DOM.td(null, skills["neg"]),

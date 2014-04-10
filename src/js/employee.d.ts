@@ -1,6 +1,6 @@
 /// <reference path="utility.d.ts" />
 declare var TEMPNAMES: {
-    english: {
+    american: {
         male: string[];
         female: string[];
         surnames: string[];

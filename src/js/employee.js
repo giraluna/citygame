@@ -1,7 +1,7 @@
 /// <reference path="js/utility.d.ts" />
 // TODO
 var TEMPNAMES = {
-    english: {
+    american: {
         male: [
             "James",
             "Christopher",

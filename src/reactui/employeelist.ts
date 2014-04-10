@@ -7,16 +7,54 @@ module UIComponents
   
 export var EmployeeList = React.createClass({
 
+  getInitialState: function()
+  {
+    return(
+    {
+      selected: null,
+      filterInactive: true
+    });
+  },
+
+  handleSelectRow: function(key)
+  {
+    this.setState(
+    {
+      selected: key
+    });
+  },
+
   render: function()
   {
+    var self = this;
     var rows = [];
+
     this.props.employees.forEach(function(employee)
     {
-      rows.push(UIComponents.Employee(
+      var key = employee.id;
+      var boundSelect = self.handleSelectRow.bind(self, key);
+
+      var employeeProps =
+      {
+        key: key,
+        employee: employee,
+        rowProps:
         {
-          key: employee.id,
-          employee: employee
-        } ));
+          onClick: boundSelect
+        }
+      };
+
+      if (self.state.selected === key)
+      {
+        employeeProps.rowProps["style"] =
+        {
+          "backgroundColor": "rgb(88, 121, 130)"
+        }
+      };
+
+      var row = UIComponents.Employee(employeeProps);
+
+      rows.push(row);
     });
     return(
       React.DOM.table(null,

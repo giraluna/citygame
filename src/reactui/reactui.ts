@@ -32,14 +32,25 @@ class ReactUI
     var activeEmployees = player.getActiveEmployees();
     var key = this.idGenerator++;
 
+    var el = UIComponents.EmployeeList({employees: activeEmployees});
+
     var content = React.DOM.div(
       {className: "popup-content"},
-      UIComponents.EmployeeList({employees: activeEmployees}),
+      el,
       UIComponents.CellInfo({cell: cell})
     );
 
+
     var boundDestroyPopup = this.destroyPopup.bind(this, key);
     var boundIncrementZIndex = this.incrementZIndex.bind(this);
+
+    var boundReturnSelected = function()
+    {
+      console.log(this.state.selected);
+      return this.state.selected;
+    }.bind(el);
+
+    var onOk = this.destroyPopup.bind(this, key, boundReturnSelected);
 
     var popup = UIComponents.Popup(
     {
@@ -47,12 +58,11 @@ class ReactUI
       okText: "ok",
       closeText: "close",
       key: key,
-      handleOk: boundDestroyPopup,
+      handleOk: onOk,
       handleClose: boundDestroyPopup,
 
       incrementZIndex: boundIncrementZIndex
     });
-
 
     this.popups.push(popup);
     this.updateReact();
@@ -63,13 +73,14 @@ class ReactUI
     return this.topZIndex++;
   }
 
-  destroyPopup(key)
+  destroyPopup(key, callback?)
   {
-    console.log(this);
     this.popups = this.popups.filter(function(popup)
     {
       return popup.props.key !== key;
     });
+
+    callback.call();
 
     this.updateReact();
   }

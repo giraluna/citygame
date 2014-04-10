@@ -14,6 +14,6 @@ declare class ReactUI {
     public init(): void;
     public makeCellBuyPopup(player: Player, cell: any): void;
     public incrementZIndex(): number;
-    public destroyPopup(key: any): void;
+    public destroyPopup(key: any, callback?: any): void;
     public updateReact(): void;
 }

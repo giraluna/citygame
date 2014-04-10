@@ -23,17 +23,26 @@ var ReactUI = (function () {
         var activeEmployees = player.getActiveEmployees();
         var key = this.idGenerator++;
 
-        var content = React.DOM.div({ className: "popup-content" }, UIComponents.EmployeeList({ employees: activeEmployees }), UIComponents.CellInfo({ cell: cell }));
+        var el = UIComponents.EmployeeList({ employees: activeEmployees });
+
+        var content = React.DOM.div({ className: "popup-content" }, el, UIComponents.CellInfo({ cell: cell }));
 
         var boundDestroyPopup = this.destroyPopup.bind(this, key);
         var boundIncrementZIndex = this.incrementZIndex.bind(this);
+
+        var boundReturnSelected = function () {
+            console.log(this.state.selected);
+            return this.state.selected;
+        }.bind(el);
+
+        var onOk = this.destroyPopup.bind(this, key, boundReturnSelected);
 
         var popup = UIComponents.Popup({
             content: content,
             okText: "ok",
             closeText: "close",
             key: key,
-            handleOk: boundDestroyPopup,
+            handleOk: onOk,
             handleClose: boundDestroyPopup,
             incrementZIndex: boundIncrementZIndex
         });
@@ -46,11 +55,12 @@ var ReactUI = (function () {
         return this.topZIndex++;
     };
 
-    ReactUI.prototype.destroyPopup = function (key) {
-        console.log(this);
+    ReactUI.prototype.destroyPopup = function (key, callback) {
         this.popups = this.popups.filter(function (popup) {
             return popup.props.key !== key;
         });
+
+        callback.call();
 
         this.updateReact();
     };

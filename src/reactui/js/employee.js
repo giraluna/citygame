@@ -26,7 +26,7 @@ var UIComponents;
                 con: this.props.employee.skills["constuction"]
             };
 
-            return (React.DOM.tr(null, React.DOM.td(null, name), React.DOM.td(null, skills["neg"]), React.DOM.td(null, skills["man"]), React.DOM.td(null, skills["rec"]), React.DOM.td(null, skills["con"])));
+            return (React.DOM.tr(this.props.rowProps, React.DOM.td(null, name), React.DOM.td(null, skills["neg"]), React.DOM.td(null, skills["man"]), React.DOM.td(null, skills["rec"]), React.DOM.td(null, skills["con"])));
         }
     });
 })(UIComponents || (UIComponents = {}));

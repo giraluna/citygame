@@ -4,13 +4,15 @@ var UIComponents;
 (function (UIComponents) {
     UIComponents.Draggable = {
         handleDragStart: function (e) {
+            //e.dataTransfer.setData("text/plain", "stupid firefox");
             this.props.offset = {
                 x: e.layerX,
                 y: e.layerY
             };
-            this.props.DOMNode.style["z-index"] = this.props.incrementZIndex();
+            this.props.DOMNode.style.zIndex = this.props.incrementZIndex();
         },
         handleDrag: function (e) {
+            //e.dataTransfer.setData("text/plain", "stupid firefox");
             if (e.x === 0 && e.y === 0)
                 return;
 
@@ -18,13 +20,14 @@ var UIComponents;
             this.props.DOMNode.style.top = (e.y - this.props.offset.y) + "px";
         },
         handleDragEnd: function (e) {
+            //e.dataTransfer.setData("text/plain", "stupid firefox");
         },
         componentDidMount: function () {
             var DOMNode = this.props.DOMNode = this.getDOMNode();
 
-            DOMNode.addEventListener("dragstart", this.handleDragStart);
-            DOMNode.addEventListener("drag", this.handleDrag);
-            DOMNode.addEventListener("dragend", this.handleDragEnd);
+            DOMNode.addEventListener("dragstart", this.handleDragStart, false);
+            DOMNode.addEventListener("drag", this.handleDrag, false);
+            DOMNode.addEventListener("dragend", this.handleDragEnd, false);
 
             DOMNode.draggable = true;
             DOMNode.style.position = "absolute";

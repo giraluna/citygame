@@ -7,43 +7,34 @@
 /// <reference path="js/popup.d.ts" />
 /// <reference path="js/stage.d.ts" />
 var ReactUI = (function () {
-    function ReactUI() {
+    function ReactUI(player) {
         this.idGenerator = 0;
         this.popups = [];
         this.topZIndex = 15;
+        this.player = player;
         this.init();
     }
     ReactUI.prototype.init = function () {
         this.updateReact();
     };
 
-    ReactUI.prototype.makeCellBuyPopup = function (player, cell) {
+    ReactUI.prototype.makeInfoPopup = function (infoText) {
         var self = this;
-
-        var activeEmployees = player.getActiveEmployees();
         var key = this.idGenerator++;
 
-        var el = UIComponents.EmployeeList({ employees: activeEmployees });
-
-        var content = React.DOM.div({ className: "popup-content" }, el, UIComponents.CellInfo({ cell: cell }));
-
-        var boundDestroyPopup = this.destroyPopup.bind(this, key);
+        var boundDestroyPopup = this.destroyPopup.bind(this, key, null);
         var boundIncrementZIndex = this.incrementZIndex.bind(this);
 
-        var boundReturnSelected = function () {
-            console.log(this.state.selected);
-            return this.state.selected;
-        }.bind(el);
-
-        var onOk = this.destroyPopup.bind(this, key, boundReturnSelected);
+        var closeBtn = React.DOM.button({
+            onClick: boundDestroyPopup,
+            key: "close"
+        }, "close");
 
         var popup = UIComponents.Popup({
-            content: content,
-            okText: "ok",
-            closeText: "close",
+            popupText: infoText,
+            content: null,
+            buttons: [closeBtn],
             key: key,
-            handleOk: onOk,
-            handleClose: boundDestroyPopup,
             incrementZIndex: boundIncrementZIndex
         });
 
@@ -51,6 +42,60 @@ var ReactUI = (function () {
         this.updateReact();
     };
 
+    ReactUI.prototype.makeCellBuyPopup = function (player, cell) {
+        var self = this;
+
+        var activeEmployees = player.getActiveEmployees();
+
+        if (activeEmployees.length < 1) {
+            self.makeInfoPopup("Recruit some employees first");
+            return;
+        }
+
+        var key = this.idGenerator++;
+
+        var el = UIComponents.EmployeeList({
+            employees: activeEmployees,
+            relevantSkills: ["negotiation"]
+        });
+
+        var content = React.DOM.div({ className: "popup-content" }, el, UIComponents.CellInfo({ cell: cell }));
+
+        var boundDestroyPopup = this.destroyPopup.bind(this, key, null);
+        var boundIncrementZIndex = this.incrementZIndex.bind(this);
+
+        var boundBuySelected = function () {
+            if (!self.player.employees[this.state.selected]) {
+                self.makeInfoPopup("No employee selected");
+                return;
+            }
+            self.player.buyCell(cell, self.player.employees[this.state.selected]);
+            return this.state.selected;
+        }.bind(el);
+
+        var onOk = this.destroyPopup.bind(this, key, boundBuySelected);
+
+        var okBtn = React.DOM.button({
+            onClick: onOk,
+            key: "ok"
+        }, "buy");
+
+        var closeBtn = React.DOM.button({
+            onClick: boundDestroyPopup,
+            key: "close"
+        }, "close");
+
+        var popup = UIComponents.Popup({
+            popupText: "helo",
+            content: content,
+            buttons: [okBtn, closeBtn],
+            key: key,
+            incrementZIndex: boundIncrementZIndex
+        });
+
+        this.popups.push(popup);
+        this.updateReact();
+    };
     ReactUI.prototype.incrementZIndex = function () {
         return this.topZIndex++;
     };
@@ -60,7 +105,8 @@ var ReactUI = (function () {
             return popup.props.key !== key;
         });
 
-        callback.call();
+        if (callback)
+            callback.call();
 
         this.updateReact();
     };

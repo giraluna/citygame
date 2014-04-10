@@ -28,23 +28,27 @@ export var Employee = React.createClass({
   render: function()
   {
     var name = this.props.employee.name;
-    var skills =
+    var skillCells = [];
+
+    for (var skill in this.props.employee.skills)
     {
-      neg: this.props.employee.skills["negotiation"],
-      man: this.props.employee.skills["management"],
-      rec: this.props.employee.skills["recruitment"],
-      con: this.props.employee.skills["constuction"]
+      var colProps = {};
+      if (this.props.relevantSkills.indexOf(skill) > -1)
+      {
+        colProps["className"] = "relevant-cell"
+      };
+
+      skillCells.push(
+        React.DOM.td(colProps, this.props.employee.skills[skill])
+      );
     }
 
     return(
 
       React.DOM.tr(this.props.rowProps, 
-        React.DOM.td(null, name),
+        React.DOM.td({className: "employee-name"}, name),
 
-        React.DOM.td(null, skills["neg"]),
-        React.DOM.td(null, skills["man"]),
-        React.DOM.td(null, skills["rec"]),
-        React.DOM.td(null, skills["con"])
+        skillCells
       )
     );
   }

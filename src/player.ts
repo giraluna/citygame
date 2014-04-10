@@ -4,11 +4,12 @@ class Player
 {
   id: string;
   money: number = 0;
+  eventListener: any;
 
   ownedContent: any = {};
   ownedCells: any = {};
 
-  employees: any = [];
+  employees: any = {};
   modifiers: any = {};
 
   moneySpan: HTMLElement;
@@ -30,23 +31,44 @@ class Player
     this.moneySpan.innerHTML = this.money + "$";
     //this.incomeSpan.innerHTML = "+" + this.income + "/s";
   }
+  addEventListeners(listener)
+  {
+    this.eventListener = listener;
+  }
 
   addEmployee(employee: Employee)
   {
-    this.employees.push(employee);
+    this.employees[employee.id] = employee;
   }
   getActiveEmployees()
   {
-    var activeEmployees = this.employees.filter( function(employee)
+    var active = [];
+    for (var employee in this.employees)
     {
-      return employee.active !== false;
-    });
+      if (employee.active !== false) active.push(this.employees[employee]);
+    };
 
-    return activeEmployees;
+    return active;
   }
-  buyCell( cell )
+  buyCell( cell, employee: Employee )
   {
+    this.addCell(cell);
+    employee.active = false;
+    cell.sprite.tint = 0xFF0000;
+    this.eventListener.dispatchEvent({type: "updateWorld", content:""});
+  }
+  getActionTime( skill, baseDuration )
+  {
+    var workRate = 3 / Math.log(skill + 1);
     
+    var approximate = Math.round(baseDuration * workRate);
+    var actual = Math.round(approximate + randRange(-2, 2));
+
+    return(
+    {
+      approximate: approximate,
+      actual: actual < 1 ? 1 : actual
+    });
   }
 
   addCell( cell )

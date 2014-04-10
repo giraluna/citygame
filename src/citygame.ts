@@ -591,11 +591,12 @@ class Game
     this.mouseEventHandler.scroller = new Scroller(this.layers["main"], 0.5);
 
     this.uiDrawer = new UIDrawer();
-    this.reactUI = new ReactUI();
 
     this.systemsManager = new SystemsManager(1000);
     this.systemsManager.addEventListeners(this.eventListener);
     var player = new Player(idGenerator.player++);
+    player.addEventListeners(this.eventListener);
+    this.reactUI = new ReactUI(player);
     this.players[player.id] = player;
     // TODO
     this.tools.buy.player = player;

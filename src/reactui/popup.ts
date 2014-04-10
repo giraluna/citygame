@@ -11,10 +11,10 @@ export var Popup = React.createClass({
   {
     return(
       React.DOM.div( {className:"popup"}, 
+        React.DOM.span( {className:"popup-text"}, this.props.popupText ),
         this.props.content,
         React.DOM.div( {className:"popup-buttons"}, 
-          React.DOM.button( {onClick:this.props.handleOk}, this.props.okText),
-          React.DOM.button( {onClick:this.props.handleClose}, this.props.closeText)
+          this.props.buttons
         )
       )
     );

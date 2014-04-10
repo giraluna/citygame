@@ -4,7 +4,7 @@ var Player = (function () {
         this.money = 0;
         this.ownedContent = {};
         this.ownedCells = {};
-        this.employees = [];
+        this.employees = {};
         this.modifiers = {};
         this.id = "player" + id;
         this.bindElements();
@@ -18,18 +18,39 @@ var Player = (function () {
         this.moneySpan.innerHTML = this.money + "$";
         //this.incomeSpan.innerHTML = "+" + this.income + "/s";
     };
+    Player.prototype.addEventListeners = function (listener) {
+        this.eventListener = listener;
+    };
 
     Player.prototype.addEmployee = function (employee) {
-        this.employees.push(employee);
+        this.employees[employee.id] = employee;
     };
     Player.prototype.getActiveEmployees = function () {
-        var activeEmployees = this.employees.filter(function (employee) {
-            return employee.active !== false;
-        });
+        var active = [];
+        for (var employee in this.employees) {
+            if (employee.active !== false)
+                active.push(this.employees[employee]);
+        }
+        ;
 
-        return activeEmployees;
+        return active;
     };
-    Player.prototype.buyCell = function (cell) {
+    Player.prototype.buyCell = function (cell, employee) {
+        this.addCell(cell);
+        employee.active = false;
+        cell.sprite.tint = 0xFF0000;
+        this.eventListener.dispatchEvent({ type: "updateWorld", content: "" });
+    };
+    Player.prototype.getActionTime = function (skill, baseDuration) {
+        var workRate = 3 / Math.log(skill + 1);
+
+        var approximate = Math.round(baseDuration * workRate);
+        var actual = Math.round(approximate + randRange(-2, 2));
+
+        return ({
+            approximate: approximate,
+            actual: actual < 1 ? 1 : actual
+        });
     };
 
     Player.prototype.addCell = function (cell) {

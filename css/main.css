@@ -69,11 +69,9 @@ body {
   border: 1px solid #587982;
   background-color: rgba(232, 251, 255, 0.8);
 }
-.popup .popup-close {
-  display: inline-block;
-  float: right;
-  clear: both;
-  top: 0px;
+.popup .popup-text {
+  display: table;
+  margin: 7px auto;
 }
 .popup .popup-content {
   display: flex;
@@ -81,6 +79,37 @@ body {
 }
 .popup .popup-content > * {
   border: 1px solid #587982;
+}
+.popup .popup-content th {
+  margin-bottom: 10px;
+  min-width: 40px;
+  font-weight: lighter;
+}
+.popup .popup-content tr {
+  text-align: center;
+}
+.popup .popup-content .employee {
+  color: #888;
+}
+.popup .popup-content .active:hover {
+  background-color: #9db6bd;
+}
+.popup .popup-content .selected {
+  background-color: #587982;
+}
+.popup .popup-content .inactive {
+  background-color: #b9c8cc;
+  color: #666666;
+}
+.popup .popup-content .employee-name {
+  text-align: left;
+  color: #000;
+}
+.popup .popup-content .relevant-col {
+  border: 1px dashed #8eaab2;
+}
+.popup .popup-content .relevant-cell {
+  color: #000;
 }
 .popup .popup-content .cellinfo {
   margin-left: 12px;

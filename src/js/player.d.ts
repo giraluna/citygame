@@ -2,6 +2,7 @@
 declare class Player {
     public id: string;
     public money: number;
+    public eventListener: any;
     public ownedContent: any;
     public ownedCells: any;
     public employees: any;
@@ -11,9 +12,14 @@ declare class Player {
     constructor(id: number);
     public bindElements(): void;
     public updateElements(): void;
+    public addEventListeners(listener: any): void;
     public addEmployee(employee: Employee): void;
-    public getActiveEmployees(): any;
-    public buyCell(cell: any): void;
+    public getActiveEmployees(): any[];
+    public buyCell(cell: any, employee: Employee): void;
+    public getActionTime(skill: any, baseDuration: any): {
+        approximate: number;
+        actual: number;
+    };
     public addCell(cell: any): void;
     public removeCell(cell: any): void;
     public addContent(type: any, content: any): void;

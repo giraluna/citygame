@@ -10,4 +10,5 @@ declare function getOrthoCoord(click: number[], tileSize: number[], worldSize: n
 declare function getIsoCoord(x: number, y: number, width: number, height: number, offset?: number[]): number[];
 declare function getTileScreenPosition(x: number, y: number, tileSize: number[], worldSize: number[], container: PIXI.DisplayObjectContainer): void;
 declare function randInt(min: any, max: any): any;
+declare function randRange(min: any, max: any): any;
 declare function rollDice(dice: any, sides: any): number;

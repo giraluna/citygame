@@ -790,12 +790,12 @@ var MouseEventHandler = (function () {
         };
     }
     MouseEventHandler.prototype.mouseDown = function (event, targetType) {
+        game.uiDrawer.removeActive();
         if (event.originalEvent.button === 2 && this.currAction !== undefined) {
             this.currAction = undefined;
             this.startPoint = undefined;
             this.scroller.end();
             game.highlighter.clearSprites();
-            game.uiDrawer.removeActive();
             game.updateWorld();
         } else if (event.originalEvent.ctrlKey || event.originalEvent.metaKey || event.originalEvent.button === 2) {
             this.startScroll(event);

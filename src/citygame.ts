@@ -1016,6 +1016,7 @@ class MouseEventHandler
   }
   mouseDown(event, targetType: string)
   {
+    game.uiDrawer.removeActive();
     if (event.originalEvent.button === 2 &&
       this.currAction !== undefined)
     {
@@ -1023,7 +1024,6 @@ class MouseEventHandler
       this.startPoint = undefined;
       this.scroller.end();
       game.highlighter.clearSprites();
-      game.uiDrawer.removeActive();
       game.updateWorld();
     }
     else if (event.originalEvent.ctrlKey ||

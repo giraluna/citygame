@@ -94,10 +94,10 @@ class ReactUI
         return;
       }
       self.player.buyCell(cell, self.player.employees[this.state.selected]);
-      return this.state.selected;
+      boundDestroyPopup();
     }.bind(el);
 
-    var onOk = this.destroyPopup.bind(this, key, boundBuySelected);
+    var onOk = boundBuySelected;
 
     var okBtn = React.DOM.button(
     {
@@ -113,7 +113,7 @@ class ReactUI
 
     var popup = UIComponents.Popup(
     {
-      popupText: "helo",
+      popupText: "hello",
       content: content,
       buttons: [okBtn, closeBtn],
       key: key,

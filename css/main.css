@@ -50,6 +50,9 @@ body {
 #bottom-menu #player {
   margin-right: 50px;
 }
+#bottom-menu #date {
+  min-width: 8em;
+}
 #react-stage {
   position: absolute;
   display: flex;

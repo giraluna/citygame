@@ -31,7 +31,8 @@ var TEMPNAMES =
       "Joseph",
       "Edward",
       "Thomas",
-      "Brian"
+      "Brian",
+      "Davis"
     ],
     female:
     [
@@ -92,6 +93,7 @@ var TEMPNAMES =
       "Adams",
       "Campbell",
       "Miller",
+      "Farmer",
       "Thompson",
       "Allen",
       "Baker",

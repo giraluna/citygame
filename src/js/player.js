@@ -1,3 +1,4 @@
+/// <reference path="../lib/pixi.d.ts" />
 /// <reference path="js/employee.d.ts" />
 var Player = (function () {
     function Player(id) {
@@ -34,23 +35,6 @@ var Player = (function () {
         ;
 
         return active;
-    };
-    Player.prototype.buyCell = function (cell, employee) {
-        this.addCell(cell);
-        employee.active = false;
-        cell.sprite.tint = 0xFF0000;
-        this.eventListener.dispatchEvent({ type: "updateWorld", content: "" });
-    };
-    Player.prototype.getActionTime = function (skill, baseDuration) {
-        var workRate = 3 / Math.log(skill + 1);
-
-        var approximate = Math.round(baseDuration * workRate);
-        var actual = Math.round(approximate + randRange(-2, 2));
-
-        return ({
-            approximate: approximate,
-            actual: actual < 1 ? 1 : actual
-        });
     };
 
     Player.prototype.addCell = function (cell) {

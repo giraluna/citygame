@@ -1,6 +1,8 @@
 /// <reference path="../../lib/react.d.ts" />
-
+/// <reference path="../../lib/pixi.d.ts" />
+/// 
 /// <reference path="../js/player.d.ts" />
+/// <reference path="../js/actions.d.ts" />
 /// 
 /// <reference path="js/employeelist.d.ts" />
 /// <reference path="js/employee.d.ts" />
@@ -16,16 +18,27 @@ class ReactUI
   stage: any;
 
   player: Player;
+  eventListener: PIXI.EventTarget;
 
-  constructor(player: Player)
+  constructor(player: Player, listener: PIXI.EventTarget)
   {
+    this.eventListener = listener;
     this.player = player;
     this.init();
   }
-
   init()
   {
+    this.addEventListeners();
     this.updateReact();
+  }
+  addEventListeners()
+  {
+    var self = this;
+    var listener = this.eventListener;
+    listener.addEventListener("makeInfoPopup", function(event)
+    {
+      self.makeInfoPopup(event.content.infoText);
+    });
   }
 
   makeInfoPopup(infoText: string)
@@ -55,6 +68,49 @@ class ReactUI
     this.popups.push(popup);
     this.updateReact();
   }
+  makeConfirmPopup(text: string, onOk: any, onCancel: any)
+  {
+    var self = this;
+    var key = this.idGenerator++;
+
+    var boundDestroyPopup = this.destroyPopup.bind(this, key, null);
+    var boundIncrementZIndex = this.incrementZIndex.bind(this);
+
+    var okAndDestroy = function()
+    {
+      onOk.call();
+      boundDestroyPopup();
+    }
+    var okBtn = React.DOM.button(
+    {
+      onClick: okAndDestroy,
+      key: "confirm"
+    }, "confirm");
+
+    var cancelAndDestroy = function()
+    {
+      onCancel.call();
+      boundDestroyPopup();
+    }
+    var closeBtn = React.DOM.button(
+    {
+      onClick: cancelAndDestroy,
+      key: "cancel"
+    }, "cancel");
+
+    var popup = UIComponents.Popup(
+    {
+      popupText: text,
+      content: null,
+      buttons: [okBtn, closeBtn],
+      key: key,
+
+      incrementZIndex: boundIncrementZIndex
+    });
+
+    this.popups.push(popup);
+    this.updateReact();
+  }
 
   makeCellBuyPopup(player: Player, cell)
   {
@@ -73,7 +129,8 @@ class ReactUI
     var el = UIComponents.EmployeeList(
       {
         employees: activeEmployees,
-        relevantSkills: ["negotiation"]
+        relevantSkills: ["negotiation"],
+        selected: null
       });
 
     var content = React.DOM.div(

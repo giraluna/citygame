@@ -93,7 +93,7 @@ var System = (function () {
             console.warn("<1 activationRate on system", this);
         }
     }
-    System.prototype.activate = function (currTick) {
+    System.prototype.activate = function (any) {
     };
 
     System.prototype.updateTicks = function (currTick) {
@@ -194,5 +194,32 @@ var DateSystem = (function (_super) {
         this.dateElem.innerHTML = this.toString();
     };
     return DateSystem;
+})(System);
+
+var DelayedActionSystem = (function (_super) {
+    __extends(DelayedActionSystem, _super);
+    function DelayedActionSystem(activationRate, systemsManager) {
+        _super.call(this, activationRate, systemsManager.tickNumber);
+        this.callbacks = {};
+        this.systemsManager = systemsManager;
+    }
+    DelayedActionSystem.prototype.addAction = function (currTick, time, action) {
+        var actionTime = currTick + time;
+        if (!this.callbacks[actionTime]) {
+            this.callbacks[actionTime] = [];
+        }
+        this.callbacks[actionTime].push(action);
+    };
+
+    DelayedActionSystem.prototype.activate = function (currTick) {
+        var callbacks = this.callbacks[currTick];
+
+        if (callbacks) {
+            for (var i = 0; i < callbacks; i++) {
+                callbacks[i].call();
+            }
+        }
+    };
+    return DelayedActionSystem;
 })(System);
 //# sourceMappingURL=systems.js.map

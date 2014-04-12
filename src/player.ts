@@ -1,3 +1,5 @@
+/// <reference path="../lib/pixi.d.ts" />
+
 /// <reference path="js/employee.d.ts" />
 
 class Player
@@ -50,27 +52,7 @@ class Player
 
     return active;
   }
-  buyCell( cell, employee: Employee )
-  {
-    this.addCell(cell);
-    employee.active = false;
-    cell.sprite.tint = 0xFF0000;
-    this.eventListener.dispatchEvent({type: "updateWorld", content:""});
-  }
-  getActionTime( skill, baseDuration )
-  {
-    var workRate = 3 / Math.log(skill + 1);
-    
-    var approximate = Math.round(baseDuration * workRate);
-    var actual = Math.round(approximate + randRange(-2, 2));
-
-    return(
-    {
-      approximate: approximate,
-      actual: actual < 1 ? 1 : actual
-    });
-  }
-
+  
   addCell( cell )
   {
     if (!this.ownedCells[cell.gridPos])

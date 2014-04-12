@@ -27,7 +27,8 @@ var TEMPNAMES = {
             "Joseph",
             "Edward",
             "Thomas",
-            "Brian"
+            "Brian",
+            "Davis"
         ],
         female: [
             "Mary",
@@ -86,6 +87,7 @@ var TEMPNAMES = {
             "Adams",
             "Campbell",
             "Miller",
+            "Farmer",
             "Thompson",
             "Allen",
             "Baker",

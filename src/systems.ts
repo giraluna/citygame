@@ -103,7 +103,7 @@ class System
   lastTick: number;
   nextTick: number;
 
-  activate(currTick?){}
+  activate(any){}
 
   constructor(activationRate: number, currTick: number)
   {
@@ -250,5 +250,39 @@ class DateSystem extends System
   updateDate()
   {
     this.dateElem.innerHTML = this.toString();
+  }
+}
+
+class DelayedActionSystem extends System
+{
+  callbacks: any = {};
+
+  constructor(activationRate: number, systemsManager: SystemsManager)
+  {
+    super(activationRate, systemsManager.tickNumber);
+    this.systemsManager = systemsManager;
+  }
+
+  addAction(currTick: number, time: number, action: any)
+  {
+    var actionTime = currTick + time;
+    if (!this.callbacks[actionTime])
+    {
+      this.callbacks[actionTime] = [];
+    }
+    this.callbacks[actionTime].push(action); 
+  }
+
+  activate(currTick: number)
+  {
+    var callbacks = this.callbacks[currTick];
+
+    if (callbacks)
+    {
+      for (var i = 0; i < callbacks; i++)
+      {
+        callbacks[i].call();
+      }
+    }
   }
 }

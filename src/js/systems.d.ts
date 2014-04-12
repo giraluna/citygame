@@ -35,7 +35,7 @@ declare class System {
     public activationRate: number;
     public lastTick: number;
     public nextTick: number;
-    public activate(currTick?: any): void;
+    public activate(any: any): void;
     constructor(activationRate: number, currTick: number);
     public updateTicks(currTick: number): void;
     public tick(currTick: number): void;
@@ -75,4 +75,10 @@ declare class DateSystem extends System {
     public getDate(): IDateObj;
     public toString(): string;
     public updateDate(): void;
+}
+declare class DelayedActionSystem extends System {
+    public callbacks: any;
+    constructor(activationRate: number, systemsManager: SystemsManager);
+    public addAction(currTick: number, time: number, action: any): void;
+    public activate(currTick: number): void;
 }

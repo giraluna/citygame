@@ -1,3 +1,4 @@
+/// <reference path="../../lib/pixi.d.ts" />
 /// <reference path="employee.d.ts" />
 declare class Player {
     public id: string;
@@ -15,11 +16,6 @@ declare class Player {
     public addEventListeners(listener: any): void;
     public addEmployee(employee: Employee): void;
     public getActiveEmployees(): any[];
-    public buyCell(cell: any, employee: Employee): void;
-    public getActionTime(skill: any, baseDuration: any): {
-        approximate: number;
-        actual: number;
-    };
     public addCell(cell: any): void;
     public removeCell(cell: any): void;
     public addContent(type: any, content: any): void;

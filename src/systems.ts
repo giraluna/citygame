@@ -1,6 +1,7 @@
 /// <reference path="../lib/pixi.d.ts" />
 /// <reference path="js/player.d.ts" />
 /// <reference path="js/timer.d.ts" />
+/// <reference path="js/eventlistener.d.ts" />
 
 /**
   * @class SystemsManager
@@ -19,7 +20,6 @@ class SystemsManager
 {
   systems: any = {};
   entities: any = {};
-  eventListener: PIXI.EventTarget;
   timer: Strawb.Timer;
   tickTime: number;
   tickNumber: number = 0;
@@ -37,21 +37,21 @@ class SystemsManager
   {
     var e = this.entities;
     e.ownedBuildings = [];
+    this.addEventListeners();
   }
   addSystem(name: string, system: System)
   {
     this.systems[name] = system;
   }
-  addEventListeners(listener)
+  addEventListeners()
   {
-    this.eventListener = listener;
     var self = this;
-    listener.addEventListener("builtBuilding", function(event)
+    eventManager.addEventListener("builtBuilding", function(event)
     {
       // TEMPORARY
       self.entities.ownedBuildings.push("temp");
     });
-    listener.addEventListener("destroyBuilding", function(event)
+    eventManager.addEventListener("destroyBuilding", function(event)
     {
       // TEMPORARY
       self.entities.ownedBuildings.pop();
@@ -256,11 +256,24 @@ class DateSystem extends System
 class DelayedActionSystem extends System
 {
   callbacks: any = {};
+  currTick: number;
 
   constructor(activationRate: number, systemsManager: SystemsManager)
   {
     super(activationRate, systemsManager.tickNumber);
     this.systemsManager = systemsManager;
+    this.addEventListeners();
+  }
+
+  addEventListeners()
+  {
+    var self = this;
+    eventManager.addEventListener("delayedAction", function(event)
+    {
+      var _e = event.content;
+      self.addAction(self.currTick, _e.time, _e.onComplete);
+      console.log(self);
+    });
   }
 
   addAction(currTick: number, time: number, action: any)
@@ -270,19 +283,21 @@ class DelayedActionSystem extends System
     {
       this.callbacks[actionTime] = [];
     }
-    this.callbacks[actionTime].push(action); 
+    this.callbacks[actionTime].push(action);
   }
 
   activate(currTick: number)
   {
-    var callbacks = this.callbacks[currTick];
+    this.currTick = currTick;
 
-    if (callbacks)
+    if (this.callbacks[currTick])
     {
-      for (var i = 0; i < callbacks; i++)
+      for (var i = 0; i < this.callbacks[currTick].length; i++)
       {
-        callbacks[i].call();
+        this.callbacks[currTick][i].call();
       }
+      this.callbacks[currTick] = null;
+      delete this.callbacks[currTick];
     }
   }
 }

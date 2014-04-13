@@ -7,6 +7,7 @@
 /// 
 /// <reference path="js/player.d.ts" />
 /// <reference path="js/systems.d.ts" />
+/// <reference path="js/eventlistener.d.ts" />
 /// 
 /// <reference path="js/utility.d.ts" />
 
@@ -355,7 +356,7 @@ class Cell
     // TEMPORARY
     if (type.baseType === "building")
     {
-      game.eventListener.dispatchEvent({type: "builtBuilding", data:""});
+      eventManager.dispatchEvent({type: "builtBuilding", content:""});
     }
 
     return this.content;
@@ -370,7 +371,7 @@ class Cell
     // TEMPORARY
     if (this.content.baseType === "building")
     {
-      game.eventListener.dispatchEvent({type: "destroyBuilding", data:""});
+      eventManager.dispatchEvent({type: "destroyBuilding", content:""});
     }
 
     game.layers["content"]._removeChildAt(this.content.sprite,
@@ -469,23 +470,22 @@ class WorldRenderer
   renderTexture: PIXI.RenderTexture;
   worldSprite: PIXI.Sprite;
   zoomLevel: number = ZOOM_LEVELS[0];
-  listener: PIXI.EventTarget;
   
   constructor(width, height)
   {
     this.initContainers(width, height);
     this.initLayers();
+    this.addEventListeners();
   }
 
-  addEventListeners(listener)
+  addEventListeners()
   {
-    this.listener = listener;
     var self = this;
-    listener.addEventListener("changeZoomLevel", function(event)
+    eventManager.addEventListener("changeZoomLevel", function(event)
     {
       self.changeZoomLevel(event.content.zoomLevel);
     });
-    listener.addEventListener("updateWorld", function(event)
+    eventManager.addEventListener("updateWorld", function(event)
     {
       self.render();
     });
@@ -566,7 +566,6 @@ class Game
   reactUI: ReactUI;
   systemsManager: SystemsManager;
   worldRenderer: WorldRenderer;
-  eventListener: PIXI.EventTarget;
   players: {[id: string]: Player;} = {};
   constructor()
   {
@@ -574,8 +573,6 @@ class Game
   init()
   {
     this.resize();
-
-    this.eventListener = new PIXI.EventTarget();
 
     this.initContainers();
     this.initTools();
@@ -593,15 +590,14 @@ class Game
     this.uiDrawer = new UIDrawer();
 
     this.systemsManager = new SystemsManager(1000);
-    this.systemsManager.addEventListeners(this.eventListener);
     var player = new Player(idGenerator.player++);
-    player.addEventListeners(this.eventListener);
     this.reactUI = new ReactUI(player);
     this.players[player.id] = player;
     // TODO
     this.tools.buy.player = player;
     var profitSystem = new ProfitSystem(1, this.systemsManager, player);
     this.systemsManager.addSystem("profit", profitSystem);
+    this.systemsManager.addSystem("delayedAction", new DelayedActionSystem(1, this.systemsManager));
 
     var dateSystem = new DateSystem(1, this.systemsManager,
       document.getElementById("date") );
@@ -639,7 +635,6 @@ class Game
       _stage.addChild(_tooltips);
 
       this.worldRenderer = new WorldRenderer(WORLD_WIDTH, WORLD_HEIGHT);
-      this.worldRenderer.addEventListeners(this.eventListener);
       _main.addChild(this.worldRenderer.worldSprite);
 
       this.initLayers();
@@ -736,7 +731,7 @@ class Game
   }
   updateWorld()
   {
-    this.eventListener.dispatchEvent({type: "updateWorld", content:""});
+    eventManager.dispatchEvent({type: "updateWorld", content:""});
   }
   resize()
   {
@@ -1548,9 +1543,13 @@ class BuyTool extends Tool
   }
   onActivate(target: Cell)
   {
-    // TODO
-    //this.player.buyCell(target);
-    game.reactUI.makeCellBuyPopup(this.player, target);
+    var self = this;
+    eventManager.dispatchEvent({type: "makeCellBuyPopup", content:
+      {
+        player: self.player,
+        cell: target
+      }
+    });
   }
 }
 

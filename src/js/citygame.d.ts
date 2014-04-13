@@ -5,6 +5,7 @@
 /// <reference path="loader.d.ts" />
 /// <reference path="player.d.ts" />
 /// <reference path="systems.d.ts" />
+/// <reference path="eventlistener.d.ts" />
 /// <reference path="utility.d.ts" />
 declare var cg: any;
 declare var arrayLogic: any;
@@ -85,9 +86,8 @@ declare class WorldRenderer {
     public renderTexture: PIXI.RenderTexture;
     public worldSprite: PIXI.Sprite;
     public zoomLevel: number;
-    public listener: PIXI.EventTarget;
     constructor(width: any, height: any);
-    public addEventListeners(listener: any): void;
+    public addEventListeners(): void;
     public initContainers(width: any, height: any): void;
     public initLayers(): void;
     public changeZoomLevel(level: any): void;
@@ -106,7 +106,6 @@ declare class Game {
     public reactUI: ReactUI;
     public systemsManager: SystemsManager;
     public worldRenderer: WorldRenderer;
-    public eventListener: PIXI.EventTarget;
     public players: {
         [id: string]: Player;
     };

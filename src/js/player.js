@@ -19,8 +19,7 @@ var Player = (function () {
         this.moneySpan.innerHTML = this.money + "$";
         //this.incomeSpan.innerHTML = "+" + this.income + "/s";
     };
-    Player.prototype.addEventListeners = function (listener) {
-        this.eventListener = listener;
+    Player.prototype.addEventListeners = function () {
     };
 
     Player.prototype.addEmployee = function (employee) {

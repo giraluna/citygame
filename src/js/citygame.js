@@ -7,6 +7,7 @@
 ///
 /// <reference path="js/player.d.ts" />
 /// <reference path="js/systems.d.ts" />
+/// <reference path="js/eventlistener.d.ts" />
 ///
 /// <reference path="js/utility.d.ts" />
 var __extends = this.__extends || function (d, b) {
@@ -271,7 +272,7 @@ var Cell = (function () {
 
         // TEMPORARY
         if (type.baseType === "building") {
-            game.eventListener.dispatchEvent({ type: "builtBuilding", data: "" });
+            eventManager.dispatchEvent({ type: "builtBuilding", content: "" });
         }
 
         return this.content;
@@ -283,7 +284,7 @@ var Cell = (function () {
 
         // TEMPORARY
         if (this.content.baseType === "building") {
-            game.eventListener.dispatchEvent({ type: "destroyBuilding", data: "" });
+            eventManager.dispatchEvent({ type: "destroyBuilding", content: "" });
         }
 
         game.layers["content"]._removeChildAt(this.content.sprite, this.gridPos[0] + this.gridPos[1]);
@@ -370,14 +371,14 @@ var WorldRenderer = (function () {
         this.zoomLevel = ZOOM_LEVELS[0];
         this.initContainers(width, height);
         this.initLayers();
+        this.addEventListeners();
     }
-    WorldRenderer.prototype.addEventListeners = function (listener) {
-        this.listener = listener;
+    WorldRenderer.prototype.addEventListeners = function () {
         var self = this;
-        listener.addEventListener("changeZoomLevel", function (event) {
+        eventManager.addEventListener("changeZoomLevel", function (event) {
             self.changeZoomLevel(event.content.zoomLevel);
         });
-        listener.addEventListener("updateWorld", function (event) {
+        eventManager.addEventListener("updateWorld", function (event) {
             self.render();
         });
     };
@@ -443,8 +444,6 @@ var Game = (function () {
     Game.prototype.init = function () {
         this.resize();
 
-        this.eventListener = new PIXI.EventTarget();
-
         this.initContainers();
         this.initTools();
         this.changeTool("grass");
@@ -461,9 +460,7 @@ var Game = (function () {
         this.uiDrawer = new UIDrawer();
 
         this.systemsManager = new SystemsManager(1000);
-        this.systemsManager.addEventListeners(this.eventListener);
         var player = new Player(idGenerator.player++);
-        player.addEventListeners(this.eventListener);
         this.reactUI = new ReactUI(player);
         this.players[player.id] = player;
 
@@ -471,6 +468,7 @@ var Game = (function () {
         this.tools.buy.player = player;
         var profitSystem = new ProfitSystem(1, this.systemsManager, player);
         this.systemsManager.addSystem("profit", profitSystem);
+        this.systemsManager.addSystem("delayedAction", new DelayedActionSystem(1, this.systemsManager));
 
         var dateSystem = new DateSystem(1, this.systemsManager, document.getElementById("date"));
         this.systemsManager.addSystem("date", dateSystem);
@@ -497,7 +495,6 @@ var Game = (function () {
         _stage.addChild(_tooltips);
 
         this.worldRenderer = new WorldRenderer(WORLD_WIDTH, WORLD_HEIGHT);
-        this.worldRenderer.addEventListeners(this.eventListener);
         _main.addChild(this.worldRenderer.worldSprite);
 
         this.initLayers();
@@ -578,7 +575,7 @@ var Game = (function () {
         _canvas.appendChild(this.renderer.view);
     };
     Game.prototype.updateWorld = function () {
-        this.eventListener.dispatchEvent({ type: "updateWorld", content: "" });
+        eventManager.dispatchEvent({ type: "updateWorld", content: "" });
     };
     Game.prototype.resize = function () {
         var container = window.getComputedStyle(document.getElementById("pixi-container"), null);
@@ -1225,9 +1222,13 @@ var BuyTool = (function (_super) {
         this.tintColor = 0x22EE22;
     }
     BuyTool.prototype.onActivate = function (target) {
-        // TODO
-        //this.player.buyCell(target);
-        game.reactUI.makeCellBuyPopup(this.player, target);
+        var self = this;
+        eventManager.dispatchEvent({
+            type: "makeCellBuyPopup", content: {
+                player: self.player,
+                cell: target
+            }
+        });
     };
     return BuyTool;
 })(Tool);

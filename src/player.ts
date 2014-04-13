@@ -33,9 +33,9 @@ class Player
     this.moneySpan.innerHTML = this.money + "$";
     //this.incomeSpan.innerHTML = "+" + this.income + "/s";
   }
-  addEventListeners(listener)
+  addEventListeners()
   {
-    this.eventListener = listener;
+    
   }
 
   addEmployee(employee: Employee)

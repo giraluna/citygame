@@ -2,6 +2,8 @@
 /// <reference path="../../lib/pixi.d.ts" />
 ///
 /// <reference path="../js/player.d.ts" />
+/// <reference path="../js/actions.d.ts" />
+/// <reference path="../js/eventlistener.d.ts" />
 ///
 /// <reference path="js/employeelist.d.ts" />
 /// <reference path="js/employee.d.ts" />
@@ -9,11 +11,10 @@
 /// <reference path="js/popup.d.ts" />
 /// <reference path="js/stage.d.ts" />
 var ReactUI = (function () {
-    function ReactUI(player, listener) {
+    function ReactUI(player) {
         this.idGenerator = 0;
         this.popups = [];
         this.topZIndex = 15;
-        this.eventListener = listener;
         this.player = player;
         this.init();
     }
@@ -23,83 +24,95 @@ var ReactUI = (function () {
     };
     ReactUI.prototype.addEventListeners = function () {
         var self = this;
-        var listener = this.eventListener;
-        listener.addEventListener("makeInfoPopup", function (event) {
-            self.makeInfoPopup(event.content.infoText);
+
+        eventManager.addEventListener("makeInfoPopup", function (event) {
+            self.makeInfoPopup(event.content);
+        });
+        eventManager.addEventListener("makeConfirmPopup", function (event) {
+            self.makeConfirmPopup(event.content);
+        });
+        eventManager.addEventListener("makeCellBuyPopup", function (event) {
+            self.makeCellBuyPopup(event.content);
         });
     };
 
-    ReactUI.prototype.makeInfoPopup = function (infoText) {
-        var self = this;
-        var key = this.idGenerator++;
+    ReactUI.prototype.makePopup = function (props) {
+        var key = props.key;
 
-        var boundDestroyPopup = this.destroyPopup.bind(this, key, null);
         var boundIncrementZIndex = this.incrementZIndex.bind(this);
+        var popup = UIComponents.Popup({
+            key: key,
+            text: props.text || null,
+            content: props.content || null,
+            buttons: props.buttons || null,
+            incrementZIndex: boundIncrementZIndex
+        });
+
+        this.popups.push(popup);
+        this.updateReact();
+    };
+
+    ReactUI.prototype.makeInfoPopup = function (props) {
+        var key = this.idGenerator++;
+        var boundDestroyPopup = this.destroyPopup.bind(this, key, null);
 
         var closeBtn = React.DOM.button({
             onClick: boundDestroyPopup,
             key: "close"
-        }, "close");
+        }, props.okText || "close");
 
-        var popup = UIComponents.Popup({
-            popupText: infoText,
-            content: null,
-            buttons: [closeBtn],
+        this.makePopup({
             key: key,
-            incrementZIndex: boundIncrementZIndex
+            text: props.text,
+            buttons: [closeBtn]
         });
-
-        this.popups.push(popup);
-        this.updateReact();
     };
-    ReactUI.prototype.makeConfirmPopup = function (text, onOk, onCancel) {
+    ReactUI.prototype.makeConfirmPopup = function (props) {
+        ///// DEFAULTS /////
+        props.okText = props.okText || "confirm";
+        props.onCancel = props.onCancel || function () {
+        };
+        props.cancelText = props.cancelText || "cancel";
+
+        var key = this.idGenerator++;
+        var boundDestroyPopup = this.destroyPopup.bind(this, key, null);
+
+        ///// BUTTONS /////
+        var okBtn = React.DOM.button({
+            onClick: function () {
+                props.onOk.call();
+                boundDestroyPopup();
+            },
+            key: "ok"
+        }, props.okText);
+
+        var closeBtn = React.DOM.button({
+            onClick: function () {
+                props.onCancel.call();
+                boundDestroyPopup();
+            },
+            key: "cancel"
+        }, props.cancelText);
+
+        this.makePopup({
+            key: key,
+            text: props.text,
+            buttons: [okBtn, closeBtn]
+        });
+    };
+
+    ReactUI.prototype.makeCellBuyPopup = function (props) {
         var self = this;
+        var player = props.player;
+        var cell = props.cell;
         var key = this.idGenerator++;
 
-        var boundDestroyPopup = this.destroyPopup.bind(this, key, null);
-        var boundIncrementZIndex = this.incrementZIndex.bind(this);
-
-        var okAndDestroy = function () {
-            onOk.call();
-            boundDestroyPopup();
-        };
-        var okBtn = React.DOM.button({
-            onClick: okAndDestroy,
-            key: "confirm"
-        }, "confirm");
-
-        var cancelAndDestroy = function () {
-            onCancel.call();
-            boundDestroyPopup();
-        };
-        var closeBtn = React.DOM.button({
-            onClick: cancelAndDestroy,
-            key: "cancel"
-        }, "cancel");
-
-        var popup = UIComponents.Popup({
-            popupText: text,
-            content: null,
-            buttons: [okBtn, closeBtn],
-            key: key,
-            incrementZIndex: boundIncrementZIndex
-        });
-
-        this.popups.push(popup);
-        this.updateReact();
-    };
-
-    ReactUI.prototype.makeCellBuyPopup = function (player, cell) {
-        var self = this;
-
+        ///// CONTENT /////
         var activeEmployees = player.getActiveEmployees();
-
         if (activeEmployees.length < 1) {
-            self.makeInfoPopup("Recruit some employees first");
+            self.makeInfoPopup({ text: "Recruit some employees first" });
             return;
         }
-
-        var key = this.idGenerator++;
 
         var el = UIComponents.EmployeeList({
             employees: activeEmployees,
@@ -109,22 +122,21 @@ var ReactUI = (function () {
 
         var content = React.DOM.div({ className: "popup-content" }, el, UIComponents.CellInfo({ cell: cell }));
 
+        ///// BUTTONS /////
         var boundDestroyPopup = this.destroyPopup.bind(this, key, null);
-        var boundIncrementZIndex = this.incrementZIndex.bind(this);
 
         var boundBuySelected = function () {
-            if (!self.player.employees[this.state.selected]) {
-                self.makeInfoPopup("No employee selected");
+            if (!player.employees[this.state.selected]) {
+                self.makeInfoPopup({ text: "No employee selected" });
                 return;
             }
-            self.player.buyCell(cell, self.player.employees[this.state.selected]);
+            actions.buyCell(player, cell, player.employees[this.state.selected]);
             boundDestroyPopup();
+            self.updateReact();
         }.bind(el);
 
-        var onOk = boundBuySelected;
-
         var okBtn = React.DOM.button({
-            onClick: onOk,
+            onClick: boundBuySelected,
             key: "ok"
         }, "buy");
 
@@ -133,16 +145,12 @@ var ReactUI = (function () {
             key: "close"
         }, "close");
 
-        var popup = UIComponents.Popup({
-            popupText: "hello",
-            content: content,
-            buttons: [okBtn, closeBtn],
+        this.makePopup({
             key: key,
-            incrementZIndex: boundIncrementZIndex
+            text: "Choose employee",
+            buttons: [okBtn, closeBtn],
+            content: content
         });
-
-        this.popups.push(popup);
-        this.updateReact();
     };
     ReactUI.prototype.incrementZIndex = function () {
         return this.topZIndex++;

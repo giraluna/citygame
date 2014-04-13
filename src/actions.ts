@@ -1,12 +1,12 @@
 /// <reference path="js/employee.d.ts" />
 /// <reference path="js/player.d.ts" />
-/// <reference path="js/eventlisteners.d.ts" />
+/// <reference path="js/eventlistener.d.ts" />
 module actions
 {
-  function buyCell( player: Player, cell, employee: Employee )
+  export function buyCell( player: Player, cell, employee: Employee )
   {
     employee.active = false;
-    cell.sprite.tint = 0xFF0000;
+    
 
     var actionTime = getActionTime(employee.skills["negotiation"], 14);
     var price = cell.landValue;
@@ -17,12 +17,12 @@ module actions
       employee.trainSkill("negotiation");
       if (player.money < price)
       {
-        listeners.UI.dispatchEvent(
+        eventManager.dispatchEvent(
         {
           type: "makeInfoPopup",
           content:
           {
-            infoText: "Not enough funds"
+            text: "Not enough funds"
           }
         })
         return false;
@@ -32,6 +32,8 @@ module actions
       {
         player.addCell(cell);
         player.addMoney(-price);
+        cell.sprite.tint = 0xFF0000;
+        eventManager.dispatchEvent({type: "updateWorld", content: ""});
 
         return true
       }
@@ -43,13 +45,14 @@ module actions
       employee.active = true;
     }.bind(this);
 
-    var onCompleteText = ""
+    var onCompleteText = "Buy cell?";
 
     var completeFN = function()
     {
-      listeners.UI.dispatchEvent(
+      console.log("done");
+      eventManager.dispatchEvent(
         {
-          type: "makeConfirmationPopup",
+          type: "makeConfirmPopup",
           content:
           {
             text: onCompleteText,
@@ -60,10 +63,15 @@ module actions
 
     }.bind(this);
 
-    listeners.UI.dispatchEvent({type: "updateWorld", content:""});
-    listeners.UI.dispatchEvent({type: "delayedAction", content:""})
+    eventManager.dispatchEvent({type: "updateWorld", content:""});
+    eventManager.dispatchEvent({type: "delayedAction", content:
+      {
+        time: actionTime["actual"],
+        onComplete: completeFN
+      }
+    });
   }
-  function getActionTime( skill, baseDuration )
+  export function getActionTime( skill, baseDuration )
   {
     var workRate = 3 / Math.log(skill + 1);
     

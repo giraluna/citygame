@@ -13,7 +13,7 @@ declare class Player {
     constructor(id: number);
     public bindElements(): void;
     public updateElements(): void;
-    public addEventListeners(listener: any): void;
+    public addEventListeners(): void;
     public addEmployee(employee: Employee): void;
     public getActiveEmployees(): any[];
     public addCell(cell: any): void;

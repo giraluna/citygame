@@ -1,6 +1,7 @@
 /// <reference path="../lib/pixi.d.ts" />
 /// <reference path="js/player.d.ts" />
 /// <reference path="js/timer.d.ts" />
+/// <reference path="js/eventlistener.d.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -35,18 +36,18 @@ var SystemsManager = (function () {
     SystemsManager.prototype.init = function () {
         var e = this.entities;
         e.ownedBuildings = [];
+        this.addEventListeners();
     };
     SystemsManager.prototype.addSystem = function (name, system) {
         this.systems[name] = system;
     };
-    SystemsManager.prototype.addEventListeners = function (listener) {
-        this.eventListener = listener;
+    SystemsManager.prototype.addEventListeners = function () {
         var self = this;
-        listener.addEventListener("builtBuilding", function (event) {
+        eventManager.addEventListener("builtBuilding", function (event) {
             // TEMPORARY
             self.entities.ownedBuildings.push("temp");
         });
-        listener.addEventListener("destroyBuilding", function (event) {
+        eventManager.addEventListener("destroyBuilding", function (event) {
             // TEMPORARY
             self.entities.ownedBuildings.pop();
         });
@@ -202,7 +203,17 @@ var DelayedActionSystem = (function (_super) {
         _super.call(this, activationRate, systemsManager.tickNumber);
         this.callbacks = {};
         this.systemsManager = systemsManager;
+        this.addEventListeners();
     }
+    DelayedActionSystem.prototype.addEventListeners = function () {
+        var self = this;
+        eventManager.addEventListener("delayedAction", function (event) {
+            var _e = event.content;
+            self.addAction(self.currTick, _e.time, _e.onComplete);
+            console.log(self);
+        });
+    };
+
     DelayedActionSystem.prototype.addAction = function (currTick, time, action) {
         var actionTime = currTick + time;
         if (!this.callbacks[actionTime]) {
@@ -212,12 +223,14 @@ var DelayedActionSystem = (function (_super) {
     };
 
     DelayedActionSystem.prototype.activate = function (currTick) {
-        var callbacks = this.callbacks[currTick];
+        this.currTick = currTick;
 
-        if (callbacks) {
-            for (var i = 0; i < callbacks; i++) {
-                callbacks[i].call();
+        if (this.callbacks[currTick]) {
+            for (var i = 0; i < this.callbacks[currTick].length; i++) {
+                this.callbacks[currTick][i].call();
             }
+            this.callbacks[currTick] = null;
+            delete this.callbacks[currTick];
         }
     };
     return DelayedActionSystem;

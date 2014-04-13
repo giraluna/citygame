@@ -1,6 +1,7 @@
 /// <reference path="../../lib/pixi.d.ts" />
 /// <reference path="player.d.ts" />
 /// <reference path="timer.d.ts" />
+/// <reference path="eventlistener.d.ts" />
 /**
 * @class SystemsManager
 * @classdesc
@@ -17,7 +18,6 @@
 declare class SystemsManager {
     public systems: any;
     public entities: any;
-    public eventListener: PIXI.EventTarget;
     public timer: Strawb.Timer;
     public tickTime: number;
     public tickNumber: number;
@@ -26,7 +26,7 @@ declare class SystemsManager {
     constructor(tickTime: any);
     public init(): void;
     public addSystem(name: string, system: System): void;
-    public addEventListeners(listener: any): void;
+    public addEventListeners(): void;
     public update(): void;
     public tick(): void;
 }
@@ -78,7 +78,9 @@ declare class DateSystem extends System {
 }
 declare class DelayedActionSystem extends System {
     public callbacks: any;
+    public currTick: number;
     constructor(activationRate: number, systemsManager: SystemsManager);
+    public addEventListeners(): void;
     public addAction(currTick: number, time: number, action: any): void;
     public activate(currTick: number): void;
 }

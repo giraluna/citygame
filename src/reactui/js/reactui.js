@@ -121,7 +121,7 @@ var ReactUI = (function () {
             relevantSkills: ["negotiation"],
             selected: null,
             action: { target: cell, baseDuration: 14, baseCost: cell.landValue },
-            actionText: "Buying this cell would take approximately:"
+            actionText: "Buying this cell would take:"
         });
 
         var content = React.DOM.div({ className: "popup-content" }, ea);

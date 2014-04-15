@@ -379,17 +379,6 @@ class Cell
       this.gridPos[0] + this.gridPos[1]);
     this.content = undefined;
   }
-  buyCell(player: Player)
-  {
-    if (player.money < this.landValue) return;
-    //else if (this.flags.indexOf(player.id) > -1 ) return;
-
-    player.addMoney(-this.landValue);
-
-    console.log(player.money);
-    this.flags.push(player.id);
-    console.log(this.flags);
-  }
 }
 
 class Board

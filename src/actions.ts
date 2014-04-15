@@ -1,18 +1,23 @@
 /// <reference path="js/employee.d.ts" />
 /// <reference path="js/player.d.ts" />
 /// <reference path="js/eventlistener.d.ts" />
+/// <reference path="js/spritehighlighter.d.ts" />
+/// 
 module actions
 {
+  var selectionHighlighterTEMP = new Highlighter();
   export function buyCell( player: Player, cell, employee: Employee )
   {
     employee.active = false;
-    
+
+    var highlightKeyTEMP = "buyCell";
 
     var actionTime = getActionTime([employee.skills["negotiation"]], 14);
-    var price = cell.landValue;
+    var price = getActionCost([employee.skills["negotiation"]], cell.landValue).actual;
 
     var buyCellConfirmFN = function()
     {
+      selectionHighlighterTEMP.stopBlink(highlightKeyTEMP);
       employee.active = true;
       employee.trainSkill("negotiation");
       if (player.money < price)
@@ -42,14 +47,15 @@ module actions
 
     var buyCellCancelFN = function()
     {
+      selectionHighlighterTEMP.stopBlink(highlightKeyTEMP);
       employee.active = true;
     }.bind(this);
 
-    var onCompleteText = "Buy cell?";
+    var onCompleteText = "Buy cell for " + price + "$ ?";
 
     var completeFN = function()
     {
-      console.log("done");
+      selectionHighlighterTEMP.blinkCells([cell], 0xFF0080, 600, highlightKeyTEMP);
       eventManager.dispatchEvent(
         {
           type: "makeConfirmPopup",

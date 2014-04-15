@@ -70,7 +70,6 @@ declare class Cell {
     public updateCell(): void;
     public addContent(type: any, data?: any): Content;
     public removeContent(): void;
-    public buyCell(player: Player): void;
 }
 declare class Board {
     public width: number;

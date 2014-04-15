@@ -131,7 +131,7 @@ function getTileScreenPosition(x: number, y:number, tileSize: number[], worldSiz
 
 function randInt(min, max)
 {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+  return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
 function randRange(min, max)

@@ -271,7 +271,6 @@ class DelayedActionSystem extends System
     {
       var _e = event.content;
       self.addAction(self.lastTick, _e.time, _e.onComplete);
-      console.log(self);
     });
   }
 

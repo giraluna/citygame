@@ -210,7 +210,6 @@ var DelayedActionSystem = (function (_super) {
         eventManager.addEventListener("delayedAction", function (event) {
             var _e = event.content;
             self.addAction(self.lastTick, _e.time, _e.onComplete);
-            console.log(self);
         });
     };
 

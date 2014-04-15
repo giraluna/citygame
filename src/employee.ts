@@ -194,7 +194,7 @@ class Employee
 
     for (var skill in skills)
     {
-      skills[skill] = Math.round(randInt(min, max));
+      skills[skill] = randInt(min, max);
     }
     return skills;
   }

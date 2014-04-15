@@ -78,7 +78,6 @@ declare class DateSystem extends System {
 }
 declare class DelayedActionSystem extends System {
     public callbacks: any;
-    public currTick: number;
     constructor(activationRate: number, systemsManager: SystemsManager);
     public addEventListeners(): void;
     public addAction(currTick: number, time: number, action: any): void;

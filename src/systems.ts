@@ -256,7 +256,6 @@ class DateSystem extends System
 class DelayedActionSystem extends System
 {
   callbacks: any = {};
-  currTick: number;
 
   constructor(activationRate: number, systemsManager: SystemsManager)
   {
@@ -271,7 +270,7 @@ class DelayedActionSystem extends System
     eventManager.addEventListener("delayedAction", function(event)
     {
       var _e = event.content;
-      self.addAction(self.currTick, _e.time, _e.onComplete);
+      self.addAction(self.lastTick, _e.time, _e.onComplete);
       console.log(self);
     });
   }
@@ -288,7 +287,6 @@ class DelayedActionSystem extends System
 
   activate(currTick: number)
   {
-    this.currTick = currTick;
 
     if (this.callbacks[currTick])
     {

@@ -3,7 +3,11 @@
 /// <reference path="eventlistener.d.ts" />
 declare module actions {
     function buyCell(player: Player, cell: any, employee: Employee): void;
-    function getActionTime(skill: any, baseDuration: any): {
+    function getActionTime(skills: number[], base: number): {
+        approximate: number;
+        actual: number;
+    };
+    function getActionCost(skills: number[], base: number): {
         approximate: number;
         actual: number;
     };

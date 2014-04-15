@@ -8,7 +8,7 @@ module actions
     employee.active = false;
     
 
-    var actionTime = getActionTime(employee.skills["negotiation"], 14);
+    var actionTime = getActionTime([employee.skills["negotiation"]], 14);
     var price = cell.landValue;
 
     var buyCellConfirmFN = function()
@@ -71,17 +71,38 @@ module actions
       }
     });
   }
-  export function getActionTime( skill, baseDuration )
+  function getSkillAdjust( skills: number[], base: number, adjustFN, variance: number)
   {
-    var workRate = 3 / Math.log(skill + 1);
+    var avgSkill = skills.reduce(function(a, b){return a+b}) / skills.length;
+    var workRate = adjustFN ? adjustFN(avgSkill) : 2 / Math.log(avgSkill + 1);
     
-    var approximate = Math.round(baseDuration * workRate);
-    var actual = Math.round(approximate + randRange(-2, 2));
+    var approximate = Math.round(base * workRate);
+    var actual = Math.round(approximate +
+      randRange(-base * variance, base * variance) );
 
     return(
     {
       approximate: approximate,
       actual: actual < 1 ? 1 : actual
     });
+  }
+  export function getActionTime( skills: number[], base: number )
+  {
+    return getSkillAdjust(
+      skills,
+      base,
+      function actionTimeAdjustFN(avgSkill){return 2 / Math.log(avgSkill + 1);},
+      0.25
+    );
+  }
+
+  export function getActionCost( skills: number[], base: number )
+  {
+    return getSkillAdjust(
+      skills,
+      base,
+      function actionTimeAdjustFN(avgSkill){return 2 / Math.log(avgSkill + 3);},
+      0.25
+    );
   }
 }

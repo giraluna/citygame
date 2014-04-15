@@ -171,7 +171,14 @@ class ReactUI
     var content = React.DOM.div(
       {className: "popup-content"},
       el,
-      UIComponents.CellInfo({cell: cell})
+      React.DOM.div(
+        null,
+        UIComponents.CellInfo({cell: cell}),
+        UIComponents.ActionInfo(
+        {
+          action: "buyCell",
+        })
+      )
     );
 
     ///// BUTTONS /////

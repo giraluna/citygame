@@ -209,7 +209,7 @@ var DelayedActionSystem = (function (_super) {
         var self = this;
         eventManager.addEventListener("delayedAction", function (event) {
             var _e = event.content;
-            self.addAction(self.currTick, _e.time, _e.onComplete);
+            self.addAction(self.lastTick, _e.time, _e.onComplete);
             console.log(self);
         });
     };
@@ -223,8 +223,6 @@ var DelayedActionSystem = (function (_super) {
     };
 
     DelayedActionSystem.prototype.activate = function (currTick) {
-        this.currTick = currTick;
-
         if (this.callbacks[currTick]) {
             for (var i = 0; i < this.callbacks[currTick].length; i++) {
                 this.callbacks[currTick][i].call();

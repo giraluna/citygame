@@ -178,7 +178,9 @@ var Employee = (function () {
             return;
         else {
             var rand = Math.random();
-            if (rand + this.growth[skill] > 1) {
+
+            var adjustedGrowth = this.growth[skill] * (1 / Math.log(this.skills[skill] + 0.5));
+            if (rand + adjustedGrowth > 1) {
                 this.skills[skill]++;
                 this.skillTotal++;
             }

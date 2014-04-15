@@ -1,7 +1,7 @@
 /// <reference path="../../lib/react.d.ts" />
 ///
 /// <reference path="js/employee.d.ts" />
-/// <reference path="js/newemployeelist.d.ts" />
+/// <reference path="js/employeelist.d.ts" />
 /// <reference path="js/actioninfo.d.ts" />
 /// 
 /// <reference path="../js/actions.d.ts" />
@@ -10,9 +10,9 @@ module UIComponents
 {
   /**
    * props:
-   * player 
-   * relevant skill
-   * 
+   * employees
+   * relevantSkills
+   * actionText
    * 
    *
    * state:
@@ -21,6 +21,7 @@ module UIComponents
    * {
    *   target
    *   base action duration
+   *   base action cost
    * }
    * }
    */
@@ -41,7 +42,7 @@ export var EmployeeAction = React.createClass({
     return(
     {
       selected: null,
-      action: null
+      action: this.props.action
     });
   },
 
@@ -69,22 +70,24 @@ export var EmployeeAction = React.createClass({
 
     var selectedAction = this.state.action;
 
-
     var el = UIComponents.EmployeeList(
     {
       employees: this.props.employees,
       relevantSkills: this.props.relevantSkills,
       selected: this.state.selected,
-      handleSelectRow: this.handleSelectRow.bind(this)
+      handleSelectRow: this.handleSelectRow
     });
 
     var data = <any> {};
 
-    data.target = selectedAction.target;
+    if (selectedAction)
+    {
+      data.target = selectedAction.target;
+    }
 
     if (selectedEmployee)
     {
-      var skills = this.props.relevantSkills.filter(function(skill)
+      var skills = this.props.relevantSkills.map(function(skill)
       {
         return selectedEmployee.skills[skill];
       });
@@ -92,18 +95,17 @@ export var EmployeeAction = React.createClass({
       data.selectedEmployee = selectedEmployee;
 
       data.approxTime = selectedAction.baseDuration ? 
-        actions.getActionTime(skills, selectedAction.baseDuration) : null;
+        actions.getActionTime(skills, selectedAction.baseDuration).approximate : null;
       data.approxCost = selectedAction.baseCost ? 
-        actions.getActionTime(skills, selectedAction.baseCost) : null;
+        actions.getActionTime(skills, selectedAction.baseCost).approximate : null;
 
     }
 
-    var actionInfo = UIComponents.ActionInfo({data: data, text: "lol"});
+    var actionInfo = UIComponents.ActionInfo({data: data, text: this.props.actionText});
 
     return (
-      el,
-      React.DOM.div(
-        null,
+      React.DOM.div(null,
+        el,
         actionInfo
       )
     );

@@ -6,6 +6,7 @@
 /// <reference path="player.d.ts" />
 /// <reference path="systems.d.ts" />
 /// <reference path="eventlistener.d.ts" />
+/// <reference path="spritehighlighter.d.ts" />
 /// <reference path="utility.d.ts" />
 declare var cg: any;
 declare var arrayLogic: any;
@@ -186,12 +187,6 @@ declare class UIDrawer {
     public makeCellPopup(cell: Cell, container: PIXI.DisplayObjectContainer): void;
     public makeFadeyPopup(pos: number[], drift: number[], lifeTime: number, content: any, easing?: (k: number) => number): void;
     public clearLayer(): void;
-}
-declare class Highlighter {
-    public currHighlighted: Sprite[];
-    public tintSprites(sprites: Sprite[], color: number): void;
-    public clearSprites(): void;
-    public tintCells(cells: Cell[], color: number): void;
 }
 declare class Tool {
     public selectType: any;

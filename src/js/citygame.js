@@ -8,6 +8,7 @@
 /// <reference path="js/player.d.ts" />
 /// <reference path="js/systems.d.ts" />
 /// <reference path="js/eventlistener.d.ts" />
+/// <reference path="js/spritehighlighter.d.ts" />
 ///
 /// <reference path="js/utility.d.ts" />
 var __extends = this.__extends || function (d, b) {
@@ -561,7 +562,7 @@ var Game = (function () {
         //recruit
         var recruitBtn = document.getElementById("recruitBtn");
         recruitBtn.addEventListener("click", function () {
-            game.players["player0"].addEmployee(new Employee(idGenerator.player++, TEMPNAMES, { skillLevel: 1, growthLevel: 1 }));
+            game.players["player0"].addEmployee(new Employee(idGenerator.player++, TEMPNAMES, { skillLevel: Math.random(), growthLevel: Math.random() }));
         });
 
         //renderer
@@ -1057,37 +1058,6 @@ var UIDrawer = (function () {
         }
     };
     return UIDrawer;
-})();
-
-var Highlighter = (function () {
-    function Highlighter() {
-        this.currHighlighted = [];
-    }
-    Highlighter.prototype.tintSprites = function (sprites, color) {
-        for (var i = 0; i < sprites.length; i++) {
-            var _sprite = sprites[i];
-            _sprite.tint = color;
-            this.currHighlighted.push(sprites[i]);
-        }
-    };
-    Highlighter.prototype.clearSprites = function () {
-        for (var i = 0; i < this.currHighlighted.length; i++) {
-            var _sprite = this.currHighlighted[i];
-            _sprite.tint = 0xFFFFFF;
-        }
-        this.currHighlighted = [];
-    };
-    Highlighter.prototype.tintCells = function (cells, color) {
-        var _sprites = [];
-        for (var i = 0; i < cells.length; i++) {
-            _sprites.push(cells[i].sprite);
-            if (cells[i].content !== undefined) {
-                _sprites.push(cells[i].content.sprite);
-            }
-        }
-        this.tintSprites(_sprites, color);
-    };
-    return Highlighter;
 })();
 
 /*

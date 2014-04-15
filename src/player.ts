@@ -42,6 +42,16 @@ class Player
   {
     this.employees[employee.id] = employee;
   }
+  getEmployees()
+  {
+    var employees = [];
+    for (var employee in this.employees)
+    {
+     employees.push(this.employees[employee]);
+    };
+
+    return employees;
+  }
   getActiveEmployees()
   {
     var active = [];

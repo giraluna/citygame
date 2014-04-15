@@ -25,6 +25,15 @@ var Player = (function () {
     Player.prototype.addEmployee = function (employee) {
         this.employees[employee.id] = employee;
     };
+    Player.prototype.getEmployees = function () {
+        var employees = [];
+        for (var employee in this.employees) {
+            employees.push(this.employees[employee]);
+        }
+        ;
+
+        return employees;
+    };
     Player.prototype.getActiveEmployees = function () {
         var active = [];
         for (var employee in this.employees) {

@@ -6,6 +6,8 @@
 /// <reference path="employeelist.d.ts" />
 /// <reference path="employee.d.ts" />
 /// <reference path="cellinfo.d.ts" />
+/// <reference path="employeeaction.d.ts" />
+/// <reference path="actioninfo.d.ts" />
 /// <reference path="popup.d.ts" />
 /// <reference path="stage.d.ts" />
 declare class ReactUI {
@@ -35,6 +37,10 @@ declare class ReactUI {
         cancelText?: string;
     }): void;
     public makeCellBuyPopup(props: {
+        player: Player;
+        cell: any;
+    }): void;
+    public makeCellBuyPopupOld(props: {
         player: Player;
         cell: any;
     }): void;

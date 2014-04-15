@@ -4,20 +4,6 @@
 var UIComponents;
 (function (UIComponents) {
     UIComponents.EmployeeList = React.createClass({
-        getInitialState: function () {
-            return ({
-                selected: null
-            });
-        },
-        handleSelectRow: function (key, employee) {
-            if (employee.active !== true)
-                return;
-            else {
-                this.setState({
-                    selected: key
-                });
-            }
-        },
         render: function () {
             var self = this;
             var rows = [];
@@ -36,19 +22,18 @@ var UIComponents;
 
             this.props.employees.forEach(function (employee) {
                 var key = employee.id;
-                var boundSelect = self.handleSelectRow.bind(self, key, employee);
 
                 var employeeProps = {
                     key: key,
                     employee: employee,
                     relevantSkills: self.props.relevantSkills,
                     rowProps: {
-                        onClick: boundSelect,
+                        onClick: self.props.handleSelectRow.bind(null, key, employee),
                         className: "employee active"
                     }
                 };
 
-                if (self.state.selected === key) {
+                if (self.props.selected && self.props.selected.key === key) {
                     employeeProps.rowProps["className"] = "employee selected";
                 } else if (employee.active === false) {
                     employeeProps.rowProps["className"] = "employee inactive";

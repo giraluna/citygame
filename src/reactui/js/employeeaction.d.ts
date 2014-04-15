@@ -1,14 +1,14 @@
 /// <reference path="../../../lib/react.d.ts" />
 /// <reference path="employee.d.ts" />
-/// <reference path="newemployeelist.d.ts" />
+/// <reference path="employeelist.d.ts" />
 /// <reference path="actioninfo.d.ts" />
 /// <reference path="../../js/actions.d.ts" />
 declare module UIComponents {
     /**
     * props:
-    * player
-    * relevant skill
-    *
+    * employees
+    * relevantSkills
+    * actionText
     *
     *
     * state:
@@ -17,6 +17,7 @@ declare module UIComponents {
     * {
     *   target
     *   base action duration
+    *   base action cost
     * }
     * }
     */

@@ -7,31 +7,12 @@ module UIComponents
   
 export var EmployeeList = React.createClass({
 
-  getInitialState: function()
-  {
-    return(
-    {
-      selected: null
-    });
-  },
-
-  handleSelectRow: function(key, employee)
-  {
-    if (employee.active !== true) return;
-    else
-    {
-      this.setState(
-      {
-        selected: key
-      });
-    }
-  },
-
   render: function()
   {
     var self = this;
     var rows = [];
     var skillColumns = [];
+
 
     for (var skill in this.props.employees[0].skills)
     {
@@ -50,7 +31,6 @@ export var EmployeeList = React.createClass({
     this.props.employees.forEach(function(employee)
     {
       var key = employee.id;
-      var boundSelect = self.handleSelectRow.bind(self, key, employee);
 
       var employeeProps =
       {
@@ -59,12 +39,12 @@ export var EmployeeList = React.createClass({
         relevantSkills: self.props.relevantSkills,
         rowProps:
         {
-          onClick: boundSelect,
+          onClick: self.props.handleSelectRow.bind(null, key, employee),
           className: "employee active"
         }
       };
 
-      if (self.state.selected === key)
+      if (self.props.selected && self.props.selected.key === key)
       {
         employeeProps.rowProps["className"] = "employee selected";
       }

@@ -8,6 +8,8 @@
 /// <reference path="js/employeelist.d.ts" />
 /// <reference path="js/employee.d.ts" />
 /// <reference path="js/cellinfo.d.ts" />
+/// <reference path="js/employeeaction.d.ts" />
+/// <reference path="js/actioninfo.d.ts" />
 /// <reference path="js/popup.d.ts" />
 /// <reference path="js/stage.d.ts" />
 
@@ -142,6 +144,76 @@ class ReactUI
   }
 
   makeCellBuyPopup(props:
+  {
+    player: Player;
+    cell;
+  })
+  {
+    var self = this;
+    var player = props.player;
+    var cell = props.cell;
+    var key = this.idGenerator++;
+
+    ///// CONTENT /////
+
+    var activeEmployees = player.getEmployees();
+    if (activeEmployees.length < 1)
+    {
+      self.makeInfoPopup({text: "Recruit some employees first"});
+      return;
+    }
+
+    var ea = UIComponents.EmployeeAction(
+      {
+        employees: activeEmployees,
+        relevantSkills: ["negotiation"],
+        selected: null,
+        action: {target: cell, baseDuration: 14, baseCost: cell.landValue},
+        actionText: "Buying this cell would take approximately:"
+      });
+
+    var content = React.DOM.div(
+      {className: "popup-content"},
+      ea
+    );
+
+    ///// BUTTONS /////
+    var boundDestroyPopup = this.destroyPopup.bind(this, key, null);
+
+    var boundBuySelected = function()
+    {
+      if (!player.employees[this.state.selected.key])
+      {
+        self.makeInfoPopup({text: "No employee selected"});
+        return;
+      }
+      actions.buyCell( player, cell, player.employees[this.state.selected.key]);
+      boundDestroyPopup();
+      self.updateReact();
+    }.bind(ea);
+
+    var okBtn = React.DOM.button(
+    {
+      onClick: boundBuySelected,
+      key: "ok"
+    }, "buy");
+
+    var closeBtn = React.DOM.button(
+    {
+      onClick: boundDestroyPopup,
+      key: "close"
+    }, "close");
+
+    this.makePopup(
+    {
+      key: key,
+      text: "Choose employee",
+      buttons: [okBtn, closeBtn],
+      content: content
+    });
+  }
+
+  makeCellBuyPopupOld(props:
   {
     player: Player;
     cell;

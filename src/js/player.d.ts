@@ -15,6 +15,7 @@ declare class Player {
     public updateElements(): void;
     public addEventListeners(): void;
     public addEmployee(employee: Employee): void;
+    public getEmployees(): any[];
     public getActiveEmployees(): any[];
     public addCell(cell: any): void;
     public removeCell(cell: any): void;

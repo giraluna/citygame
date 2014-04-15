@@ -13,13 +13,20 @@ module UIComponents
 export var ActionInfo = React.createClass({
   render: function()
   {
+    var textSpan = this.props.text ?
+      [React.DOM.span(null, this.props.text), React.DOM.br(null)] :
+      null;
+    var timeSpan = this.props.data.approxTime ?
+      [React.DOM.span(null, "~" + this.props.data.approxTime + " days"), React.DOM.br(null)] :
+      null;
+    var costSpan = this.props.data.approxCost ?
+      [React.DOM.span(null, "~" + this.props.data.approxCost + "$"), React.DOM.br(null)] :
+      null;
     return(
       React.DOM.div( {className:"action-info"}, 
-        React.DOM.span(null, this.props.text || null),
-        React.DOM.br(null),
-        React.DOM.span(null, this.props.data.approxTime || null + " days"),
-        React.DOM.br(null),
-        React.DOM.span(null, this.props.data.approxCost || null + "$")
+        textSpan,
+        timeSpan,
+        costSpan
       )
     );
   }

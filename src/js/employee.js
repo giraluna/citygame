@@ -147,7 +147,7 @@ var Employee = (function () {
         var max = 16 * skillLevel + 2;
 
         for (var skill in skills) {
-            skills[skill] = randInt(min, max);
+            skills[skill] = Math.round(randInt(min, max));
         }
         return skills;
     };

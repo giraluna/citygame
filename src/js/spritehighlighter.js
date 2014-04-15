@@ -6,7 +6,7 @@ var Highlighter = (function () {
     function Highlighter() {
         this.currHighlighted = [];
         this.blinkGroups = {};
-        this.intervalIdGenerator = 0;
+        this.idGenerator = 0;
         this.blinkIntervals = {};
     }
     Highlighter.prototype.tintSprites = function (sprites, color) {
@@ -21,7 +21,6 @@ var Highlighter = (function () {
             var _sprite = this.currHighlighted[i];
             _sprite.tint = 0xFFFFFF;
         }
-        console.log(this.currHighlighted);
         this.currHighlighted = [];
     };
     Highlighter.prototype.tintCells = function (cells, color) {
@@ -34,38 +33,53 @@ var Highlighter = (function () {
         }
         this.tintSprites(_sprites, color);
     };
+    Highlighter.prototype.tintByBlinkKey = function (key, color) {
+        var cells = [];
+        for (var cell in this.blinkGroups[key]) {
+            cells = cells.concat(this.blinkGroups[key][cell]);
+        }
+        this.tintCells(cells, color);
+    };
 
-    Highlighter.prototype.blinkCells = function (cells, color, delay, key) {
-        var key = key || "" + this.intervalIdGenerator++;
+    Highlighter.prototype.blinkCells = function (cells, color, delay, groupKey, id) {
+        var id = id || "" + this.idGenerator++;
 
         // create new group if it doesn't exist
-        if (!this.blinkGroups[key])
-            this.blinkGroups[key] = [];
+        if (!this.blinkGroups[groupKey])
+            this.blinkGroups[groupKey] = {};
 
         // add new cells to group
-        var toBlink = this.blinkGroups[key].concat(cells);
+        this.blinkGroups[groupKey][id] = cells;
 
         // return if interval is already active
-        if (this.blinkIntervals[key])
-            return key;
+        if (this.blinkIntervals[groupKey])
+            return groupKey;
 
-        var blinkFunctions = [this.tintCells.bind(this, toBlink, color), this.clearSprites.bind(this)];
+        var blinkFunctions = [this.tintByBlinkKey.bind(this, groupKey, color), this.clearSprites.bind(this)];
         var blinkCellsFN = function () {
             blinkFunctions[0].call();
             blinkFunctions[blinkFunctions.length - 1] = blinkFunctions.shift();
             eventManager.dispatchEvent({ type: "updateWorld", content: "" });
         };
 
-        this.blinkIntervals[key] = window.setInterval(blinkCellsFN, delay);
+        this.blinkIntervals[groupKey] = window.setInterval(blinkCellsFN, delay);
 
-        return key;
+        return id;
     };
 
-    Highlighter.prototype.stopBlink = function (key) {
-        window.clearTimeout(this.blinkIntervals[key]);
-        delete this.blinkIntervals[key];
+    Highlighter.prototype.removeSingleBlink = function (group, id) {
+        delete this.blinkGroups[group][id];
+        if (Object.keys(this.blinkGroups[group]).length <= 0) {
+            this.stopBlink(group);
+        }
+    };
+
+    Highlighter.prototype.stopBlink = function (group) {
+        window.clearTimeout(this.blinkIntervals[group]);
+        delete this.blinkIntervals[group];
 
         this.clearSprites();
+        this.blinkGroups[group] = [];
         eventManager.dispatchEvent({ type: "updateWorld", content: "" });
     };
 

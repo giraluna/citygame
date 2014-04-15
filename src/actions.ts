@@ -11,13 +11,14 @@ module actions
     employee.active = false;
 
     var highlightKeyTEMP = "buyCell";
+    var blinkerId = "" + selectionHighlighterTEMP.idGenerator++;
 
     var actionTime = getActionTime([employee.skills["negotiation"]], 14);
     var price = getActionCost([employee.skills["negotiation"]], cell.landValue).actual;
 
     var buyCellConfirmFN = function()
     {
-      selectionHighlighterTEMP.stopBlink(highlightKeyTEMP);
+      selectionHighlighterTEMP.removeSingleBlink(highlightKeyTEMP, blinkerId);
       employee.active = true;
       employee.trainSkill("negotiation");
       if (player.money < price)
@@ -47,15 +48,15 @@ module actions
 
     var buyCellCancelFN = function()
     {
-      selectionHighlighterTEMP.stopBlink(highlightKeyTEMP);
+      selectionHighlighterTEMP.removeSingleBlink(highlightKeyTEMP, blinkerId);
       employee.active = true;
     }.bind(this);
 
-    var onCompleteText = "Buy cell for " + price + "$ ?";
+    var onCompleteText = "Buy plot for " + price + "$ ?";
 
     var completeFN = function()
     {
-      selectionHighlighterTEMP.blinkCells([cell], 0xFF0080, 600, highlightKeyTEMP);
+      selectionHighlighterTEMP.blinkCells([cell], 0x84007D, 600, highlightKeyTEMP, blinkerId);
       eventManager.dispatchEvent(
         {
           type: "makeConfirmPopup",

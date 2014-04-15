@@ -18,7 +18,7 @@ declare var arrayLogic: any;
 
 cg = JSON.parse(JSON.stringify(cg)); //dumb
 
-var container;
+//var container;
 var SCREEN_WIDTH = 720,
     SCREEN_HEIGHT = 480,
     TILE_WIDTH = 64,

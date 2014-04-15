@@ -9,7 +9,7 @@ class Highlighter
 
   blinkGroups: any = {};
 
-  intervalIdGenerator: number = 0;
+  idGenerator: number = 0;
   blinkIntervals: any = {};
 
   tintSprites(sprites: PIXI.Sprite[], color: number)
@@ -28,7 +28,6 @@ class Highlighter
       var _sprite = this.currHighlighted[i];
       _sprite.tint = 0xFFFFFF;
     }
-    console.log(this.currHighlighted);
     this.currHighlighted = [];
   }
   tintCells(cells: any[], color: number)
@@ -44,19 +43,29 @@ class Highlighter
     }
     this.tintSprites(_sprites, color);
   }
-
-  blinkCells(cells: any[], color: number, delay: number, key: string)
+  tintByBlinkKey(key: string, color: number)
   {
-    var key = key || "" + this.intervalIdGenerator++;
+    var cells = [];
+    for (var cell in this.blinkGroups[key])
+    {
+      cells = cells.concat(this.blinkGroups[key][cell]);
+    }
+    this.tintCells(cells, color);
+  }
+
+  blinkCells(cells: any[], color: number, delay: number, groupKey: string, id?: string)
+  {
+    var id = id || "" + this.idGenerator++;
 
     // create new group if it doesn't exist
-    if (!this.blinkGroups[key]) this.blinkGroups[key] = [];
+    if (!this.blinkGroups[groupKey]) this.blinkGroups[groupKey] = {};
     // add new cells to group
-    var toBlink = this.blinkGroups[key].concat(cells);
+    this.blinkGroups[groupKey][id] = cells;
+    
     // return if interval is already active
-    if (this.blinkIntervals[key]) return key;
+    if (this.blinkIntervals[groupKey]) return groupKey;
 
-    var blinkFunctions = [this.tintCells.bind(this, toBlink, color), this.clearSprites.bind(this)];
+    var blinkFunctions = [this.tintByBlinkKey.bind(this, groupKey, color), this.clearSprites.bind(this)];
     var blinkCellsFN = function()
     {
       blinkFunctions[0].call();
@@ -64,17 +73,27 @@ class Highlighter
       eventManager.dispatchEvent({type: "updateWorld", content: ""});
     }
 
-    this.blinkIntervals[key] = window.setInterval(blinkCellsFN, delay);
+    this.blinkIntervals[groupKey] = window.setInterval(blinkCellsFN, delay);
 
-    return key;
+    return id;
   }
 
-  stopBlink(key: string)
+  removeSingleBlink(group: string, id: string)
   {
-    window.clearTimeout( this.blinkIntervals[key] );
-    delete this.blinkIntervals[key];
+    delete this.blinkGroups[group][id];
+    if (Object.keys(this.blinkGroups[group]).length <= 0)
+    {
+      this.stopBlink(group);
+    }
+  }
+
+  stopBlink(group: string)
+  {
+    window.clearTimeout( this.blinkIntervals[group] );
+    delete this.blinkIntervals[group];
 
     this.clearSprites();
+    this.blinkGroups[group] = [];
     eventManager.dispatchEvent({type: "updateWorld", content: ""});
   }
 

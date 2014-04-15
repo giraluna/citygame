@@ -20,7 +20,7 @@ var __extends = this.__extends || function (d, b) {
 
 cg = JSON.parse(JSON.stringify(cg)); //dumb
 
-var container;
+//var container;
 var SCREEN_WIDTH = 720, SCREEN_HEIGHT = 480, TILE_WIDTH = 64, TILE_HEIGHT = 32, TILES = 32, WORLD_WIDTH = TILES * TILE_WIDTH, WORLD_HEIGHT = TILES * TILE_HEIGHT, ZOOM_LEVELS = [1];
 
 var idGenerator = {

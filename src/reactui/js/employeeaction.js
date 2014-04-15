@@ -79,7 +79,7 @@ var UIComponents;
                 data.selectedEmployee = selectedEmployee;
 
                 data.approxTime = selectedAction.baseDuration ? actions.getActionTime(skills, selectedAction.baseDuration).approximate : null;
-                data.approxCost = selectedAction.baseCost ? actions.getActionTime(skills, selectedAction.baseCost).approximate : null;
+                data.approxCost = selectedAction.baseCost ? actions.getActionCost(skills, selectedAction.baseCost).approximate : null;
             }
 
             var actionInfo = UIComponents.ActionInfo({ data: data, text: this.props.actionText });

@@ -101,7 +101,7 @@ module actions
     return getSkillAdjust(
       skills,
       base,
-      function actionTimeAdjustFN(avgSkill){return 2 / Math.log(avgSkill + 3);},
+      function actionCostAdjustFN(avgSkill){return 2 / Math.log(avgSkill + 3);},
       0.25
     );
   }

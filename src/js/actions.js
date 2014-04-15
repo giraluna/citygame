@@ -79,7 +79,7 @@ var actions;
     actions.getActionTime = getActionTime;
 
     function getActionCost(skills, base) {
-        return getSkillAdjust(skills, base, function actionTimeAdjustFN(avgSkill) {
+        return getSkillAdjust(skills, base, function actionCostAdjustFN(avgSkill) {
             return 2 / Math.log(avgSkill + 3);
         }, 0.25);
     }

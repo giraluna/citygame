@@ -97,7 +97,7 @@ export var EmployeeAction = React.createClass({
       data.approxTime = selectedAction.baseDuration ? 
         actions.getActionTime(skills, selectedAction.baseDuration).approximate : null;
       data.approxCost = selectedAction.baseCost ? 
-        actions.getActionTime(skills, selectedAction.baseCost).approximate : null;
+        actions.getActionCost(skills, selectedAction.baseCost).approximate : null;
 
     }
 

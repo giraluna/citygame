@@ -8,6 +8,7 @@
 /// <reference path="js/player.d.ts" />
 /// <reference path="js/systems.d.ts" />
 /// <reference path="js/eventlistener.d.ts" />
+/// <reference path="js/spritehighlighter.d.ts" />
 /// 
 /// <reference path="js/utility.d.ts" />
 
@@ -715,7 +716,7 @@ class Game
       recruitBtn.addEventListener("click", function()
       {
         game.players["player0"].addEmployee(
-          new Employee(idGenerator.player++, TEMPNAMES, {skillLevel: 1, growthLevel: 1}));
+          new Employee(idGenerator.player++, TEMPNAMES, {skillLevel: Math.random(), growthLevel: Math.random()}));
       });
 
       //renderer
@@ -1354,42 +1355,6 @@ class UIDrawer
     {
       this.layer.removeChild(this.layer.children[i]);
     }
-  }
-}
-
-class Highlighter
-{
-  currHighlighted: Sprite[] = [];
-  tintSprites(sprites: Sprite[], color: number)
-  {
-    for (var i = 0; i < sprites.length; i++)
-    {
-      var _sprite = sprites[i];
-      _sprite.tint = color;
-      this.currHighlighted.push( sprites[i] );
-    }
-  }
-  clearSprites()
-  {
-    for (var i = 0; i < this.currHighlighted.length; i++)
-    {
-      var _sprite = this.currHighlighted[i];
-      _sprite.tint = 0xFFFFFF;
-    }
-    this.currHighlighted = [];
-  }
-  tintCells(cells: Cell[], color: number)
-  {
-    var _sprites = [];
-    for (var i = 0; i < cells.length; i++)
-    {
-      _sprites.push(cells[i].sprite);
-      if (cells[i].content !== undefined)
-      {
-        _sprites.push(cells[i].content.sprite);
-      }
-    }
-    this.tintSprites(_sprites, color);
   }
 }
 

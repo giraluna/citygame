@@ -102,118 +102,97 @@ var ReactUI = (function () {
             buttons: [okBtn, closeBtn]
         });
     };
+    ReactUI.prototype.makeEmployeeActionPopup = function (props) {
+        ///// DEFAULTS /////
+        props.text = props.text || "Choose employee";
+        props.okText = props.okText || "Confirm";
+        props.onCancel = props.onCancel || function () {
+        };
+        props.cancelText = props.cancelText || "Cancel";
 
-    ReactUI.prototype.makeCellBuyPopup = function (props) {
+        props.action = props.action || {};
+
         var self = this;
         var player = props.player;
-        var cell = props.cell;
         var key = this.idGenerator++;
+        var boundDestroyPopup = this.destroyPopup.bind(this, key, null);
 
         ///// CONTENT /////
         var activeEmployees = player.getEmployees();
         if (activeEmployees.length < 1) {
-            self.makeInfoPopup({ text: "Recruit some employees first" });
+            this.makeInfoPopup({ text: "Recruit some employees first" });
             return;
         }
 
         var ea = UIComponents.EmployeeAction({
             employees: activeEmployees,
-            relevantSkills: ["negotiation"],
+            relevantSkills: props.relevantSkills,
             selected: null,
-            action: { target: cell, baseDuration: 14, baseCost: cell.landValue },
-            actionText: "Buying this cell would take:"
+            action: props.action,
+            actionText: props.action.actionText
         });
 
         var content = React.DOM.div({ className: "popup-content" }, ea);
 
         ///// BUTTONS /////
-        var boundDestroyPopup = this.destroyPopup.bind(this, key, null);
-
-        var boundBuySelected = function () {
-            if (!player.employees[this.state.selected.key]) {
-                self.makeInfoPopup({ text: "No employee selected" });
-                return;
-            }
-            actions.buyCell(player, cell, player.employees[this.state.selected.key]);
-            boundDestroyPopup();
-            self.updateReact();
-        }.bind(ea);
-
         var okBtn = React.DOM.button({
-            onClick: boundBuySelected,
+            onClick: function () {
+                if (!player.employees[this.state.selected.key]) {
+                    self.makeInfoPopup({ text: "No employee selected" });
+                    return;
+                } else {
+                    props.onOk.call(ea);
+                    boundDestroyPopup();
+                }
+            }.bind(ea),
             key: "ok"
-        }, "buy");
+        }, props.okText);
 
         var closeBtn = React.DOM.button({
-            onClick: boundDestroyPopup,
-            key: "close"
-        }, "close");
+            onClick: function () {
+                props.onCancel.call(ea);
+                boundDestroyPopup();
+            }.bind(ea),
+            key: "cancel"
+        }, props.cancelText);
 
         this.makePopup({
             key: key,
-            text: "Choose employee",
-            buttons: [okBtn, closeBtn],
-            content: content
+            text: props.text,
+            content: content,
+            buttons: [okBtn, closeBtn]
         });
     };
 
-    ReactUI.prototype.makeCellBuyPopupOld = function (props) {
-        var self = this;
+    ReactUI.prototype.makeCellBuyPopup = function (props) {
         var player = props.player;
         var cell = props.cell;
-        var key = this.idGenerator++;
-
-        ///// CONTENT /////
-        var activeEmployees = player.getActiveEmployees();
-        if (activeEmployees.length < 1) {
-            self.makeInfoPopup({ text: "Recruit some employees first" });
-            return;
-        }
-
-        var el = UIComponents.EmployeeList({
-            employees: activeEmployees,
-            relevantSkills: ["negotiation"],
-            selected: null
-        });
-
-        var content = React.DOM.div({ className: "popup-content" }, el, React.DOM.div(null, UIComponents.CellInfo({ cell: cell }), UIComponents.ActionInfo({
-            action: "buyCell"
-        })));
 
         ///// BUTTONS /////
-        var boundDestroyPopup = this.destroyPopup.bind(this, key, null);
+        var buySelected = function () {
+            console.log(this);
+            actions.buyCell(player, cell, player.employees[this.state.selected.key]);
+        };
 
-        var boundBuySelected = function () {
-            if (!player.employees[this.state.selected]) {
-                self.makeInfoPopup({ text: "No employee selected" });
-                return;
-            }
-            actions.buyCell(player, cell, player.employees[this.state.selected]);
-            boundDestroyPopup();
-            self.updateReact();
-        }.bind(el);
-
-        var okBtn = React.DOM.button({
-            onClick: boundBuySelected,
-            key: "ok"
-        }, "buy");
-
-        var closeBtn = React.DOM.button({
-            onClick: boundDestroyPopup,
-            key: "close"
-        }, "close");
-
-        this.makePopup({
-            key: key,
+        this.makeEmployeeActionPopup({
+            player: player,
+            relevantSkills: ["negotiation"],
+            action: {
+                target: cell,
+                baseDuration: 14,
+                baseCost: cell.landValue,
+                actionText: "Buying this cell would take:"
+            },
             text: "Choose employee",
-            buttons: [okBtn, closeBtn],
-            content: content
+            onOk: buySelected,
+            okText: "Buy"
         });
     };
+
+    ///// OTHER METHODS /////
     ReactUI.prototype.incrementZIndex = function () {
         return this.topZIndex++;
     };
-
     ReactUI.prototype.destroyPopup = function (key, callback) {
         this.popups = this.popups.filter(function (popup) {
             return popup.props.key !== key;

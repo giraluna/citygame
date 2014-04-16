@@ -36,11 +36,22 @@ declare class ReactUI {
         onCancel?: any;
         cancelText?: string;
     }): void;
-    public makeCellBuyPopup(props: {
+    public makeEmployeeActionPopup(props: {
         player: Player;
-        cell: any;
+        relevantSkills: string[];
+        action?: {
+            target?: any;
+            baseCost?: number;
+            baseDuration?: number;
+            actionText?: string;
+        };
+        text?: string;
+        onOk: any;
+        onCancel?: any;
+        okText?: string;
+        cancelText?: string;
     }): void;
-    public makeCellBuyPopupOld(props: {
+    public makeCellBuyPopup(props: {
         player: Player;
         cell: any;
     }): void;

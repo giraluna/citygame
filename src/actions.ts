@@ -78,6 +78,44 @@ module actions
       }
     });
   }
+  export function recruitEmployee(player: Player, employee: Employee)
+  {
+    employee.active = false;
+
+    var actionTime = getActionTime([employee.skills["recruitment"]], 14);
+
+    var employeeCount = getSkillAdjust(
+      [employee.skills["recruitment"]],
+      2,
+      function employeeCountAdjustFN(avgSkill){return 1 / (1.5 / Math.log(avgSkill + 1))},
+      0.33);
+
+    var recruitConfirmFN = function()
+    {
+
+    }
+
+    var recruitCancelFN = function()
+    {
+      employee.active = true;
+    }.bind(this);
+
+    var recruitCancelFN = function()
+    {
+      eventManager.dispatchEvent(
+      {
+        type: "makeConfirmPopup",
+        content:
+        {
+          text: "Are you sure you don't want to recruit anyone?",
+          onOk: confirmCancelFN,
+          okText: "Cancel recruitment",
+          onCancel: cancelCancelFN, // TODO
+          cancelText: "On second thought..."
+        }
+      });
+    }.bind(this);
+  }
   function getSkillAdjust( skills: number[], base: number, adjustFN, variance: number)
   {
     var avgSkill = skills.reduce(function(a, b){return a+b}) / skills.length;

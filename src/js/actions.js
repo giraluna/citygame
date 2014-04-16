@@ -1,22 +1,21 @@
 /// <reference path="js/employee.d.ts" />
 /// <reference path="js/player.d.ts" />
 /// <reference path="js/eventlistener.d.ts" />
-/// <reference path="js/spritehighlighter.d.ts" />
+/// <reference path="js/spriteblinker.d.ts" />
 ///
 var actions;
 (function (actions) {
-    var selectionHighlighterTEMP = new Highlighter();
+    var blinkerTODO = new Blinker(600, 0x880055, -1, false);
+
     function buyCell(player, cell, employee) {
         employee.active = false;
-
-        var highlightKeyTEMP = "buyCell";
-        var blinkerId = "" + selectionHighlighterTEMP.idGenerator++;
+        var blinkerIdTODO = blinkerTODO.idGenerator++;
 
         var actionTime = getActionTime([employee.skills["negotiation"]], 14);
         var price = getActionCost([employee.skills["negotiation"]], cell.landValue).actual;
 
         var buyCellConfirmFN = function () {
-            selectionHighlighterTEMP.removeSingleBlink(highlightKeyTEMP, blinkerId);
+            blinkerTODO.removeCells(blinkerIdTODO);
             employee.active = true;
             employee.trainSkill("negotiation");
             if (player.money < price) {
@@ -38,14 +37,15 @@ var actions;
         }.bind(this);
 
         var buyCellCancelFN = function () {
-            selectionHighlighterTEMP.removeSingleBlink(highlightKeyTEMP, blinkerId);
+            blinkerTODO.removeCells(blinkerIdTODO);
             employee.active = true;
         }.bind(this);
 
         var onCompleteText = "Buy plot for " + price + "$ ?";
 
         var completeFN = function () {
-            selectionHighlighterTEMP.blinkCells([cell], 0x84007D, 600, highlightKeyTEMP, blinkerId);
+            blinkerTODO.addCells([cell], blinkerIdTODO);
+            blinkerTODO.start();
             eventManager.dispatchEvent({
                 type: "makeConfirmPopup",
                 content: {

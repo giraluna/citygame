@@ -44,9 +44,22 @@ class ReactUI
     {
       self.makeConfirmPopup(event.content)
     });
+    eventManager.addEventListener("makeEmployeeActionPopup", function(event)
+    {
+      self.makeEmployeeActionPopup(event.content)
+    });
+
     eventManager.addEventListener("makeCellBuyPopup", function(event)
     {
       self.makeCellBuyPopup(event.content)
+    });
+    eventManager.addEventListener("makeRecruitPopup", function(event)
+    {
+      self.makeRecruitPopup(event.content)
+    });
+    eventManager.addEventListener("makeRecruitCompletePopup", function(event)
+    {
+      self.makeRecruitCompletePopup(event.content)
     });
   }
 
@@ -144,8 +157,9 @@ class ReactUI
   }
   makeEmployeeActionPopup(props:
   {
-    player: Player;
-    relevantSkills: string[];
+    employees: Employee[];
+    relevantSkills?: string[];
+    player?: Player;
     action?:
     {
       target?: any;
@@ -156,7 +170,7 @@ class ReactUI
 
     text?: string;
 
-    onOk: any;
+    onOk: (employee) => any;
     onCancel?: any;
     okText?: string;
     cancelText?: string;
@@ -168,17 +182,19 @@ class ReactUI
     props.onCancel = props.onCancel || function(){};
     props.cancelText = props.cancelText || "Cancel";
 
+    props.relevantSkills = props.relevantSkills || [];
+
     props.action = props.action || {};
 
 
     var self = this;
-    var player = props.player;
     var key = this.idGenerator++;
+    var player = props.player;
     var boundDestroyPopup = this.destroyPopup.bind(this, key, null);
 
     ///// CONTENT /////
     
-    var activeEmployees = player.getEmployees();
+    var activeEmployees = props.employees;
     if (activeEmployees.length < 1)
     {
       this.makeInfoPopup({text: "Recruit some employees first"});
@@ -204,14 +220,14 @@ class ReactUI
     {
       onClick: function()
       {
-        if (!player.employees[this.state.selected.key])
+        if (!this.state.selected)
         {
           self.makeInfoPopup({text: "No employee selected"});
           return;
         }
         else
         {
-          props.onOk.call(ea);
+          props.onOk.call(this.state.selected.employee);
           boundDestroyPopup();
         }
       }.bind(ea),
@@ -251,16 +267,15 @@ class ReactUI
 
     ///// BUTTONS /////
 
-    var buySelected = function()
+    var buySelected = function(selected)
     {
-      console.log(this);
-      actions.buyCell( player, cell, player.employees[this.state.selected.key]);
+      actions.buyCell( player, cell, selected);
     };
 
 
     this.makeEmployeeActionPopup(
     {
-      player: player,
+      employees: player.getEmployees(),
       relevantSkills: ["negotiation"],
 
       action: {
@@ -276,7 +291,66 @@ class ReactUI
 
     });
   }
-  
+
+  makeRecruitPopup(props:
+  {
+    player: Player;
+  })
+  {
+    var player = props.player;
+
+    ///// BUTTONS /////
+
+    var recruitWithSelected = function(selected)
+    {
+      actions.recruitEmployee(player, selected);
+    };
+
+
+    this.makeEmployeeActionPopup(
+    {
+      player: player,
+      employees: player.getEmployees(),
+      relevantSkills: ["recruitment"],
+
+      action: {actionText: null},
+
+      text: "Select employee in charge of recruitment",
+      onOk: recruitWithSelected,
+      okText: "Select"
+
+    });
+  }
+
+  makeRecruitCompletePopup(props:
+  {
+    player: Player;
+    employees: Employee[];
+
+    onConfirm?: any;
+  })
+  {
+    var player = props.player;
+
+    props.onConfirm = props.onConfirm || function(){};
+
+    ///// BUTTONS /////
+
+    var recruitConfirmFN = function(selected)
+    {
+      player.addEmployee(selected);
+      props.onConfirm.call();
+    }
+
+
+    this.makeEmployeeActionPopup(
+    {
+      employees: props.employees,
+      text: "Choose employee to recruit",
+      onOk: recruitConfirmFN,
+      okText: "Recruit",
+    });
+  }
 
   ///// OTHER METHODS /////
 

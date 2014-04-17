@@ -37,8 +37,9 @@ declare class ReactUI {
         cancelText?: string;
     }): void;
     public makeEmployeeActionPopup(props: {
-        player: Player;
-        relevantSkills: string[];
+        employees: Employee[];
+        relevantSkills?: string[];
+        player?: Player;
         action?: {
             target?: any;
             baseCost?: number;
@@ -46,7 +47,7 @@ declare class ReactUI {
             actionText?: string;
         };
         text?: string;
-        onOk: any;
+        onOk: (employee: any) => any;
         onCancel?: any;
         okText?: string;
         cancelText?: string;
@@ -54,6 +55,14 @@ declare class ReactUI {
     public makeCellBuyPopup(props: {
         player: Player;
         cell: any;
+    }): void;
+    public makeRecruitPopup(props: {
+        player: Player;
+    }): void;
+    public makeRecruitCompletePopup(props: {
+        player: Player;
+        employees: Employee[];
+        onConfirm?: any;
     }): void;
     public incrementZIndex(): number;
     public destroyPopup(key: any, callback: any): void;

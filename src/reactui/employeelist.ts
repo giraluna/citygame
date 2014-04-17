@@ -18,9 +18,12 @@ export var EmployeeList = React.createClass({
     {
       var colProps = {};
 
-      if (this.props.relevantSkills.indexOf(skill) > -1)
+      if (this.props.relevantSkills && this.props.relevantSkills.length > 0)
       {
-        colProps["className"] = "relevant-col"
+        if (this.props.relevantSkills.indexOf(skill) > -1)
+        {
+          colProps["className"] = "relevant-col";
+        }
       };
 
       skillColumns.push(

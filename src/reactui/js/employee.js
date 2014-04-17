@@ -23,10 +23,12 @@ var UIComponents;
 
             for (var skill in this.props.employee.skills) {
                 var colProps = {};
-                if (this.props.relevantSkills.indexOf(skill) > -1) {
-                    colProps["className"] = "relevant-cell";
+                if (this.props.relevantSkills && this.props.relevantSkills.length > 0) {
+                    if (this.props.relevantSkills.indexOf(skill) === -1) {
+                        colProps["className"] = "irrelevant-cell";
+                    }
+                    ;
                 }
-                ;
 
                 skillCells.push(React.DOM.td(colProps, this.props.employee.skills[skill]));
             }

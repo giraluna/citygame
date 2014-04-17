@@ -551,7 +551,11 @@ var Game = (function () {
         //recruit
         var recruitBtn = document.getElementById("recruitBtn");
         recruitBtn.addEventListener("click", function () {
-            game.players["player0"].addEmployee(new Employee(idGenerator.player++, TEMPNAMES, { skillLevel: Math.random(), growthLevel: Math.random() }));
+            eventManager.dispatchEvent({
+                type: "makeRecruitPopup", content: {
+                    player: self.players["player0"]
+                }
+            });
         });
 
         //renderer

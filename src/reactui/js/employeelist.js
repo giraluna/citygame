@@ -12,8 +12,10 @@ var UIComponents;
             for (var skill in this.props.employees[0].skills) {
                 var colProps = {};
 
-                if (this.props.relevantSkills.indexOf(skill) > -1) {
-                    colProps["className"] = "relevant-col";
+                if (this.props.relevantSkills && this.props.relevantSkills.length > 0) {
+                    if (this.props.relevantSkills.indexOf(skill) > -1) {
+                        colProps["className"] = "relevant-col";
+                    }
                 }
                 ;
 

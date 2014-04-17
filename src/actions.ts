@@ -90,31 +90,63 @@ module actions
       function employeeCountAdjustFN(avgSkill){return 1 / (1.5 / Math.log(avgSkill + 1))},
       0.33);
 
-    var recruitConfirmFN = function()
-    {
+    var newEmployees = {};
 
+
+    // sets skill level linearly between 0 and 1 with 1 = 0 and 20 = 1
+    var recruitSkillLevel = function(recruitingSkill)
+      {
+        // i love you wolfram alpha
+        return 0.0526316*employee.skills["recruitment"] - 0.0526316;
+      };
+
+    // logarithmic: 1 = 3, >=6 = 1
+    // kiss me wolfram alpha
+    var skillVariance = employee.skills["recruitment"] > 6 ?
+      1 :
+      3 - 0.868589*Math.log(employee.skills["recruitment"]);
+
+
+    for (var i = 0; i < employeeCount.actual; i++)
+    {
+      var id = "tempEmployee" + i;
+
+      var newEmployee = new Employee(id, TEMPNAMES,
+      {
+        skillLevel: recruitSkillLevel(employee.skills["recruitment"]),
+        growthLevel: Math.random(),
+        skillVariance: skillVariance
+      });
+
+      newEmployees[id] = newEmployee;
     }
+
+    var recruitConfirmFN = function(selected)
+    {
+      employee.active = true;
+      player.addEmployee(selected);
+    }.bind(this);
 
     var recruitCancelFN = function()
     {
       employee.active = true;
     }.bind(this);
 
-    var recruitCancelFN = function()
+    var recruitCompleteFN = function()
     {
       eventManager.dispatchEvent(
-      {
-        type: "makeConfirmPopup",
-        content:
         {
-          text: "Are you sure you don't want to recruit anyone?",
-          onOk: confirmCancelFN,
-          okText: "Cancel recruitment",
-          onCancel: cancelCancelFN, // TODO
-          cancelText: "On second thought..."
-        }
-      });
-    }.bind(this);
+          type: "makeEmployeeActionPopup",
+          content:
+          {
+            employees: newEmployees,
+            text: "Choose employee to recruit",
+            onOk: recruitConfirmFN,
+            okText: "Recruit",
+
+          }
+        })
+    }
   }
   function getSkillAdjust( skills: number[], base: number, adjustFN, variance: number)
   {

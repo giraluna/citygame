@@ -124,7 +124,8 @@ var Employee = (function () {
         this.ethnicity = _params.ethnicity || getRandomKey(names);
         this.name = _params.name || this.getName(names, this.gender, this.ethnicity);
 
-        this.skills = _params.skills || this.setSkillsByLevel(_params.skillLevel);
+        var skillVariance = Math.round(_params.skillVariance) || 1;
+        this.skills = _params.skills || this.setSkillsByLevel(_params.skillLevel, skillVariance);
         this.growth = _params.growth || this.setGrowthByLevel(_params.growthLevel);
         this.potential = _params.potential || 50 * _params.skillLevel + 30 * Math.random();
 
@@ -136,7 +137,7 @@ var Employee = (function () {
 
         return "" + first + " " + last;
     };
-    Employee.prototype.setSkillsByLevel = function (skillLevel) {
+    Employee.prototype.setSkillsByLevel = function (skillLevel, variance) {
         var skills = {
             negotiation: 1,
             management: 1,
@@ -144,7 +145,7 @@ var Employee = (function () {
             constuction: 1
         };
         var min = 8 * skillLevel + 1;
-        var max = 16 * skillLevel + 2;
+        var max = 16 * skillLevel + 1 + variance;
 
         for (var skill in skills) {
             skills[skill] = randInt(min, max);

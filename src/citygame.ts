@@ -581,6 +581,7 @@ class Game
 
     this.systemsManager = new SystemsManager(1000);
     var player = new Player(idGenerator.player++);
+    player.addEmployee()
     this.reactUI = new ReactUI(player);
     this.players[player.id] = player;
     // TODO
@@ -704,8 +705,11 @@ class Game
       var recruitBtn = document.getElementById("recruitBtn");
       recruitBtn.addEventListener("click", function()
       {
-        game.players["player0"].addEmployee(
-          new Employee(idGenerator.player++, TEMPNAMES, {skillLevel: Math.random(), growthLevel: Math.random()}));
+        eventManager.dispatchEvent({type: "makeRecruitPopup", content:
+          {
+            player: self.players["player0"]
+          }
+        });
       });
 
       //renderer

@@ -138,7 +138,7 @@ class Employee
   traits: any = {};
   active: boolean = true;
 
-  constructor( id: number,
+  constructor( id: string,
     names: any,
     params?: {
       name?: string;
@@ -146,6 +146,7 @@ class Employee
       ethnicity?: string;
 
       skillLevel?: number;
+      skillVariance?: number;
       growthLevel?: number;
 
       growth?: ISkillsObj;
@@ -163,8 +164,8 @@ class Employee
     this.ethnicity = _params.ethnicity || getRandomKey(names);
     this.name = _params.name || this.getName( names, this.gender, this.ethnicity );
 
-
-    this.skills = _params.skills || this.setSkillsByLevel(_params.skillLevel);
+    var skillVariance = Math.round(_params.skillVariance) || 1;
+    this.skills = _params.skills || this.setSkillsByLevel(_params.skillLevel, skillVariance);
     this.growth = _params.growth || this.setGrowthByLevel(_params.growthLevel);
     this.potential = _params.potential ||
       50 * _params.skillLevel + 30 * Math.random();
@@ -180,7 +181,7 @@ class Employee
 
     return "" + first + " " + last;
   }
-  setSkillsByLevel(skillLevel)
+  setSkillsByLevel(skillLevel, variance)
   {
     var skills: ISkillsObj =
     {
@@ -190,7 +191,7 @@ class Employee
       constuction: 1
     }
     var min = 8 * skillLevel + 1;
-    var max = 16 * skillLevel + 2;
+    var max = 16 * skillLevel + 1 + variance;
 
     for (var skill in skills)
     {

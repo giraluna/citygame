@@ -705,12 +705,13 @@ class Game
       {
         if ( Object.keys(self.players["player0"].employees).length < 1 )
         {
-          if (self.players["player0"].usedInitialRecruit)
+          if ( self.players["player0"].usedInitialRecruit)
           {
             eventManager.dispatchEvent({type: "makeInfoPopup", content:
               {
                 text: ["Already used initial recruitment.",
-                "Wait 20 seconds"]
+                "Wait 5 seconds",
+                "(todo)"]
               }
             });
           }
@@ -726,7 +727,7 @@ class Game
             window.setTimeout(function()
               {
                 self.players["player0"].usedInitialRecruit = false;
-              }, 20 * 1000)
+              }, 5 * 1000)
           }
         }
         else

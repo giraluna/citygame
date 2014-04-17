@@ -557,7 +557,8 @@ var Game = (function () {
                         type: "makeInfoPopup", content: {
                             text: [
                                 "Already used initial recruitment.",
-                                "Wait 20 seconds"]
+                                "Wait 5 seconds",
+                                "(todo)"]
                         }
                     });
                 } else {
@@ -570,7 +571,7 @@ var Game = (function () {
                     });
                     window.setTimeout(function () {
                         self.players["player0"].usedInitialRecruit = false;
-                    }, 20 * 1000);
+                    }, 5 * 1000);
                 }
             } else {
                 eventManager.dispatchEvent({

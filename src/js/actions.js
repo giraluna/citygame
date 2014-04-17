@@ -78,6 +78,7 @@ var actions;
 
         var onConfirmFN = function () {
             employee.active = true;
+            employee.trainSkill("recruitment");
         };
 
         var recruitCompleteFN = function () {

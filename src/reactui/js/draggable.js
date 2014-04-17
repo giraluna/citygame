@@ -30,7 +30,6 @@ var UIComponents;
             DOMNode.addEventListener("dragend", this.handleDragEnd, false);
 
             DOMNode.draggable = true;
-            DOMNode.style.position = "absolute";
         },
         componentWillUnmount: function () {
             this.props.DOMNode.removeEventListener("dragstart", this.handleDragStart);

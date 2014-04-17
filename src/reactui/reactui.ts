@@ -73,6 +73,10 @@ class ReactUI
   {
     var key = props.key
 
+    var container = document.getElementById("react-container");
+    console.log(container.offsetWidth);
+    console.log(this.topZIndex);
+
     var boundIncrementZIndex = this.incrementZIndex.bind(this);
     var popup = UIComponents.Popup(
     {
@@ -80,6 +84,12 @@ class ReactUI
       text:      props.text    || null,
       content:   props.content || null,
       buttons:   props.buttons || null,
+      initialStyle:
+      {
+        top: container.offsetHeight / 3.5 + this.popups.length * 15,
+        left: container.offsetWidth / 3.5 + this.popups.length * 15,
+        zIndex: this.incrementZIndex()
+      },
 
       incrementZIndex: boundIncrementZIndex
     });
@@ -282,10 +292,10 @@ class ReactUI
         target: cell,
         baseDuration: 14,
         baseCost: cell.landValue,
-        actionText: "Buying this cell would take:"
+        actionText: "Buying this plot would take:"
       },
 
-      text: "Choose employee",
+      text: "Choose employee to buy plot",
       onOk: buySelected,
       okText: "Buy"
 

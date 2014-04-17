@@ -28,7 +28,7 @@ body {
   flex-flow: column;
   flex: 0 0 70px;
   position: relative;
-  margin: 20px 0;
+  margin: 10px 0;
 }
 #side-menu button {
   width: 70px;
@@ -44,8 +44,9 @@ body {
 #bottom-menu {
   order: 2;
   flex: 0 0 20px;
-  display: flex;
-  flex-flow: row;
+}
+#bottom-menu > * {
+  float: left;
 }
 #bottom-menu #player {
   margin-right: 50px;
@@ -53,17 +54,25 @@ body {
 #bottom-menu #date {
   min-width: 8em;
 }
-#react-stage {
+#bottom-menu #show-info {
+  float: right;
+  text-align: right;
+  margin-bottom: 5px;
+  padding-right: 7px;
+  text-decoration: none;
+}
+#bottom-menu #show-info:hover {
+  text-decoration: underline;
+}
+#react-container {
   position: absolute;
-  display: flex;
+  display: block;
   width: 100%;
   height: 100%;
   z-index: 1;
-  align-items: center;
-  justify-content: center;
   pointer-events: none;
 }
-#react-stage * {
+#react-container * {
   pointer-events: auto;
 }
 .popup {
@@ -124,4 +133,28 @@ body {
 }
 .popup .popup-buttons button {
   margin: 0 20px;
+}
+#info-container {
+  height: 100%;
+  width: 100%;
+  z-index: 99;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  align-items: center;
+  justify-content: center;
+}
+#info-container #info-window {
+  position: relative;
+  background-color: #dddddd;
+  padding: 25px;
+}
+#info-container #info-window #close-info {
+  margin: 7px;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  color: #444;
+  text-decoration: none;
 }

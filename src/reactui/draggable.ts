@@ -39,7 +39,6 @@ export var Draggable =
     DOMNode.addEventListener("dragend", this.handleDragEnd, false);
 
     DOMNode.draggable = true;
-    DOMNode.style.position = "absolute";
   },
 
   componentWillUnmount: function() {

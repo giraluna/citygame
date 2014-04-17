@@ -87,11 +87,20 @@
     <span id="income"></span>
   </div>
   <span id="date"></span>
-  speed:
+  <label for="speed-control">Speed</label>
   <input type="range" id="speed-control" value="1" min="0" max="3" step="1">
+
+  <a id="show-info" href="#" onClick="document.getElementById('info-container').style.display='flex';">About</a>
 </div>
 
-<div id="info" style="display: none">
-  This game is heavily inspired by <a href="http://www.booming.jp/index.html">BOOMING</a>
+<div id="info-container" style="display: none">
+  <div id="info-window">
+    <span>This game is heavily inspired by <a href="http://www.booming.jp/index.html" target="_blank">BOOMING</a></span>
+    <br>
+    <br>
+    <span>Github: <a href="https://www.github.com/giraluna/citygame" target="_blank">https://www.github.com/giraluna/citygame</a></span>
+
+    <a id="close-info" href="#" onClick="document.getElementById('info-container').style.display='none'">X</a>
+  </div>
 </div>
 </body>

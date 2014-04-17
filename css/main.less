@@ -1,5 +1,6 @@
 @light-blue: rgb(232, 251, 255);
 @dark-blue: rgb(88, 121, 130);
+@near-white: #DDD;
 
 .single-gradient(@dir, @col1, @col2)
 {
@@ -80,7 +81,7 @@ html, body
   flex: 0 0 70px;
 
   position: relative;
-  margin: 20px 0;
+  margin: 10px 0;
 
   button
   {
@@ -103,9 +104,10 @@ html, body
 {
   order: 2;
   flex: 0 0 20px;
-
-  display: flex;
-  flex-flow: row;
+  >*
+  {
+    float: left;
+  }
 
   #player
   {
@@ -115,20 +117,31 @@ html, body
   {
     min-width: 8em;
   }
+
+  #show-info
+  {
+    float: right;
+    text-align: right;
+    margin-bottom: 5px;
+    padding-right: 7px;
+    text-decoration: none;
+
+    &:hover
+    {
+      text-decoration: underline;
+    }
+  }
 }
 
 // REACT START
 
-#react-stage
+#react-container
 {
   position: absolute;
-  display: flex;
+  display: block;
   width: 100%;
   height: 100%;
   z-index: 1;
-
-  align-items: center;
-  justify-content: center;
 
   pointer-events: none;
 
@@ -226,3 +239,37 @@ html, body
 
 
 // REACT END
+
+// INFO
+
+#info-container
+{
+  height: 100%;
+  width: 100%;
+  z-index: 99;
+  //display: flex;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: rgba(0,0,0,0.3);
+  align-items: center;
+  justify-content: center;
+
+  #info-window
+  {
+    position: relative;
+    background-color: @near-white;
+    padding: 25px;
+
+    #close-info
+    {
+      margin: 7px;
+      position: absolute;
+      top: 0px;
+      right: 0px;
+      color: #444;
+      text-decoration: none;
+    }
+  }
+
+}

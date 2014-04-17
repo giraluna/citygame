@@ -554,7 +554,7 @@ var Game = (function () {
                 eventManager.dispatchEvent({
                     type: "makeRecruitCompletePopup", content: {
                         player: self.players["player0"],
-                        employees: makeNewEmployees(randInt(4, 6), 1)
+                        employees: makeNewEmployees(randInt(4, 6), 2)
                     }
                 });
             } else {

@@ -708,7 +708,7 @@ class Game
           eventManager.dispatchEvent({type: "makeRecruitCompletePopup", content:
             {
               player: self.players["player0"],
-              employees: makeNewEmployees(4, 1)
+              employees: makeNewEmployees(randInt(4, 6), 1)
             }
           });
         }

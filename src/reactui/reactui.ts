@@ -227,7 +227,7 @@ class ReactUI
         }
         else
         {
-          props.onOk.call(this.state.selected.employee);
+          props.onOk.call(this, this.state.selected.employee);
           boundDestroyPopup();
         }
       }.bind(ea),
@@ -328,11 +328,13 @@ class ReactUI
     employees: Employee[];
 
     onConfirm?: any;
+    text?: string;
   })
   {
     var player = props.player;
 
     props.onConfirm = props.onConfirm || function(){};
+    props.text = props.text || "Choose employee to recruit";
 
     ///// BUTTONS /////
 
@@ -346,9 +348,10 @@ class ReactUI
     this.makeEmployeeActionPopup(
     {
       employees: props.employees,
-      text: "Choose employee to recruit",
+      text: props.text,
       onOk: recruitConfirmFN,
       okText: "Recruit",
+      onCancel: props.onConfirm
     });
   }
 

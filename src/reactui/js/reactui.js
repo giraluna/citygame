@@ -153,7 +153,7 @@ var ReactUI = (function () {
                     self.makeInfoPopup({ text: "No employee selected" });
                     return;
                 } else {
-                    props.onOk.call(this.state.selected.employee);
+                    props.onOk.call(this, this.state.selected.employee);
                     boundDestroyPopup();
                 }
             }.bind(ea),
@@ -224,6 +224,7 @@ var ReactUI = (function () {
 
         props.onConfirm = props.onConfirm || function () {
         };
+        props.text = props.text || "Choose employee to recruit";
 
         ///// BUTTONS /////
         var recruitConfirmFN = function (selected) {
@@ -233,9 +234,10 @@ var ReactUI = (function () {
 
         this.makeEmployeeActionPopup({
             employees: props.employees,
-            text: "Choose employee to recruit",
+            text: props.text,
             onOk: recruitConfirmFN,
-            okText: "Recruit"
+            okText: "Recruit",
+            onCancel: props.onConfirm
         });
     };
 

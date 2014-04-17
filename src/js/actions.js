@@ -54,7 +54,7 @@ var actions;
                     onCancel: buyCellCancelFN
                 }
             });
-        }.bind(this);
+        };
 
         eventManager.dispatchEvent({ type: "updateWorld", content: "" });
         eventManager.dispatchEvent({
@@ -74,50 +74,31 @@ var actions;
             return 1 / (1.5 / Math.log(avgSkill + 1));
         }, 0.33);
 
-        var newEmployees = {};
+        var newEmployees = makeNewEmployees(employeeCount.actual, employee.skills["recruitment"]);
 
-        // sets skill level linearly between 0 and 1 with 1 = 0 and 20 = 1
-        var recruitSkillLevel = function (recruitingSkill) {
-            // i love you wolfram alpha
-            return 0.0526316 * employee.skills["recruitment"] - 0.0526316;
+        var onConfirmFN = function () {
+            employee.active = true;
         };
-
-        // logarithmic: 1 = 3, >=6 = 1
-        // kiss me wolfram alpha
-        var skillVariance = employee.skills["recruitment"] > 6 ? 1 : 3 - 0.868589 * Math.log(employee.skills["recruitment"]);
-
-        for (var i = 0; i < employeeCount.actual; i++) {
-            var id = "tempEmployee" + i;
-
-            var newEmployee = new Employee(id, TEMPNAMES, {
-                skillLevel: recruitSkillLevel(employee.skills["recruitment"]),
-                growthLevel: Math.random(),
-                skillVariance: skillVariance
-            });
-
-            newEmployees[id] = newEmployee;
-        }
-
-        var recruitConfirmFN = function (selected) {
-            employee.active = true;
-            player.addEmployee(selected);
-        }.bind(this);
-
-        var recruitCancelFN = function () {
-            employee.active = true;
-        }.bind(this);
 
         var recruitCompleteFN = function () {
             eventManager.dispatchEvent({
-                type: "makeEmployeeActionPopup",
+                type: "makeRecruitCompletePopup",
                 content: {
+                    player: player,
                     employees: newEmployees,
-                    text: "Choose employee to recruit",
-                    onOk: recruitConfirmFN,
-                    okText: "Recruit"
+                    onConfirm: onConfirmFN,
+                    text: [
+                        employee.name + " was able to scout the following people.",
+                        "Which one should we recruit?"]
                 }
             });
         };
+        eventManager.dispatchEvent({
+            type: "delayedAction", content: {
+                time: actionTime["actual"],
+                onComplete: recruitCompleteFN
+            }
+        });
     }
     actions.recruitEmployee = recruitEmployee;
     function getSkillAdjust(skills, base, adjustFN, variance) {

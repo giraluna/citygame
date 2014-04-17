@@ -111,11 +111,14 @@ var TEMPNAMES = {
     }
 };
 
+var idGenerator = idGenerator || {};
+idGenerator.employee = 0;
+
 var Employee = (function () {
-    function Employee(id, names, params) {
+    function Employee(names, params) {
         this.traits = {};
         this.active = true;
-        this.id = "employee" + id;
+        this.id = "employee" + idGenerator.employee++;
 
         // lets us do cleaner || check instead of (params && param.x) ? x : y
         var _params = params || {};
@@ -189,4 +192,30 @@ var Employee = (function () {
     };
     return Employee;
 })();
+
+function makeNewEmployees(employeeCount, recruitingSkill) {
+    var newEmployees = [];
+
+    // sets skill level linearly between 0 and 1 with 1 = 0 and 20 = 1
+    var recruitSkillLevel = function (recruitingSkill) {
+        // i love you wolfram alpha
+        return 0.0526316 * recruitingSkill - 0.0526316;
+    };
+
+    // logarithmic: 1 = 3, >=6 = 1
+    // kiss me wolfram alpha
+    var skillVariance = recruitingSkill > 6 ? 1 : 3 - 0.868589 * Math.log(recruitingSkill);
+
+    for (var i = 0; i < employeeCount; i++) {
+        var newEmployee = new Employee(TEMPNAMES, {
+            skillLevel: recruitSkillLevel(recruitingSkill),
+            growthLevel: Math.random(),
+            skillVariance: skillVariance
+        });
+
+        newEmployees.push(newEmployee);
+    }
+
+    return newEmployees;
+}
 //# sourceMappingURL=employee.js.map

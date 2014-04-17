@@ -21,7 +21,6 @@ var UIComponents;
 
                 skillColumns.push(React.DOM.col(colProps));
             }
-
             this.props.employees.forEach(function (employee) {
                 var key = employee.id;
 

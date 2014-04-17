@@ -117,6 +117,9 @@ var TEMPNAMES =
   }
 }
 
+var idGenerator = idGenerator || {};
+idGenerator.employee = 0;
+
 interface ISkillsObj
 {
   negotiation: number; // buy & sell price
@@ -138,7 +141,7 @@ class Employee
   traits: any = {};
   active: boolean = true;
 
-  constructor( id: string,
+  constructor(
     names: any,
     params?: {
       name?: string;
@@ -155,7 +158,7 @@ class Employee
       traits?: any;
     })
   {
-    this.id = "employee" + id;
+    this.id = "employee" + idGenerator.employee++;
 
     // lets us do cleaner || check instead of (params && param.x) ? x : y
     var _params = params || {};
@@ -243,4 +246,38 @@ class Employee
       }
     }
   }
+}
+
+function makeNewEmployees(employeeCount: number, recruitingSkill: number)
+{
+  var newEmployees = [];
+
+  // sets skill level linearly between 0 and 1 with 1 = 0 and 20 = 1
+  var recruitSkillLevel = function(recruitingSkill)
+    {
+      // i love you wolfram alpha
+      return 0.0526316*recruitingSkill - 0.0526316;
+    };
+
+  // logarithmic: 1 = 3, >=6 = 1
+  // kiss me wolfram alpha
+  var skillVariance = recruitingSkill > 6 ?
+    1 :
+    3 - 0.868589*Math.log(recruitingSkill);
+
+
+  for (var i = 0; i < employeeCount; i++)
+  {
+
+    var newEmployee = new Employee(TEMPNAMES,
+    {
+      skillLevel: recruitSkillLevel(recruitingSkill),
+      growthLevel: Math.random(),
+      skillVariance: skillVariance
+    });
+
+    newEmployees.push( newEmployee );
+  }
+
+  return newEmployees;
 }

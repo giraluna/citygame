@@ -6,6 +6,7 @@ declare var TEMPNAMES: {
         surnames: string[];
     };
 };
+declare var idGenerator: any;
 interface ISkillsObj {
     negotiation: number;
     management: number;
@@ -23,7 +24,7 @@ declare class Employee {
     public potential: number;
     public traits: any;
     public active: boolean;
-    constructor(id: string, names: any, params?: {
+    constructor(names: any, params?: {
         name?: string;
         gender?: string;
         ethnicity?: string;
@@ -41,3 +42,4 @@ declare class Employee {
     public setSkillTotal(): void;
     public trainSkill(skill: string): void;
 }
+declare function makeNewEmployees(employeeCount: number, recruitingSkill: number): any[];

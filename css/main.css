@@ -73,7 +73,6 @@ body {
   background-color: rgba(232, 251, 255, 0.8);
 }
 .popup .popup-text {
-  display: table;
   margin: 7px auto;
 }
 .popup .popup-content {

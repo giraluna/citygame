@@ -63,6 +63,7 @@ declare class ReactUI {
         player: Player;
         employees: Employee[];
         onConfirm?: any;
+        text?: string;
     }): void;
     public incrementZIndex(): number;
     public destroyPopup(key: any, callback: any): void;

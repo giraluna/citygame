@@ -28,11 +28,9 @@ var SCREEN_WIDTH = 720,
     WORLD_HEIGHT = TILES * TILE_HEIGHT,
     ZOOM_LEVELS = [1];
 
-var idGenerator =
-{
-  content: 0,
-  player: 0
-}
+var idGenerator = idGenerator || {};
+idGenerator.content = 0;
+idGenerator.player = 0;
 
 
 class Sprite extends PIXI.Sprite
@@ -581,7 +579,6 @@ class Game
 
     this.systemsManager = new SystemsManager(1000);
     var player = new Player(idGenerator.player++);
-    player.addEmployee()
     this.reactUI = new ReactUI(player);
     this.players[player.id] = player;
     // TODO
@@ -705,11 +702,24 @@ class Game
       var recruitBtn = document.getElementById("recruitBtn");
       recruitBtn.addEventListener("click", function()
       {
-        eventManager.dispatchEvent({type: "makeRecruitPopup", content:
-          {
-            player: self.players["player0"]
-          }
-        });
+        if ( Object.keys(self.players["player0"].employees).length < 1 )
+        {
+
+          eventManager.dispatchEvent({type: "makeRecruitCompletePopup", content:
+            {
+              player: self.players["player0"],
+              employees: makeNewEmployees(4, 1)
+            }
+          });
+        }
+        else
+        {
+          eventManager.dispatchEvent({type: "makeRecruitPopup", content:
+            {
+              player: self.players["player0"]
+            }
+          });
+        }
       });
 
       //renderer

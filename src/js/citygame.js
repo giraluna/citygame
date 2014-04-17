@@ -549,14 +549,29 @@ var Game = (function () {
         // TODO
         //recruit
         var recruitBtn = document.getElementById("recruitBtn");
+
         recruitBtn.addEventListener("click", function () {
             if (Object.keys(self.players["player0"].employees).length < 1) {
-                eventManager.dispatchEvent({
-                    type: "makeRecruitCompletePopup", content: {
-                        player: self.players["player0"],
-                        employees: makeNewEmployees(randInt(4, 6), 2)
-                    }
-                });
+                if (self.players["player0"].usedInitialRecruit) {
+                    eventManager.dispatchEvent({
+                        type: "makeInfoPopup", content: {
+                            text: [
+                                "Already used initial recruitment.",
+                                "Wait 20 seconds"]
+                        }
+                    });
+                } else {
+                    self.players["player0"].usedInitialRecruit = true;
+                    eventManager.dispatchEvent({
+                        type: "makeRecruitCompletePopup", content: {
+                            player: self.players["player0"],
+                            employees: makeNewEmployees(randInt(4, 6), 2)
+                        }
+                    });
+                    window.setTimeout(function () {
+                        self.players["player0"].usedInitialRecruit = false;
+                    }, 20 * 1000);
+                }
             } else {
                 eventManager.dispatchEvent({
                     type: "makeRecruitPopup", content: {

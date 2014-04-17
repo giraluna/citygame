@@ -6,6 +6,7 @@ var Player = (function () {
         this.ownedContent = {};
         this.ownedCells = {};
         this.employees = {};
+        this.usedInitialRecruit = false;
         this.modifiers = {};
         this.id = "player" + id;
         this.bindElements();

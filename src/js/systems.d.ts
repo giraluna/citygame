@@ -23,10 +23,15 @@ declare class SystemsManager {
     public tickNumber: number;
     public accumulated: number;
     public paused: boolean;
+    public speed: number;
+    public speedBeforePausing: number;
     constructor(tickTime: any);
     public init(): void;
     public addSystem(name: string, system: System): void;
     public addEventListeners(): void;
+    public pause(): void;
+    public unpause(resuming?: boolean): void;
+    public setSpeed(speed: number): void;
     public update(): void;
     public tick(): void;
 }

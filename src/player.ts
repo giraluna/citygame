@@ -12,6 +12,7 @@ class Player
   ownedCells: any = {};
 
   employees: any = {};
+  usedInitialRecruit: boolean = false;
   modifiers: any = {};
 
   moneySpan: HTMLElement;

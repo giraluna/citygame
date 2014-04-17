@@ -7,6 +7,7 @@ declare class Player {
     public ownedContent: any;
     public ownedCells: any;
     public employees: any;
+    public usedInitialRecruit: boolean;
     public modifiers: any;
     public moneySpan: HTMLElement;
     public incomeSpan: HTMLElement;

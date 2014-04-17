@@ -25,6 +25,8 @@ class SystemsManager
   tickNumber: number = 0;
   accumulated: number = 0;
   paused: boolean = false;
+  speed: number = 1;
+  speedBeforePausing: number;
 
   constructor(tickTime)
   {
@@ -46,6 +48,8 @@ class SystemsManager
   addEventListeners()
   {
     var self = this;
+    var slider = <HTMLInputElement> document.getElementById("speed-control");
+
     eventManager.addEventListener("builtBuilding", function(event)
     {
       // TEMPORARY
@@ -56,25 +60,50 @@ class SystemsManager
       // TEMPORARY
       self.entities.ownedBuildings.pop();
     });
-    var slider = <HTMLInputElement> document.getElementById("speed-control");
+    eventManager.addEventListener("pause", function(event)
+    {
+      self.pause();
+    });
+    eventManager.addEventListener("unpause", function(event)
+    {
+      self.unpause(true);
+    });
 
     slider.addEventListener("change", function()
     {
       if (slider.value === "0")
       {
-        self.timer.stop();
-        self.paused = true;
+        self.pause();
       }
       else
       {
-        var value = Math.pow(parseInt(slider.value), 2)
-
-        self.timer.start();
-        self.paused = false;
-        self.tickTime = 1 / value;
-        self.accumulated = self.accumulated / value;
+        self.setSpeed(parseInt(slider.value));
       }
     });
+  }
+  pause()
+  {
+    this.speedBeforePausing = this.speed;
+    this.speed = 0;
+    this.timer.stop();
+    this.paused = true;
+  }
+  unpause(resuming: boolean = false)
+  {
+    this.timer.start();
+    this.paused = false;
+
+    if (resuming) this.speed = this.speedBeforePausing;
+  }
+  setSpeed(speed: number)
+  {
+    if (this.paused) this.unpause(false);
+
+    var speed = this.speed = Math.round(speed);
+    var adjustedSpeed = Math.pow(speed, 2);
+
+    this.tickTime = 1 / adjustedSpeed;
+    this.accumulated = this.accumulated / adjustedSpeed;
   }
   update()
   {

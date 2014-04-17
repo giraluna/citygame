@@ -74,8 +74,6 @@ class ReactUI
     var key = props.key
 
     var container = document.getElementById("react-container");
-    console.log(container.offsetWidth);
-    console.log(this.topZIndex);
 
     var boundIncrementZIndex = this.incrementZIndex.bind(this);
     var popup = UIComponents.Popup(

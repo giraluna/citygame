@@ -511,6 +511,10 @@ class WorldRenderer
     {
       game.mouseEventHandler.mouseUp(event, "world");
     }
+    _ws.mouseupoutside = function(event)
+    {
+      game.mouseEventHandler.mouseUp(event, "world");
+    }
   }
   initLayers()
   {
@@ -640,6 +644,10 @@ class Game
       _stage.mouseup = function(event)
       {
         _game.mouseEventHandler.mouseUp(event, "stage");
+      }
+      _stage.mouseupoutside = function(event)
+      {
+        game.mouseEventHandler.mouseUp(event, "stage");
       }
 
     }

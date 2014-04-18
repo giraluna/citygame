@@ -398,6 +398,9 @@ var WorldRenderer = (function () {
         _ws.mouseup = function (event) {
             game.mouseEventHandler.mouseUp(event, "world");
         };
+        _ws.mouseupoutside = function (event) {
+            game.mouseEventHandler.mouseUp(event, "world");
+        };
     };
     WorldRenderer.prototype.initLayers = function () {
         for (var i = 0; i < ZOOM_LEVELS.length; i++) {
@@ -498,6 +501,9 @@ var Game = (function () {
         };
         _stage.mouseup = function (event) {
             _game.mouseEventHandler.mouseUp(event, "stage");
+        };
+        _stage.mouseupoutside = function (event) {
+            game.mouseEventHandler.mouseUp(event, "stage");
         };
     };
     Game.prototype.initLayers = function () {

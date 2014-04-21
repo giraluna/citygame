@@ -475,7 +475,7 @@ class WorldRenderer
     });
     eventManager.addEventListener("updateWorld", function(event)
     {
-      self.render();
+      self.render(event.content.clear);
     });
   }
   initContainers(width, height)
@@ -531,16 +531,27 @@ class WorldRenderer
       main.addChild(content);
     }
   }
+  clearLayers()
+  {
+    for (var i = 0; i < ZOOM_LEVELS.length; i++)
+    {
+      var zoomStr = "zoom" + ZOOM_LEVELS[i];
+      var zoomLayer = this.layers[zoomStr];
+      var main = zoomLayer["main"];
+
+      if(main.children.length > 0) main.removeChildren();
+    }
+  }
   changeZoomLevel(level)
   {
     this.zoomLevel = level;
     this.render();
   }
-  render()
+  render(clear: boolean = true)
   {
     var zoomStr = "zoom" + this.zoomLevel;
     var activeMainLayer = this.layers[zoomStr]["main"]
-    this.renderTexture.render(activeMainLayer);
+    this.renderTexture.render(activeMainLayer, null, clear);
   }
 }
 
@@ -587,7 +598,7 @@ class Game
     this.players[player.id] = player;
     // TODO
     this.tools.buy.player = player;
-    var profitSystem = new ProfitSystem(1, this.systemsManager, player);
+    var profitSystem = new ProfitSystem(1, this.systemsManager, this.players);
     this.systemsManager.addSystem("profit", profitSystem);
     this.systemsManager.addSystem("delayedAction", new DelayedActionSystem(1, this.systemsManager));
 
@@ -655,7 +666,6 @@ class Game
     {
       this.layers["ground"] = this.worldRenderer.layers["zoom1"]["ground"];
       this.layers["content"] = this.worldRenderer.layers["zoom1"]["content"];
-      this.updateWorld();
     }
     initTools()
     {
@@ -698,11 +708,11 @@ class Game
       var loadBtn = document.getElementById("loadBtn");
       saveBtn.addEventListener("click", function()
       {
-        self.saveBoard();
+        self.save();
       });
       loadBtn.addEventListener("click", function()
       {
-        self.loadBoard();
+        self.load();
       });
 
       // TODO
@@ -759,9 +769,9 @@ class Game
     var _canvas = document.getElementById("pixi-container");
     _canvas.appendChild(this.renderer.view);
   }
-  updateWorld()
+  updateWorld(clear?: boolean)
   {
-    eventManager.dispatchEvent({type: "updateWorld", content:""});
+    eventManager.dispatchEvent({type: "updateWorld", content:{clear: clear}});
   }
   resize()
   {
@@ -778,6 +788,16 @@ class Game
   changeTool( tool )
   {
     this.activeTool = this.tools[tool];
+  }
+  save()
+  {
+    this.saveBoard();
+    this.savePlayer();
+  }
+  load()
+  {
+    this.loadBoard();
+    this.loadPlayer();
   }
   saveBoard()
   {
@@ -814,7 +834,44 @@ class Game
     var parsed = JSON.parse( localStorage.getItem("board") );
     var board = this.board = new Board(parsed["width"], parsed["height"]);
     board.makeMap( parsed["cells"] );
-    this.updateWorld();
+    eventManager.dispatchEvent({type: "updateWorld", content:{clear: true}});
+  }
+  // TODO
+  savePlayer()
+  {
+    var player = this.players["player0"];
+    var toSave = JSON.stringify(player,
+      function replacerFN(key, value)
+      {
+        switch (key)
+        {
+          case "moneySpan":
+          case "incomeSpan":
+            return undefined;
+            
+          default:
+            return value;
+        }
+      });
+    localStorage.setItem("player", toSave);
+  }
+  loadPlayer()
+  {
+    var data = JSON.parse(localStorage.getItem("player"));
+    for (var employee in data.employees)
+    {
+      data.employees[employee] = new Employee(TEMPNAMES, data.employees[employee]);
+    }
+    var newPlayer = new Player(data.id);
+    for (var prop in data)
+    {
+      if (data[prop] !== undefined)
+      {
+        newPlayer[prop] = data[prop];
+      }
+
+    }
+    this.players["player0"] = newPlayer;
   }
   render()
   {
@@ -827,7 +884,10 @@ class Game
   }
   resetLayers()
   {
+    this.worldRenderer.clearLayers();
     this.worldRenderer.initLayers();
+    this.initLayers();
+    this.worldRenderer.render();
   }
 }
 
@@ -1175,7 +1235,7 @@ class MouseEventHandler
 
     game.highlighter.clearSprites();
     this.currAction = undefined;
-    game.updateWorld();
+    game.updateWorld(true);
     /* TEMPORARY
     var cell = game.board.getCell(this.currCell);
     var neighs = cell.getNeighbors()
@@ -1540,7 +1600,7 @@ class BuyTool extends Tool
     var self = this;
     eventManager.dispatchEvent({type: "makeCellBuyPopup", content:
       {
-        player: self.player,
+        player: game.players["player0"],
         cell: target
       }
     });

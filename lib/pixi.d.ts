@@ -339,7 +339,7 @@ declare module PIXI
 	{
 		constructor(width: number, height: number, renderer?: IPixiRenderer, scaleMode?: number);
 		resize(width: number, height: number): void;
-		render(DisplayObject): void;
+		render(DisplayObject, position?, clear?): void;
 	}
 
 	export class Sprite extends DisplayObjectContainer

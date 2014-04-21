@@ -368,7 +368,7 @@ var WorldRenderer = (function () {
             self.changeZoomLevel(event.content.zoomLevel);
         });
         eventManager.addEventListener("updateWorld", function (event) {
-            self.render();
+            self.render(event.content.clear);
         });
     };
     WorldRenderer.prototype.initContainers = function (width, height) {
@@ -415,14 +415,25 @@ var WorldRenderer = (function () {
             main.addChild(content);
         }
     };
+    WorldRenderer.prototype.clearLayers = function () {
+        for (var i = 0; i < ZOOM_LEVELS.length; i++) {
+            var zoomStr = "zoom" + ZOOM_LEVELS[i];
+            var zoomLayer = this.layers[zoomStr];
+            var main = zoomLayer["main"];
+
+            if (main.children.length > 0)
+                main.removeChildren();
+        }
+    };
     WorldRenderer.prototype.changeZoomLevel = function (level) {
         this.zoomLevel = level;
         this.render();
     };
-    WorldRenderer.prototype.render = function () {
+    WorldRenderer.prototype.render = function (clear) {
+        if (typeof clear === "undefined") { clear = true; }
         var zoomStr = "zoom" + this.zoomLevel;
         var activeMainLayer = this.layers[zoomStr]["main"];
-        this.renderTexture.render(activeMainLayer);
+        this.renderTexture.render(activeMainLayer, null, clear);
     };
     return WorldRenderer;
 })();
@@ -458,7 +469,7 @@ var Game = (function () {
 
         // TODO
         this.tools.buy.player = player;
-        var profitSystem = new ProfitSystem(1, this.systemsManager, player);
+        var profitSystem = new ProfitSystem(1, this.systemsManager, this.players);
         this.systemsManager.addSystem("profit", profitSystem);
         this.systemsManager.addSystem("delayedAction", new DelayedActionSystem(1, this.systemsManager));
 
@@ -509,7 +520,6 @@ var Game = (function () {
     Game.prototype.initLayers = function () {
         this.layers["ground"] = this.worldRenderer.layers["zoom1"]["ground"];
         this.layers["content"] = this.worldRenderer.layers["zoom1"]["content"];
-        this.updateWorld();
     };
     Game.prototype.initTools = function () {
         this.tools.water = new WaterTool();
@@ -546,10 +556,10 @@ var Game = (function () {
         var saveBtn = document.getElementById("saveBtn");
         var loadBtn = document.getElementById("loadBtn");
         saveBtn.addEventListener("click", function () {
-            self.saveBoard();
+            self.save();
         });
         loadBtn.addEventListener("click", function () {
-            self.loadBoard();
+            self.load();
         });
 
         // TODO
@@ -598,8 +608,8 @@ var Game = (function () {
         var _canvas = document.getElementById("pixi-container");
         _canvas.appendChild(this.renderer.view);
     };
-    Game.prototype.updateWorld = function () {
-        eventManager.dispatchEvent({ type: "updateWorld", content: "" });
+    Game.prototype.updateWorld = function (clear) {
+        eventManager.dispatchEvent({ type: "updateWorld", content: { clear: clear } });
     };
     Game.prototype.resize = function () {
         var container = window.getComputedStyle(document.getElementById("pixi-container"), null);
@@ -612,6 +622,14 @@ var Game = (function () {
 
     Game.prototype.changeTool = function (tool) {
         this.activeTool = this.tools[tool];
+    };
+    Game.prototype.save = function () {
+        this.saveBoard();
+        this.savePlayer();
+    };
+    Game.prototype.load = function () {
+        this.loadBoard();
+        this.loadPlayer();
     };
     Game.prototype.saveBoard = function () {
         var data = JSON.stringify(this.board, function replacerFN(key, value) {
@@ -641,7 +659,36 @@ var Game = (function () {
         var parsed = JSON.parse(localStorage.getItem("board"));
         var board = this.board = new Board(parsed["width"], parsed["height"]);
         board.makeMap(parsed["cells"]);
-        this.updateWorld();
+        eventManager.dispatchEvent({ type: "updateWorld", content: { clear: true } });
+    };
+
+    // TODO
+    Game.prototype.savePlayer = function () {
+        var player = this.players["player0"];
+        var toSave = JSON.stringify(player, function replacerFN(key, value) {
+            switch (key) {
+                case "moneySpan":
+                case "incomeSpan":
+                    return undefined;
+
+                default:
+                    return value;
+            }
+        });
+        localStorage.setItem("player", toSave);
+    };
+    Game.prototype.loadPlayer = function () {
+        var data = JSON.parse(localStorage.getItem("player"));
+        for (var employee in data.employees) {
+            data.employees[employee] = new Employee(TEMPNAMES, data.employees[employee]);
+        }
+        var newPlayer = new Player(data.id);
+        for (var prop in data) {
+            if (data[prop] !== undefined) {
+                newPlayer[prop] = data[prop];
+            }
+        }
+        this.players["player0"] = newPlayer;
     };
     Game.prototype.render = function () {
         this.renderer.render(this.stage);
@@ -652,7 +699,10 @@ var Game = (function () {
         requestAnimFrame(this.render.bind(this));
     };
     Game.prototype.resetLayers = function () {
+        this.worldRenderer.clearLayers();
         this.worldRenderer.initLayers();
+        this.initLayers();
+        this.worldRenderer.render();
     };
     return Game;
 })();
@@ -907,7 +957,7 @@ var MouseEventHandler = (function () {
 
         game.highlighter.clearSprites();
         this.currAction = undefined;
-        game.updateWorld();
+        game.updateWorld(true);
         /* TEMPORARY
         var cell = game.board.getCell(this.currCell);
         var neighs = cell.getNeighbors()
@@ -1218,7 +1268,7 @@ var BuyTool = (function (_super) {
         var self = this;
         eventManager.dispatchEvent({
             type: "makeCellBuyPopup", content: {
-                player: self.player,
+                player: game.players["player0"],
                 cell: target
             }
         });

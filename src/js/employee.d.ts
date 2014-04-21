@@ -25,6 +25,7 @@ declare class Employee {
     public traits: any;
     public active: boolean;
     constructor(names: any, params?: {
+        id?: string;
         name?: string;
         gender?: string;
         ethnicity?: string;

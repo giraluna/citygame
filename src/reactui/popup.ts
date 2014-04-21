@@ -23,7 +23,6 @@ export var Popup = React.createClass({
     {
       text = this.props.text;
     }
-    console.log("2");
     return(
       React.DOM.div( {className:"popup", style: this.props.initialStyle}, 
         React.DOM.p( {className:"popup-text"}, text ),

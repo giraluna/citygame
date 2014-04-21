@@ -141,16 +141,16 @@ var System = (function () {
 
 var ProfitSystem = (function (_super) {
     __extends(ProfitSystem, _super);
-    function ProfitSystem(activationRate, systemsManager, player) {
+    function ProfitSystem(activationRate, systemsManager, players) {
         _super.call(this, activationRate, systemsManager.tickNumber);
         this.targets = [];
         this.systemsManager = systemsManager;
         this.targets = systemsManager.entities.ownedBuildings;
-        this.player = player;
+        this.players = players;
     }
     ProfitSystem.prototype.activate = function () {
         for (var i = 0; i < this.targets.length; i++) {
-            this.player.addMoney(1);
+            this.players["player0"].addMoney(1);
         }
     };
     return ProfitSystem;

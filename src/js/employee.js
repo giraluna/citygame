@@ -119,10 +119,10 @@ var Employee = (function () {
     function Employee(names, params) {
         this.traits = {};
         this.active = true;
-        this.id = "employee" + idGenerator.employee++;
-
         // lets us do cleaner || check instead of (params && param.x) ? x : y
         var _params = params || {};
+
+        this.id = _params.id || "employee" + idGenerator.employee++;
 
         this.gender = _params.gender || getRandomArrayItem(["male", "female"]);
         this.ethnicity = _params.ethnicity || getRandomKey(names);
@@ -180,6 +180,8 @@ var Employee = (function () {
     Employee.prototype.trainSkill = function (skill) {
         // don't train if potential is already reached
         if (this.skillTotal >= this.potential)
+            return;
+        else if (this.skills[skill] >= 20)
             return;
         else {
             var rand = Math.random();

@@ -145,6 +145,7 @@ class Employee
   constructor(
     names: any,
     params?: {
+      id?: string;
       name?: string;
       gender?: string;
       ethnicity?: string;
@@ -159,10 +160,11 @@ class Employee
       traits?: any;
     })
   {
-    this.id = "employee" + idGenerator.employee++;
 
     // lets us do cleaner || check instead of (params && param.x) ? x : y
     var _params = params || {};
+
+    this.id = _params.id || "employee" + idGenerator.employee++;
 
     this.gender = _params.gender || getRandomArrayItem(["male", "female"]);
     this.ethnicity = _params.ethnicity || getRandomKey(names);
@@ -233,6 +235,7 @@ class Employee
   {
     // don't train if potential is already reached
     if (this.skillTotal >= this.potential) return;
+    else if (this.skills[skill] >= 20) return;
 
     else
     {

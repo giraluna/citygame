@@ -47,8 +47,12 @@ declare class System {
 }
 declare class ProfitSystem extends System {
     public targets: any[];
-    public player: Player;
-    constructor(activationRate: number, systemsManager: SystemsManager, player: Player);
+    public players: {
+        [key: string]: Player;
+    };
+    constructor(activationRate: number, systemsManager: SystemsManager, players: {
+        [key: string]: Player;
+    });
     public activate(): void;
 }
 interface IDateObj {

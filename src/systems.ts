@@ -165,21 +165,22 @@ class System
 class ProfitSystem extends System
 {
   targets: any[] = [];
-  player: Player;
+  // TODO
+  players: {[key:string]: Player};
 
-  constructor(activationRate: number, systemsManager: SystemsManager, player: Player)
+  constructor(activationRate: number, systemsManager: SystemsManager, players: {[key:string]: Player})
   {
     super(activationRate, systemsManager.tickNumber);
     this.systemsManager = systemsManager;
     this.targets = systemsManager.entities.ownedBuildings;
-    this.player = player;
+    this.players = players;
   }
 
   activate()
   {
     for (var i = 0; i < this.targets.length; i++)
     {
-      this.player.addMoney(1);
+      this.players["player0"].addMoney(1);
     }
   }
 }

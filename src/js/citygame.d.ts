@@ -86,8 +86,9 @@ declare class WorldRenderer {
     public addEventListeners(): void;
     public initContainers(width: any, height: any): void;
     public initLayers(): void;
+    public clearLayers(): void;
     public changeZoomLevel(level: any): void;
-    public render(): void;
+    public render(clear?: boolean): void;
 }
 declare class Game {
     public board: Board;
@@ -112,11 +113,15 @@ declare class Game {
     public initTools(): void;
     public bindElements(): void;
     public bindRenderer(): void;
-    public updateWorld(): void;
+    public updateWorld(clear?: boolean): void;
     public resize(): void;
     public changeTool(tool: any): void;
+    public save(): void;
+    public load(): void;
     public saveBoard(): void;
     public loadBoard(): void;
+    public savePlayer(): void;
+    public loadPlayer(): void;
     public render(): void;
     public resetLayers(): void;
 }

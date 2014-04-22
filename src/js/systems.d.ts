@@ -30,7 +30,8 @@ declare class SystemsManager {
     public addSystem(name: string, system: System): void;
     public addEventListeners(): void;
     public pause(): void;
-    public unpause(resuming?: boolean): void;
+    public unPause(newSpeed?: number): void;
+    public togglePause(): void;
     public setSpeed(speed: number): void;
     public update(): void;
     public tick(): void;

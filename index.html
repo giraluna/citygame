@@ -32,6 +32,7 @@
   <script src="src/js/timer.js"></script>
   <script src="src/js/spritehighlighter.js"></script>
   <script src="src/js/spriteblinker.js"></script>
+  <script src="src/js/keyboardinput.js"></script>
   <script src="src/js/employee.js"></script>
   <script src="src/js/player.js"></script>
   <script src="src/js/actions.js"></script>
@@ -87,9 +88,10 @@
     <span id="income"></span>
   </div>
   <span id="date"></span>
-  <label for="speed-control">Speed</label>
-  <input type="range" id="speed-control" value="1" min="0" max="3" step="1">
-
+  <div id="speed">
+    <label for="speed-control">Speed</label>
+    <input type="range" id="speed-control" value="1" min="0" max="4" step="1">
+  </div>
   <a id="show-info" href="#" onClick="document.getElementById('info-container').style.display='flex';">About</a>
 </div>
 

@@ -7,6 +7,7 @@
 /// <reference path="systems.d.ts" />
 /// <reference path="eventlistener.d.ts" />
 /// <reference path="spritehighlighter.d.ts" />
+/// <reference path="keyboardinput.d.ts" />
 /// <reference path="utility.d.ts" />
 declare var cg: any;
 declare var arrayLogic: any;
@@ -95,6 +96,7 @@ declare class Game {
     public tools: any;
     public activeTool: Tool;
     public mouseEventHandler: MouseEventHandler;
+    public keyboardEventHandler: KeyboardEventHandler;
     public highlighter: Highlighter;
     public stage: PIXI.Stage;
     public renderer: any;
@@ -228,7 +230,6 @@ declare class RoadTool extends Tool {
     public onActivate(target: Cell): void;
 }
 declare class BuyTool extends Tool {
-    public player: Player;
     constructor();
     public onActivate(target: Cell): void;
 }

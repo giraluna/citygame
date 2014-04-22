@@ -9,6 +9,7 @@
 /// <reference path="js/systems.d.ts" />
 /// <reference path="js/eventlistener.d.ts" />
 /// <reference path="js/spritehighlighter.d.ts" />
+/// <reference path="js/keyboardinput.d.ts" />
 /// 
 /// <reference path="js/utility.d.ts" />
 
@@ -16,9 +17,6 @@ declare var cg:any;
 declare var arrayLogic: any;
 
 
-cg = JSON.parse(JSON.stringify(cg)); //dumb
-
-//var container;
 var SCREEN_WIDTH = 720,
     SCREEN_HEIGHT = 480,
     TILE_WIDTH = 64,
@@ -561,6 +559,7 @@ class Game
   tools: any = {};
   activeTool: Tool;
   mouseEventHandler: MouseEventHandler;
+  keyboardEventHandler: KeyboardEventHandler;
   highlighter: Highlighter;
   stage: PIXI.Stage;
   renderer: any;
@@ -590,14 +589,14 @@ class Game
     this.mouseEventHandler = new MouseEventHandler();
     this.mouseEventHandler.scroller = new Scroller(this.layers["main"], 0.5);
 
+    this.keyboardEventHandler = new KeyboardEventHandler();
+
     this.uiDrawer = new UIDrawer();
 
     this.systemsManager = new SystemsManager(1000);
     var player = new Player(idGenerator.player++);
     this.reactUI = new ReactUI(player);
     this.players[player.id] = player;
-    // TODO
-    this.tools.buy.player = player;
     var profitSystem = new ProfitSystem(1, this.systemsManager, this.players);
     this.systemsManager.addSystem("profit", profitSystem);
     this.systemsManager.addSystem("delayedAction", new DelayedActionSystem(1, this.systemsManager));
@@ -1205,6 +1204,10 @@ class MouseEventHandler
 
     this.currAction = "cellAction";
     this.startCell = gridPos;
+
+    game.highlighter.clearSprites();
+    game.highlighter.tintCells([game.board.getCell(gridPos)], game.activeTool.tintColor);
+    game.updateWorld();
   }
   worldMove(event)
   {
@@ -1588,7 +1591,6 @@ class RoadTool extends Tool
 
 class BuyTool extends Tool
 {
-  player: Player;
   constructor()
   {
     super();
@@ -1597,7 +1599,6 @@ class BuyTool extends Tool
   }
   onActivate(target: Cell)
   {
-    var self = this;
     eventManager.dispatchEvent({type: "makeCellBuyPopup", content:
       {
         player: game.players["player0"],

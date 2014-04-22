@@ -9,6 +9,7 @@
 /// <reference path="js/systems.d.ts" />
 /// <reference path="js/eventlistener.d.ts" />
 /// <reference path="js/spritehighlighter.d.ts" />
+/// <reference path="js/keyboardinput.d.ts" />
 ///
 /// <reference path="js/utility.d.ts" />
 var __extends = this.__extends || function (d, b) {
@@ -18,9 +19,6 @@ var __extends = this.__extends || function (d, b) {
     d.prototype = new __();
 };
 
-cg = JSON.parse(JSON.stringify(cg)); //dumb
-
-//var container;
 var SCREEN_WIDTH = 720, SCREEN_HEIGHT = 480, TILE_WIDTH = 64, TILE_HEIGHT = 32, TILES = 32, WORLD_WIDTH = TILES * TILE_WIDTH, WORLD_HEIGHT = TILES * TILE_HEIGHT, ZOOM_LEVELS = [1];
 
 var idGenerator = idGenerator || {};
@@ -460,15 +458,14 @@ var Game = (function () {
         this.mouseEventHandler = new MouseEventHandler();
         this.mouseEventHandler.scroller = new Scroller(this.layers["main"], 0.5);
 
+        this.keyboardEventHandler = new KeyboardEventHandler();
+
         this.uiDrawer = new UIDrawer();
 
         this.systemsManager = new SystemsManager(1000);
         var player = new Player(idGenerator.player++);
         this.reactUI = new ReactUI(player);
         this.players[player.id] = player;
-
-        // TODO
-        this.tools.buy.player = player;
         var profitSystem = new ProfitSystem(1, this.systemsManager, this.players);
         this.systemsManager.addSystem("profit", profitSystem);
         this.systemsManager.addSystem("delayedAction", new DelayedActionSystem(1, this.systemsManager));
@@ -932,6 +929,10 @@ var MouseEventHandler = (function () {
 
         this.currAction = "cellAction";
         this.startCell = gridPos;
+
+        game.highlighter.clearSprites();
+        game.highlighter.tintCells([game.board.getCell(gridPos)], game.activeTool.tintColor);
+        game.updateWorld();
     };
     MouseEventHandler.prototype.worldMove = function (event) {
         var pos = event.getLocalPosition(event.target);
@@ -1265,7 +1266,6 @@ var BuyTool = (function (_super) {
         this.tintColor = 0x22EE22;
     }
     BuyTool.prototype.onActivate = function (target) {
-        var self = this;
         eventManager.dispatchEvent({
             type: "makeCellBuyPopup", content: {
                 player: game.players["player0"],

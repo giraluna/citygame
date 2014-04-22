@@ -54,14 +54,12 @@ var SystemsManager = (function () {
             // TEMPORARY
             self.entities.ownedBuildings.pop();
         });
-        eventManager.addEventListener("pause", function (event) {
-            self.pause();
-        });
-        eventManager.addEventListener("unpause", function (event) {
-            self.unpause(true);
+        eventManager.addEventListener("togglePause", function (event) {
+            self.togglePause();
         });
 
-        slider.addEventListener("change", function () {
+        slider.addEventListener("change", function (event) {
+            console.log(event);
             if (slider.value === "0") {
                 self.pause();
             } else {
@@ -74,24 +72,38 @@ var SystemsManager = (function () {
         this.speed = 0;
         this.timer.stop();
         this.paused = true;
+        var slider = document.getElementById("speed-control");
+        slider.value = "0";
     };
-    SystemsManager.prototype.unpause = function (resuming) {
-        if (typeof resuming === "undefined") { resuming = false; }
+    SystemsManager.prototype.unPause = function (newSpeed) {
         this.timer.start();
         this.paused = false;
 
-        if (resuming)
-            this.speed = this.speedBeforePausing;
+        if (newSpeed)
+            this.setSpeed(newSpeed);
+    };
+    SystemsManager.prototype.togglePause = function () {
+        if (this.paused)
+            this.unPause(this.speedBeforePausing);
+        else
+            this.pause();
     };
     SystemsManager.prototype.setSpeed = function (speed) {
+        if (speed <= 0) {
+            this.pause();
+            return;
+        }
         if (this.paused)
-            this.unpause(false);
+            this.unPause();
 
         var speed = this.speed = Math.round(speed);
         var adjustedSpeed = Math.pow(speed, 2);
 
         this.tickTime = 1 / adjustedSpeed;
         this.accumulated = this.accumulated / adjustedSpeed;
+        var slider = document.getElementById("speed-control");
+        console.log(speed);
+        slider.value = "" + speed;
     };
     SystemsManager.prototype.update = function () {
         if (this.paused)

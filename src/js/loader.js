@@ -1,4 +1,5 @@
 /// <reference path="../lib/pixi.d.ts" />
+/// <reference path="js/utility.d.ts" />
 
 var Loader = (function () {
     function Loader(game) {
@@ -44,12 +45,12 @@ var Loader = (function () {
     };
     Loader.prototype.loadSprites = function () {
         var self = this;
-        var assetsToLoad = ["img\/sprites.json"];
-        var loader = new PIXI.AssetLoader(assetsToLoad);
-        loader.onComplete = function () {
+        var loader = new PIXI.JsonLoader("img\/sprites.json");
+        loader.addEventListener("loaded", function (event) {
+            self.spriteImages = spritesheetToImages(event.content.json, event.content.baseUrl);
             self.loaded.sprites = true;
             self.checkLoaded();
-        };
+        });
 
         loader.load();
     };
@@ -63,6 +64,7 @@ var Loader = (function () {
         var elapsed = window.performance.now() - this.startTime;
         console.log("loaded in " + Math.round(elapsed) + " ms");
         this.game.init();
+        this.game.frameImages = this.spriteImages;
     };
     return Loader;
 })();

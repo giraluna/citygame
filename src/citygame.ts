@@ -569,6 +569,8 @@ class Game
   systemsManager: SystemsManager;
   worldRenderer: WorldRenderer;
   players: {[id: string]: Player;} = {};
+
+  frameImages: {[id: string]: HTMLImageElement;};
   constructor()
   {
   }

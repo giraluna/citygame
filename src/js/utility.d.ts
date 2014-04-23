@@ -12,3 +12,19 @@ declare function getTileScreenPosition(x: number, y: number, tileSize: number[],
 declare function randInt(min: any, max: any): number;
 declare function randRange(min: any, max: any): any;
 declare function rollDice(dice: any, sides: any): number;
+interface ISpritesheetData {
+    frames: {
+        [id: string]: {
+            frame: {
+                x: number;
+                y: number;
+                w: number;
+                h: number;
+            };
+        };
+    };
+    meta: any;
+}
+declare function spritesheetToImages(sheetData: ISpritesheetData, baseUrl: string): {
+    [id: string]: HTMLImageElement;
+};

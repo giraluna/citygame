@@ -5,6 +5,22 @@ var keyboardStates = {
             // space
             "32": function () {
                 eventManager.dispatchEvent({ type: "togglePause", content: "" });
+            },
+            // numpad plus
+            "107": function () {
+                eventManager.dispatchEvent({ type: "incrementSpeed", content: "" });
+            },
+            // plus
+            "187": function () {
+                eventManager.dispatchEvent({ type: "incrementSpeed", content: "" });
+            },
+            // numpad minus
+            "109": function () {
+                eventManager.dispatchEvent({ type: "decrementSpeed", content: "" });
+            },
+            // minus
+            "189": function () {
+                eventManager.dispatchEvent({ type: "decrementSpeed", content: "" });
             }
         }
     }

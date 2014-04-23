@@ -3,6 +3,10 @@ declare var keyboardStates: {
     "default": {
         "keydown": {
             "32": () => void;
+            "107": () => void;
+            "187": () => void;
+            "109": () => void;
+            "189": () => void;
         };
     };
 };

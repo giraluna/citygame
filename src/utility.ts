@@ -125,8 +125,6 @@ function getTileScreenPosition(x: number, y:number, tileSize: number[], worldSiz
     wt.ty + tileSize[1]/2 * zoom];
   tileSize[0] *= zoom;
   tileSize[1] *= zoom;
-
-  console.log(getIsoCoord(x, y, tileSize[0], tileSize[1], offset));
 }
 
 function randInt(min, max)
@@ -147,4 +145,46 @@ function rollDice(dice, sides)
     total += randInt(1, sides);
   }
   return total;
+}
+
+interface ISpritesheetData
+{
+  frames:
+  {
+    [id: string]:
+    {
+      frame: {x: number; y: number; w: number; h: number;}
+    }
+  };
+  meta: any;
+}
+function spritesheetToImages(sheetData: ISpritesheetData, baseUrl: string)
+{
+  var sheetData = sheetData;
+  var sheetImg = new Image();
+  sheetImg.src = baseUrl + sheetData.meta.image;
+
+  var frames: {[id: string]: HTMLImageElement;} = {};
+
+  (function splitSpritesheetFN()
+  {
+    for (var sprite in sheetData.frames)
+    {
+      var frame = sheetData.frames[sprite].frame;
+      var newFrame = frames[sprite] = new Image(frame.w, frame.h);
+
+      var canvas = <HTMLCanvasElement> document.createElement("canvas");
+      canvas.width = frame.w;
+      canvas.height = frame.h;
+      var context = canvas.getContext("2d");
+
+      context.drawImage(sheetImg, frame.x, frame.y, frame.w, frame.h,
+        0, 0, frame.w, frame.h);
+
+      newFrame.src = canvas.toDataURL();
+      frames[sprite] = newFrame;
+    }
+  }());
+
+  return frames;
 }

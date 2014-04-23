@@ -64,10 +64,17 @@ class SystemsManager
     {
       self.togglePause();
     });
+    eventManager.addEventListener("incrementSpeed", function(event)
+    {
+      self.setSpeed(self.speed + 1);
+    });
+    eventManager.addEventListener("decrementSpeed", function(event)
+    {
+      self.setSpeed(self.speed - 1);
+    });
 
     slider.addEventListener("change", function(event)
     {
-      console.log(event);
       if (slider.value === "0")
       {
         self.pause();
@@ -101,11 +108,14 @@ class SystemsManager
   }
   setSpeed(speed: number)
   {
+    var slider = <HTMLInputElement> document.getElementById("speed-control");
     if (speed <= 0)
     {
       this.pause();
       return;
     }
+    else if (speed > parseInt(slider.max)) return;
+
     if (this.paused) this.unPause();
 
     var speed = this.speed = Math.round(speed);
@@ -113,8 +123,6 @@ class SystemsManager
 
     this.tickTime = 1 / adjustedSpeed;
     this.accumulated = this.accumulated / adjustedSpeed;
-    var slider = <HTMLInputElement> document.getElementById("speed-control");
-    console.log(speed);
     slider.value = "" + speed;
   }
   update()

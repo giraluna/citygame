@@ -108,6 +108,9 @@ declare class Game {
     public players: {
         [id: string]: Player;
     };
+    public frameImages: {
+        [id: string]: HTMLImageElement;
+    };
     constructor();
     public init(): void;
     public initContainers(): void;

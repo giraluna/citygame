@@ -849,6 +849,8 @@ class Game
           case "moneySpan":
           case "incomeSpan":
             return undefined;
+
+          
             
           default:
             return value;

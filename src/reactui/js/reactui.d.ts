@@ -3,6 +3,7 @@
 /// <reference path="../../js/player.d.ts" />
 /// <reference path="../../js/actions.d.ts" />
 /// <reference path="../../js/eventlistener.d.ts" />
+/// <reference path="buildinglist.d.ts" />
 /// <reference path="employeelist.d.ts" />
 /// <reference path="employee.d.ts" />
 /// <reference path="cellinfo.d.ts" />
@@ -64,6 +65,11 @@ declare class ReactUI {
         employees: Employee[];
         onConfirm?: any;
         text?: string;
+    }): void;
+    public makeConstructBuildingPopup(props: {
+        player: Player;
+        buildingTemplates: any;
+        buildingImages: any;
     }): void;
     public incrementZIndex(): number;
     public destroyPopup(key: any, callback: any): void;

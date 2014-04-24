@@ -137,6 +137,9 @@ body {
 .popup .popup-content .inactive * {
   color: #AAA;
 }
+.popup .popup-content .insufficient {
+  color: red;
+}
 .popup .popup-content .cellinfo {
   margin-left: 12px;
 }

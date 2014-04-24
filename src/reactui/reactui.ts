@@ -5,6 +5,7 @@
 /// <reference path="../js/actions.d.ts" />
 /// <reference path="../js/eventlistener.d.ts" />
 /// 
+/// <reference path="js/buildinglist.d.ts" />
 /// <reference path="js/employeelist.d.ts" />
 /// <reference path="js/employee.d.ts" />
 /// <reference path="js/cellinfo.d.ts" />
@@ -360,6 +361,29 @@ class ReactUI
       onOk: recruitConfirmFN,
       okText: "Recruit",
       onCancel: props.onConfirm
+    });
+  }
+
+  makeConstructBuildingPopup(props:
+  {
+    player: Player;
+    buildingTemplates: any;
+    buildingImages: any;
+  })
+  {
+    this.makePopup(
+    {
+      key: this.idGenerator++,
+      content: React.DOM.div({className: "popup-content"},
+        UIComponents.BuildingList(
+        {
+          selected: null,
+          player: props.player,
+          buildingTemplates: props.buildingTemplates,
+          buildingImages: props.buildingImages
+        })
+      )
+
     });
   }
 

@@ -22,8 +22,14 @@ export var BuildingList = React.createClass({
     });
   },
 
+  componentShouldUpdate: function(newProps)
+  {
+    console.log(newProps);
+  },
+
   handleSelectRow: function(selectedBuildingType)
   {
+    console.log(this.props.buildingTemplates[selectedBuildingType]);
     this.setState(
     {
       selected: selectedBuildingType
@@ -38,26 +44,41 @@ export var BuildingList = React.createClass({
     {
       var buildingTemplate = this.props.buildingTemplates[type];
       var playerCanBuildBuilding = true;
-      var rowProps: any = {};
+      var rowProps: any = {key: buildingTemplate.type};
       var costProps = {className: "money"};
 
       if (player.money < buildingTemplate.cost)
       {
         playerCanBuildBuilding = false;
-        costProps.className = "insufficient-money";
+        rowProps.className = "inactive";
+        costProps.className = "insufficient";
       };
 
       if (playerCanBuildBuilding)
       {
-        rowProps.onClick = this.handleSelectRow(buildingTemplate.type);
+        rowProps.onClick = this.handleSelectRow.bind(null, buildingTemplate.type);
+        rowProps.className = "active";
       };
+
+      if (this.state.selected && this.state.selected === buildingTemplate.type)
+      {
+        rowProps.className = "selected";
+      }
+
+      var image = this.props.buildingImages[buildingTemplate.frame];
 
       var row = React.DOM.tr(rowProps,
         React.DOM.td({className: "building-image"},
-          React.DOM.img({src: this.props.buildingImages[buildingTemplate.type]})
+          React.DOM.img(
+            {
+              src: image.src,
+              width: image.width/2,
+              height: image.height/2
+            }
+          )
         ),
         React.DOM.td({className: "building-title"}, buildingTemplate.type),
-        React.DOM.td(costProps, buildingTemplate.cost)
+        React.DOM.td(costProps, buildingTemplate.cost + "$")
       )
 
       rows.push(row);

@@ -1,21 +1,14 @@
 /// <reference path="../../lib/react.d.ts" />
 ///
 /// <reference path="js/draggable.d.ts" />
+/// <reference path="js/splitmultilinetext.d.ts" />
 var UIComponents;
 (function (UIComponents) {
     UIComponents.Popup = React.createClass({
-        mixins: [UIComponents.Draggable],
+        mixins: [UIComponents.Draggable, UIComponents.SplitMultilineText],
         render: function () {
-            var text;
-            if (Array.isArray(this.props.text)) {
-                text = [];
-                for (var i = 0; i < this.props.text.length; i++) {
-                    text.push(this.props.text[i]);
-                    text.push(React.DOM.br(null));
-                }
-            } else {
-                text = this.props.text;
-            }
+            var text = this.splitMultilineText(this.props.text);
+
             return (React.DOM.div({ className: "popup", style: this.props.initialStyle }, React.DOM.p({ className: "popup-text" }, text), this.props.content, React.DOM.div({ className: "popup-buttons" }, this.props.buttons)));
         }
     });

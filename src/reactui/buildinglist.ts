@@ -21,12 +21,7 @@ export var BuildingList = React.createClass({
       selected: null
     });
   },
-
-  componentShouldUpdate: function(newProps)
-  {
-    console.log(newProps);
-  },
-
+  
   handleSelectRow: function(selectedBuildingType)
   {
     console.log(this.props.buildingTemplates[selectedBuildingType]);

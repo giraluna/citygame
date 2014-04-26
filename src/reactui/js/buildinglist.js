@@ -16,9 +16,6 @@ var UIComponents;
                 selected: null
             });
         },
-        componentShouldUpdate: function (newProps) {
-            console.log(newProps);
-        },
         handleSelectRow: function (selectedBuildingType) {
             console.log(this.props.buildingTemplates[selectedBuildingType]);
             this.setState({

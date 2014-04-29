@@ -208,6 +208,7 @@ var Cell = (function () {
     };
     Cell.prototype.changeContent = function (type, update, data) {
         if (typeof update === "undefined") { update = true; }
+        console.log(type);
         var buildable = this.checkBuildable(type);
         var toAdd = (type !== "none" && buildable !== false);
         var toRemove = (type === "none" || toAdd);
@@ -528,6 +529,7 @@ var Game = (function () {
         this.tools.house = new HouseTool();
         this.tools.road = new RoadTool();
         this.tools.buy = new BuyTool();
+        this.tools.build = new BuildTool();
     };
 
     Game.prototype.bindElements = function () {
@@ -559,7 +561,6 @@ var Game = (function () {
             self.load();
         });
 
-        // TODO
         //recruit
         var recruitBtn = document.getElementById("recruitBtn");
 
@@ -1273,6 +1274,24 @@ var BuyTool = (function (_super) {
         });
     };
     return BuyTool;
+})(Tool);
+
+var BuildTool = (function (_super) {
+    __extends(BuildTool, _super);
+    function BuildTool() {
+        _super.call(this);
+        this.selectType = singleSelect;
+        this.tintColor = 0x696969;
+    }
+    BuildTool.prototype.onActivate = function (target) {
+        eventManager.dispatchEvent({
+            type: "makeBuildingConstructPopup", content: {
+                player: game.players["player0"],
+                cell: target
+            }
+        });
+    };
+    return BuildTool;
 })(Tool);
 
 function getRoadConnections(target, depth) {

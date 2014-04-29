@@ -276,6 +276,7 @@ class Cell
   }
   changeContent( type:string, update:boolean=true, data? )
   {
+    console.log(type);
     var buildable = this.checkBuildable(type);
     var toAdd: boolean = ( type !== "none" && buildable !== false );
     var toRemove: boolean = ( type === "none" || toAdd );
@@ -679,6 +680,7 @@ class Game
       this.tools.house = new HouseTool();
       this.tools.road = new RoadTool();
       this.tools.buy = new BuyTool();
+      this.tools.build = new BuildTool(); 
     }
 
     bindElements()
@@ -716,7 +718,6 @@ class Game
         self.load();
       });
 
-      // TODO
       //recruit
       var recruitBtn = document.getElementById("recruitBtn");
 
@@ -1603,6 +1604,25 @@ class BuyTool extends Tool
   onActivate(target: Cell)
   {
     eventManager.dispatchEvent({type: "makeCellBuyPopup", content:
+      {
+        player: game.players["player0"],
+        cell: target
+      }
+    });
+  }
+}
+
+class BuildTool extends Tool
+{
+  constructor()
+  {
+    super();
+    this.selectType = singleSelect;
+    this.tintColor = 0x696969;
+  }
+  onActivate(target: Cell)
+  {
+    eventManager.dispatchEvent({type: "makeBuildingConstructPopup", content:
       {
         player: game.players["player0"],
         cell: target

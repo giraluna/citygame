@@ -202,6 +202,7 @@ class ProfitSystem extends System
     {
       this.players["player0"].addMoney(1);
     }
+    eventManager.dispatchEvent({type:"updateReact", content:""});
   }
 }
 

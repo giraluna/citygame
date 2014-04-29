@@ -60,9 +60,7 @@ export var EmployeeActionPopup = React.createClass({
   {
     return {
       employees: this.props.employees || this.props.player.employees,
-      style: this.props.initialStyle,
-      pos: {left: this.props.initialStyle.left, top: this.props.initialStyle.top},
-      ZIndex: this.props.initialStyle.ZIndex
+      style: this.props.initialStyle
     };
   },
 

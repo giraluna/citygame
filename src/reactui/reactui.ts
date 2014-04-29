@@ -70,6 +70,10 @@ class ReactUI
     {
       self.makeInfoPopup(event.content)
     });
+    eventManager.addEventListener("makeBuildingConstructPopup", function(event)
+    {
+      self.makeBuildingConstructPopup(event.content)
+    });
     eventManager.addEventListener("updateReact", function(event)
     {
       self.updateReact()
@@ -193,6 +197,11 @@ class ReactUI
     cell: any;
   })
   {
+    if (Object.keys(props.player.employees).length < 1)
+    {
+      this.makeInfoPopup({text: "Recruit some employees first"});
+      return;
+    }
     var buySelected = function(selected)
     {
       actions.buyCell( props.player, props.cell, selected.employee);
@@ -223,6 +232,35 @@ class ReactUI
   })
   {
     this.makePopup("ConfirmPopup", props);
+  }
+  makeBuildingConstructPopup(props:
+  {
+    player: Player;
+    cell: any;
+  })
+  {
+    var buildSelected = function(selected)
+    {
+      // TODO
+      if (selected && props.player.money >= selected.cost)
+      {
+        props.cell.changeContent(selected);
+        eventManager.dispatchEvent({type:"updateWorld", content:""});
+        props.player.addMoney(-selected.cost);
+      }
+    }
+    // TODO
+    // really bad
+    var _: any = window;
+    var _game = _.game;
+    var _cg = _.cg;
+    this.makePopup("BuildingListPopup",
+    {
+      player: props.player,
+      buildingTemplates: _cg.content.buildings,
+      buildingImages: _game.frameImages,
+      onOk: buildSelected
+    });
   }
 
   ///// OTHER METHODS /////

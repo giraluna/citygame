@@ -66,6 +66,10 @@ function deepDestroy(object)
 {
   if (object.texture)
   {
+    if (object.texture.baseTexture.source._pixiId)
+    {
+      PIXI.Texture.removeTextureFromCache(object.texture.baseTexture.source._pixiId);
+    }
     object.texture.destroy(true);
   }
 

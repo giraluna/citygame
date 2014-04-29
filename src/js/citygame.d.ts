@@ -236,6 +236,10 @@ declare class BuyTool extends Tool {
     constructor();
     public onActivate(target: Cell): void;
 }
+declare class BuildTool extends Tool {
+    constructor();
+    public onActivate(target: Cell): void;
+}
 declare function getRoadConnections(target: Cell, depth: number): any;
 declare function singleSelect(a: number[], b: number[]): number[][];
 declare function rectSelect(a: number[], b: number[]): number[];

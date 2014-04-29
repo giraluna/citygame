@@ -99,8 +99,7 @@ body {
   margin: 7px auto;
 }
 .popup .popup-content {
-  display: flex;
-  flex-flow: row;
+  display: inline-block;
 }
 .popup .popup-content > * {
   border: 1px solid #587982;

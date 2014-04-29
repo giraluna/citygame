@@ -170,6 +170,7 @@ var ProfitSystem = (function (_super) {
         for (var i = 0; i < this.targets.length; i++) {
             this.players["player0"].addMoney(1);
         }
+        eventManager.dispatchEvent({ type: "updateReact", content: "" });
     };
     return ProfitSystem;
 })(System);

@@ -26,7 +26,19 @@ declare module UIComponents {
     **/
     var EmployeeActionPopup: React.ReactComponentFactory<{
         employees: any;
+        style: any;
+        pos: {
+            left: any;
+            top: any;
+        };
+        ZIndex: any;
     }, React.ReactComponent<{
         employees: any;
+        style: any;
+        pos: {
+            left: any;
+            top: any;
+        };
+        ZIndex: any;
     }, {}>>;
 }

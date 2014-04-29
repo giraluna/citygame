@@ -39,7 +39,12 @@ var UIComponents;
             this.props.onClose.call();
         },
         getInitialState: function () {
-            return { employees: this.props.employees || this.props.player.employees };
+            return {
+                employees: this.props.employees || this.props.player.employees,
+                style: this.props.initialStyle,
+                pos: { left: this.props.initialStyle.left, top: this.props.initialStyle.top },
+                ZIndex: this.props.initialStyle.ZIndex
+            };
         },
         componentWillRecieveProps: function (newProps) {
             console.log(newProps.player);
@@ -67,7 +72,13 @@ var UIComponents;
                 onClick: this.handleClose
             }, this.props.closeBtnText || "Cancel");
 
-            return (React.DOM.div({ className: "popup", style: this.props.initialStyle }, React.DOM.p({ className: "popup-text" }, text), React.DOM.div({ className: "popup-content" }, UIComponents.EmployeeAction(employeeActionProps)), React.DOM.div({ className: "popup-buttons" }, okBtn, closeBtn)));
+            return (React.DOM.div({
+                className: "popup",
+                style: this.state.style,
+                draggable: true,
+                onDragStart: this.handleDragStart,
+                onDrag: this.handleDrag
+            }, React.DOM.p({ className: "popup-text" }, text), React.DOM.div({ className: "popup-content" }, UIComponents.EmployeeAction(employeeActionProps)), React.DOM.div({ className: "popup-buttons" }, okBtn, closeBtn)));
         }
     });
 })(UIComponents || (UIComponents = {}));

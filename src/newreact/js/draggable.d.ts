@@ -4,6 +4,5 @@ declare module UIComponents {
         handleDrag: (e: any) => void;
         handleDragEnd: (e: any) => void;
         componentDidMount: () => void;
-        componentWillUnmount: () => void;
     };
 }

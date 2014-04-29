@@ -13,11 +13,11 @@ var UIComponents;
         },
         handleDrag: function (e) {
             //e.dataTransfer.setData("text/plain", "stupid firefox");
-            if (e.x === 0 && e.y === 0)
+            if (e.clientX === 0 && e.clientY === 0)
                 return;
 
-            this.props.DOMNode.style.left = (e.x - this.props.offset.x) + "px";
-            this.props.DOMNode.style.top = (e.y - this.props.offset.y) + "px";
+            this.props.DOMNode.style.left = (e.clientX - this.props.offset.x) + "px";
+            this.props.DOMNode.style.top = (e.clientY - this.props.offset.y) + "px";
         },
         handleDragEnd: function (e) {
             //e.dataTransfer.setData("text/plain", "stupid firefox");

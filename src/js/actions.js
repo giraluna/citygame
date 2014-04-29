@@ -87,10 +87,7 @@ var actions;
                 content: {
                     player: player,
                     employees: newEmployees,
-                    onConfirm: onConfirmFN,
-                    text: [
-                        employee.name + " was able to scout the following people.",
-                        "Which one should we recruit?"]
+                    recruitingEmployee: employee
                 }
             });
         };

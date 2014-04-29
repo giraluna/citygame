@@ -11,7 +11,12 @@
 /// <reference path="stage.d.ts" />
 declare class ReactUI {
     public idGenerator: number;
-    public popups: any[];
+    public popups: {
+        [id: number]: {
+            type: string;
+            props: any;
+        };
+    };
     public topZIndex: number;
     public stage: any;
     public player: Player;
@@ -19,15 +24,28 @@ declare class ReactUI {
     public init(): void;
     public addEventListeners(): void;
     public makeEmployeeActionPopup(props: {
-        employees?: Employee[];
+        employees?: {
+            [key: string]: Employee;
+        };
         player?: Player;
-        text?: string;
+        text?: any;
         onOk?: any;
         okBtnText?: string;
         onClose?: any;
         closeBtnText?: string;
         relevantSkills?: string[];
         action?: any;
+    }): void;
+    public makeRecruitPopup(props: {
+        player: Player;
+    }): void;
+    public makeRecruitCompletePopup(props: {
+        recruitingEmployee?: Employee;
+        employees: {
+            [key: string]: Employee;
+        };
+        player: Player;
+        text: any;
     }): void;
     public incrementZIndex(): number;
     public destroyPopup(key: any, callback: any): void;

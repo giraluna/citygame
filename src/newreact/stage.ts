@@ -7,12 +7,13 @@ export var Stage = React.createClass(
 {
   render: function()
   {
-    var popups = [];
     var self = this;
-    this.props.popups.forEach(function(popup)
+    var popups = [];
+    for (var _popup in this.props.popups)
     {
-      popups.push(popup);
-    });
+      var popup = this.props.popups[_popup];
+      popups.push( UIComponents[popup.type].call(null, popup.props) );
+    };
     return(
       React.DOM.div( {id:"react-stage"}, 
         popups

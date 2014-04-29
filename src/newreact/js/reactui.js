@@ -14,7 +14,7 @@
 var ReactUI = (function () {
     function ReactUI(player) {
         this.idGenerator = 0;
-        this.popups = [];
+        this.popups = {};
         this.topZIndex = 15;
         this.player = player;
         this.init();
@@ -29,29 +29,78 @@ var ReactUI = (function () {
         eventManager.addEventListener("makeEmployeeActionPopup", function (event) {
             self.makeEmployeeActionPopup(event.content);
         });
+        eventManager.addEventListener("makeRecruitPopup", function (event) {
+            self.makeRecruitPopup(event.content);
+        });
+        eventManager.addEventListener("makeRecruitCompletePopup", function (event) {
+            self.makeRecruitCompletePopup(event.content);
+        });
+        eventManager.addEventListener("updateReact", function (event) {
+            self.updateReact();
+        });
     };
 
     ///// /////
     ReactUI.prototype.makeEmployeeActionPopup = function (props) {
         var container = document.getElementById("react-container");
+        var key = this.idGenerator++;
+
+        var onCloseCallback = props.onClose;
+        props.onClose = function () {
+            this.destroyPopup(key, onCloseCallback);
+        }.bind(this);
 
         var popupProps = {};
         for (var prop in props) {
             popupProps[prop] = props[prop];
         }
         ;
-        popupProps.key = this.idGenerator++;
+        popupProps.key = key;
         popupProps.initialStyle = {
-            top: container.offsetHeight / 3.5 + this.popups.length * 15,
-            left: container.offsetWidth / 3.5 + this.popups.length * 15,
+            top: container.offsetHeight / 3.5 + Object.keys(this.popups).length * 15,
+            left: container.offsetWidth / 3.5 + Object.keys(this.popups).length * 15,
             zIndex: this.incrementZIndex()
         };
         popupProps.incrementZIndex = this.incrementZIndex.bind(this);
 
-        var popup = UIComponents.EmployeeActionPopup(popupProps);
+        var popup = {
+            type: "EmployeeActionPopup",
+            props: popupProps
+        };
 
-        this.popups.push(popup);
+        this.popups[key] = popup;
         this.updateReact();
+    };
+
+    ReactUI.prototype.makeRecruitPopup = function (props) {
+        var recruitWithSelected = function (selected) {
+            actions.recruitEmployee(props.player, selected.employee);
+        };
+        this.makeEmployeeActionPopup({
+            player: props.player,
+            relevantSkills: ["recruitment"],
+            text: "Select employee in charge of recruitment",
+            onOk: recruitWithSelected,
+            okBtnText: "Select"
+        });
+    };
+
+    ReactUI.prototype.makeRecruitCompletePopup = function (props) {
+        var self = this;
+        var recruitConfirmFN = function (selected) {
+            props.player.addEmployee(selected.employee);
+            if (props.recruitingEmployee) {
+                props.recruitingEmployee.active = true;
+                props.recruitingEmployee.trainSkill("recruitment");
+            }
+            self.updateReact();
+        };
+        this.makeEmployeeActionPopup({
+            employees: props.employees,
+            text: props.text || "Choose employee to recruit",
+            onOk: recruitConfirmFN,
+            okBtnText: "Recruit"
+        });
     };
 
     ///// OTHER METHODS /////
@@ -59,12 +108,11 @@ var ReactUI = (function () {
         return this.topZIndex++;
     };
     ReactUI.prototype.destroyPopup = function (key, callback) {
-        this.popups = this.popups.filter(function (popup) {
-            return popup.props.key !== key;
-        });
-
         if (callback)
             callback.call();
+
+        this.popups[key] = null;
+        delete this.popups[key];
 
         this.updateReact();
     };

@@ -32,7 +32,7 @@ export var Employee = React.createClass({
 
     for (var skill in this.props.employee.skills)
     {
-      var colProps = {};
+      var colProps: any = {key: skill};
       if (this.props.relevantSkills && this.props.relevantSkills.length > 0)
       {
         if (this.props.relevantSkills.indexOf(skill) === -1)

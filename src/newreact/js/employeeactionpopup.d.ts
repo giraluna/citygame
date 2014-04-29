@@ -24,5 +24,9 @@ declare module UIComponents {
     * incrementZIndex: function
     *
     **/
-    var EmployeeActionPopup: React.ReactComponentFactory<{}, React.ReactComponent<{}, {}>>;
+    var EmployeeActionPopup: React.ReactComponentFactory<{
+        employees: any;
+    }, React.ReactComponent<{
+        employees: any;
+    }, {}>>;
 }

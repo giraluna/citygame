@@ -34,12 +34,27 @@ export var EmployeeActionPopup = React.createClass({
 
   handleOk: function()
   {
-    this.props.onOk.call(this.refs.employeeAction.state.selected);
-    this.handleClose();
+    var callbackSuccessful =
+      this.props.onOk.call(null, this.refs.employeeAction.state.selected);
+    if (callbackSuccessful !== false)
+    {
+      this.handleClose();
+    }
   },
   handleClose: function()
   {
     this.props.onClose.call();
+  },
+
+  getInitialState: function()
+  {
+    return {employees: this.props.employees || this.props.player.employees};
+  },
+
+  componentWillRecieveProps: function(newProps)
+  {
+    console.log(newProps.player);
+    this.setState({employees: newProps.employees || newProps.player.employees});
   },
 
   render: function()
@@ -47,7 +62,7 @@ export var EmployeeActionPopup = React.createClass({
     var self = this;
 
     var text = this.splitMultilineText(this.props.text) || null;
-    var employees = this.props.employees || this.player.getEmployees();
+    var employees = this.state.employees;
 
     var employeeActionProps =
     {

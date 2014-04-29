@@ -141,6 +141,7 @@ class Employee
   potential: number;
   traits: any = {};
   active: boolean = true;
+  currentAction: string;
 
   constructor(
     names: any,

@@ -24,6 +24,7 @@ declare class Employee {
     public potential: number;
     public traits: any;
     public active: boolean;
+    public currentAction: string;
     constructor(names: any, params?: {
         id?: string;
         name?: string;

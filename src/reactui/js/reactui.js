@@ -5,18 +5,16 @@
 /// <reference path="../js/actions.d.ts" />
 /// <reference path="../js/eventlistener.d.ts" />
 ///
-/// <reference path="js/buildinglist.d.ts" />
 /// <reference path="js/employeelist.d.ts" />
 /// <reference path="js/employee.d.ts" />
-/// <reference path="js/cellinfo.d.ts" />
 /// <reference path="js/employeeaction.d.ts" />
+/// <reference path="js/employeeactionpopup.d.ts" />
 /// <reference path="js/actioninfo.d.ts" />
-/// <reference path="js/popup.d.ts" />
 /// <reference path="js/stage.d.ts" />
 var ReactUI = (function () {
     function ReactUI(player) {
         this.idGenerator = 0;
-        this.popups = [];
+        this.popups = {};
         this.topZIndex = 15;
         this.player = player;
         this.init();
@@ -28,18 +26,8 @@ var ReactUI = (function () {
     ReactUI.prototype.addEventListeners = function () {
         var self = this;
 
-        eventManager.addEventListener("makeInfoPopup", function (event) {
-            self.makeInfoPopup(event.content);
-        });
-        eventManager.addEventListener("makeConfirmPopup", function (event) {
-            self.makeConfirmPopup(event.content);
-        });
         eventManager.addEventListener("makeEmployeeActionPopup", function (event) {
             self.makeEmployeeActionPopup(event.content);
-        });
-
-        eventManager.addEventListener("makeCellBuyPopup", function (event) {
-            self.makeCellBuyPopup(event.content);
         });
         eventManager.addEventListener("makeRecruitPopup", function (event) {
             self.makeRecruitPopup(event.content);
@@ -47,218 +35,115 @@ var ReactUI = (function () {
         eventManager.addEventListener("makeRecruitCompletePopup", function (event) {
             self.makeRecruitCompletePopup(event.content);
         });
+        eventManager.addEventListener("makeCellBuyPopup", function (event) {
+            self.makeCellBuyPopup(event.content);
+        });
+        eventManager.addEventListener("makeConfirmPopup", function (event) {
+            self.makeConfirmPopup(event.content);
+        });
+        eventManager.addEventListener("makePopup", function (event) {
+            self.makePopup(event.content.type, event.content.props);
+        });
+        eventManager.addEventListener("makeInfoPopup", function (event) {
+            self.makeInfoPopup(event.content);
+        });
+        eventManager.addEventListener("updateReact", function (event) {
+            self.updateReact();
+        });
     };
 
-    ReactUI.prototype.makePopup = function (props) {
-        var key = props.key;
-
+    ///// /////
+    ReactUI.prototype.makePopup = function (type, props) {
         var container = document.getElementById("react-container");
+        var key = this.idGenerator++;
 
-        var boundIncrementZIndex = this.incrementZIndex.bind(this);
-        var popup = UIComponents.Popup({
-            key: key,
-            text: props.text || null,
-            content: props.content || null,
-            buttons: props.buttons || null,
-            initialStyle: {
-                top: container.offsetHeight / 3.5 + this.popups.length * 15,
-                left: container.offsetWidth / 3.5 + this.popups.length * 15,
-                zIndex: this.incrementZIndex()
-            },
-            incrementZIndex: boundIncrementZIndex
-        });
+        var onCloseCallback = props.onClose;
+        props.onClose = function () {
+            this.destroyPopup(key, onCloseCallback);
+        }.bind(this);
 
-        this.popups.push(popup);
+        var popupProps = {};
+        for (var prop in props) {
+            popupProps[prop] = props[prop];
+        }
+        ;
+        popupProps.key = key;
+        popupProps.initialStyle = {
+            top: container.offsetHeight / 3.5 + Object.keys(this.popups).length * 15,
+            left: container.offsetWidth / 3.5 + Object.keys(this.popups).length * 15,
+            zIndex: this.incrementZIndex()
+        };
+        popupProps.incrementZIndex = this.incrementZIndex.bind(this);
+
+        var popup = {
+            type: type,
+            props: popupProps
+        };
+
+        this.popups[key] = popup;
         this.updateReact();
     };
 
-    ReactUI.prototype.makeInfoPopup = function (props) {
-        var key = this.idGenerator++;
-        var boundDestroyPopup = this.destroyPopup.bind(this, key, null);
-
-        var closeBtn = React.DOM.button({
-            onClick: boundDestroyPopup,
-            key: "close"
-        }, props.okText || "close");
-
-        this.makePopup({
-            key: key,
-            text: props.text,
-            buttons: [closeBtn]
-        });
-    };
-    ReactUI.prototype.makeConfirmPopup = function (props) {
-        ///// DEFAULTS /////
-        props.okText = props.okText || "confirm";
-        props.onCancel = props.onCancel || function () {
-        };
-        props.cancelText = props.cancelText || "cancel";
-
-        var key = this.idGenerator++;
-        var boundDestroyPopup = this.destroyPopup.bind(this, key, null);
-
-        ///// BUTTONS /////
-        var okBtn = React.DOM.button({
-            onClick: function () {
-                props.onOk.call();
-                boundDestroyPopup();
-            },
-            key: "ok"
-        }, props.okText);
-
-        var closeBtn = React.DOM.button({
-            onClick: function () {
-                props.onCancel.call();
-                boundDestroyPopup();
-            },
-            key: "cancel"
-        }, props.cancelText);
-
-        this.makePopup({
-            key: key,
-            text: props.text,
-            buttons: [okBtn, closeBtn]
-        });
-    };
     ReactUI.prototype.makeEmployeeActionPopup = function (props) {
-        ///// DEFAULTS /////
-        props.text = props.text || "Choose employee";
-        props.okText = props.okText || "Confirm";
-        props.onCancel = props.onCancel || function () {
-        };
-        props.cancelText = props.cancelText || "Cancel";
-
-        props.relevantSkills = props.relevantSkills || [];
-
-        props.action = props.action || {};
-
-        var self = this;
-        var key = this.idGenerator++;
-        var player = props.player;
-        var boundDestroyPopup = this.destroyPopup.bind(this, key, null);
-
-        ///// CONTENT /////
-        var activeEmployees = props.employees;
-        if (activeEmployees.length < 1) {
-            this.makeInfoPopup({ text: "Recruit some employees first" });
-            return;
-        }
-
-        var ea = UIComponents.EmployeeAction({
-            employees: activeEmployees,
-            relevantSkills: props.relevantSkills,
-            selected: null,
-            action: props.action,
-            actionText: props.action.actionText
-        });
-
-        var content = React.DOM.div({ className: "popup-content" }, ea);
-
-        ///// BUTTONS /////
-        var okBtn = React.DOM.button({
-            onClick: function () {
-                if (!this.state.selected) {
-                    self.makeInfoPopup({ text: "No employee selected" });
-                    return;
-                } else {
-                    props.onOk.call(this, this.state.selected.employee);
-                    boundDestroyPopup();
-                }
-            }.bind(ea),
-            key: "ok"
-        }, props.okText);
-
-        var closeBtn = React.DOM.button({
-            onClick: function () {
-                props.onCancel.call(ea);
-                boundDestroyPopup();
-            }.bind(ea),
-            key: "cancel"
-        }, props.cancelText);
-
-        this.makePopup({
-            key: key,
-            text: props.text,
-            content: content,
-            buttons: [okBtn, closeBtn]
-        });
+        this.makePopup("EmployeeActionPopup", props);
     };
 
-    ReactUI.prototype.makeCellBuyPopup = function (props) {
-        var player = props.player;
-        var cell = props.cell;
-
-        ///// BUTTONS /////
-        var buySelected = function (selected) {
-            actions.buyCell(player, cell, selected);
-        };
-
-        this.makeEmployeeActionPopup({
-            employees: player.getEmployees(),
-            relevantSkills: ["negotiation"],
-            action: {
-                target: cell,
-                baseDuration: 14,
-                baseCost: cell.landValue,
-                actionText: "Buying this plot would take:"
-            },
-            text: "Choose employee to buy plot",
-            onOk: buySelected,
-            okText: "Buy"
-        });
+    ReactUI.prototype.makeInfoPopup = function (props) {
+        this.makePopup("InfoPopup", props);
     };
 
     ReactUI.prototype.makeRecruitPopup = function (props) {
-        var player = props.player;
-
-        ///// BUTTONS /////
+        var self = this;
         var recruitWithSelected = function (selected) {
-            actions.recruitEmployee(player, selected);
+            actions.recruitEmployee(props.player, selected.employee);
         };
-
         this.makeEmployeeActionPopup({
-            player: player,
-            employees: player.getEmployees(),
+            player: props.player,
             relevantSkills: ["recruitment"],
-            action: { actionText: null },
             text: "Select employee in charge of recruitment",
             onOk: recruitWithSelected,
-            okText: "Select"
+            okBtnText: "Select"
         });
     };
 
     ReactUI.prototype.makeRecruitCompletePopup = function (props) {
-        var player = props.player;
-
-        props.onConfirm = props.onConfirm || function () {
-        };
-        props.text = props.text || "Choose employee to recruit";
-
-        ///// BUTTONS /////
+        var self = this;
         var recruitConfirmFN = function (selected) {
-            player.addEmployee(selected);
-            props.onConfirm.call();
+            props.player.addEmployee(selected.employee);
+            if (props.recruitingEmployee) {
+                props.recruitingEmployee.active = true;
+                props.recruitingEmployee.trainSkill("recruitment");
+            }
+            self.updateReact();
         };
-
         this.makeEmployeeActionPopup({
             employees: props.employees,
-            text: props.text,
+            text: props.text || "Choose employee to recruit",
             onOk: recruitConfirmFN,
-            okText: "Recruit",
-            onCancel: props.onConfirm
+            okBtnText: "Recruit"
         });
     };
 
-    ReactUI.prototype.makeConstructBuildingPopup = function (props) {
-        this.makePopup({
-            key: this.idGenerator++,
-            content: React.DOM.div({ className: "popup-content" }, UIComponents.BuildingList({
-                selected: null,
-                player: props.player,
-                buildingTemplates: props.buildingTemplates,
-                buildingImages: props.buildingImages
-            }))
+    ReactUI.prototype.makeCellBuyPopup = function (props) {
+        var buySelected = function (selected) {
+            actions.buyCell(props.player, props.cell, selected.employee);
+        };
+        this.makeEmployeeActionPopup({
+            player: props.player,
+            relevantSkills: ["negotiation"],
+            text: "Select employee in charge of purchasing the plot",
+            onOk: buySelected,
+            okBtnText: "Buy",
+            action: {
+                target: props.cell,
+                baseDuration: 14,
+                baseCost: props.cell.landValue,
+                actionText: "Buying this plot would take:"
+            }
         });
+    };
+    ReactUI.prototype.makeConfirmPopup = function (props) {
+        this.makePopup("ConfirmPopup", props);
     };
 
     ///// OTHER METHODS /////
@@ -266,14 +151,15 @@ var ReactUI = (function () {
         return this.topZIndex++;
     };
     ReactUI.prototype.destroyPopup = function (key, callback) {
-        this.popups = this.popups.filter(function (popup) {
-            return popup.props.key !== key;
-        });
-
         if (callback)
             callback.call();
 
+        this.popups[key] = null;
+        delete this.popups[key];
+
         this.updateReact();
+    };
+    ReactUI.prototype.closeTopPopup = function () {
     };
 
     ReactUI.prototype.updateReact = function () {

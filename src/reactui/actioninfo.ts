@@ -13,7 +13,7 @@ module UIComponents
 export var ActionInfo = React.createClass({
   render: function()
   {
-    // TEMP
+
     var textSpan = this.props.text && this.props.data.approxCost ?
       [React.DOM.span(null, this.props.text), React.DOM.br(null)] :
       null;

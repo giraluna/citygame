@@ -5,19 +5,24 @@
 /// <reference path="../js/actions.d.ts" />
 /// <reference path="../js/eventlistener.d.ts" />
 /// 
-/// <reference path="js/buildinglist.d.ts" />
 /// <reference path="js/employeelist.d.ts" />
 /// <reference path="js/employee.d.ts" />
-/// <reference path="js/cellinfo.d.ts" />
 /// <reference path="js/employeeaction.d.ts" />
+/// <reference path="js/employeeactionpopup.d.ts" />
 /// <reference path="js/actioninfo.d.ts" />
-/// <reference path="js/popup.d.ts" />
 /// <reference path="js/stage.d.ts" />
 
 class ReactUI
 {
   idGenerator: number = 0;
-  popups: any[] = [];
+  popups:
+  {
+    [id: number]:
+    {
+      type: string;
+      props: any;
+    }
+  } = {};
   topZIndex: number = 15;
   stage: any;
 
@@ -37,22 +42,9 @@ class ReactUI
   {
     var self = this;
 
-    eventManager.addEventListener("makeInfoPopup", function(event)
-    {
-      self.makeInfoPopup(event.content);
-    });
-    eventManager.addEventListener("makeConfirmPopup", function(event)
-    {
-      self.makeConfirmPopup(event.content)
-    });
     eventManager.addEventListener("makeEmployeeActionPopup", function(event)
     {
       self.makeEmployeeActionPopup(event.content)
-    });
-
-    eventManager.addEventListener("makeCellBuyPopup", function(event)
-    {
-      self.makeCellBuyPopup(event.content)
     });
     eventManager.addEventListener("makeRecruitPopup", function(event)
     {
@@ -62,329 +54,175 @@ class ReactUI
     {
       self.makeRecruitCompletePopup(event.content)
     });
-  }
-
-  makePopup(props:
-  {
-    key: number;
-    text?: string;
-    content?: any;
-    buttons?: any[];
-  })
-  {
-    var key = props.key
-
-    var container = document.getElementById("react-container");
-
-    var boundIncrementZIndex = this.incrementZIndex.bind(this);
-    var popup = UIComponents.Popup(
+    eventManager.addEventListener("makeCellBuyPopup", function(event)
     {
-      key: key,
-      text:      props.text    || null,
-      content:   props.content || null,
-      buttons:   props.buttons || null,
-      initialStyle:
-      {
-        top: container.offsetHeight / 3.5 + this.popups.length * 15,
-        left: container.offsetWidth / 3.5 + this.popups.length * 15,
-        zIndex: this.incrementZIndex()
-      },
-
-      incrementZIndex: boundIncrementZIndex
+      self.makeCellBuyPopup(event.content)
     });
-
-    this.popups.push(popup);
-    this.updateReact();
-  }
-
-  makeInfoPopup(props:
-  {
-    text: string;
-    okText?: string;
-  })
-  {
-    var key = this.idGenerator++;
-    var boundDestroyPopup = this.destroyPopup.bind(this, key, null);
-
-    var closeBtn = React.DOM.button(
+    eventManager.addEventListener("makeConfirmPopup", function(event)
     {
-      onClick: boundDestroyPopup,
-      key: "close"
-    }, props.okText || "close");
-
-    this.makePopup(
+      self.makeConfirmPopup(event.content)
+    });
+    eventManager.addEventListener("makePopup", function(event)
     {
-      key: key,
-      text: props.text,
-      buttons: [closeBtn]
+      self.makePopup(event.content.type, event.content.props)
+    });
+    eventManager.addEventListener("makeInfoPopup", function(event)
+    {
+      self.makeInfoPopup(event.content)
+    });
+    eventManager.addEventListener("updateReact", function(event)
+    {
+      self.updateReact()
     });
   }
-  makeConfirmPopup(props:
+
+  ///// /////
+
+  makePopup(type:string, props:
     {
-      text: string;
-      onOk: any;
-      okText?: string;
-      onCancel?: any;
-      cancelText?: string;
+
+      employees?: {[key:string]: Employee};
+      player?: Player;
+
+      text?: any; // string or string[]
+
+      onOk?: any;
+      okBtnText?: string;
+      onClose?: any;
+      closeBtnText?: string;
+
+      relevantSkills?: string[];
+      action?: any;
     })
-  {
-    ///// DEFAULTS /////
-    props.okText = props.okText || "confirm";
-    props.onCancel = props.onCancel || function(){};
-    props.cancelText = props.cancelText || "cancel";
-
-    var key = this.idGenerator++;
-    var boundDestroyPopup = this.destroyPopup.bind(this, key, null);
-
-    ///// BUTTONS /////
-    var okBtn = React.DOM.button(
     {
-      onClick: function()
+      var container = document.getElementById("react-container");
+      var key = this.idGenerator++;
+
+      var onCloseCallback = props.onClose;
+      props.onClose = function()
       {
-        props.onOk.call();
-        boundDestroyPopup();
-      },
-      key: "ok"
-    }, props.okText);
+        this.destroyPopup(key, onCloseCallback);
+      }.bind(this);
 
-    var closeBtn = React.DOM.button(
-    {
-      onClick: function()
+      var popupProps: any = {};
+      for (var prop in props)
       {
-        props.onCancel.call();
-        boundDestroyPopup();
-      },
-      key: "cancel"
-    }, props.cancelText);
+        popupProps[prop] = props[prop];
+      };
+      popupProps.key = key;
+      popupProps.initialStyle =
+      {
+        top: container.offsetHeight / 3.5 + Object.keys(this.popups).length * 15,
+        left: container.offsetWidth / 3.5 + Object.keys(this.popups).length * 15,
+        zIndex: this.incrementZIndex()
+      };
+      popupProps.incrementZIndex = this.incrementZIndex.bind(this);
 
-    this.makePopup(
-    {
-      key: key,
-      text: props.text,
-      buttons: [okBtn, closeBtn]
-    });
-  }
-  makeEmployeeActionPopup(props:
-  {
-    employees: Employee[];
-    relevantSkills?: string[];
-    player?: Player;
-    action?:
-    {
-      target?: any;
-      baseCost?: number;
-      baseDuration?: number;
-      actionText?: string;
-    };
+      var popup =
+      {
+        type: type,
+        props: popupProps
+      };
 
-    text?: string;
-
-    onOk: (employee) => any;
-    onCancel?: any;
-    okText?: string;
-    cancelText?: string;
-  })
-  {
-    ///// DEFAULTS /////
-    props.text = props.text || "Choose employee";
-    props.okText = props.okText || "Confirm";
-    props.onCancel = props.onCancel || function(){};
-    props.cancelText = props.cancelText || "Cancel";
-
-    props.relevantSkills = props.relevantSkills || [];
-
-    props.action = props.action || {};
-
-
-    var self = this;
-    var key = this.idGenerator++;
-    var player = props.player;
-    var boundDestroyPopup = this.destroyPopup.bind(this, key, null);
-
-    ///// CONTENT /////
-    
-    var activeEmployees = props.employees;
-    if (activeEmployees.length < 1)
-    {
-      this.makeInfoPopup({text: "Recruit some employees first"});
-      return;
+      this.popups[key] = popup;
+      this.updateReact();
     }
 
-    var ea = UIComponents.EmployeeAction(
-      {
-        employees: activeEmployees,
-        relevantSkills: props.relevantSkills,
-        selected: null,
-        action: props.action,
-        actionText: props.action.actionText
-      });
-
-    var content = React.DOM.div(
-      {className: "popup-content"},
-      ea
-    );
-
-    ///// BUTTONS /////
-    var okBtn = React.DOM.button(
-    {
-      onClick: function()
-      {
-        if (!this.state.selected)
-        {
-          self.makeInfoPopup({text: "No employee selected"});
-          return;
-        }
-        else
-        {
-          props.onOk.call(this, this.state.selected.employee);
-          boundDestroyPopup();
-        }
-      }.bind(ea),
-      key: "ok"
-    }, props.okText);
-
-    var closeBtn = React.DOM.button(
-    {
-      onClick: function()
-      {
-        props.onCancel.call(ea);
-        boundDestroyPopup();
-      }.bind(ea),
-      key: "cancel"
-    }, props.cancelText);
-
-    
-
-    this.makePopup(
-    {
-      key: key,
-      text: props.text,
-      content: content,
-      buttons: [okBtn, closeBtn]
-    });
-
+  makeEmployeeActionPopup(props: any)
+  {
+    this.makePopup("EmployeeActionPopup", props);
   }
 
-  makeCellBuyPopup(props:
+  makeInfoPopup(props: any)
   {
-    player: Player;
-    cell;
-  })
-  {
-    var player = props.player;
-    var cell = props.cell;
-
-    ///// BUTTONS /////
-
-    var buySelected = function(selected)
-    {
-      actions.buyCell( player, cell, selected);
-    };
-
-
-    this.makeEmployeeActionPopup(
-    {
-      employees: player.getEmployees(),
-      relevantSkills: ["negotiation"],
-
-      action: {
-        target: cell,
-        baseDuration: 14,
-        baseCost: cell.landValue,
-        actionText: "Buying this plot would take:"
-      },
-
-      text: "Choose employee to buy plot",
-      onOk: buySelected,
-      okText: "Buy"
-
-    });
+    this.makePopup("InfoPopup", props);
   }
 
   makeRecruitPopup(props:
   {
-    player: Player;
+    player: Player
   })
   {
-    var player = props.player;
-
-    ///// BUTTONS /////
-
+    var self = this;
     var recruitWithSelected = function(selected)
     {
-      actions.recruitEmployee(player, selected);
+      actions.recruitEmployee(props.player, selected.employee);
     };
-
-
     this.makeEmployeeActionPopup(
     {
-      player: player,
-      employees: player.getEmployees(),
+      player: props.player,
       relevantSkills: ["recruitment"],
-
-      action: {actionText: null},
-
       text: "Select employee in charge of recruitment",
       onOk: recruitWithSelected,
-      okText: "Select"
-
+      okBtnText: "Select"
     });
   }
 
   makeRecruitCompletePopup(props:
   {
+    recruitingEmployee?: Employee;
+    employees: {[key:string]: Employee};
     player: Player;
-    employees: Employee[];
-
-    onConfirm?: any;
-    text?: string;
+    text?: any;
   })
   {
-    var player = props.player;
-
-    props.onConfirm = props.onConfirm || function(){};
-    props.text = props.text || "Choose employee to recruit";
-
-    ///// BUTTONS /////
-
+    var self = this;
     var recruitConfirmFN = function(selected)
     {
-      player.addEmployee(selected);
-      props.onConfirm.call();
-    }
-
-
+      
+      props.player.addEmployee(selected.employee);
+      if (props.recruitingEmployee)
+      {
+        props.recruitingEmployee.active = true;
+        props.recruitingEmployee.trainSkill("recruitment");
+      }
+      self.updateReact();
+    };
     this.makeEmployeeActionPopup(
     {
       employees: props.employees,
-      text: props.text,
+      text: props.text || "Choose employee to recruit",
       onOk: recruitConfirmFN,
-      okText: "Recruit",
-      onCancel: props.onConfirm
+      okBtnText: "Recruit"
     });
   }
 
-  makeConstructBuildingPopup(props:
+  makeCellBuyPopup(props:
   {
     player: Player;
-    buildingTemplates: any;
-    buildingImages: any;
+    cell: any;
   })
   {
-    this.makePopup(
+    var buySelected = function(selected)
     {
-      key: this.idGenerator++,
-      content: React.DOM.div({className: "popup-content"},
-        UIComponents.BuildingList(
-        {
-          selected: null,
-          player: props.player,
-          buildingTemplates: props.buildingTemplates,
-          buildingImages: props.buildingImages
-        })
-      )
-
+      actions.buyCell( props.player, props.cell, selected.employee);
+    }
+    this.makeEmployeeActionPopup(
+    {
+      player: props.player,
+      relevantSkills: ["negotiation"],
+      text: "Select employee in charge of purchasing the plot",
+      onOk: buySelected,
+      okBtnText: "Buy",
+      action:
+      {
+        target: props.cell,
+        baseDuration: 14,
+        baseCost: props.cell.landValue,
+        actionText: "Buying this plot would take:"
+      }
     });
+  }
+  makeConfirmPopup(props:
+  {
+    text: any;
+    onOk: any;
+    okBtnText?: string;
+    onClose?: any;
+    closeBtnText?: string;
+  })
+  {
+    this.makePopup("ConfirmPopup", props);
   }
 
   ///// OTHER METHODS /////
@@ -395,14 +233,16 @@ class ReactUI
   }
   destroyPopup(key, callback)
   {
-    this.popups = this.popups.filter(function(popup)
-    {
-      return popup.props.key !== key;
-    });
-
     if (callback) callback.call();
 
+    this.popups[key] = null;
+    delete this.popups[key];
+
     this.updateReact();
+  }
+  closeTopPopup()
+  {
+
   }
 
   updateReact()

@@ -10,7 +10,6 @@ var UIComponents;
     */
     UIComponents.ActionInfo = React.createClass({
         render: function () {
-            // TEMP
             var textSpan = this.props.text && this.props.data.approxCost ? [React.DOM.span(null, this.props.text), React.DOM.br(null)] : null;
             var timeSpan = this.props.data.approxTime ? [React.DOM.span(null, "~" + this.props.data.approxTime + " days"), React.DOM.br(null)] : null;
             var costSpan = this.props.data.approxCost ? [React.DOM.span(null, "~" + this.props.data.approxCost + "$"), React.DOM.br(null)] : null;

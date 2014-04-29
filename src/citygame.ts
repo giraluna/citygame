@@ -729,8 +729,7 @@ class Game
             eventManager.dispatchEvent({type: "makeInfoPopup", content:
               {
                 text: ["Already used initial recruitment.",
-                "Wait 5 seconds",
-                "(todo)"]
+                "Wait 5 seconds (todo)"]
               }
             });
           }

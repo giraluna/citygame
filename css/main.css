@@ -93,6 +93,7 @@ body {
   padding: 5px;
   border: 1px solid #587982;
   background-color: rgba(232, 251, 255, 0.8);
+  cursor: move;
 }
 .popup .popup-text {
   margin: 7px auto;
@@ -103,6 +104,7 @@ body {
 }
 .popup .popup-content > * {
   border: 1px solid #587982;
+  cursor: auto;
 }
 .popup .popup-content th {
   margin-bottom: 10px;
@@ -173,4 +175,7 @@ body {
   right: 0px;
   color: #444;
   text-decoration: none;
+}
+#info-container #info-window #close-info:hover {
+  text-decoration: underline;
 }

@@ -6,25 +6,24 @@
 declare module UIComponents {
     /**
     * props:
-    * employees
-    * relevantSkills
-    * actionText
-    *
+    * employees: array
+    * relevantSkills?: array
+    * action?: any
     *
     * state:
-    * selected employee: Employee
-    * action:
+    * selected employee: employee
+    * action
     * {
     *   target
-    *   base action duration
-    *   base action cost
+    *   base cost
+    *   base duration
     * }
-    * }
-    */
-    /**
+    *
+    *
+    * children:
     * el
     * {
-    *   selected employee
+    *   selected
     *   employees
     *   relevantskills
     *   handleselect

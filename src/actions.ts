@@ -10,6 +10,7 @@ module actions
   export function buyCell( player: Player, cell, employee: Employee )
   {
     employee.active = false;
+    employee.currentAction = "buyCell";
     var blinkerIdTODO = blinkerTODO.idGenerator++;
 
     var actionTime = getActionTime([employee.skills["negotiation"]], 14);
@@ -19,6 +20,7 @@ module actions
     {
       blinkerTODO.removeCells(blinkerIdTODO);
       employee.active = true;
+      employee.currentAction = undefined;
       employee.trainSkill("negotiation");
       if (player.money < price)
       {
@@ -27,7 +29,11 @@ module actions
           type: "makeInfoPopup",
           content:
           {
-            text: "Not enough funds"
+            text: [
+            "Not enough funds",
+            "",
+            "Build some houses to get cash",
+            "(They're free for now)"]
           }
         })
         return false;
@@ -49,9 +55,10 @@ module actions
     {
       blinkerTODO.removeCells(blinkerIdTODO);
       employee.active = true;
+      employee.currentAction = undefined;
     }.bind(this);
 
-    var onCompleteText = "Buy plot for " + price + "$ ?";
+    var onCompleteText = "Buy plot for " + price + "$?";
 
     var completeFN = function()
     {
@@ -64,7 +71,7 @@ module actions
         {
           text: onCompleteText,
           onOk: buyCellConfirmFN,
-          onCancel: buyCellCancelFN
+          onClose: buyCellCancelFN
         }
       })
 
@@ -81,6 +88,7 @@ module actions
   export function recruitEmployee(player: Player, employee: Employee)
   {
     employee.active = false;
+    employee.currentAction = "recruit";
 
     var actionTime = getActionTime([employee.skills["recruitment"]], 14);
 
@@ -95,6 +103,7 @@ module actions
     var onConfirmFN = function()
     {
       employee.active = true;
+      employee.currentAction = undefined;
       employee.trainSkill("recruitment");
     }
 

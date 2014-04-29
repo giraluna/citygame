@@ -9,25 +9,24 @@ var UIComponents;
 (function (UIComponents) {
     /**
     * props:
-    * employees
-    * relevantSkills
-    * actionText
-    *
+    * employees: array
+    * relevantSkills?: array
+    * action?: any
     *
     * state:
-    * selected employee: Employee
-    * action:
+    * selected employee: employee
+    * action
     * {
     *   target
-    *   base action duration
-    *   base action cost
+    *   base cost
+    *   base duration
     * }
-    * }
-    */
-    /**
+    *
+    *
+    * children:
     * el
     * {
-    *   selected employee
+    *   selected
     *   employees
     *   relevantskills
     *   handleselect
@@ -37,7 +36,7 @@ var UIComponents;
         getInitialState: function () {
             return ({
                 selected: null,
-                action: this.props.action
+                action: this.props.action || null
             });
         },
         handleSelectRow: function (key, employee) {
@@ -68,21 +67,21 @@ var UIComponents;
             var data = {};
 
             if (selectedAction) {
+                var data = {};
                 data.target = selectedAction.target;
+
+                if (selectedEmployee) {
+                    var skills = this.props.relevantSkills.map(function (skill) {
+                        return selectedEmployee.skills[skill];
+                    });
+
+                    data.selectedEmployee = selectedEmployee;
+
+                    data.approxTime = selectedAction.baseDuration ? actions.getActionTime(skills, selectedAction.baseDuration).approximate : null;
+                    data.approxCost = selectedAction.baseCost ? actions.getActionCost(skills, selectedAction.baseCost).approximate : null;
+                }
             }
-
-            if (selectedEmployee) {
-                var skills = this.props.relevantSkills.map(function (skill) {
-                    return selectedEmployee.skills[skill];
-                });
-
-                data.selectedEmployee = selectedEmployee;
-
-                data.approxTime = selectedAction.baseDuration ? actions.getActionTime(skills, selectedAction.baseDuration).approximate : null;
-                data.approxCost = selectedAction.baseCost ? actions.getActionCost(skills, selectedAction.baseCost).approximate : null;
-            }
-
-            var actionInfo = UIComponents.ActionInfo({ data: data, text: this.props.actionText });
+            var actionInfo = selectedAction ? UIComponents.ActionInfo({ data: data, text: selectedAction.actionText }) : null;
 
             return (React.DOM.div(null, el, actionInfo));
         }

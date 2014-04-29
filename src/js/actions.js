@@ -9,6 +9,7 @@ var actions;
 
     function buyCell(player, cell, employee) {
         employee.active = false;
+        employee.currentAction = "buyCell";
         var blinkerIdTODO = blinkerTODO.idGenerator++;
 
         var actionTime = getActionTime([employee.skills["negotiation"]], 14);
@@ -17,12 +18,17 @@ var actions;
         var buyCellConfirmFN = function () {
             blinkerTODO.removeCells(blinkerIdTODO);
             employee.active = true;
+            employee.currentAction = undefined;
             employee.trainSkill("negotiation");
             if (player.money < price) {
                 eventManager.dispatchEvent({
                     type: "makeInfoPopup",
                     content: {
-                        text: "Not enough funds"
+                        text: [
+                            "Not enough funds",
+                            "",
+                            "Build some houses to get cash",
+                            "(They're free for now)"]
                     }
                 });
                 return false;
@@ -39,9 +45,10 @@ var actions;
         var buyCellCancelFN = function () {
             blinkerTODO.removeCells(blinkerIdTODO);
             employee.active = true;
+            employee.currentAction = undefined;
         }.bind(this);
 
-        var onCompleteText = "Buy plot for " + price + "$ ?";
+        var onCompleteText = "Buy plot for " + price + "$?";
 
         var completeFN = function () {
             blinkerTODO.addCells([cell], blinkerIdTODO);
@@ -51,7 +58,7 @@ var actions;
                 content: {
                     text: onCompleteText,
                     onOk: buyCellConfirmFN,
-                    onCancel: buyCellCancelFN
+                    onClose: buyCellCancelFN
                 }
             });
         };
@@ -67,6 +74,7 @@ var actions;
     actions.buyCell = buyCell;
     function recruitEmployee(player, employee) {
         employee.active = false;
+        employee.currentAction = "recruit";
 
         var actionTime = getActionTime([employee.skills["recruitment"]], 14);
 
@@ -78,6 +86,7 @@ var actions;
 
         var onConfirmFN = function () {
             employee.active = true;
+            employee.currentAction = undefined;
             employee.trainSkill("recruitment");
         };
 
@@ -87,6 +96,9 @@ var actions;
                 content: {
                     player: player,
                     employees: newEmployees,
+                    text: [
+                        employee.name + " was able to scout the following people.",
+                        "Which one should we recruit?"],
                     recruitingEmployee: employee
                 }
             });

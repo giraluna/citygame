@@ -1,4 +1,5 @@
 /// <reference path="../../lib/react.d.ts" />
+/// <reference path="../js/eventlistener.d.ts" />
 /// 
 /// <reference path="js/draggable.d.ts" />
 /// <reference path="js/splitmultilinetext.d.ts" />
@@ -32,10 +33,19 @@ module UIComponents
 export var EmployeeActionPopup = React.createClass({
   mixins: [Draggable, SplitMultilineText],
 
-  handleOk: function()
+  handleOk: function(e)
   {
+    var selected = this.refs.employeeAction.state.selected;
+    if (!selected || !selected.employee.active)
+    {
+      eventManager.dispatchEvent({
+        type: "makeInfoPopup", content:{text: "No employee selected"}
+      });
+      return false;
+    }
+
     var callbackSuccessful =
-      this.props.onOk.call(null, this.refs.employeeAction.state.selected);
+      this.props.onOk.call(null, selected);
     if (callbackSuccessful !== false)
     {
       this.handleClose();
@@ -58,7 +68,6 @@ export var EmployeeActionPopup = React.createClass({
 
   componentWillRecieveProps: function(newProps)
   {
-    console.log(newProps.player);
     this.setState({employees: newProps.employees || newProps.player.employees});
   },
 
@@ -78,16 +87,22 @@ export var EmployeeActionPopup = React.createClass({
 
       selected: null
     }
+    var stopBubble = function(e){e.stopPropagation();};
 
     var okBtn = React.DOM.button(
     {
-      onClick: this.handleOk
+      onClick: this.handleOk,
+      draggable: true,
+      onDrag: stopBubble
     }, this.props.okBtnText || "Ok");
 
     var closeBtn = React.DOM.button(
     {
-      onClick: this.handleClose
+      onClick: this.handleClose,
+      draggable: true,
+      onDrag: stopBubble
     }, this.props.closeBtnText || "Cancel");
+
 
     return(
       React.DOM.div( 
@@ -96,10 +111,11 @@ export var EmployeeActionPopup = React.createClass({
           style: this.state.style,
           draggable: true,
           onDragStart: this.handleDragStart,
-          onDrag: this.handleDrag
+          onDrag: this.handleDrag,
+          onDragEnd: this.handleDragEnd
         }, 
         React.DOM.p( {className:"popup-text"}, text ),
-        React.DOM.div( {className:"popup-content"},
+        React.DOM.div( {className:"popup-content", draggable: true, onDrag: stopBubble},
           UIComponents.EmployeeAction(employeeActionProps)
         ),
         React.DOM.div( {className:"popup-buttons"}, 

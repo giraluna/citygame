@@ -9,7 +9,8 @@ var UIComponents;
             var rows = [];
             var skillColumns = [];
 
-            for (var skill in this.props.employees[0].skills) {
+            Object.keys(this.props.employees);
+            for (var skill in this.props.employees[Object.keys(this.props.employees)[0]]) {
                 var colProps = {};
 
                 if (this.props.relevantSkills && this.props.relevantSkills.length > 0) {
@@ -21,7 +22,8 @@ var UIComponents;
 
                 skillColumns.push(React.DOM.col(colProps));
             }
-            this.props.employees.forEach(function (employee) {
+            for (var _e in this.props.employees) {
+                var employee = this.props.employees[_e];
                 var key = employee.id;
 
                 var employeeProps = {
@@ -37,17 +39,18 @@ var UIComponents;
                     employeeProps.rowProps.onClick = self.props.handleSelectRow.bind(null, key, employee);
                 }
 
-                if (self.props.selected && self.props.selected.key === key) {
-                    employeeProps.rowProps["className"] = "employee selected";
-                } else if (employee.active === false) {
+                if (employee.active === false) {
                     employeeProps.rowProps["className"] = "employee inactive";
+                } else if (self.props.selected && self.props.selected.key === key) {
+                    employeeProps.rowProps["className"] = "employee selected";
                 }
                 ;
 
                 var row = UIComponents.Employee(employeeProps);
 
                 rows.push(row);
-            });
+            }
+            ;
 
             return (React.DOM.table({ className: "employee-list" }, React.DOM.colgroup(null, React.DOM.col(null), skillColumns), React.DOM.thead(null, React.DOM.tr(null, React.DOM.th(null, "Name"), React.DOM.th({ title: "Negotiation" }, "neg"), React.DOM.th({ title: "Management" }, "mgt"), React.DOM.th({ title: "Recruitment" }, "rec"), React.DOM.th({ title: "Construction" }, "con"))), React.DOM.tbody(null, rows)));
         }

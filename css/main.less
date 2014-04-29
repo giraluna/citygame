@@ -39,8 +39,6 @@
   overflow-x: hidden;
 }
 
-
-
 html, body
 {
   height: 100%;
@@ -176,6 +174,8 @@ html, body
   border: 1px solid @dark-blue;
   background-color: rgba(232, 251, 255, 0.8);
 
+  cursor: move;
+
   .popup-text
   {
     margin: 7px auto;
@@ -189,6 +189,7 @@ html, body
     >*
     {
       border: 1px solid @dark-blue;
+      cursor: auto;
     }
     th
     {
@@ -298,6 +299,10 @@ html, body
       right: 0px;
       color: #444;
       text-decoration: none;
+    }
+    #close-info:hover
+    {
+      text-decoration: underline;
     }
   }
 

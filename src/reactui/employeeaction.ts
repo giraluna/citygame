@@ -10,26 +10,24 @@ module UIComponents
 {
   /**
    * props:
-   * employees
-   * relevantSkills
-   * actionText
-   * 
+   * employees: array
+   * relevantSkills?: array
+   * action?: any
    *
    * state:
-   * selected employee: Employee
-   * action:
+   * selected employee: employee
+   * action
    * {
    *   target
-   *   base action duration
-   *   base action cost
+   *   base cost
+   *   base duration
    * }
-   * }
-   */
-  
-  /**
+   *
+   *
+   * children:
    * el
    * {
-   *   selected employee
+   *   selected
    *   employees
    *   relevantskills
    *   handleselect
@@ -42,7 +40,7 @@ export var EmployeeAction = React.createClass({
     return(
     {
       selected: null,
-      action: this.props.action
+      action: this.props.action || null
     });
   },
 
@@ -82,26 +80,27 @@ export var EmployeeAction = React.createClass({
 
     if (selectedAction)
     {
-      data.target = selectedAction.target;
-    }
+      var data: any = {};
+        data.target = selectedAction.target;
 
-    if (selectedEmployee)
-    {
-      var skills = this.props.relevantSkills.map(function(skill)
+      if (selectedEmployee)
       {
-        return selectedEmployee.skills[skill];
-      });
+        var skills = this.props.relevantSkills.map(function(skill)
+        {
+          return selectedEmployee.skills[skill];
+        });
 
-      data.selectedEmployee = selectedEmployee;
+        data.selectedEmployee = selectedEmployee;
 
-      data.approxTime = selectedAction.baseDuration ? 
-        actions.getActionTime(skills, selectedAction.baseDuration).approximate : null;
-      data.approxCost = selectedAction.baseCost ? 
-        actions.getActionCost(skills, selectedAction.baseCost).approximate : null;
-
+        data.approxTime = selectedAction.baseDuration ? 
+          actions.getActionTime(skills, selectedAction.baseDuration).approximate : null;
+        data.approxCost = selectedAction.baseCost ? 
+          actions.getActionCost(skills, selectedAction.baseCost).approximate : null;
+      }
     }
-
-    var actionInfo = UIComponents.ActionInfo({data: data, text: this.props.actionText});
+    var actionInfo = selectedAction ?
+      UIComponents.ActionInfo({data: data, text: selectedAction.actionText}) :
+      null;
 
     return (
       React.DOM.div(null,

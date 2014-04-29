@@ -1,4 +1,5 @@
 /// <reference path="../../../lib/react.d.ts" />
+/// <reference path="../../js/eventlistener.d.ts" />
 /// <reference path="draggable.d.ts" />
 /// <reference path="splitmultilinetext.d.ts" />
 /// <reference path="employeeaction.d.ts" />

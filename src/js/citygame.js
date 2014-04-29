@@ -208,7 +208,6 @@ var Cell = (function () {
     };
     Cell.prototype.changeContent = function (type, update, data) {
         if (typeof update === "undefined") { update = true; }
-        console.log(type);
         var buildable = this.checkBuildable(type);
         var toAdd = (type !== "none" && buildable !== false);
         var toRemove = (type === "none" || toAdd);

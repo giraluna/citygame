@@ -276,7 +276,6 @@ class Cell
   }
   changeContent( type:string, update:boolean=true, data? )
   {
-    console.log(type);
     var buildable = this.checkBuildable(type);
     var toAdd: boolean = ( type !== "none" && buildable !== false );
     var toRemove: boolean = ( type === "none" || toAdd );

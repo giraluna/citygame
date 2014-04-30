@@ -473,6 +473,7 @@ var Game = (function () {
         var dateSystem = new DateSystem(1, this.systemsManager, document.getElementById("date"));
         this.systemsManager.addSystem("date", dateSystem);
 
+        this.resize();
         this.render();
         this.updateWorld();
 
@@ -609,8 +610,9 @@ var Game = (function () {
     };
     Game.prototype.resize = function () {
         var container = window.getComputedStyle(document.getElementById("pixi-container"), null);
-        SCREEN_WIDTH = parseInt(container.width);
-        SCREEN_HEIGHT = parseInt(container.height);
+        SCREEN_WIDTH = parseInt(container.width) / window.devicePixelRatio;
+        SCREEN_HEIGHT = parseInt(container.height) / window.devicePixelRatio;
+        console.log(SCREEN_WIDTH, SCREEN_HEIGHT);
         if (game.renderer) {
             game.renderer.resize(SCREEN_WIDTH, SCREEN_HEIGHT);
         }

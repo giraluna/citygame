@@ -52,7 +52,8 @@ export var ConfirmPopup = React.createClass({
         draggable: true,
         onDragStart: this.handleDragStart,
         onDrag: this.handleDrag,
-        onDragEnd: this.handleDragEnd
+        onDragEnd: this.handleDragEnd,
+        onTouchStart: this.handleDragStart
       }, 
         React.DOM.p( {className:"popup-text"}, text ),
         React.DOM.div( {className:"popup-buttons"}, okBtn, cancelBtn)

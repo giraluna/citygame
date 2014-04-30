@@ -78,7 +78,8 @@ var UIComponents;
                 draggable: true,
                 onDragStart: this.handleDragStart,
                 onDrag: this.handleDrag,
-                onDragEnd: this.handleDragEnd
+                onDragEnd: this.handleDragEnd,
+                onTouchStart: this.handleDragStart
             }, React.DOM.p({ className: "popup-text" }, text), React.DOM.div({ className: "popup-content", draggable: true, onDrag: stopBubble }, UIComponents.BuildingList(buildingListProps)), React.DOM.div({ className: "popup-buttons" }, okBtn, closeBtn)));
         }
     });

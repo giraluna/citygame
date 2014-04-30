@@ -58,7 +58,6 @@ var ReactUI = (function () {
 
     ///// /////
     ReactUI.prototype.makePopup = function (type, props) {
-        var container = document.getElementById("react-container");
         var key = this.idGenerator++;
 
         var onCloseCallback = props.onClose;
@@ -73,8 +72,8 @@ var ReactUI = (function () {
         ;
         popupProps.key = key;
         popupProps.initialStyle = {
-            top: container.offsetHeight / 3.5 + Object.keys(this.popups).length * 15,
-            left: container.offsetWidth / 3.5 + Object.keys(this.popups).length * 15,
+            top: window.innerHeight / 3.5 - 60 + Object.keys(this.popups).length * 15,
+            left: window.innerWidth / 3.5 - 60 + Object.keys(this.popups).length * 15,
             zIndex: this.incrementZIndex()
         };
         popupProps.incrementZIndex = this.incrementZIndex.bind(this);

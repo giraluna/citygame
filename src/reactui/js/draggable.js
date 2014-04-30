@@ -4,6 +4,11 @@ var UIComponents;
 (function (UIComponents) {
     UIComponents.Draggable = {
         handleDragStart: function (e) {
+            this.DOMNode.style.zIndex = this.props.incrementZIndex();
+
+            if (!e.nativeEvent.dataTransfer)
+                return;
+
             //this.DOMNode.classList.add("dragging");
             // browser overrides css cursor when dragging
             e.nativeEvent.dataTransfer.dropEffect = "move";
@@ -12,7 +17,6 @@ var UIComponents;
                 x: e.nativeEvent.layerX,
                 y: e.nativeEvent.layerY
             };
-            this.DOMNode.style.zIndex = this.props.incrementZIndex();
         },
         handleDrag: function (e) {
             if (e.clientX === 0 && e.clientY === 0)

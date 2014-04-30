@@ -8,6 +8,9 @@ export var Draggable =
 {
   handleDragStart: function(e)
   {
+    this.DOMNode.style.zIndex = this.props.incrementZIndex();
+
+    if (!e.nativeEvent.dataTransfer) return;
     //this.DOMNode.classList.add("dragging");
     // browser overrides css cursor when dragging
     e.nativeEvent.dataTransfer.dropEffect = "move";
@@ -17,7 +20,6 @@ export var Draggable =
       x: e.nativeEvent.layerX,
       y: e.nativeEvent.layerY
     };
-    this.DOMNode.style.zIndex = this.props.incrementZIndex();
   },
   handleDrag: function(e)
   {

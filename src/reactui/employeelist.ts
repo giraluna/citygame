@@ -48,7 +48,7 @@ export var EmployeeList = React.createClass({
 
       if (self.props.handleSelectRow)
       {
-        employeeProps.rowProps.onClick =
+        employeeProps.rowProps.onClick = employeeProps.rowProps.onTouchStart =
           self.props.handleSelectRow.bind(null, key, employee);
       }
 

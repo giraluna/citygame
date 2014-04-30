@@ -21,6 +21,7 @@ var UIComponents;
 
             var okBtn = React.DOM.button({
                 onClick: this.handleOk,
+                onTouchStart: this.handleOk,
                 draggable: true,
                 onDrag: function (e) {
                     e.stopPropagation();
@@ -29,6 +30,7 @@ var UIComponents;
 
             var cancelBtn = React.DOM.button({
                 onClick: this.handleClose,
+                onTouchStart: this.handleClose,
                 draggable: true,
                 onDrag: function (e) {
                     e.stopPropagation();

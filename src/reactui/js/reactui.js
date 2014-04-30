@@ -20,6 +20,7 @@ var ReactUI = (function () {
         this.init();
     }
     ReactUI.prototype.init = function () {
+        React.initializeTouchEvents(true);
         this.addEventListeners();
         this.updateReact();
     };
@@ -105,7 +106,16 @@ var ReactUI = (function () {
             relevantSkills: ["recruitment"],
             text: "Select employee in charge of recruitment",
             onOk: recruitWithSelected,
-            okBtnText: "Select"
+            okBtnText: "Select",
+            action: {
+                actionText: "Scouting new employees would take:",
+                data: {
+                    time: {
+                        approximate: true,
+                        amount: 14
+                    }
+                }
+            }
         });
     };
 

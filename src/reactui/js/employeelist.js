@@ -36,7 +36,7 @@ var UIComponents;
                 };
 
                 if (self.props.handleSelectRow) {
-                    employeeProps.rowProps.onClick = self.props.handleSelectRow.bind(null, key, employee);
+                    employeeProps.rowProps.onClick = employeeProps.rowProps.onTouchStart = self.props.handleSelectRow.bind(null, key, employee);
                 }
 
                 if (employee.active === false) {

@@ -28,3 +28,4 @@ interface ISpritesheetData {
 declare function spritesheetToImages(sheetData: ISpritesheetData, baseUrl: string): {
     [id: string]: HTMLImageElement;
 };
+declare function addClickAndTouchEventListener(target: any, callback: any): void;

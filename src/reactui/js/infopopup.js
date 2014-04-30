@@ -12,6 +12,7 @@ var UIComponents;
 
             var okBtn = React.DOM.button({
                 onClick: this.props.onClose,
+                onTouchStart: this.props.onClose,
                 draggable: true,
                 onDrag: function (e) {
                     e.stopPropagation();

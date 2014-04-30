@@ -35,6 +35,7 @@ class ReactUI
   }
   init()
   {
+    React.initializeTouchEvents(true);
     this.addEventListeners();
     this.updateReact();
   }
@@ -158,7 +159,19 @@ class ReactUI
       relevantSkills: ["recruitment"],
       text: "Select employee in charge of recruitment",
       onOk: recruitWithSelected,
-      okBtnText: "Select"
+      okBtnText: "Select",
+      action:
+      {
+        actionText: "Scouting new employees would take:",
+        data:
+        {
+          time:
+          {
+            approximate: true,
+            amount: 14
+          }
+        }
+      }
     });
   }
 

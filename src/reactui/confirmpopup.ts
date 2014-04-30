@@ -31,6 +31,7 @@ export var ConfirmPopup = React.createClass({
     var okBtn = React.DOM.button(
     {
       onClick: this.handleOk,
+      onTouchStart: this.handleOk,
       draggable: true,
       onDrag: function(e){e.stopPropagation();}
     }, this.props.okBtnText || "Confirm");
@@ -38,6 +39,7 @@ export var ConfirmPopup = React.createClass({
     var cancelBtn = React.DOM.button(
     {
       onClick: this.handleClose,
+      onTouchStart: this.handleClose,
       draggable: true,
       onDrag: function(e){e.stopPropagation();}
     }, this.props.CloseBtnText || "Cancel");

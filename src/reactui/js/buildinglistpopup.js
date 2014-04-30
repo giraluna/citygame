@@ -60,12 +60,14 @@ var UIComponents;
 
             var okBtn = React.DOM.button({
                 onClick: this.handleOk,
+                onTouchStart: this.handleOk,
                 draggable: true,
                 onDrag: stopBubble
             }, this.props.okBtnText || "Build");
 
             var closeBtn = React.DOM.button({
                 onClick: this.handleClose,
+                onTouchStart: this.handleClose,
                 draggable: true,
                 onDrag: stopBubble
             }, this.props.closeBtnText || "Cancel");

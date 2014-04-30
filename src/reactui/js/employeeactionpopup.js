@@ -50,9 +50,7 @@ var UIComponents;
         getInitialState: function () {
             return {
                 employees: this.props.employees || this.props.player.employees,
-                style: this.props.initialStyle,
-                pos: { left: this.props.initialStyle.left, top: this.props.initialStyle.top },
-                ZIndex: this.props.initialStyle.ZIndex
+                style: this.props.initialStyle
             };
         },
         componentWillRecieveProps: function (newProps) {
@@ -77,12 +75,14 @@ var UIComponents;
 
             var okBtn = React.DOM.button({
                 onClick: this.handleOk,
+                onTouchStart: this.handleOk,
                 draggable: true,
                 onDrag: stopBubble
             }, this.props.okBtnText || "Ok");
 
             var closeBtn = React.DOM.button({
                 onClick: this.handleClose,
+                onTouchStart: this.handleClose,
                 draggable: true,
                 onDrag: stopBubble
             }, this.props.closeBtnText || "Cancel");

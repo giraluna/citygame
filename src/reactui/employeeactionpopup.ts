@@ -90,6 +90,7 @@ export var EmployeeActionPopup = React.createClass({
     var okBtn = React.DOM.button(
     {
       onClick: this.handleOk,
+      onTouchStart: this.handleOk,
       draggable: true,
       onDrag: stopBubble
     }, this.props.okBtnText || "Ok");
@@ -97,6 +98,7 @@ export var EmployeeActionPopup = React.createClass({
     var closeBtn = React.DOM.button(
     {
       onClick: this.handleClose,
+      onTouchStart: this.handleClose,
       draggable: true,
       onDrag: stopBubble
     }, this.props.closeBtnText || "Cancel");

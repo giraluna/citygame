@@ -192,3 +192,14 @@ function spritesheetToImages(sheetData: ISpritesheetData, baseUrl: string)
 
   return frames;
 }
+
+function addClickAndTouchEventListener(target, callback)
+{
+  function execClickCallback(e)
+  {
+    e.preventDefault();
+    callback.call();
+  }
+  target.addEventListener("click", execClickCallback);
+  target.addEventListener("touchend", execClickCallback);
+}

@@ -386,17 +386,17 @@ var WorldRenderer = (function () {
 
         // TEMPORARY
         var self = this;
-        _ws.mousedown = function (event) {
+        _ws.mousedown = _ws.touchstart = function (event) {
             game.mouseEventHandler.mouseDown(event, "world");
         };
-        _ws.mousemove = function (event) {
+        _ws.mousemove = _ws.touchmove = function (event) {
             game.mouseEventHandler.mouseMove(event, "world");
         };
 
-        _ws.mouseup = function (event) {
+        _ws.mouseup = _ws.touchend = function (event) {
             game.mouseEventHandler.mouseUp(event, "world");
         };
-        _ws.mouseupoutside = function (event) {
+        _ws.mouseupoutside = _ws.touchendoutside = function (event) {
             game.mouseEventHandler.mouseUp(event, "world");
         };
     };
@@ -501,16 +501,16 @@ var Game = (function () {
 
         var _game = this;
 
-        _stage.mousedown = function (event) {
+        _stage.mousedown = _stage.touchstart = function (event) {
             _game.mouseEventHandler.mouseDown(event, "stage");
         };
-        _stage.mousemove = function (event) {
+        _stage.mousemove = _stage.touchmove = function (event) {
             _game.mouseEventHandler.mouseMove(event, "stage");
         };
-        _stage.mouseup = function (event) {
+        _stage.mouseup = _stage.touchend = function (event) {
             _game.mouseEventHandler.mouseUp(event, "stage");
         };
-        _stage.mouseupoutside = function (event) {
+        _stage.mouseupoutside = _stage.touchendoutside = function (event) {
             game.mouseEventHandler.mouseUp(event, "stage");
         };
     };
@@ -536,7 +536,7 @@ var Game = (function () {
 
         //zoom
         var zoomBtn = document.getElementById("zoomBtn");
-        zoomBtn.addEventListener("click", function () {
+        addClickAndTouchEventListener(zoomBtn, function () {
             var zoomAmount = document.getElementById("zoom-amount")["value"];
             game.mouseEventHandler.scroller.zoom(zoomAmount);
         });
@@ -544,7 +544,7 @@ var Game = (function () {
         for (var tool in this.tools) {
             var btn = document.getElementById("" + tool + "Btn");
             (function addBtnFn(btn, tool) {
-                btn.addEventListener("click", function () {
+                addClickAndTouchEventListener(btn, function () {
                     self.changeTool([tool]);
                 });
             })(btn, tool);
@@ -553,17 +553,17 @@ var Game = (function () {
         //save & load
         var saveBtn = document.getElementById("saveBtn");
         var loadBtn = document.getElementById("loadBtn");
-        saveBtn.addEventListener("click", function () {
+        addClickAndTouchEventListener(saveBtn, function () {
             self.save();
         });
-        loadBtn.addEventListener("click", function () {
+        addClickAndTouchEventListener(loadBtn, function () {
             self.load();
         });
 
         //recruit
         var recruitBtn = document.getElementById("recruitBtn");
 
-        recruitBtn.addEventListener("click", function () {
+        addClickAndTouchEventListener(recruitBtn, function () {
             if (Object.keys(self.players["player0"].employees).length < 1) {
                 if (self.players["player0"].usedInitialRecruit) {
                     eventManager.dispatchEvent({

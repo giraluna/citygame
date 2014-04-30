@@ -48,7 +48,8 @@ module UIComponents
 
         if (playerCanBuildBuilding)
         {
-          rowProps.onClick = this.handleSelectRow.bind(null, buildingTemplate.type);
+          rowProps.onClick = rowProps.onTouchStart =
+            this.handleSelectRow.bind(null, buildingTemplate.type);
           rowProps.className = "active";
         };
 

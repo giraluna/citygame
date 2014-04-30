@@ -595,6 +595,14 @@ var Game = (function () {
             }
         });
 
+        //info
+        addClickAndTouchEventListener(document.getElementById("show-info"), function () {
+            document.getElementById("info-container").style.display = "flex";
+        });
+        addClickAndTouchEventListener(document.getElementById("close-info"), function () {
+            document.getElementById("info-container").style.display = "none";
+        });
+
         //renderer
         this.bindRenderer();
 

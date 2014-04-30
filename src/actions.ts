@@ -60,7 +60,7 @@ module actions
 
     var onCompleteText = "Buy plot for " + price + "$?";
 
-    var completeFN = function()
+    var buyCellCompleteFN = function()
     {
       blinkerTODO.addCells([cell], blinkerIdTODO);
       blinkerTODO.start();
@@ -74,14 +74,13 @@ module actions
           onClose: buyCellCancelFN
         }
       })
-
     };
 
     eventManager.dispatchEvent({type: "updateWorld", content:""});
     eventManager.dispatchEvent({type: "delayedAction", content:
       {
         time: actionTime["actual"],
-        onComplete: completeFN
+        onComplete: buyCellCompleteFN
       }
     });
   }
@@ -129,6 +128,58 @@ module actions
       }
     });
   }
+
+  export function constructBuilding(props:
+  {
+    player: Player;
+    cell: any;
+    building: any;
+    employee: Employee;
+  })
+  {
+    var player = props.player;
+    var cell = props.cell;
+    var building = props.building;
+    var employee = props.employee;
+
+    employee.active = false;
+    employee.currentAction = "constructBuilding";
+    var blinkerId = blinkerTODO.idGenerator++;
+
+    var actionTime = getActionTime([employee.skills["construction"]], building.buildTime);
+
+    var constructBuildingConfirmFN = function()
+    {
+      blinkerTODO.removeCells(blinkerId);
+      employee.active = true;
+      employee.currentAction = undefined;
+
+      cell.changeContent(building);
+      eventManager.dispatchEvent({type: "updateWorld", content: ""});
+    };
+    var constructBuildingCompleteFN = function()
+    {
+      blinkerTODO.addCells([cell], blinkerId);
+      blinkerTODO.start();
+      eventManager.dispatchEvent(
+      {
+        type: "makeInfoPopup",
+        content:
+        {
+          text: "Building at cell " + cell.gridPos + " has finished construction.",
+          onClose: constructBuildingConfirmFN
+        }
+      })
+    }
+
+    eventManager.dispatchEvent({type: "delayedAction", content:
+      {
+        time: actionTime["actual"],
+        onComplete: constructBuildingCompleteFN
+      }
+    });
+  }
+
   function getSkillAdjust( skills: number[], base: number, adjustFN, variance: number)
   {
     var avgSkill = skills.reduce(function(a, b){return a+b}) / skills.length;

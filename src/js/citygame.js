@@ -922,6 +922,9 @@ var MouseEventHandler = (function () {
         }
     };
 
+    // need to switch to the click event being transferred to
+    // rendertexture parent DOC and checked against individual sprites
+    // (that have hit masks) to support slopes / variable height
     MouseEventHandler.prototype.startCellAction = function (event) {
         var pos = event.getLocalPosition(event.target);
         var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
@@ -1284,7 +1287,7 @@ var BuildTool = (function (_super) {
     }
     BuildTool.prototype.onActivate = function (target) {
         eventManager.dispatchEvent({
-            type: "makeBuildingConstructPopup", content: {
+            type: "makeBuildingSelectPopup", content: {
                 player: game.players["player0"],
                 cell: target
             }

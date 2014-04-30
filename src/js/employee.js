@@ -146,7 +146,7 @@ var Employee = (function () {
             negotiation: 1,
             management: 1,
             recruitment: 1,
-            constuction: 1
+            construction: 1
         };
         var min = 8 * skillLevel + 1;
         var max = 16 * skillLevel + 1 + variance;
@@ -161,7 +161,7 @@ var Employee = (function () {
             negotiation: 1,
             management: 1,
             recruitment: 1,
-            constuction: 1
+            construction: 1
         };
 
         for (var skill in skills) {

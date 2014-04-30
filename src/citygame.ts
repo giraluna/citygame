@@ -1199,7 +1199,9 @@ class MouseEventHandler
       this.currAction = undefined;
     }
   }
-
+  // need to switch to the click event being transferred to
+  // rendertexture parent DOC and checked against individual sprites
+  // (that have hit masks) to support slopes / variable height
   startCellAction(event)
   {
     var pos = event.getLocalPosition(event.target);
@@ -1621,7 +1623,7 @@ class BuildTool extends Tool
   }
   onActivate(target: Cell)
   {
-    eventManager.dispatchEvent({type: "makeBuildingConstructPopup", content:
+    eventManager.dispatchEvent({type: "makeBuildingSelectPopup", content:
       {
         player: game.players["player0"],
         cell: target

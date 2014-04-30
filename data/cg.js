@@ -208,6 +208,7 @@ var cg =
         "baseType": "building",
         "categoryType": "apartment",
         "cost": 1,
+        "buildTime": 1,
         "anchor": [0.5, 1],
         "frame": "house1.png",
         "canNotBuildOn": ["water", "building", "road"]
@@ -218,6 +219,7 @@ var cg =
         "baseType": "building",
         "categoryType": "apartment",
         "cost": 2,
+        "buildTime": 2,
         "anchor": [0.5, 1],
         "frame": "house2.png",
         "canNotBuildOn": ["water", "building", "road"]
@@ -228,6 +230,7 @@ var cg =
         "baseType": "building",
         "categoryType": "apartment",
         "cost": 3,
+        "buildTime": 3,
         "anchor": [0.5, 1],
         "frame": "house3.png",
         "canNotBuildOn": ["water", "building", "road"]
@@ -238,6 +241,7 @@ var cg =
         "baseType": "building",
         "categoryType": "apartment",
         "cost": 4,
+        "buildTime": 4,
         "anchor": [0.5, 1],
         "frame": "house4.png",
         "canNotBuildOn": ["water", "building", "road"]
@@ -248,6 +252,7 @@ var cg =
         "baseType": "building",
         "categoryType": "apartment",
         "cost": 5,
+        "buildTime": 5,
         "anchor": [0.5, 1],
         "frame": "house5.png",
         "canNotBuildOn": ["water", "building", "road"]
@@ -258,6 +263,7 @@ var cg =
         "baseType": "building",
         "categoryType": "apartment",
         "cost": 6,
+        "buildTime": 6,
         "anchor": [0.5, 1],
         "frame": "house6.png",
         "canNotBuildOn": ["water", "building", "road"]

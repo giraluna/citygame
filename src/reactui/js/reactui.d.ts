@@ -60,9 +60,15 @@ declare class ReactUI {
         onClose?: any;
         closeBtnText?: string;
     }): void;
-    public makeBuildingConstructPopup(props: {
+    public makeBuildingSelectPopup(props: {
         player: Player;
         cell: any;
+    }): void;
+    public makeBuildingConstructPopup(props: {
+        player: Player;
+        buildingTemplate: any;
+        cell: any;
+        text?: any;
     }): void;
     public incrementZIndex(): number;
     public destroyPopup(key: any, callback: any): void;

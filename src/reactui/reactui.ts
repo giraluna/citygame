@@ -70,9 +70,9 @@ class ReactUI
     {
       self.makeInfoPopup(event.content)
     });
-    eventManager.addEventListener("makeBuildingConstructPopup", function(event)
+    eventManager.addEventListener("makeBuildingSelectPopup", function(event)
     {
-      self.makeBuildingConstructPopup(event.content)
+      self.makeBuildingSelectPopup(event.content)
     });
     eventManager.addEventListener("updateReact", function(event)
     {
@@ -216,9 +216,21 @@ class ReactUI
       action:
       {
         target: props.cell,
-        baseDuration: 14,
-        baseCost: props.cell.landValue,
-        actionText: "Buying this plot would take:"
+        actionText: "Buying this plot would take:",
+        
+        data:
+        {
+          time:
+          {
+            approximate: true,
+            amount: 14
+          },
+          cost:
+          {
+            approximate: true,
+            amount: props.cell.landValue
+          }
+        }
       }
     });
   }
@@ -233,24 +245,33 @@ class ReactUI
   {
     this.makePopup("ConfirmPopup", props);
   }
-  makeBuildingConstructPopup(props:
+  makeBuildingSelectPopup(props:
   {
     player: Player;
     cell: any;
   })
   {
+    if (Object.keys(props.player.employees).length < 1)
+    {
+      this.makeInfoPopup({text: "Recruit some employees first"});
+      return;
+    }
+
+    var self = this;
     var buildSelected = function(selected)
     {
-      // TODO
       if (selected && props.player.money >= selected.cost)
       {
-        props.cell.changeContent(selected);
-        eventManager.dispatchEvent({type:"updateWorld", content:""});
-        props.player.addMoney(-selected.cost);
+        self.makeBuildingConstructPopup(
+        {
+          player: props.player,
+          buildingTemplate: selected,
+          cell: props.cell
+        });
       }
     }
     // TODO
-    // really bad
+    // bad
     var _: any = window;
     var _game = _.game;
     var _cg = _.cg;
@@ -260,6 +281,62 @@ class ReactUI
       buildingTemplates: _cg.content.buildings,
       buildingImages: _game.frameImages,
       onOk: buildSelected
+    });
+  }
+  makeBuildingConstructPopup(props:
+  {
+    player: Player;
+    buildingTemplate: any;
+    cell: any;
+    text?: any;
+  })
+  {
+    var buildBuilding = function(selected)
+    {
+      if (selected && props.player.money >= props.buildingTemplate.cost)
+      {
+        // TODO
+        var _: any = window;
+        var _cg = _.cg;
+        props.player.addMoney(-props.buildingTemplate.cost);
+
+        actions.constructBuilding(
+        {
+          player: props.player,
+          cell: props.cell,
+          building: props.buildingTemplate,
+          employee: selected.employee
+        });
+      }
+    }
+    this.makeEmployeeActionPopup(
+    {
+      player: props.player,
+      relevantSkills: ["construction"],
+      text: "Select employee in charge of construction",
+      onOk: buildBuilding,
+      okBtnText: "Build",
+      action:
+      {
+        target: props.cell,
+        actionText: "Constructing this building would take:",
+        data:
+        {
+          time:
+          {
+            approximate: true,
+            amount: props.buildingTemplate.buildTime
+          },
+          cost:
+          {
+            approximate: false,
+            amount: props.buildingTemplate.cost
+          }
+        },
+        baseDuration: props.buildingTemplate.buildTime,
+        exactCost: props.buildingTemplate.cost,
+        
+      }
     });
   }
 

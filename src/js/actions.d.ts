@@ -5,6 +5,12 @@
 declare module actions {
     function buyCell(player: Player, cell: any, employee: Employee): void;
     function recruitEmployee(player: Player, employee: Employee): void;
+    function constructBuilding(props: {
+        player: Player;
+        cell: any;
+        building: any;
+        employee: Employee;
+    }): void;
     function getActionTime(skills: number[], base: number): {
         approximate: number;
         actual: number;

@@ -11,7 +11,7 @@ interface ISkillsObj {
     negotiation: number;
     management: number;
     recruitment: number;
-    constuction: number;
+    construction: number;
 }
 declare class Employee {
     public id: string;

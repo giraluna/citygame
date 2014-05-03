@@ -1,6 +1,7 @@
 /// <reference path="../lib/pixi.d.ts" />
 
 /// <reference path="js/employee.d.ts" />
+/// <reference path="../data/js/cg.d.ts" />
 
 class Player
 {
@@ -22,6 +23,7 @@ class Player
   {
     this.id = "player" + id;
     this.bindElements();
+    this.init();
   }
   bindElements()
   {
@@ -33,6 +35,17 @@ class Player
   {
     this.moneySpan.innerHTML = this.money + "$";
     //this.incomeSpan.innerHTML = "+" + this.income + "/s";
+  }
+  init()
+  {
+    for (var building in cg.content.buildings)
+    {
+      var type = cg.content.buildings[building].categoryType;
+      if (!this.ownedContent[type])
+      {
+        this.ownedContent[type] = [];
+      }
+    }
   }
   addEventListeners()
   {
@@ -78,13 +91,14 @@ class Player
       delete this.ownedCells[cell.gridPos];
     }
   }
-  addContent( type, content )
+  addContent( content )
   {
-    if (!this.ownedContent[type])
-    {
-      this.ownedContent[type] = {};
-    }
-    this.ownedContent[type][content.id] = content;
+    var type = content.categoryType;
+    this.ownedContent[type].push(content);
+  }
+  removeContent( content )
+  {
+
   }
   addMoney(amount)
   {

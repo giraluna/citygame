@@ -1,5 +1,6 @@
 /// <reference path="../lib/pixi.d.ts" />
 /// <reference path="js/employee.d.ts" />
+/// <reference path="../data/js/cg.d.ts" />
 var Player = (function () {
     function Player(id) {
         this.money = 0;
@@ -10,6 +11,7 @@ var Player = (function () {
         this.modifiers = {};
         this.id = "player" + id;
         this.bindElements();
+        this.init();
     }
     Player.prototype.bindElements = function () {
         this.moneySpan = document.getElementById("money");
@@ -19,6 +21,14 @@ var Player = (function () {
     Player.prototype.updateElements = function () {
         this.moneySpan.innerHTML = this.money + "$";
         //this.incomeSpan.innerHTML = "+" + this.income + "/s";
+    };
+    Player.prototype.init = function () {
+        for (var building in cg.content.buildings) {
+            var type = cg.content.buildings[building].categoryType;
+            if (!this.ownedContent[type]) {
+                this.ownedContent[type] = [];
+            }
+        }
     };
     Player.prototype.addEventListeners = function () {
     };
@@ -56,11 +66,11 @@ var Player = (function () {
             delete this.ownedCells[cell.gridPos];
         }
     };
-    Player.prototype.addContent = function (type, content) {
-        if (!this.ownedContent[type]) {
-            this.ownedContent[type] = {};
-        }
-        this.ownedContent[type][content.id] = content;
+    Player.prototype.addContent = function (content) {
+        var type = content.categoryType;
+        this.ownedContent[type].push(content);
+    };
+    Player.prototype.removeContent = function (content) {
     };
     Player.prototype.addMoney = function (amount) {
         this.money += amount;

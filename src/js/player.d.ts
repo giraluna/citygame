@@ -1,5 +1,6 @@
 /// <reference path="../../lib/pixi.d.ts" />
 /// <reference path="employee.d.ts" />
+/// <reference path="../../data/js/cg.d.ts" />
 declare class Player {
     public id: string;
     public money: number;
@@ -14,12 +15,14 @@ declare class Player {
     constructor(id: number);
     public bindElements(): void;
     public updateElements(): void;
+    public init(): void;
     public addEventListeners(): void;
     public addEmployee(employee: Employee): void;
     public getEmployees(): any[];
     public getActiveEmployees(): any[];
     public addCell(cell: any): void;
     public removeCell(cell: any): void;
-    public addContent(type: any, content: any): void;
+    public addContent(content: any): void;
+    public removeContent(content: any): void;
     public addMoney(amount: any): void;
 }

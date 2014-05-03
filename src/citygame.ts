@@ -77,7 +77,7 @@ class ContentSprite extends Sprite
 
 class Content
 {
-  type: string;
+  type: any;
   baseType: string;
   categoryType: string;
   id: number;
@@ -85,7 +85,12 @@ class Content
   cell: Cell;
   flags: string[];
 
-  constructor( cell: Cell, type, data?)
+  baseProfit: number = 0;
+  modifiedProfit: number = 0;
+  modifiers: any = {};
+  player: Player;
+
+  constructor( cell: Cell, type: any, player?: Player)
   {
     this.cell = cell;
     this.type = type;
@@ -94,12 +99,16 @@ class Content
     this.flags = type["flags"] ? type["flags"].slice(0) : [];
     this.flags.push(this.baseType);
 
-    this.init( type );
-
-    if (data)
+    if (player)
     {
-      this.applyData(data);
+      this.baseProfit = type.baseProfit;
+      // TODO
+      this.modifiedProfit = this.baseProfit;
+      this.player = player;
+      player.addContent(this);
     }
+
+    this.init( type );
   }
   init( type )
   {
@@ -108,13 +117,6 @@ class Content
     var gridPos = this.cell.gridPos;
     _s.position = this.cell.sprite.position.clone();
     game.layers["content"]._addChildAt(_s, gridPos[0] + gridPos[1]);
-  }
-  applyData( data )
-  {
-    for (var key in data)
-    {
-      this[key] = data[key];
-    }
   }
 }
 
@@ -274,7 +276,7 @@ class Cell
       }
     }
   }
-  changeContent( type:string, update:boolean=true, data? )
+  changeContent( type:string, update:boolean=true, player?: Player)
   {
     var buildable = this.checkBuildable(type);
     var toAdd: boolean = ( type !== "none" && buildable !== false );
@@ -287,7 +289,7 @@ class Cell
 
     if ( toAdd )
     {
-      this.addContent( type, data );
+      this.addContent( type, player);
     }
     if (update)
     {
@@ -346,16 +348,10 @@ class Cell
   {
     getRoadConnections(this, 1);
   }
-  addContent( type, data? )
+  addContent( type: any, player?: Player )
   {
-    this.content = new Content( this, type, data );
-
-    // TEMPORARY
-    if (type.baseType === "building")
-    {
-      eventManager.dispatchEvent({type: "builtBuilding", content:""});
-    }
-
+    this.content = new Content( this, type, player);
+    
     return this.content;
   }
   removeContent()
@@ -364,15 +360,13 @@ class Cell
     {
       return;
     }
-
-    // TEMPORARY
-    if (this.content.baseType === "building")
+    if (this.content.player)
     {
-      eventManager.dispatchEvent({type: "destroyBuilding", content:""});
+      this.content.player.removeContent(this.content);
     }
-
     game.layers["content"]._removeChildAt(this.content.sprite,
       this.gridPos[0] + this.gridPos[1]);
+
     this.content = undefined;
   }
 }
@@ -434,7 +428,7 @@ class Board
         game.layers["ground"].addChild(sprite);
         if (data && dataCell.content)
         {
-          cell.changeContent(dataCell.content.type, dataCell.content.data);
+          cell.changeContent(dataCell.content.type);
         }
       }
     }
@@ -597,10 +591,11 @@ class Game
 
     this.systemsManager = new SystemsManager(1000);
     var player = new Player(idGenerator.player++);
+    player.addMoney(100);
     this.reactUI = new ReactUI(player);
     this.players[player.id] = player;
-    var profitSystem = new ProfitSystem(1, this.systemsManager, this.players);
-    this.systemsManager.addSystem("profit", profitSystem);
+    var apartmentProfitSystem = new ProfitSystem(1, this.systemsManager, this.players, "apartment");
+    this.systemsManager.addSystem("apartmentProfit", apartmentProfitSystem);
     this.systemsManager.addSystem("delayedAction", new DelayedActionSystem(1, this.systemsManager));
 
     var dateSystem = new DateSystem(1, this.systemsManager,
@@ -724,7 +719,8 @@ class Game
       {
         if ( Object.keys(self.players["player0"].employees).length < 1 )
         {
-          if ( self.players["player0"].usedInitialRecruit)
+          // TODO
+          if ( false) //self.players["player0"].usedInitialRecruit)
           {
             eventManager.dispatchEvent({type: "makeInfoPopup", content:
               {
@@ -791,7 +787,6 @@ class Game
       document.getElementById("pixi-container"), null );
     SCREEN_WIDTH = parseInt(container.width) / window.devicePixelRatio;
     SCREEN_HEIGHT = parseInt(container.height) / window.devicePixelRatio;
-    console.log(SCREEN_WIDTH, SCREEN_HEIGHT);
     if (game.renderer)
     {
       game.renderer.resize(SCREEN_WIDTH, SCREEN_HEIGHT);

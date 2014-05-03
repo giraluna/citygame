@@ -107,24 +107,32 @@ html, body
   flex-flow: row;
   align-items: center;
   margin: 0 10px;
+  @media(max-width: 700px)
+  {
+    margin: 0;
+  }
+
   >*
   {
     float: left;
   }
-
   #player
   {
+    display: flex;
+    align-items: center;
+
     min-width: 4em;
   }
   #date
   {
-    min-width: 8em;
+    min-width: 5em;
+    margin: 0 10px;
   }
   #speed
   {
     display: flex;
-    align-items: center;
     flex: 1;
+    align-items: center;
 
     label
     {
@@ -134,18 +142,23 @@ html, body
     {
       padding: 0;
       margin: 0;
+      @media(max-width: 600px)
+      {
+        width: 70px;
+      }
     }
   }
-  
   #show-info
   {
     text-decoration: none;
+    float: right;
     
     &:hover
     {
       text-decoration: underline;
     }
   }
+  
 }
 
 // REACT START

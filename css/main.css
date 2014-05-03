@@ -50,19 +50,27 @@ body {
   align-items: center;
   margin: 0 10px;
 }
+@media (max-width: 700px) {
+  #bottom-menu {
+    margin: 0;
+  }
+}
 #bottom-menu > * {
   float: left;
 }
 #bottom-menu #player {
+  display: flex;
+  align-items: center;
   min-width: 4em;
 }
 #bottom-menu #date {
-  min-width: 8em;
+  min-width: 5em;
+  margin: 0 10px;
 }
 #bottom-menu #speed {
   display: flex;
-  align-items: center;
   flex: 1;
+  align-items: center;
 }
 #bottom-menu #speed label {
   margin-right: 10px;
@@ -71,8 +79,14 @@ body {
   padding: 0;
   margin: 0;
 }
+@media (max-width: 600px) {
+  #bottom-menu #speed #speed-control {
+    width: 70px;
+  }
+}
 #bottom-menu #show-info {
   text-decoration: none;
+  float: right;
 }
 #bottom-menu #show-info:hover {
   text-decoration: underline;

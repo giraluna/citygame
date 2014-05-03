@@ -129,7 +129,7 @@ var actions;
             employee.active = true;
             employee.currentAction = undefined;
 
-            cell.changeContent(building);
+            cell.changeContent(building, true, player);
             eventManager.dispatchEvent({ type: "updateWorld", content: "" });
         };
         var constructBuildingCompleteFN = function () {

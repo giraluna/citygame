@@ -61,7 +61,10 @@ var ContentSprite = (function (_super) {
 })(Sprite);
 
 var Content = (function () {
-    function Content(cell, type, data) {
+    function Content(cell, type, player) {
+        this.baseProfit = 0;
+        this.modifiedProfit = 0;
+        this.modifiers = {};
         this.cell = cell;
         this.type = type;
         this.baseType = type["baseType"] || undefined;
@@ -69,11 +72,16 @@ var Content = (function () {
         this.flags = type["flags"] ? type["flags"].slice(0) : [];
         this.flags.push(this.baseType);
 
-        this.init(type);
+        if (player) {
+            this.baseProfit = type.baseProfit;
 
-        if (data) {
-            this.applyData(data);
+            // TODO
+            this.modifiedProfit = this.baseProfit;
+            this.player = player;
+            player.addContent(this);
         }
+
+        this.init(type);
     }
     Content.prototype.init = function (type) {
         var _s = this.sprite = new ContentSprite(type, this);
@@ -81,11 +89,6 @@ var Content = (function () {
         var gridPos = this.cell.gridPos;
         _s.position = this.cell.sprite.position.clone();
         game.layers["content"]._addChildAt(_s, gridPos[0] + gridPos[1]);
-    };
-    Content.prototype.applyData = function (data) {
-        for (var key in data) {
-            this[key] = data[key];
-        }
     };
     return Content;
 })();
@@ -206,7 +209,7 @@ var Cell = (function () {
             }
         }
     };
-    Cell.prototype.changeContent = function (type, update, data) {
+    Cell.prototype.changeContent = function (type, update, player) {
         if (typeof update === "undefined") { update = true; }
         var buildable = this.checkBuildable(type);
         var toAdd = (type !== "none" && buildable !== false);
@@ -217,7 +220,7 @@ var Cell = (function () {
         }
 
         if (toAdd) {
-            this.addContent(type, data);
+            this.addContent(type, player);
         }
         if (update) {
             this.updateCell();
@@ -265,13 +268,8 @@ var Cell = (function () {
     Cell.prototype.updateCell = function () {
         getRoadConnections(this, 1);
     };
-    Cell.prototype.addContent = function (type, data) {
-        this.content = new Content(this, type, data);
-
-        // TEMPORARY
-        if (type.baseType === "building") {
-            eventManager.dispatchEvent({ type: "builtBuilding", content: "" });
-        }
+    Cell.prototype.addContent = function (type, player) {
+        this.content = new Content(this, type, player);
 
         return this.content;
     };
@@ -279,13 +277,11 @@ var Cell = (function () {
         if (this.content === undefined) {
             return;
         }
-
-        // TEMPORARY
-        if (this.content.baseType === "building") {
-            eventManager.dispatchEvent({ type: "destroyBuilding", content: "" });
+        if (this.content.player) {
+            this.content.player.removeContent(this.content);
         }
-
         game.layers["content"]._removeChildAt(this.content.sprite, this.gridPos[0] + this.gridPos[1]);
+
         this.content = undefined;
     };
     return Cell;
@@ -337,7 +333,7 @@ var Board = (function () {
                 sprite.position = arrayToPoint(getIsoCoord(i, j, TILE_WIDTH, TILE_HEIGHT, [WORLD_WIDTH / 2, TILE_HEIGHT]));
                 game.layers["ground"].addChild(sprite);
                 if (data && dataCell.content) {
-                    cell.changeContent(dataCell.content.type, dataCell.content.data);
+                    cell.changeContent(dataCell.content.type);
                 }
             }
         }
@@ -464,10 +460,11 @@ var Game = (function () {
 
         this.systemsManager = new SystemsManager(1000);
         var player = new Player(idGenerator.player++);
+        player.addMoney(100);
         this.reactUI = new ReactUI(player);
         this.players[player.id] = player;
-        var profitSystem = new ProfitSystem(1, this.systemsManager, this.players);
-        this.systemsManager.addSystem("profit", profitSystem);
+        var apartmentProfitSystem = new ProfitSystem(1, this.systemsManager, this.players, "apartment");
+        this.systemsManager.addSystem("apartmentProfit", apartmentProfitSystem);
         this.systemsManager.addSystem("delayedAction", new DelayedActionSystem(1, this.systemsManager));
 
         var dateSystem = new DateSystem(1, this.systemsManager, document.getElementById("date"));
@@ -566,7 +563,8 @@ var Game = (function () {
 
         addClickAndTouchEventListener(recruitBtn, function () {
             if (Object.keys(self.players["player0"].employees).length < 1) {
-                if (self.players["player0"].usedInitialRecruit) {
+                // TODO
+                if (false) {
                     eventManager.dispatchEvent({
                         type: "makeInfoPopup", content: {
                             text: [
@@ -620,7 +618,6 @@ var Game = (function () {
         var container = window.getComputedStyle(document.getElementById("pixi-container"), null);
         SCREEN_WIDTH = parseInt(container.width) / window.devicePixelRatio;
         SCREEN_HEIGHT = parseInt(container.height) / window.devicePixelRatio;
-        console.log(SCREEN_WIDTH, SCREEN_HEIGHT);
         if (game.renderer) {
             game.renderer.resize(SCREEN_WIDTH, SCREEN_HEIGHT);
         }

@@ -47,13 +47,13 @@ declare class System {
     public tick(currTick: number): void;
 }
 declare class ProfitSystem extends System {
-    public targets: any[];
     public players: {
         [key: string]: Player;
     };
+    public targetType: string;
     constructor(activationRate: number, systemsManager: SystemsManager, players: {
         [key: string]: Player;
-    });
+    }, targetType: string);
     public activate(): void;
 }
 interface IDateObj {

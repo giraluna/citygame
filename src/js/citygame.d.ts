@@ -27,16 +27,19 @@ declare class ContentSprite extends Sprite {
     constructor(type: any, content: any);
 }
 declare class Content {
-    public type: string;
+    public type: any;
     public baseType: string;
     public categoryType: string;
     public id: number;
     public sprite: Sprite;
     public cell: Cell;
     public flags: string[];
-    constructor(cell: Cell, type: any, data?: any);
+    public baseProfit: number;
+    public modifiedProfit: number;
+    public modifiers: any;
+    public player: Player;
+    constructor(cell: Cell, type: any, player?: Player);
     public init(type: any): void;
-    public applyData(data: any): void;
 }
 interface neighborCells {
     n: Cell;
@@ -61,11 +64,11 @@ declare class Cell {
     public getNeighbors(diagonal?: boolean): neighborCells;
     public getArea(size: number, anchor?: string): any;
     public replace(type: string): void;
-    public changeContent(type: string, update?: boolean, data?: any): void;
+    public changeContent(type: string, update?: boolean, player?: Player): void;
     public checkBuildable(type: any, checkContent?: boolean): boolean;
     public addPlant(): void;
     public updateCell(): void;
-    public addContent(type: any, data?: any): Content;
+    public addContent(type: any, player?: Player): Content;
     public removeContent(): void;
 }
 declare class Board {

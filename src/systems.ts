@@ -184,24 +184,30 @@ class System
 
 class ProfitSystem extends System
 {
-  targets: any[] = [];
-  // TODO
   players: {[key:string]: Player};
+  targetType: string;
 
-  constructor(activationRate: number, systemsManager: SystemsManager, players: {[key:string]: Player})
+  constructor(activationRate: number, systemsManager: SystemsManager, players: {[key:string]: Player},
+    targetType: string)
   {
     super(activationRate, systemsManager.tickNumber);
     this.systemsManager = systemsManager;
-    this.targets = systemsManager.entities.ownedBuildings;
     this.players = players;
+    this.targetType = targetType;
   }
 
   activate()
   {
-    for (var i = 0; i < this.targets.length; i++)
+    for (var player in this.players)
     {
-      this.players["player0"].addMoney(1);
+      var targets = this.players[player].ownedContent[this.targetType];
+      var _player = this.players[player];
+      for (var i = 0; i < targets.length; i++)
+      {
+        _player.addMoney(targets[i].modifiedProfit);
+      }
     }
+    
     eventManager.dispatchEvent({type:"updateReact", content:""});
   }
 }

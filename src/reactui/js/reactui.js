@@ -51,6 +51,9 @@ var ReactUI = (function () {
         eventManager.addEventListener("makeBuildingSelectPopup", function (event) {
             self.makeBuildingSelectPopup(event.content);
         });
+        eventManager.addEventListener("closeTopPopup", function (event) {
+            self.closeTopPopup();
+        });
         eventManager.addEventListener("updateReact", function (event) {
             self.updateReact();
         });
@@ -65,6 +68,7 @@ var ReactUI = (function () {
             this.destroyPopup(key, onCloseCallback);
         }.bind(this);
 
+        var zIndex = this.incrementZIndex();
         var popupProps = {};
         for (var prop in props) {
             popupProps[prop] = props[prop];
@@ -74,13 +78,14 @@ var ReactUI = (function () {
         popupProps.initialStyle = {
             top: window.innerHeight / 3.5 - 60 + Object.keys(this.popups).length * 15,
             left: window.innerWidth / 3.5 - 60 + Object.keys(this.popups).length * 15,
-            zIndex: this.incrementZIndex()
+            zIndex: zIndex
         };
-        popupProps.incrementZIndex = this.incrementZIndex.bind(this);
+        popupProps.incrementZIndex = this.incrementZIndex.bind(this, key);
 
         var popup = {
             type: type,
-            props: popupProps
+            props: popupProps,
+            zIndex: zIndex
         };
 
         this.popups[key] = popup;
@@ -240,8 +245,12 @@ var ReactUI = (function () {
     };
 
     ///// OTHER METHODS /////
-    ReactUI.prototype.incrementZIndex = function () {
-        return this.topZIndex++;
+    ReactUI.prototype.incrementZIndex = function (key) {
+        var newZIndex = this.topZIndex++;
+        if (key) {
+            this.popups[key].zIndex = newZIndex;
+        }
+        return newZIndex;
     };
     ReactUI.prototype.destroyPopup = function (key, callback) {
         if (callback)
@@ -253,6 +262,19 @@ var ReactUI = (function () {
         this.updateReact();
     };
     ReactUI.prototype.closeTopPopup = function () {
+        if (Object.keys(this.popups).length < 1)
+            return;
+        else {
+            var max = 0;
+            var key;
+            for (var popup in this.popups) {
+                if (this.popups[popup].zIndex > max) {
+                    max = this.popups[popup].zIndex;
+                    key = popup;
+                }
+            }
+            this.destroyPopup(key);
+        }
     };
 
     ReactUI.prototype.updateReact = function () {

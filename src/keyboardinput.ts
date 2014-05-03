@@ -30,6 +30,11 @@ var keyboardStates =
       "189": function()
       {
         eventManager.dispatchEvent({type: "decrementSpeed", content:""});
+      },
+      // enter
+      "13": function()
+      {
+        eventManager.dispatchEvent({type: "closeTopPopup", content:""});
       }
     }
   }
@@ -84,6 +89,7 @@ class KeyboardEventHandler
   {
     if (this.statesObj[this.currState]["keydown"][event.keyCode])
     {
+      event.preventDefault();
       this.statesObj[this.currState]["keydown"][event.keyCode].call();
     }
   }

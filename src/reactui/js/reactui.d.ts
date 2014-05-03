@@ -15,6 +15,7 @@ declare class ReactUI {
         [id: number]: {
             type: string;
             props: any;
+            zIndex: number;
         };
     };
     public topZIndex: number;
@@ -70,8 +71,8 @@ declare class ReactUI {
         cell: any;
         text?: any;
     }): void;
-    public incrementZIndex(): number;
-    public destroyPopup(key: any, callback: any): void;
+    public incrementZIndex(key?: any): number;
+    public destroyPopup(key: any, callback?: any): void;
     public closeTopPopup(): void;
     public updateReact(): void;
 }

@@ -21,6 +21,7 @@ class ReactUI
     {
       type: string;
       props: any;
+      zIndex: number;
     }
   } = {};
   topZIndex: number = 15;
@@ -75,6 +76,10 @@ class ReactUI
     {
       self.makeBuildingSelectPopup(event.content)
     });
+    eventManager.addEventListener("closeTopPopup", function(event)
+    {
+      self.closeTopPopup()
+    });
     eventManager.addEventListener("updateReact", function(event)
     {
       self.updateReact()
@@ -108,6 +113,7 @@ class ReactUI
         this.destroyPopup(key, onCloseCallback);
       }.bind(this);
 
+      var zIndex = this.incrementZIndex();
       var popupProps: any = {};
       for (var prop in props)
       {
@@ -118,14 +124,15 @@ class ReactUI
       {
         top: window.innerHeight / 3.5 - 60 + Object.keys(this.popups).length * 15,
         left: window.innerWidth / 3.5 - 60 + Object.keys(this.popups).length * 15,
-        zIndex: this.incrementZIndex()
+        zIndex: zIndex
       };
-      popupProps.incrementZIndex = this.incrementZIndex.bind(this);
+      popupProps.incrementZIndex = this.incrementZIndex.bind(this, key);
 
       var popup =
       {
         type: type,
-        props: popupProps
+        props: popupProps,
+        zIndex: zIndex
       };
 
       this.popups[key] = popup;
@@ -354,11 +361,16 @@ class ReactUI
 
   ///// OTHER METHODS /////
 
-  incrementZIndex()
+  incrementZIndex(key?)
   {
-    return this.topZIndex++;
+    var newZIndex = this.topZIndex++;
+    if (key)
+    {
+      this.popups[key].zIndex = newZIndex;
+    }
+    return newZIndex;
   }
-  destroyPopup(key, callback)
+  destroyPopup(key, callback?)
   {
     if (callback) callback.call();
 
@@ -369,7 +381,21 @@ class ReactUI
   }
   closeTopPopup()
   {
-
+    if (Object.keys(this.popups).length < 1) return;
+    else
+    {
+      var max = 0;
+      var key;
+      for (var popup in this.popups)
+      {
+        if (this.popups[popup].zIndex > max)
+        {
+          max = this.popups[popup].zIndex;
+          key = popup;
+        }
+      }
+      this.destroyPopup(key);
+    }
   }
 
   updateReact()

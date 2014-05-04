@@ -1,6 +1,4 @@
-"use strict";
-
-function arrayLogic(logic, array1, array2)
+var arrayLogic: any = function (logic, array1, array2)
 {
   var regexes =
   {
@@ -99,7 +97,7 @@ arrayLogic.inputIsValid = function(array1, array2)
   {
     
     if (!arguments[i] ||
-      !arguments[i] instanceof Array ||
+      !arguments[i].length ||
       arguments[i].length === 0)
     {
       return false;

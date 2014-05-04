@@ -2,6 +2,8 @@
 /// <reference path="../lib/tween.js.d.ts" />
 ///
 /// <reference path="reactui/js/reactui.d.ts" />
+/// <reference path="../data/js/cg.d.ts" />
+///
 /// <reference path="js/ui.d.ts" />
 /// <reference path="js/loader.d.ts" />
 ///
@@ -12,13 +14,13 @@
 /// <reference path="js/keyboardinput.d.ts" />
 ///
 /// <reference path="js/utility.d.ts" />
+/// <reference path="js/arraylogic.d.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-
 var SCREEN_WIDTH = 720, SCREEN_HEIGHT = 480, TILE_WIDTH = 64, TILE_HEIGHT = 32, TILES = 32, WORLD_WIDTH = TILES * TILE_WIDTH, WORLD_HEIGHT = TILES * TILE_HEIGHT, ZOOM_LEVELS = [1];
 
 var idGenerator = idGenerator || {};
@@ -63,6 +65,7 @@ var ContentSprite = (function (_super) {
 var Content = (function () {
     function Content(cell, type, player) {
         this.baseProfit = 0;
+        this.multiplier = 1;
         this.modifiedProfit = 0;
         this.modifiers = {};
         this.cell = cell;
@@ -70,7 +73,7 @@ var Content = (function () {
         this.baseType = type["baseType"] || undefined;
         this.categoryType = type["categoryType"] || undefined;
         this.flags = type["flags"] ? type["flags"].slice(0) : [];
-        this.flags.push(this.baseType);
+        this.flags.push(this.baseType, this.categoryType);
 
         if (player) {
             this.baseProfit = type.baseProfit;
@@ -95,6 +98,7 @@ var Content = (function () {
 
 var Cell = (function () {
     function Cell(gridPos, type) {
+        this.modifiers = {};
         this.gridPos = gridPos;
         this.type = type;
         this.landValue = randInt(40, 50);
@@ -283,6 +287,36 @@ var Cell = (function () {
         game.layers["content"]._removeChildAt(this.content.sprite, this.gridPos[0] + this.gridPos[1]);
 
         this.content = undefined;
+    };
+    Cell.prototype.addModifier = function (modifier) {
+        if (!this.modifiers[modifier.type]) {
+            this.modifiers[modifier.type] = modifier;
+        } else {
+            this.modifiers[modifier.type].strength += modifier.strength;
+        }
+        ;
+
+        if (arrayLogic.or(modifier.targets, this.flags) || arrayLogic.or(modifier.targets, this.content.flags)) {
+            this.applyModifiersToContent();
+        }
+    };
+    Cell.prototype.removeModifier = function (modifier) {
+        this.modifiers[modifier.type].strength -= modifier.strength;
+        if (this.modifiers[modifier.type].strength <= 0) {
+            delete this.modifiers[modifier.type];
+        }
+        this.applyModifiersToContent();
+    };
+    Cell.prototype.applyModifiersToContent = function () {
+        for (var modifierType in this.modifiers) {
+            var modifier = this.modifiers[modifierType];
+
+            if (this.content && arrayLogic.or(modifier.targets, this.flags) || arrayLogic.or(modifier.targets, this.content.flags)) {
+                for (var prop in modifier.effect) {
+                    this.content[prop] += (1 + Math.log(modifier.strength)) * modifier.effect[prop];
+                }
+            }
+        }
     };
     return Cell;
 })();

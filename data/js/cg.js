@@ -1,3 +1,4 @@
+/// <reference path="js/cellmodifiers.d.ts" />
 var cg = {
     "terrain": {
         "grass": {
@@ -174,68 +175,111 @@ var cg = {
                 "baseType": "building",
                 "categoryType": "apartment",
                 "baseProfit": 1,
-                "cost": 1,
-                "buildTime": 1,
+                "cost": 25,
+                "buildTime": 14,
                 "anchor": [0.5, 1],
                 "frame": "house1.png",
-                "canNotBuildOn": ["water", "building", "road"]
+                "canNotBuildOn": ["water", "building", "road"],
+                "effect": {
+                    "type": "testModifier",
+                    "range": 2,
+                    "strength": 1
+                }
             },
             "house2": {
                 "type": "house2",
                 "baseType": "building",
                 "categoryType": "apartment",
                 "baseProfit": 2,
-                "cost": 2,
-                "buildTime": 2,
+                "cost": 50,
+                "buildTime": 21,
                 "anchor": [0.5, 1],
                 "frame": "house2.png",
-                "canNotBuildOn": ["water", "building", "road"]
+                "canNotBuildOn": ["water", "building", "road"],
+                "effect": {
+                    "type": "testModifier",
+                    "range": 2,
+                    "strength": 1
+                }
             },
             "house3": {
                 "type": "house3",
                 "baseType": "building",
                 "categoryType": "apartment",
-                "baseProfit": 3,
-                "cost": 3,
-                "buildTime": 3,
+                "baseProfit": 1,
+                "cost": 25,
+                "buildTime": 14,
                 "anchor": [0.5, 1],
                 "frame": "house3.png",
-                "canNotBuildOn": ["water", "building", "road"]
+                "canNotBuildOn": ["water", "building", "road"],
+                "effect": {
+                    "type": "testModifier",
+                    "range": 2,
+                    "strength": 1
+                }
             },
             "house4": {
                 "type": "house4",
                 "baseType": "building",
                 "categoryType": "apartment",
-                "baseProfit": 4,
-                "cost": 4,
-                "buildTime": 4,
+                "baseProfit": 2,
+                "cost": 50,
+                "buildTime": 21,
                 "anchor": [0.5, 1],
                 "frame": "house4.png",
-                "canNotBuildOn": ["water", "building", "road"]
+                "canNotBuildOn": ["water", "building", "road"],
+                "effect": {
+                    "type": "testModifier",
+                    "range": 2,
+                    "strength": 1
+                }
             },
             "house5": {
                 "type": "house5",
                 "baseType": "building",
                 "categoryType": "apartment",
-                "baseProfit": 5,
-                "cost": 5,
-                "buildTime": 5,
+                "baseProfit": 2,
+                "cost": 50,
+                "buildTime": 21,
                 "anchor": [0.5, 1],
                 "frame": "house5.png",
-                "canNotBuildOn": ["water", "building", "road"]
+                "canNotBuildOn": ["water", "building", "road"],
+                "effect": {
+                    "type": "testModifier",
+                    "range": 2,
+                    "strength": 1
+                }
             },
             "house6": {
                 "type": "house6",
                 "baseType": "building",
                 "categoryType": "apartment",
-                "baseProfit": 6,
-                "cost": 6,
-                "buildTime": 6,
+                "baseProfit": 2,
+                "cost": 50,
+                "buildTime": 21,
                 "anchor": [0.5, 1],
                 "frame": "house6.png",
-                "canNotBuildOn": ["water", "building", "road"]
+                "canNotBuildOn": ["water", "building", "road"],
+                "effect": {
+                    "type": "testModifier",
+                    "range": 2,
+                    "strength": 1
+                }
             }
         }
     }
 };
+
+(function translateModifierEffects(target) {
+    for (var prop in target) {
+        if (prop === "effect") {
+            var e = target[prop];
+            if (!cellModifiers[e.type])
+                console.error("Invalid effect defined on ", target);
+            target.translatedEffect = cellModifiers[e.type].call(null, e.range, e.strength);
+        } else if (typeof target[prop] === "object") {
+            translateModifierEffects(target[prop]);
+        }
+    }
+}(cg));
 //# sourceMappingURL=cg.js.map

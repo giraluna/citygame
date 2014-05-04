@@ -1,6 +1,7 @@
 /// <reference path="../../lib/pixi.d.ts" />
 /// <reference path="../../lib/tween.js.d.ts" />
 /// <reference path="../reactui/js/reactui.d.ts" />
+/// <reference path="../../data/js/cg.d.ts" />
 /// <reference path="ui.d.ts" />
 /// <reference path="loader.d.ts" />
 /// <reference path="player.d.ts" />
@@ -9,8 +10,7 @@
 /// <reference path="spritehighlighter.d.ts" />
 /// <reference path="keyboardinput.d.ts" />
 /// <reference path="utility.d.ts" />
-declare var cg: any;
-declare var arrayLogic: any;
+/// <reference path="arraylogic.d.ts" />
 declare var SCREEN_WIDTH: number, SCREEN_HEIGHT: number, TILE_WIDTH: number, TILE_HEIGHT: number, TILES: number, WORLD_WIDTH: number, WORLD_HEIGHT: number, ZOOM_LEVELS: number[];
 declare var idGenerator: any;
 declare class Sprite extends PIXI.Sprite {
@@ -35,6 +35,7 @@ declare class Content {
     public cell: Cell;
     public flags: string[];
     public baseProfit: number;
+    public multiplier: number;
     public modifiedProfit: number;
     public modifiers: any;
     public player: Player;
@@ -58,6 +59,7 @@ declare class Cell {
     public landValue: number;
     public gridPos: number[];
     public flags: string[];
+    public modifiers: any;
     constructor(gridPos: any, type: any);
     public init(type: string): void;
     public getScreenPos(container: any): number[];
@@ -70,6 +72,9 @@ declare class Cell {
     public updateCell(): void;
     public addContent(type: any, player?: Player): Content;
     public removeContent(): void;
+    public addModifier(modifier: any): void;
+    public removeModifier(modifier: any): void;
+    public applyModifiersToContent(): void;
 }
 declare class Board {
     public width: number;

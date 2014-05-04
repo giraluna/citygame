@@ -115,7 +115,7 @@ var SystemsManager = (function () {
         if (this.paused)
             return;
         this.accumulated += this.timer.getDelta();
-        if (this.accumulated >= this.tickTime) {
+        while (this.accumulated >= this.tickTime) {
             this.tick();
         }
     };

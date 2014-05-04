@@ -2,6 +2,8 @@
 /// <reference path="../lib/tween.js.d.ts" />
 /// 
 /// <reference path="reactui/js/reactui.d.ts" />
+/// <reference path="../data/js/cg.d.ts" />
+/// 
 /// <reference path="js/ui.d.ts" />
 /// <reference path="js/loader.d.ts" />
 /// 
@@ -12,9 +14,7 @@
 /// <reference path="js/keyboardinput.d.ts" />
 /// 
 /// <reference path="js/utility.d.ts" />
-
-declare var cg:any;
-declare var arrayLogic: any;
+/// <reference path="js/arraylogic.d.ts" />
 
 
 var SCREEN_WIDTH = 720,
@@ -86,6 +86,7 @@ class Content
   flags: string[];
 
   baseProfit: number = 0;
+  multiplier: number = 1;
   modifiedProfit: number = 0;
   modifiers: any = {};
   player: Player;
@@ -97,7 +98,7 @@ class Content
     this.baseType = type["baseType"] || undefined;
     this.categoryType = type["categoryType"] || undefined;
     this.flags = type["flags"] ? type["flags"].slice(0) : [];
-    this.flags.push(this.baseType);
+    this.flags.push(this.baseType, this.categoryType);
 
     if (player)
     {
@@ -140,6 +141,7 @@ class Cell
   landValue: number;
   gridPos: number[];
   flags: string[];
+  modifiers: any = {};
 
   constructor( gridPos, type )
   {
@@ -368,6 +370,48 @@ class Cell
       this.gridPos[0] + this.gridPos[1]);
 
     this.content = undefined;
+  }
+  addModifier(modifier)
+  {
+    if (!this.modifiers[modifier.type])
+    {
+      this.modifiers[modifier.type] = modifier;
+    }
+    else
+    {
+      this.modifiers[modifier.type].strength += modifier.strength;
+    };
+
+    if (arrayLogic.or(modifier.targets, this.flags)
+      || arrayLogic.or(modifier.targets, this.content.flags))
+    {
+      this.applyModifiersToContent()
+    }
+  }
+  removeModifier(modifier)
+  {
+    this.modifiers[modifier.type].strength -= modifier.strength;
+    if (this.modifiers[modifier.type].strength <= 0)
+    {
+      delete this.modifiers[modifier.type];
+    }
+    this.applyModifiersToContent();
+  }
+  applyModifiersToContent()
+  {
+    for (var modifierType in this.modifiers)
+    {
+      var modifier = this.modifiers[modifierType];
+
+      if (this.content && arrayLogic.or(modifier.targets, this.flags)
+        || arrayLogic.or(modifier.targets, this.content.flags))
+      {
+        for (var prop in modifier.effect)
+        {
+          this.content[prop] += ( 1 + Math.log(modifier.strength) ) * modifier.effect[prop];
+        }
+      }
+    }
   }
 }
 

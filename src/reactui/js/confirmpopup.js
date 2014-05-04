@@ -15,11 +15,15 @@ var UIComponents;
                 this.handleClose();
             }
         },
+        componentDidMount: function () {
+            this.refs.okBtn.getDOMNode().focus();
+        },
         render: function () {
             var self = this;
             var text = this.splitMultilineText(this.props.text) || null;
 
             var okBtn = React.DOM.button({
+                ref: "okBtn",
                 onClick: this.handleOk,
                 onTouchStart: this.handleOk,
                 draggable: true,

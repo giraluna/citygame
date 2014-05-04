@@ -32,6 +32,11 @@ module UIComponents
       this.setState({player: newProps.player});
     },
 
+    componentDidMount: function()
+    {
+      this.refs.okBtn.getDOMNode().focus();
+    },
+
     handleOk: function(e)
     {
       var selectedTemplate = this.refs.buildingList.state.selected;
@@ -75,6 +80,7 @@ module UIComponents
 
       var okBtn = React.DOM.button(
       {
+        ref: "okBtn",
         onClick: this.handleOk,
         onTouchStart: this.handleOk,
         draggable: true,

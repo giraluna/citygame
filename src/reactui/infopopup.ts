@@ -9,6 +9,11 @@ module UIComponents
 export var InfoPopup = React.createClass({
   mixins: [Draggable, SplitMultilineText],
 
+  componentDidMount: function()
+  {
+    this.refs.okBtn.getDOMNode().focus();
+  },
+
   render: function()
   {
     var self = this;
@@ -16,6 +21,7 @@ export var InfoPopup = React.createClass({
 
     var okBtn = React.DOM.button(
     {
+      ref: "okBtn",
       onClick: this.props.onClose,
       onTouchStart: this.props.onClose,
       draggable: true,

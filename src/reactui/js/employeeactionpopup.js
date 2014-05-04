@@ -56,6 +56,9 @@ var UIComponents;
         componentWillRecieveProps: function (newProps) {
             this.setState({ employees: newProps.employees || newProps.player.employees });
         },
+        componentDidMount: function () {
+            this.refs.okBtn.getDOMNode().focus();
+        },
         render: function () {
             var self = this;
 
@@ -74,6 +77,7 @@ var UIComponents;
             };
 
             var okBtn = React.DOM.button({
+                ref: "okBtn",
                 onClick: this.handleOk,
                 onTouchStart: this.handleOk,
                 draggable: true,

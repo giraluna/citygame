@@ -17,7 +17,8 @@ module UIComponents
   {
     getInitialState: function()
     {
-      return {selected: null};
+      var templates = this.props.buildingTemplates;
+      return {selected: templates[Object.keys(templates)[0]].type};
     },
 
     handleSelectRow: function(selectedBuildingType)

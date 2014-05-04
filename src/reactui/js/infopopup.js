@@ -6,11 +6,15 @@ var UIComponents;
 (function (UIComponents) {
     UIComponents.InfoPopup = React.createClass({
         mixins: [UIComponents.Draggable, UIComponents.SplitMultilineText],
+        componentDidMount: function () {
+            this.refs.okBtn.getDOMNode().focus();
+        },
         render: function () {
             var self = this;
             var text = this.splitMultilineText(this.props.text) || null;
 
             var okBtn = React.DOM.button({
+                ref: "okBtn",
                 onClick: this.props.onClose,
                 onTouchStart: this.props.onClose,
                 draggable: true,

@@ -37,9 +37,22 @@ export var EmployeeAction = React.createClass({
 
   getInitialState: function()
   {
+    var employee;
+    for (var e in this.props.employees)
+    {
+      if (this.props.employees[e].active === true)
+      {
+        employee = this.props.employees[e];
+        break;
+      }
+    }
     return(
     {
-      selected: null,
+      selected: employee ?
+      {
+        key: employee.id,
+        employee: employee
+      } : null,
       action: this.props.action || null
     });
   },
@@ -80,7 +93,7 @@ export var EmployeeAction = React.createClass({
 
     if (selectedAction)
     {
-      if (selectedEmployee)
+      if (selectedEmployee && selectedEmployee.active === true)
       {
         var skills = this.props.relevantSkills.map(function(skill)
         {

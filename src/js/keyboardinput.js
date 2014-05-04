@@ -21,10 +21,6 @@ var keyboardStates = {
             // minus
             "189": function () {
                 eventManager.dispatchEvent({ type: "decrementSpeed", content: "" });
-            },
-            // enter
-            "13": function () {
-                eventManager.dispatchEvent({ type: "closeTopPopup", content: "" });
             }
         }
     }

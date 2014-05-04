@@ -13,7 +13,6 @@ export var EmployeeList = React.createClass({
     var rows = [];
     var skillColumns = [];
 
-    Object.keys(this.props.employees)
     for (var skill in this.props.employees[ Object.keys(this.props.employees)[0] ])
     {
       var colProps = {};

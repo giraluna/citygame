@@ -30,10 +30,16 @@ declare module UIComponents {
     * }
     */
     var EmployeeAction: React.ReactComponentFactory<{
-        selected: any;
+        selected: {
+            key: any;
+            employee: any;
+        };
         action: any;
     }, React.ReactComponent<{
-        selected: any;
+        selected: {
+            key: any;
+            employee: any;
+        };
         action: any;
     }, {}>>;
 }

@@ -69,6 +69,11 @@ export var EmployeeActionPopup = React.createClass({
     this.setState({employees: newProps.employees || newProps.player.employees});
   },
 
+  componentDidMount: function()
+  {
+    this.refs.okBtn.getDOMNode().focus();
+  },
+
   render: function()
   {
     var self = this;
@@ -89,6 +94,7 @@ export var EmployeeActionPopup = React.createClass({
 
     var okBtn = React.DOM.button(
     {
+      ref: "okBtn",
       onClick: this.handleOk,
       onTouchStart: this.handleOk,
       draggable: true,

@@ -23,6 +23,11 @@ export var ConfirmPopup = React.createClass({
     }
   },
 
+  componentDidMount: function()
+  {
+    this.refs.okBtn.getDOMNode().focus();
+  },
+
   render: function()
   {
     var self = this;
@@ -30,6 +35,7 @@ export var ConfirmPopup = React.createClass({
 
     var okBtn = React.DOM.button(
     {
+      ref: "okBtn",
       onClick: this.handleOk,
       onTouchStart: this.handleOk,
       draggable: true,

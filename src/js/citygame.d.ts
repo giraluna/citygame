@@ -74,6 +74,8 @@ declare class Cell {
     public removeContent(): void;
     public addModifier(modifier: any): void;
     public removeModifier(modifier: any): void;
+    public propagateModifier(modifier: any): void;
+    public removePropagatedModifier(modifier: any): void;
     public applyModifiersToContent(): void;
 }
 declare class Board {
@@ -197,7 +199,7 @@ declare class UIDrawer {
     public init(): void;
     public removeActive(): void;
     public makeCellTooltip(event: any, cell: Cell, container: PIXI.DisplayObjectContainer): UIObject;
-    public makeCellPopup(cell: Cell, container: PIXI.DisplayObjectContainer): void;
+    public makeCellPopup(cell: Cell, text: string, container: PIXI.DisplayObjectContainer): void;
     public makeFadeyPopup(pos: number[], drift: number[], lifeTime: number, content: any, easing?: (k: number) => number): void;
     public clearLayer(): void;
 }

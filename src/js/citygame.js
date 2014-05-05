@@ -189,7 +189,7 @@ var Cell = (function () {
         }
         ;
 
-        for (var i = 0; i < size - 1; i++) {
+        for (var i = 0; i < size; i++) {
             start[0] += adjust[0][0];
             start[1] += adjust[0][1];
             end[0] += adjust[1][0];
@@ -275,6 +275,10 @@ var Cell = (function () {
     Cell.prototype.addContent = function (type, player) {
         this.content = new Content(this, type, player);
 
+        if (type.effect) {
+            this.propagateModifier(type.translatedEffect);
+        }
+
         return this.content;
     };
     Cell.prototype.removeContent = function () {
@@ -284,34 +288,53 @@ var Cell = (function () {
         if (this.content.player) {
             this.content.player.removeContent(this.content);
         }
+        if (this.content.type.effect) {
+            this.removePropagatedModifier(this.content.type.translatedEffect);
+        }
         game.layers["content"]._removeChildAt(this.content.sprite, this.gridPos[0] + this.gridPos[1]);
 
         this.content = undefined;
     };
     Cell.prototype.addModifier = function (modifier) {
         if (!this.modifiers[modifier.type]) {
-            this.modifiers[modifier.type] = modifier;
+            this.modifiers[modifier.type] = Object.create(modifier);
         } else {
             this.modifiers[modifier.type].strength += modifier.strength;
         }
         ;
 
-        if (arrayLogic.or(modifier.targets, this.flags) || arrayLogic.or(modifier.targets, this.content.flags)) {
+        if (arrayLogic.or(modifier.targets, this.flags) || (this.content && arrayLogic.or(modifier.targets, this.content.flags))) {
             this.applyModifiersToContent();
         }
     };
     Cell.prototype.removeModifier = function (modifier) {
+        if (!this.modifiers[modifier.type])
+            return;
         this.modifiers[modifier.type].strength -= modifier.strength;
         if (this.modifiers[modifier.type].strength <= 0) {
             delete this.modifiers[modifier.type];
         }
         this.applyModifiersToContent();
     };
+    Cell.prototype.propagateModifier = function (modifier) {
+        var effectedCells = this.getArea(modifier.range);
+        for (var cell in effectedCells) {
+            effectedCells[cell].addModifier(modifier);
+        }
+    };
+    Cell.prototype.removePropagatedModifier = function (modifier) {
+        var effectedCells = this.getArea(modifier.range);
+        for (var cell in effectedCells) {
+            effectedCells[cell].removeModifier(modifier);
+        }
+    };
     Cell.prototype.applyModifiersToContent = function () {
+        if (!this.content)
+            return;
         for (var modifierType in this.modifiers) {
             var modifier = this.modifiers[modifierType];
 
-            if (this.content && arrayLogic.or(modifier.targets, this.flags) || arrayLogic.or(modifier.targets, this.content.flags)) {
+            if (this.content && arrayLogic.or(modifier.targets, this.flags) || (this.content && arrayLogic.or(modifier.targets, this.content.flags))) {
                 for (var prop in modifier.effect) {
                     this.content[prop] += (1 + Math.log(modifier.strength)) * modifier.effect[prop];
                 }
@@ -1085,7 +1108,7 @@ var UIDrawer = (function () {
         var screenX = event.global.x;
         var screenY = event.global.y;
 
-        var text = cell.content ? cell.content.type["type"] : cell.type["type"];
+        var text = cell.modifiers["testModifier"] ? cell.modifiers["testModifier"].strength : "none";
         var font = this.fonts["base"];
 
         var textObject = new PIXI.Text(text, font);
@@ -1127,9 +1150,9 @@ var UIDrawer = (function () {
 
         return uiObj;
     };
-    UIDrawer.prototype.makeCellPopup = function (cell, container) {
+    UIDrawer.prototype.makeCellPopup = function (cell, text, container) {
         var pos = cell.getScreenPos(container);
-        var content = new PIXI.Text("+1", this.fonts["black"]);
+        var content = new PIXI.Text(text, this.fonts["black"]);
 
         this.makeFadeyPopup([pos[0], pos[1]], [0, -20], 2000, content);
     };

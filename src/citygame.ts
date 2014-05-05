@@ -246,7 +246,7 @@ class Cell
       adjust[1] = [1, 1];
     };
 
-    for (var i = 0; i < size - 1; i++)
+    for (var i = 0; i < size; i++)
     {
       start[0] += adjust[0][0];
       start[1] += adjust[0][1];
@@ -353,6 +353,11 @@ class Cell
   addContent( type: any, player?: Player )
   {
     this.content = new Content( this, type, player);
+
+    if (type.effect)
+    {
+      this.propagateModifier(type.translatedEffect);
+    }
     
     return this.content;
   }
@@ -366,6 +371,10 @@ class Cell
     {
       this.content.player.removeContent(this.content);
     }
+    if (this.content.type.effect)
+    {
+      this.removePropagatedModifier(this.content.type.translatedEffect);
+    }
     game.layers["content"]._removeChildAt(this.content.sprite,
       this.gridPos[0] + this.gridPos[1]);
 
@@ -375,7 +384,7 @@ class Cell
   {
     if (!this.modifiers[modifier.type])
     {
-      this.modifiers[modifier.type] = modifier;
+      this.modifiers[modifier.type] = Object.create(modifier);
     }
     else
     {
@@ -383,13 +392,14 @@ class Cell
     };
 
     if (arrayLogic.or(modifier.targets, this.flags)
-      || arrayLogic.or(modifier.targets, this.content.flags))
+      || (this.content && arrayLogic.or(modifier.targets, this.content.flags) ))
     {
       this.applyModifiersToContent()
     }
   }
   removeModifier(modifier)
   {
+    if (!this.modifiers[modifier.type]) return;
     this.modifiers[modifier.type].strength -= modifier.strength;
     if (this.modifiers[modifier.type].strength <= 0)
     {
@@ -397,14 +407,31 @@ class Cell
     }
     this.applyModifiersToContent();
   }
+  propagateModifier(modifier)
+  {
+    var effectedCells = this.getArea(modifier.range);
+    for (var cell in effectedCells)
+    {
+      effectedCells[cell].addModifier(modifier);
+    }
+  }
+  removePropagatedModifier(modifier)
+  {
+    var effectedCells = this.getArea(modifier.range);
+    for (var cell in effectedCells)
+    {
+      effectedCells[cell].removeModifier(modifier);
+    }
+  }
   applyModifiersToContent()
   {
+    if (!this.content) return;
     for (var modifierType in this.modifiers)
     {
       var modifier = this.modifiers[modifierType];
 
       if (this.content && arrayLogic.or(modifier.targets, this.flags)
-        || arrayLogic.or(modifier.targets, this.content.flags))
+        || (this.content && arrayLogic.or(modifier.targets, this.content.flags) ))
       {
         for (var prop in modifier.effect)
         {
@@ -413,6 +440,7 @@ class Cell
       }
     }
   }
+
 }
 
 class Board
@@ -1392,8 +1420,7 @@ class UIDrawer
     var screenX = event.global.x;
     var screenY = event.global.y;
 
-
-    var text = cell.content ? cell.content.type["type"] : cell.type["type"];
+    var text = cell.modifiers["testModifier"] ? cell.modifiers["testModifier"].strength : "none";
     var font = this.fonts["base"];
 
     var textObject = new PIXI.Text(text, font);
@@ -1442,10 +1469,10 @@ class UIDrawer
 
     return uiObj;
   }
-  makeCellPopup(cell: Cell, container: PIXI.DisplayObjectContainer)
+  makeCellPopup(cell: Cell, text: string, container: PIXI.DisplayObjectContainer)
   {
     var pos = cell.getScreenPos(container);
-    var content = new PIXI.Text("+1", this.fonts["black"]);
+    var content = new PIXI.Text(text, this.fonts["black"]);
 
     this.makeFadeyPopup([pos[0], pos[1]], [0, -20], 2000, content);
   }

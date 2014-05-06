@@ -65,9 +65,8 @@ var ContentSprite = (function (_super) {
 var Content = (function () {
     function Content(cell, type, player) {
         this.baseProfit = 0;
-        this.multiplier = 1;
-        this.modifiedProfit = 0;
         this.modifiers = {};
+        this.modifiedProfit = 0;
         this.cell = cell;
         this.type = type;
         this.baseType = type["baseType"] || undefined;
@@ -75,11 +74,9 @@ var Content = (function () {
         this.flags = type["flags"] ? type["flags"].slice(0) : [];
         this.flags.push(this.baseType, this.categoryType);
 
-        if (player) {
-            this.baseProfit = type.baseProfit;
+        this.baseProfit = type.baseProfit || undefined;
 
-            // TODO
-            this.modifiedProfit = this.baseProfit;
+        if (player) {
             this.player = player;
             player.addContent(this);
         }
@@ -92,6 +89,19 @@ var Content = (function () {
         var gridPos = this.cell.gridPos;
         _s.position = this.cell.sprite.position.clone();
         game.layers["content"]._addChildAt(_s, gridPos[0] + gridPos[1]);
+    };
+    Content.prototype.applyModifiers = function () {
+        var totals = {
+            baseProfit: this.baseProfit,
+            multiplier: 1
+        };
+        for (var _modifier in this.modifiers) {
+            var modifier = this.modifiers[_modifier];
+            for (var prop in modifier.effect) {
+                totals[prop] += (1 + Math.log(modifier.strength)) * modifier.effect[prop];
+            }
+        }
+        this.modifiedProfit = totals.baseProfit * totals.multiplier;
     };
     return Content;
 })();
@@ -274,6 +284,7 @@ var Cell = (function () {
     };
     Cell.prototype.addContent = function (type, player) {
         this.content = new Content(this, type, player);
+        this.applyModifiersToContent();
 
         if (type.effect) {
             this.propagateModifier(type.translatedEffect);
@@ -303,7 +314,8 @@ var Cell = (function () {
         }
         ;
 
-        if (arrayLogic.or(modifier.targets, this.flags) || (this.content && arrayLogic.or(modifier.targets, this.content.flags))) {
+        // check to see if modifiers need to be updated
+        if (this.content && (arrayLogic.or(modifier.targets, this.flags) || (this.content && arrayLogic.or(modifier.targets, this.content.flags)))) {
             this.applyModifiersToContent();
         }
     };
@@ -314,12 +326,17 @@ var Cell = (function () {
         if (this.modifiers[modifier.type].strength <= 0) {
             delete this.modifiers[modifier.type];
         }
-        this.applyModifiersToContent();
+
+        if (this.content && (arrayLogic.or(modifier.targets, this.flags) || (this.content && arrayLogic.or(modifier.targets, this.content.flags)))) {
+            this.applyModifiersToContent();
+        }
     };
     Cell.prototype.propagateModifier = function (modifier) {
         var effectedCells = this.getArea(modifier.range);
         for (var cell in effectedCells) {
-            effectedCells[cell].addModifier(modifier);
+            if (effectedCells[cell] !== this) {
+                effectedCells[cell].addModifier(modifier);
+            }
         }
     };
     Cell.prototype.removePropagatedModifier = function (modifier) {
@@ -328,18 +345,28 @@ var Cell = (function () {
             effectedCells[cell].removeModifier(modifier);
         }
     };
+
+    // todo: rework later to only update modifiers that have changed
+    Cell.prototype.getValidModifiers = function () {
+        if (!this.content)
+            return;
+
+        var validModifiers = {};
+        for (var modifierType in this.modifiers) {
+            var modifier = this.modifiers[modifierType];
+            if (arrayLogic.or(modifier.targets, this.flags) || (arrayLogic.or(modifier.targets, this.content.flags))) {
+                validModifiers[modifierType] = modifier;
+            }
+        }
+
+        return validModifiers;
+    };
     Cell.prototype.applyModifiersToContent = function () {
         if (!this.content)
             return;
-        for (var modifierType in this.modifiers) {
-            var modifier = this.modifiers[modifierType];
 
-            if (this.content && arrayLogic.or(modifier.targets, this.flags) || (this.content && arrayLogic.or(modifier.targets, this.content.flags))) {
-                for (var prop in modifier.effect) {
-                    this.content[prop] += (1 + Math.log(modifier.strength)) * modifier.effect[prop];
-                }
-            }
-        }
+        this.content.modifiers = this.getValidModifiers();
+        this.content.applyModifiers();
     };
     return Cell;
 })();
@@ -1108,7 +1135,7 @@ var UIDrawer = (function () {
         var screenX = event.global.x;
         var screenY = event.global.y;
 
-        var text = cell.modifiers["testModifier"] ? cell.modifiers["testModifier"].strength : "none";
+        var text = (cell.content) ? "Base profit: " + cell.content.baseProfit + "\n" + "Modified profit: " + cell.content.modifiedProfit + "\n" + "Modifier strength: " + (cell.content.modifiers["testModifier"] ? "" + (1 + Math.log(cell.content.modifiers["testModifier"].strength)) : "none") : "none";
         var font = this.fonts["base"];
 
         var textObject = new PIXI.Text(text, font);

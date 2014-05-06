@@ -19,7 +19,7 @@ var Player = (function () {
         this.updateElements();
     };
     Player.prototype.updateElements = function () {
-        this.moneySpan.innerHTML = this.money + "$";
+        this.moneySpan.innerHTML = Math.round(this.money) + "$";
         //this.incomeSpan.innerHTML = "+" + this.income + "/s";
     };
     Player.prototype.init = function () {

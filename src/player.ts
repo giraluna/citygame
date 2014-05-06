@@ -33,7 +33,7 @@ class Player
   }
   updateElements()
   {
-    this.moneySpan.innerHTML = this.money + "$";
+    this.moneySpan.innerHTML = Math.round(this.money) + "$";
     //this.incomeSpan.innerHTML = "+" + this.income + "/s";
   }
   init()

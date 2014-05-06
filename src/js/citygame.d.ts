@@ -35,12 +35,12 @@ declare class Content {
     public cell: Cell;
     public flags: string[];
     public baseProfit: number;
-    public multiplier: number;
-    public modifiedProfit: number;
     public modifiers: any;
+    public modifiedProfit: number;
     public player: Player;
     constructor(cell: Cell, type: any, player?: Player);
     public init(type: any): void;
+    public applyModifiers(): void;
 }
 interface neighborCells {
     n: Cell;
@@ -76,6 +76,7 @@ declare class Cell {
     public removeModifier(modifier: any): void;
     public propagateModifier(modifier: any): void;
     public removePropagatedModifier(modifier: any): void;
+    public getValidModifiers(): any;
     public applyModifiersToContent(): void;
 }
 declare class Board {

@@ -6,13 +6,13 @@ declare module cellModifiers {
         strength: number;
         targets: string[];
         effect: {
-            baseProfit: number;
+            addedProfit: number;
             multiplier: number;
         };
     };
     var effects: {
         testEffect: {
-            baseProfit: number;
+            addedProfit: number;
             multiplier: number;
         };
     };

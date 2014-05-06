@@ -61,10 +61,10 @@ var Loader = (function () {
                 return;
             }
         }
+        this.game.frameImages = this.spriteImages;
+        this.game.init();
         var elapsed = window.performance.now() - this.startTime;
         console.log("loaded in " + Math.round(elapsed) + " ms");
-        this.game.init();
-        this.game.frameImages = this.spriteImages;
     };
     return Loader;
 })();

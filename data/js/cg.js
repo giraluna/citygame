@@ -199,7 +199,7 @@ var cg = {
                 "effect": {
                     "type": "testModifier",
                     "range": 2,
-                    "strength": 1
+                    "strength": 2
                 }
             },
             "house3": {
@@ -231,7 +231,7 @@ var cg = {
                 "effect": {
                     "type": "testModifier",
                     "range": 2,
-                    "strength": 1
+                    "strength": 2
                 }
             },
             "house5": {
@@ -247,7 +247,7 @@ var cg = {
                 "effect": {
                     "type": "testModifier",
                     "range": 2,
-                    "strength": 1
+                    "strength": 2
                 }
             },
             "house6": {
@@ -263,7 +263,7 @@ var cg = {
                 "effect": {
                     "type": "testModifier",
                     "range": 2,
-                    "strength": 1
+                    "strength": 2
                 }
             }
         }

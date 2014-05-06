@@ -86,9 +86,8 @@ class Content
   flags: string[];
 
   baseProfit: number = 0;
-  multiplier: number = 1;
-  modifiedProfit: number = 0;
   modifiers: any = {};
+  modifiedProfit: number = 0;
   player: Player;
 
   constructor( cell: Cell, type: any, player?: Player)
@@ -100,11 +99,10 @@ class Content
     this.flags = type["flags"] ? type["flags"].slice(0) : [];
     this.flags.push(this.baseType, this.categoryType);
 
+    this.baseProfit = type.baseProfit || undefined;
+    
     if (player)
     {
-      this.baseProfit = type.baseProfit;
-      // TODO
-      this.modifiedProfit = this.baseProfit;
       this.player = player;
       player.addContent(this);
     }
@@ -118,6 +116,23 @@ class Content
     var gridPos = this.cell.gridPos;
     _s.position = this.cell.sprite.position.clone();
     game.layers["content"]._addChildAt(_s, gridPos[0] + gridPos[1]);
+  }
+  applyModifiers()
+  {
+    var totals =
+    {
+      baseProfit: this.baseProfit,
+      multiplier: 1
+    };
+    for (var _modifier in this.modifiers)
+    {
+      var modifier = this.modifiers[_modifier];
+      for (var prop in modifier.effect)
+      {
+        totals[prop] += ( 1 + Math.log(modifier.strength) ) * modifier.effect[prop];
+      }
+    }
+    this.modifiedProfit = totals.baseProfit * totals.multiplier;
   }
 }
 
@@ -353,6 +368,7 @@ class Cell
   addContent( type: any, player?: Player )
   {
     this.content = new Content( this, type, player);
+    this.applyModifiersToContent();
 
     if (type.effect)
     {
@@ -391,10 +407,15 @@ class Cell
       this.modifiers[modifier.type].strength += modifier.strength;
     };
 
-    if (arrayLogic.or(modifier.targets, this.flags)
-      || (this.content && arrayLogic.or(modifier.targets, this.content.flags) ))
+    // check to see if modifiers need to be updated
+    if (this.content &&
+        (
+          arrayLogic.or(modifier.targets, this.flags)
+          || (this.content && arrayLogic.or(modifier.targets, this.content.flags))
+        )
+      )
     {
-      this.applyModifiersToContent()
+      this.applyModifiersToContent();
     }
   }
   removeModifier(modifier)
@@ -405,14 +426,26 @@ class Cell
     {
       delete this.modifiers[modifier.type];
     }
-    this.applyModifiersToContent();
+
+    if (this.content &&
+        (
+          arrayLogic.or(modifier.targets, this.flags)
+          || (this.content && arrayLogic.or(modifier.targets, this.content.flags))
+        )
+      )
+    {
+      this.applyModifiersToContent();
+    }
   }
   propagateModifier(modifier)
   {
     var effectedCells = this.getArea(modifier.range);
     for (var cell in effectedCells)
     {
-      effectedCells[cell].addModifier(modifier);
+      if (effectedCells[cell] !== this)
+      {
+        effectedCells[cell].addModifier(modifier);
+      }
     }
   }
   removePropagatedModifier(modifier)
@@ -423,24 +456,31 @@ class Cell
       effectedCells[cell].removeModifier(modifier);
     }
   }
-  applyModifiersToContent()
+  // todo: rework later to only update modifiers that have changed
+  getValidModifiers()
   {
     if (!this.content) return;
+
+    var validModifiers: any = {};
     for (var modifierType in this.modifiers)
     {
       var modifier = this.modifiers[modifierType];
-
-      if (this.content && arrayLogic.or(modifier.targets, this.flags)
-        || (this.content && arrayLogic.or(modifier.targets, this.content.flags) ))
+      if (arrayLogic.or(modifier.targets, this.flags)
+        || (arrayLogic.or(modifier.targets, this.content.flags) ))
       {
-        for (var prop in modifier.effect)
-        {
-          this.content[prop] += ( 1 + Math.log(modifier.strength) ) * modifier.effect[prop];
-        }
+        validModifiers[modifierType] = modifier;
       }
     }
-  }
 
+    return validModifiers;
+  }
+  applyModifiersToContent()
+  {
+    if (!this.content) return;
+
+    this.content.modifiers = this.getValidModifiers();
+    this.content.applyModifiers();
+  }
 }
 
 class Board
@@ -1420,7 +1460,11 @@ class UIDrawer
     var screenX = event.global.x;
     var screenY = event.global.y;
 
-    var text = cell.modifiers["testModifier"] ? cell.modifiers["testModifier"].strength : "none";
+    var text = (cell.content) ?
+      "Base profit: "+cell.content.baseProfit +"\n" +
+      "Modified profit: "+cell.content.modifiedProfit + "\n" +
+      "Modifier strength: "+ (cell.content.modifiers["testModifier"] ? "" +(1 + Math.log(cell.content.modifiers["testModifier"].strength)): "none") :
+      "none";
     var font = this.fonts["base"];
 
     var textObject = new PIXI.Text(text, font);

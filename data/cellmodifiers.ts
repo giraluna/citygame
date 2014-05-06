@@ -18,7 +18,7 @@ module cellModifiers
   {
     testEffect:
     {
-      baseProfit: 10,
+      addedProfit: 10,
       multiplier: 0.25
     }
   }

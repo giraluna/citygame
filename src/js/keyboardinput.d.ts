@@ -7,6 +7,9 @@ declare var keyboardStates: {
             "187": () => void;
             "109": () => void;
             "189": () => void;
+            "82": () => void;
+            "85": () => void;
+            "66": () => void;
         };
     };
 };

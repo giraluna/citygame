@@ -30,6 +30,24 @@ var keyboardStates =
       "189": function()
       {
         eventManager.dispatchEvent({type: "decrementSpeed", content:""});
+      },
+      // r
+      // recruit
+      "82": function()
+      {
+        document.getElementById("recruitBtn").click();
+      },
+      // u
+      // buy
+      "85": function()
+      {
+        document.getElementById("buyBtn").click();
+      },
+      // b
+      // build
+      "66": function()
+      {
+        document.getElementById("buildBtn").click();
       }
     }
   }

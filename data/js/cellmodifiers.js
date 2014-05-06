@@ -20,7 +20,7 @@ var cellModifiers;
         if (typeof strength === "undefined") { strength = 1; }
         return ({
             type: "testModifier2",
-            translate: "Overcrowding",
+            translate: "Crowded",
             range: range,
             strength: strength,
             targets: ["apartment"],

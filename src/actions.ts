@@ -29,11 +29,7 @@ module actions
           type: "makeInfoPopup",
           content:
           {
-            text: [
-            "Not enough funds",
-            "",
-            "Build some houses to get cash",
-            "(They're free for now)"]
+            text: "Not enough funds"
           }
         })
         return false;

@@ -37,6 +37,9 @@ body {
 #side-menu input {
   width: 64px;
 }
+#side-menu #action-buttons {
+  margin-top: 25px;
+}
 #side-menu #other-buttons {
   position: absolute;
   bottom: 0px;

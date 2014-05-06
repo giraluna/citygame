@@ -15,7 +15,12 @@ var cg = {
             "frame": "water.png",
             "interactive": true,
             "hitArea": [[0, -32], [32, -16], [0, 0], [-32, -16]],
-            "flags": ["water"]
+            "flags": ["water"],
+            "effect": {
+                "type": "testModifier",
+                "range": 2,
+                "strength": 1
+            }
         },
         "sand": {
             "type": "sand",
@@ -42,35 +47,60 @@ var cg = {
                     "baseType": "plant",
                     "anchor": [0.5, 1],
                     "frame": "tree1.png",
-                    "canBuildOn": ["grass"]
+                    "canBuildOn": ["grass"],
+                    "effect": {
+                        "type": "testModifier",
+                        "range": 2,
+                        "strength": 1
+                    }
                 },
                 "tree2": {
                     "type": "tree2",
                     "baseType": "plant",
                     "anchor": [0.5, 1],
                     "frame": "tree2.png",
-                    "canBuildOn": ["grass"]
+                    "canBuildOn": ["grass"],
+                    "effect": {
+                        "type": "testModifier",
+                        "range": 2,
+                        "strength": 1
+                    }
                 },
                 "tree3": {
                     "type": "tree3",
                     "baseType": "plant",
                     "anchor": [0.5, 1],
                     "frame": "tree3.png",
-                    "canBuildOn": ["grass"]
+                    "canBuildOn": ["grass"],
+                    "effect": {
+                        "type": "testModifier",
+                        "range": 2,
+                        "strength": 1
+                    }
                 },
                 "tree4": {
                     "type": "tree4",
                     "baseType": "plant",
                     "anchor": [0.5, 1],
                     "frame": "tree4.png",
-                    "canBuildOn": ["grass"]
+                    "canBuildOn": ["grass"],
+                    "effect": {
+                        "type": "testModifier",
+                        "range": 2,
+                        "strength": 1
+                    }
                 },
                 "tree5": {
                     "type": "tree5",
                     "baseType": "plant",
                     "anchor": [0.5, 1],
                     "frame": "tree5.png",
-                    "canBuildOn": ["grass"]
+                    "canBuildOn": ["grass"],
+                    "effect": {
+                        "type": "testModifier",
+                        "range": 2,
+                        "strength": 1
+                    }
                 }
             },
             "sand": {
@@ -181,8 +211,8 @@ var cg = {
                 "frame": "house1.png",
                 "canNotBuildOn": ["water", "building", "road"],
                 "effect": {
-                    "type": "testModifier",
-                    "range": 2,
+                    "type": "testModifier2",
+                    "range": 1,
                     "strength": 1
                 }
             },
@@ -197,7 +227,7 @@ var cg = {
                 "frame": "house2.png",
                 "canNotBuildOn": ["water", "building", "road"],
                 "effect": {
-                    "type": "testModifier",
+                    "type": "testModifier2",
                     "range": 2,
                     "strength": 2
                 }
@@ -213,8 +243,8 @@ var cg = {
                 "frame": "house3.png",
                 "canNotBuildOn": ["water", "building", "road"],
                 "effect": {
-                    "type": "testModifier",
-                    "range": 2,
+                    "type": "testModifier2",
+                    "range": 1,
                     "strength": 1
                 }
             },
@@ -229,7 +259,7 @@ var cg = {
                 "frame": "house4.png",
                 "canNotBuildOn": ["water", "building", "road"],
                 "effect": {
-                    "type": "testModifier",
+                    "type": "testModifier2",
                     "range": 2,
                     "strength": 2
                 }
@@ -245,7 +275,7 @@ var cg = {
                 "frame": "house5.png",
                 "canNotBuildOn": ["water", "building", "road"],
                 "effect": {
-                    "type": "testModifier",
+                    "type": "testModifier2",
                     "range": 2,
                     "strength": 2
                 }
@@ -261,7 +291,7 @@ var cg = {
                 "frame": "house6.png",
                 "canNotBuildOn": ["water", "building", "road"],
                 "effect": {
-                    "type": "testModifier",
+                    "type": "testModifier2",
                     "range": 2,
                     "strength": 2
                 }

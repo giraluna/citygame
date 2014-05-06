@@ -20,7 +20,13 @@ var cg: any =
       "frame": "water.png",
       "interactive": true,
       "hitArea": [[0, -32], [32, -16], [0, 0], [-32, -16]],
-      "flags": ["water"]
+      "flags": ["water"],
+      "effect":
+      {
+        "type": "testModifier",
+        "range": 2,
+        "strength": 1
+      }
     },
     "sand":
     {
@@ -53,7 +59,13 @@ var cg: any =
           "baseType": "plant",
           "anchor": [0.5, 1],
           "frame": "tree1.png",
-          "canBuildOn": ["grass"]
+          "canBuildOn": ["grass"],
+          "effect":
+          {
+            "type": "testModifier",
+            "range": 2,
+            "strength": 1
+          }
         },
         "tree2":
         {
@@ -61,7 +73,13 @@ var cg: any =
           "baseType": "plant",
           "anchor": [0.5, 1],
           "frame": "tree2.png",
-          "canBuildOn": ["grass"]
+          "canBuildOn": ["grass"],
+          "effect":
+          {
+            "type": "testModifier",
+            "range": 2,
+            "strength": 1
+          }
         },
         "tree3":
         {
@@ -69,7 +87,13 @@ var cg: any =
           "baseType": "plant",
           "anchor": [0.5, 1],
           "frame": "tree3.png",
-          "canBuildOn": ["grass"]
+          "canBuildOn": ["grass"],
+          "effect":
+          {
+            "type": "testModifier",
+            "range": 2,
+            "strength": 1
+          }
         },
         "tree4":
         {
@@ -77,7 +101,13 @@ var cg: any =
           "baseType": "plant",
           "anchor": [0.5, 1],
           "frame": "tree4.png",
-          "canBuildOn": ["grass"]
+          "canBuildOn": ["grass"],
+          "effect":
+          {
+            "type": "testModifier",
+            "range": 2,
+            "strength": 1
+          }
         },
         "tree5":
         {
@@ -85,7 +115,13 @@ var cg: any =
           "baseType": "plant",
           "anchor": [0.5, 1],
           "frame": "tree5.png",
-          "canBuildOn": ["grass"]
+          "canBuildOn": ["grass"],
+          "effect":
+          {
+            "type": "testModifier",
+            "range": 2,
+            "strength": 1
+          }
         },
       },
       "sand":
@@ -217,8 +253,8 @@ var cg: any =
         "canNotBuildOn": ["water", "building", "road"],
         "effect":
         {
-          "type": "testModifier",
-          "range": 2,
+          "type": "testModifier2",
+          "range": 1,
           "strength": 1
         }
       },
@@ -235,7 +271,7 @@ var cg: any =
         "canNotBuildOn": ["water", "building", "road"],
         "effect":
         {
-          "type": "testModifier",
+          "type": "testModifier2",
           "range": 2,
           "strength": 2
         }
@@ -253,8 +289,8 @@ var cg: any =
         "canNotBuildOn": ["water", "building", "road"],
         "effect":
         {
-          "type": "testModifier",
-          "range": 2,
+          "type": "testModifier2",
+          "range": 1,
           "strength": 1
         }
       },
@@ -271,7 +307,7 @@ var cg: any =
         "canNotBuildOn": ["water", "building", "road"],
         "effect":
         {
-          "type": "testModifier",
+          "type": "testModifier2",
           "range": 2,
           "strength": 2
         }
@@ -289,7 +325,7 @@ var cg: any =
         "canNotBuildOn": ["water", "building", "road"],
         "effect":
         {
-          "type": "testModifier",
+          "type": "testModifier2",
           "range": 2,
           "strength": 2
         }
@@ -307,7 +343,7 @@ var cg: any =
         "canNotBuildOn": ["water", "building", "road"],
         "effect":
         {
-          "type": "testModifier",
+          "type": "testModifier2",
           "range": 2,
           "strength": 2
         }

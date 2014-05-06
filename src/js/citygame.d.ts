@@ -53,7 +53,7 @@ interface neighborCells {
     sw: Cell;
 }
 declare class Cell {
-    public type: string;
+    public type: any;
     public sprite: Sprite;
     public content: Content;
     public landValue: number;
@@ -61,11 +61,11 @@ declare class Cell {
     public flags: string[];
     public modifiers: any;
     constructor(gridPos: any, type: any);
-    public init(type: string): void;
+    public init(type: any): void;
     public getScreenPos(container: any): number[];
     public getNeighbors(diagonal?: boolean): neighborCells;
     public getArea(size: number, anchor?: string): any;
-    public replace(type: string): void;
+    public replace(type: any): void;
     public changeContent(type: string, update?: boolean, player?: Player): void;
     public checkBuildable(type: any, checkContent?: boolean): boolean;
     public addPlant(): void;

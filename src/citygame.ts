@@ -121,7 +121,7 @@ class Content
   {
     var totals =
     {
-      baseProfit: this.baseProfit,
+      addedProfit: this.baseProfit,
       multiplier: 1
     };
     for (var _modifier in this.modifiers)
@@ -132,7 +132,7 @@ class Content
         totals[prop] += ( 1 + Math.log(modifier.strength) ) * modifier.effect[prop];
       }
     }
-    this.modifiedProfit = totals.baseProfit * totals.multiplier;
+    this.modifiedProfit = totals.addedProfit * totals.multiplier;
   }
 }
 
@@ -150,7 +150,7 @@ interface neighborCells
 }
 class Cell
 {
-  type: string;
+  type: any;
   sprite: Sprite;
   content: Content;
   landValue: number;
@@ -166,7 +166,7 @@ class Cell
 
     this.init(type);
   }
-  init( type:string )
+  init( type )
   {
     var _s = this.sprite = new GroundSprite( type, this );
     this.flags = type["flags"].slice(0);
@@ -271,8 +271,9 @@ class Cell
     var rect = rectSelect(start, end);
     return game.board.getCells(rect);
   }
-  replace( type:string ) //change base type of tile
+  replace( type ) //change base type of tile
   {
+    var _oldType = this.type;
     var _texture = type["frame"];
     this.sprite.setTexture( PIXI.Texture.fromFrame( _texture ));
     this.sprite.type = this.type = type;
@@ -291,6 +292,15 @@ class Cell
       {
         this.changeContent( this.content.type );
       }
+    }
+
+    if (_oldType.effect)
+    {
+      this.removePropagatedModifier(_oldType.translatedEffect);
+    }
+    if (type.effect)
+    {
+      this.propagateModifier(type.translatedEffect);
     }
   }
   changeContent( type:string, update:boolean=true, player?: Player)
@@ -1415,7 +1425,7 @@ class UIDrawer
     {
       base:
       {
-        font: "18px Arial",
+        font: "16px Arial",
         fill: "#444444",
         align: "left"
       },
@@ -1460,11 +1470,24 @@ class UIDrawer
     var screenX = event.global.x;
     var screenY = event.global.y;
 
-    var text = (cell.content) ?
-      "Base profit: "+cell.content.baseProfit +"\n" +
-      "Modified profit: "+cell.content.modifiedProfit + "\n" +
-      "Modifier strength: "+ (cell.content.modifiers["testModifier"] ? "" +(1 + Math.log(cell.content.modifiers["testModifier"].strength)): "none") :
-      "none";
+    var text = cell.content ? cell.content.type["type"] : cell.type["type"];
+
+    if (cell.content && cell.content.baseProfit)
+    {
+      text += "\n--------------\n";
+      text += "Base profit: " + cell.content.baseProfit + "\n";
+      text += "-------\n";
+      for (var modifier in cell.content.modifiers)
+      {
+        var _mod = cell.content.modifiers[modifier];
+        text += "Modifier: " + _mod.translate + "\n";
+        text += "Strength: " + _mod.strength + "\n";
+        text += "Adj strength: " + (1 + Math.log(_mod.strength)) + "\n";
+        text += "--------------\n";
+      }
+      text += "Modified profit: " + cell.content.modifiedProfit;
+    }
+
     var font = this.fonts["base"];
 
     var textObject = new PIXI.Text(text, font);

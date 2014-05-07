@@ -140,6 +140,7 @@ declare class Game {
     public loadPlayer(): void;
     public render(): void;
     public resetLayers(): void;
+    public switchToEditorMode(): void;
 }
 declare class SortedDisplayObjectContainer extends PIXI.DisplayObjectContainer {
     public container: PIXI.DisplayObjectContainer;

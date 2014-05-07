@@ -97,8 +97,11 @@ var Content = (function () {
         };
         for (var _modifier in this.modifiers) {
             var modifier = this.modifiers[_modifier];
+            var scaleModifierFN = modifier.scaling || function (strength) {
+                return 1 + Math.log(strength);
+            };
             for (var prop in modifier.effect) {
-                totals[prop] += (1 + Math.log(modifier.strength)) * modifier.effect[prop];
+                totals[prop] += scaleModifierFN(modifier.strength) * modifier.effect[prop];
             }
         }
         this.modifiedProfit = totals.addedProfit * totals.multiplier;
@@ -117,6 +120,8 @@ var Cell = (function () {
     }
     Cell.prototype.init = function (type) {
         var _s = this.sprite = new GroundSprite(type, this);
+        _s.position = arrayToPoint(getIsoCoord(this.gridPos[0], this.gridPos[1], TILE_WIDTH, TILE_HEIGHT, [WORLD_WIDTH / 2, TILE_HEIGHT]));
+        game.layers["ground"].addChild(_s);
         this.flags = type["flags"].slice(0);
     };
     Cell.prototype.getScreenPos = function (container) {
@@ -344,6 +349,7 @@ var Cell = (function () {
         for (var cell in effectedCells) {
             if (effectedCells[cell] !== this) {
                 effectedCells[cell].addModifier(modifier);
+                game.uiDrawer.makeCellPopup(effectedCells[cell], "+1", game.worldRenderer.worldSprite);
             }
         }
     };
@@ -419,11 +425,7 @@ var Board = (function () {
                 }
                 var cellType = dataCell ? dataCell["type"] : cg["terrain"]["grass"];
                 var cell = this.cells[i][j] = new Cell([i, j], cellType);
-                cell.flags = dataCell ? dataCell.flags : cellType["flags"];
 
-                var sprite = cell.sprite;
-                sprite.position = arrayToPoint(getIsoCoord(i, j, TILE_WIDTH, TILE_HEIGHT, [WORLD_WIDTH / 2, TILE_HEIGHT]));
-                game.layers["ground"].addChild(sprite);
                 if (data && dataCell.content) {
                     cell.changeContent(dataCell.content.type);
                 }
@@ -472,7 +474,6 @@ var WorldRenderer = (function () {
             var main = zoomLayer["main"] = new PIXI.DisplayObjectContainer();
         }
 
-        // TEMPORARY
         var self = this;
         _ws.mousedown = _ws.touchstart = function (event) {
             game.mouseEventHandler.mouseDown(event, "world");
@@ -617,6 +618,7 @@ var Game = (function () {
         this.tools.plant = new PlantTool();
         this.tools.house = new HouseTool();
         this.tools.road = new RoadTool();
+
         this.tools.buy = new BuyTool();
         this.tools.build = new BuildTool();
     };
@@ -798,6 +800,8 @@ var Game = (function () {
         this.worldRenderer.initLayers();
         this.initLayers();
         this.worldRenderer.render();
+    };
+    Game.prototype.switchToEditorMode = function () {
     };
     return Game;
 })();

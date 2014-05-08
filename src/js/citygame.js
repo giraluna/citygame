@@ -763,6 +763,9 @@ var Game = (function () {
                 case "ownedContent":
                     return undefined;
 
+                case "ownedCells":
+                    return Object.keys(value);
+
                 default:
                     return value;
             }
@@ -778,6 +781,14 @@ var Game = (function () {
         for (var prop in data) {
             if (data[prop] !== undefined) {
                 newPlayer[prop] = data[prop];
+            }
+        }
+        if (data.ownedCells) {
+            var cells = {};
+            for (var i = 0; i < data.ownedCells.length; i++) {
+                var pos = [data.ownedCells[i].slice(0, 2), data.ownedCells[i].slice(3, 5)];
+                var cell = game.board.getCell(pos);
+                newPlayer.addCell(cell);
             }
         }
         this.players["player0"] = newPlayer;

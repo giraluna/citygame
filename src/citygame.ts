@@ -521,7 +521,7 @@ class Cell
   addOverlay(color)
   {
     if (this.hasOverlay) return;
-    
+
     var gfx = new PIXI.Graphics();
     var poly = this.type.hitArea;
 
@@ -984,6 +984,9 @@ class Game
 
           case "ownedContent":
             return undefined;
+
+          case "ownedCells":
+            return Object.keys(value);
             
           default:
             return value;
@@ -1005,7 +1008,16 @@ class Game
       {
         newPlayer[prop] = data[prop];
       }
-
+    }
+    if (data.ownedCells)
+    {
+      var cells: any = {};
+      for (var i = 0; i < data.ownedCells.length; i++)
+      {
+        var pos = [data.ownedCells[i].slice(0,2), data.ownedCells[i].slice(3,5)]
+        var cell = game.board.getCell(pos);
+        newPlayer.addCell(cell);
+      }
     }
     this.players["player0"] = newPlayer;
     newPlayer.updateElements();

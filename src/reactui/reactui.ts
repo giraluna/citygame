@@ -1,6 +1,8 @@
 /// <reference path="../../lib/react.d.ts" />
 /// <reference path="../../lib/pixi.d.ts" />
 /// 
+/// <reference path="../../data/js/cg.d.ts" />
+/// 
 /// <reference path="../js/player.d.ts" />
 /// <reference path="../js/actions.d.ts" />
 /// <reference path="../js/eventlistener.d.ts" />
@@ -26,12 +28,14 @@ class ReactUI
   } = {};
   topZIndex: number = 15;
   stage: any;
+  frameImages: {[id: string]: HTMLImageElement;}
 
   player: Player;
 
-  constructor(player: Player)
+  constructor(player: Player, frameImages: {[id: string]: HTMLImageElement;})
   {
     this.player = player;
+    this.frameImages = frameImages;
     this.init();
   }
   init()
@@ -289,16 +293,11 @@ class ReactUI
         });
       }
     }
-    // TODO
-    // bad
-    var _: any = window;
-    var _game = _.game;
-    var _cg = _.cg;
     this.makePopup("BuildingListPopup",
     {
       player: props.player,
-      buildingTemplates: _cg.content.buildings,
-      buildingImages: _game.frameImages,
+      buildingTemplates: cg.content.buildings,
+      buildingImages: this.frameImages,
       onOk: buildSelected
     });
   }
@@ -314,9 +313,6 @@ class ReactUI
     {
       if (selected && props.player.money >= props.buildingTemplate.cost)
       {
-        // TODO
-        var _: any = window;
-        var _cg = _.cg;
         props.player.addMoney(-props.buildingTemplate.cost);
 
         actions.constructBuilding(

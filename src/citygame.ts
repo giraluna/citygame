@@ -12,6 +12,8 @@
 /// <reference path="js/eventlistener.d.ts" />
 /// <reference path="js/spritehighlighter.d.ts" />
 /// <reference path="js/keyboardinput.d.ts" />
+/// <reference path="js/mapgeneration.d.ts" />
+/// <reference path="js/board.d.ts" />
 /// 
 /// <reference path="js/utility.d.ts" />
 /// <reference path="js/arraylogic.d.ts" />
@@ -155,6 +157,7 @@ interface neighborCells
 class Cell
 {
   type: any;
+  board: Board;
   sprite: Sprite;
   content: Content;
   landValue: number;
@@ -162,11 +165,12 @@ class Cell
   flags: string[];
   modifiers: any = {};
 
-  constructor( gridPos, type )
+  constructor( gridPos, type, board)
   {
     this.gridPos = gridPos;
     this.type = type;
     this.landValue = randInt(40, 50);
+    this.board = board;
 
     this.init(type);
   }
@@ -207,8 +211,8 @@ class Cell
       s: undefined,
       w: undefined
     };
-    var cells = game.board.cells;
-    var size = game.board.width;
+    var cells = this.board.cells;
+    var size = this.board.width;
     var x = this.gridPos[0];
     var y = this.gridPos[1];
 
@@ -241,10 +245,9 @@ class Cell
   getArea(size: number, anchor:string="center")
   {
     var gridPos = this.gridPos;
-
     var start = [gridPos[0], gridPos[1]];
     var end = [gridPos[0], gridPos[1]];
-    var boardSize = game.board.width;
+    var boardSize = this.board.width;
 
     var adjust = [[0,0], [0,0]];
 
@@ -277,7 +280,7 @@ class Cell
       end[1] += adjust[1][1];
     }
     var rect = rectSelect(start, end);
-    return game.board.getCells(rect);
+    return this.board.getCells(rect);
   }
   replace( type ) //change base type of tile
   {
@@ -298,7 +301,7 @@ class Cell
       }
       else
       {
-        this.changeContent( this.content.type );
+        this.changeContent( this.content.type, false, this.content.player );
       }
     }
 
@@ -463,7 +466,6 @@ class Cell
       if (effectedCells[cell] !== this)
       {
         effectedCells[cell].addModifier(modifier);
-        game.uiDrawer.makeCellPopup(effectedCells[cell], "+1", game.worldRenderer.worldSprite);
       }
     }
   }
@@ -499,73 +501,6 @@ class Cell
 
     this.content.modifiers = this.getValidModifiers();
     this.content.applyModifiers();
-  }
-}
-
-class Board
-{
-  width: number;
-  height: number;
-  cells: Cell[][];
-  constructor(width= TILES, height= TILES)
-  {
-    this.width = width;
-    this.height = height
-    this.cells = [];
-
-    this.init();
-  }
-  init()
-  {
-    for (var i=0; i<this.width; i++)
-    {
-      this.cells[i] = [];
-    }
-  }
-  /*makeEmptyMap()
-  {
-    for (var i = 0; i < this.width; i++)
-    {
-      for (var j = 0; j < this.height; j++)
-      {
-        var cellType = "grass";
-        var cell = this.cells[i][j] = new Cell([i, j], cellType);
-        var sprite = cell.sprite;
-        sprite.position = arrayToPoint( getIsoCoord(i, j,
-          TILE_WIDTH, TILE_HEIGHT,
-          [WORLD_WIDTH/2, TILE_HEIGHT]) );
-        game.layers["ground"].addChild(sprite);
-      }
-    }
-  }*/
-  makeMap( data? )
-  {
-    for (var i = 0; i < this.width; i++)
-    {
-      for (var j = 0; j < this.height; j++)
-      {
-        if (data)
-        {
-          var dataCell = data[i][j] || undefined;
-        }
-        var cellType = dataCell ? dataCell["type"] : cg["terrain"]["grass"];
-        var cell = this.cells[i][j] = new Cell([i, j], cellType);
-
-        if (data && dataCell.content)
-        {
-          cell.changeContent(dataCell.content.type);
-        }
-      }
-    }
-  }
-  
-  getCell(arr: number[]): Cell
-  {
-    return this.cells[arr[0]][arr[1]];
-  }
-  getCells(arr:number[]): Cell[]
-  {
-    return getFrom2dArray(this.cells, arr);
   }
 }
 
@@ -701,8 +636,7 @@ class Game
     this.changeTool("grass");
     this.bindElements();
 
-    this.board = new Board(TILES, TILES);
-    this.board.makeMap();
+    this.board = new Board({width: TILES});
 
     this.highlighter = new Highlighter();
 
@@ -716,7 +650,7 @@ class Game
     this.systemsManager = new SystemsManager(1000);
     var player = new Player(idGenerator.player++);
     player.addMoney(100);
-    this.reactUI = new ReactUI(player);
+    this.reactUI = new ReactUI(player, this.frameImages);
     this.players[player.id] = player;
     var apartmentProfitSystem = new ProfitSystem(1, this.systemsManager, this.players, "apartment");
     this.systemsManager.addSystem("apartmentProfit", apartmentProfitSystem);
@@ -924,49 +858,70 @@ class Game
   }
   save()
   {
-    this.saveBoard();
     this.savePlayer();
+    this.saveBoard(this.board);
   }
   load()
   {
-    this.loadBoard();
     this.loadPlayer();
+    this.loadBoard();
   }
-  saveBoard()
+  saveBoard(board: Board)
   {
-    var data = JSON.stringify(this.board,
-      function replacerFN(key, value)
-      {
-        var replaced= {};
-        if (typeof(value) === "object")
-        {
-          switch (key)
-          {
-            case "content":
-              replaced =
-              {
-                "type": this.content.type,
-                "id": this.content.id
-              };
-              return replaced;
+    var data: any = {};
+    data.width = board.width;
+    data.height = board.height;
+    data.cells = [];
 
-            case "sprite":
-              return this.sprite.type;
-              
-            default:
-              return value;
+    for (var i = 0; i < board.cells.length; i++)
+    {
+      data.cells[i] = [];
+      for (var j = 0; j < board.cells[i].length; j++)
+      {
+        var boardCell = board.cells[i][j];
+        var cell: any = data.cells[i][j] = {};
+        cell.type = boardCell.type;
+        if (boardCell.content)
+        {
+          cell.content =
+          {
+            type: boardCell.content.type,
+            player: boardCell.content.player ?
+              boardCell.content.player.id : null
+          }
+          if (cell.content.type.baseType === "road")
+          {
+            cell.content.type = cg["content"]["roads"]["road_nesw"];
           }
         }
-        return value;
-      });
-    localStorage.setItem("board", data);
+      }
+    }
+    localStorage.setItem("board", JSON.stringify(data));
   }
   loadBoard()
   {
     this.resetLayers();
-    var parsed = JSON.parse( localStorage.getItem("board") );
-    var board = this.board = new Board(parsed["width"], parsed["height"]);
-    board.makeMap( parsed["cells"] );
+    var parsed = JSON.parse( localStorage.getItem("board"),
+    function reviverFN(key, value)
+    {
+      switch (key)
+      {
+        case "player":
+        {
+          return game.players[value];
+        }
+        default:
+        {
+          return value;
+        }
+      }
+    });
+    var board = this.board = new Board(
+    {
+      width: parsed["width"],
+      height: parsed["height"],
+      savedCells: parsed["cells"]
+    });
     eventManager.dispatchEvent({type: "updateWorld", content:{clear: true}});
   }
   // TODO
@@ -982,7 +937,8 @@ class Game
           case "incomeSpan":
             return undefined;
 
-          
+          case "ownedContent":
+            return undefined;
             
           default:
             return value;
@@ -1007,6 +963,7 @@ class Game
 
     }
     this.players["player0"] = newPlayer;
+    newPlayer.updateElements();
   }
   render()
   {
@@ -1024,9 +981,10 @@ class Game
     this.initLayers();
     this.worldRenderer.render();
   }
-  switchToEditorMode()
+  switchEditingMode()
   {
-
+    document.getElementById("tool-buttons").classList.toggle("hidden");
+    document.getElementById("action-buttons").classList.toggle("hidden");
   }
 }
 

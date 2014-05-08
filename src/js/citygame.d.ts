@@ -9,6 +9,8 @@
 /// <reference path="eventlistener.d.ts" />
 /// <reference path="spritehighlighter.d.ts" />
 /// <reference path="keyboardinput.d.ts" />
+/// <reference path="mapgeneration.d.ts" />
+/// <reference path="board.d.ts" />
 /// <reference path="utility.d.ts" />
 /// <reference path="arraylogic.d.ts" />
 declare var SCREEN_WIDTH: number, SCREEN_HEIGHT: number, TILE_WIDTH: number, TILE_HEIGHT: number, TILES: number, WORLD_WIDTH: number, WORLD_HEIGHT: number, ZOOM_LEVELS: number[];
@@ -54,13 +56,14 @@ interface neighborCells {
 }
 declare class Cell {
     public type: any;
+    public board: Board;
     public sprite: Sprite;
     public content: Content;
     public landValue: number;
     public gridPos: number[];
     public flags: string[];
     public modifiers: any;
-    constructor(gridPos: any, type: any);
+    constructor(gridPos: any, type: any, board: any);
     public init(type: any): void;
     public getScreenPos(container: any): number[];
     public getNeighbors(diagonal?: boolean): neighborCells;
@@ -78,16 +81,6 @@ declare class Cell {
     public removePropagatedModifier(modifier: any): void;
     public getValidModifiers(): any;
     public applyModifiersToContent(): void;
-}
-declare class Board {
-    public width: number;
-    public height: number;
-    public cells: Cell[][];
-    constructor(width?: number, height?: number);
-    public init(): void;
-    public makeMap(data?: any): void;
-    public getCell(arr: number[]): Cell;
-    public getCells(arr: number[]): Cell[];
 }
 declare class WorldRenderer {
     public layers: any;
@@ -134,13 +127,13 @@ declare class Game {
     public changeTool(tool: any): void;
     public save(): void;
     public load(): void;
-    public saveBoard(): void;
+    public saveBoard(board: Board): void;
     public loadBoard(): void;
     public savePlayer(): void;
     public loadPlayer(): void;
     public render(): void;
     public resetLayers(): void;
-    public switchToEditorMode(): void;
+    public switchEditingMode(): void;
 }
 declare class SortedDisplayObjectContainer extends PIXI.DisplayObjectContainer {
     public container: PIXI.DisplayObjectContainer;

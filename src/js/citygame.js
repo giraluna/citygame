@@ -12,6 +12,8 @@
 /// <reference path="js/eventlistener.d.ts" />
 /// <reference path="js/spritehighlighter.d.ts" />
 /// <reference path="js/keyboardinput.d.ts" />
+/// <reference path="js/mapgeneration.d.ts" />
+/// <reference path="js/board.d.ts" />
 ///
 /// <reference path="js/utility.d.ts" />
 /// <reference path="js/arraylogic.d.ts" />
@@ -110,11 +112,12 @@ var Content = (function () {
 })();
 
 var Cell = (function () {
-    function Cell(gridPos, type) {
+    function Cell(gridPos, type, board) {
         this.modifiers = {};
         this.gridPos = gridPos;
         this.type = type;
         this.landValue = randInt(40, 50);
+        this.board = board;
 
         this.init(type);
     }
@@ -149,8 +152,8 @@ var Cell = (function () {
             s: undefined,
             w: undefined
         };
-        var cells = game.board.cells;
-        var size = game.board.width;
+        var cells = this.board.cells;
+        var size = this.board.width;
         var x = this.gridPos[0];
         var y = this.gridPos[1];
 
@@ -176,10 +179,9 @@ var Cell = (function () {
     Cell.prototype.getArea = function (size, anchor) {
         if (typeof anchor === "undefined") { anchor = "center"; }
         var gridPos = this.gridPos;
-
         var start = [gridPos[0], gridPos[1]];
         var end = [gridPos[0], gridPos[1]];
-        var boardSize = game.board.width;
+        var boardSize = this.board.width;
 
         var adjust = [[0, 0], [0, 0]];
 
@@ -211,7 +213,7 @@ var Cell = (function () {
             end[1] += adjust[1][1];
         }
         var rect = rectSelect(start, end);
-        return game.board.getCells(rect);
+        return this.board.getCells(rect);
     };
     Cell.prototype.replace = function (type) {
         var _oldType = this.type;
@@ -225,7 +227,7 @@ var Cell = (function () {
             if (!this.checkBuildable(this.content.type, false)) {
                 this.changeContent("none");
             } else {
-                this.changeContent(this.content.type);
+                this.changeContent(this.content.type, false, this.content.player);
             }
         }
 
@@ -349,7 +351,6 @@ var Cell = (function () {
         for (var cell in effectedCells) {
             if (effectedCells[cell] !== this) {
                 effectedCells[cell].addModifier(modifier);
-                game.uiDrawer.makeCellPopup(effectedCells[cell], "+1", game.worldRenderer.worldSprite);
             }
         }
     };
@@ -383,63 +384,6 @@ var Cell = (function () {
         this.content.applyModifiers();
     };
     return Cell;
-})();
-
-var Board = (function () {
-    function Board(width, height) {
-        if (typeof width === "undefined") { width = TILES; }
-        if (typeof height === "undefined") { height = TILES; }
-        this.width = width;
-        this.height = height;
-        this.cells = [];
-
-        this.init();
-    }
-    Board.prototype.init = function () {
-        for (var i = 0; i < this.width; i++) {
-            this.cells[i] = [];
-        }
-    };
-
-    /*makeEmptyMap()
-    {
-    for (var i = 0; i < this.width; i++)
-    {
-    for (var j = 0; j < this.height; j++)
-    {
-    var cellType = "grass";
-    var cell = this.cells[i][j] = new Cell([i, j], cellType);
-    var sprite = cell.sprite;
-    sprite.position = arrayToPoint( getIsoCoord(i, j,
-    TILE_WIDTH, TILE_HEIGHT,
-    [WORLD_WIDTH/2, TILE_HEIGHT]) );
-    game.layers["ground"].addChild(sprite);
-    }
-    }
-    }*/
-    Board.prototype.makeMap = function (data) {
-        for (var i = 0; i < this.width; i++) {
-            for (var j = 0; j < this.height; j++) {
-                if (data) {
-                    var dataCell = data[i][j] || undefined;
-                }
-                var cellType = dataCell ? dataCell["type"] : cg["terrain"]["grass"];
-                var cell = this.cells[i][j] = new Cell([i, j], cellType);
-
-                if (data && dataCell.content) {
-                    cell.changeContent(dataCell.content.type);
-                }
-            }
-        }
-    };
-
-    Board.prototype.getCell = function (arr) {
-        return this.cells[arr[0]][arr[1]];
-    };
-    Board.prototype.getCells = function (arr) {
-        return getFrom2dArray(this.cells, arr);
-    };
-    return Board;
 })();
 
 var WorldRenderer = (function () {
@@ -539,8 +483,7 @@ var Game = (function () {
         this.changeTool("grass");
         this.bindElements();
 
-        this.board = new Board(TILES, TILES);
-        this.board.makeMap();
+        this.board = new Board({ width: TILES });
 
         this.highlighter = new Highlighter();
 
@@ -554,7 +497,7 @@ var Game = (function () {
         this.systemsManager = new SystemsManager(1000);
         var player = new Player(idGenerator.player++);
         player.addMoney(100);
-        this.reactUI = new ReactUI(player);
+        this.reactUI = new ReactUI(player, this.frameImages);
         this.players[player.id] = player;
         var apartmentProfitSystem = new ProfitSystem(1, this.systemsManager, this.players, "apartment");
         this.systemsManager.addSystem("apartmentProfit", apartmentProfitSystem);
@@ -721,41 +664,55 @@ var Game = (function () {
         this.activeTool = this.tools[tool];
     };
     Game.prototype.save = function () {
-        this.saveBoard();
         this.savePlayer();
+        this.saveBoard(this.board);
     };
     Game.prototype.load = function () {
-        this.loadBoard();
         this.loadPlayer();
+        this.loadBoard();
     };
-    Game.prototype.saveBoard = function () {
-        var data = JSON.stringify(this.board, function replacerFN(key, value) {
-            var replaced = {};
-            if (typeof (value) === "object") {
-                switch (key) {
-                    case "content":
-                        replaced = {
-                            "type": this.content.type,
-                            "id": this.content.id
-                        };
-                        return replaced;
+    Game.prototype.saveBoard = function (board) {
+        var data = {};
+        data.width = board.width;
+        data.height = board.height;
+        data.cells = [];
 
-                    case "sprite":
-                        return this.sprite.type;
-
-                    default:
-                        return value;
+        for (var i = 0; i < board.cells.length; i++) {
+            data.cells[i] = [];
+            for (var j = 0; j < board.cells[i].length; j++) {
+                var boardCell = board.cells[i][j];
+                var cell = data.cells[i][j] = {};
+                cell.type = boardCell.type;
+                if (boardCell.content) {
+                    cell.content = {
+                        type: boardCell.content.type,
+                        player: boardCell.content.player ? boardCell.content.player.id : null
+                    };
+                    if (cell.content.type.baseType === "road") {
+                        cell.content.type = cg["content"]["roads"]["road_nesw"];
+                    }
                 }
             }
-            return value;
-        });
-        localStorage.setItem("board", data);
+        }
+        localStorage.setItem("board", JSON.stringify(data));
     };
     Game.prototype.loadBoard = function () {
         this.resetLayers();
-        var parsed = JSON.parse(localStorage.getItem("board"));
-        var board = this.board = new Board(parsed["width"], parsed["height"]);
-        board.makeMap(parsed["cells"]);
+        var parsed = JSON.parse(localStorage.getItem("board"), function reviverFN(key, value) {
+            switch (key) {
+                case "player": {
+                    return game.players[value];
+                }
+                default: {
+                    return value;
+                }
+            }
+        });
+        var board = this.board = new Board({
+            width: parsed["width"],
+            height: parsed["height"],
+            savedCells: parsed["cells"]
+        });
         eventManager.dispatchEvent({ type: "updateWorld", content: { clear: true } });
     };
 
@@ -766,6 +723,9 @@ var Game = (function () {
             switch (key) {
                 case "moneySpan":
                 case "incomeSpan":
+                    return undefined;
+
+                case "ownedContent":
                     return undefined;
 
                 default:
@@ -786,6 +746,7 @@ var Game = (function () {
             }
         }
         this.players["player0"] = newPlayer;
+        newPlayer.updateElements();
     };
     Game.prototype.render = function () {
         this.renderer.render(this.stage);
@@ -801,7 +762,9 @@ var Game = (function () {
         this.initLayers();
         this.worldRenderer.render();
     };
-    Game.prototype.switchToEditorMode = function () {
+    Game.prototype.switchEditingMode = function () {
+        document.getElementById("tool-buttons").classList.toggle("hidden");
+        document.getElementById("action-buttons").classList.toggle("hidden");
     };
     return Game;
 })();

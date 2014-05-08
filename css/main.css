@@ -1,3 +1,6 @@
+.hidden {
+  display: none;
+}
 html,
 body {
   height: 100%;
@@ -36,6 +39,9 @@ body {
 }
 #side-menu input {
   width: 64px;
+}
+#side-menu #removeBtn {
+  margin-top: 25px;
 }
 #side-menu #action-buttons {
   margin-top: 25px;

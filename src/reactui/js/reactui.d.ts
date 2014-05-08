@@ -1,5 +1,6 @@
 /// <reference path="../../../lib/react.d.ts" />
 /// <reference path="../../../lib/pixi.d.ts" />
+/// <reference path="../../../data/js/cg.d.ts" />
 /// <reference path="../../js/player.d.ts" />
 /// <reference path="../../js/actions.d.ts" />
 /// <reference path="../../js/eventlistener.d.ts" />
@@ -20,8 +21,13 @@ declare class ReactUI {
     };
     public topZIndex: number;
     public stage: any;
+    public frameImages: {
+        [id: string]: HTMLImageElement;
+    };
     public player: Player;
-    constructor(player: Player);
+    constructor(player: Player, frameImages: {
+        [id: string]: HTMLImageElement;
+    });
     public init(): void;
     public addEventListeners(): void;
     public makePopup(type: string, props: {

@@ -65,12 +65,14 @@ var ContentSprite = (function (_super) {
 })(Sprite);
 
 var Content = (function () {
-    function Content(cell, type, player) {
+    function Content(props) {
         this.baseProfit = 0;
         this.modifiers = {};
         this.modifiedProfit = 0;
-        this.cell = cell;
-        this.type = type;
+        this.cell = props.cell;
+        var type = this.type = props.type;
+        this.id = props.id || idGenerator.content++;
+
         this.baseType = type["baseType"] || undefined;
         this.categoryType = type["categoryType"] || undefined;
         this.flags = type["flags"] ? type["flags"].slice(0) : [];
@@ -78,9 +80,9 @@ var Content = (function () {
 
         this.baseProfit = type.baseProfit || undefined;
 
-        if (player) {
-            this.player = player;
-            player.addContent(this);
+        if (props.player) {
+            this.player = props.player;
+            props.player.addContent(this);
         }
 
         this.init(type);
@@ -114,6 +116,7 @@ var Content = (function () {
 var Cell = (function () {
     function Cell(gridPos, type, board) {
         this.modifiers = {};
+        this.hasOverlay = false;
         this.gridPos = gridPos;
         this.type = type;
         this.landValue = randInt(40, 50);
@@ -298,7 +301,11 @@ var Cell = (function () {
         getRoadConnections(this, 1);
     };
     Cell.prototype.addContent = function (type, player) {
-        this.content = new Content(this, type, player);
+        this.content = new Content({
+            cell: this,
+            type: type,
+            player: player
+        });
         this.applyModifiersToContent();
 
         if (type.effect) {
@@ -312,6 +319,7 @@ var Cell = (function () {
             return;
         }
         if (this.content.player) {
+            console.log("removed");
             this.content.player.removeContent(this.content);
         }
         if (this.content.type.effect) {
@@ -383,6 +391,30 @@ var Cell = (function () {
         this.content.modifiers = this.getValidModifiers();
         this.content.applyModifiers();
     };
+    Cell.prototype.addOverlay = function (color) {
+        if (this.hasOverlay)
+            return;
+
+        var gfx = new PIXI.Graphics();
+        var poly = this.type.hitArea;
+
+        poly.push(this.type.hitArea[0]);
+        drawPolygon(gfx, poly, {
+            width: 3,
+            color: color,
+            alpha: 1
+        }, {
+            width: 1,
+            color: 0x000000,
+            alpha: 0
+        });
+        gfx.position = this.sprite.position.clone();
+        game.layers["cellOverlay"]._addChildAt(gfx, this.gridPos[0], this.gridPos[1]);
+
+        this.hasOverlay = true;
+
+        game.updateWorld();
+    };
     return Cell;
 })();
 
@@ -439,11 +471,13 @@ var WorldRenderer = (function () {
             var zoomLayer = this.layers[zoomStr];
             var main = zoomLayer["main"];
 
-            var ground = zoomLayer["ground"] = new PIXI.DisplayObjectContainer();
-            var content = zoomLayer["content"] = new SortedDisplayObjectContainer(TILES * 2);
+            zoomLayer["ground"] = new PIXI.DisplayObjectContainer();
+            zoomLayer["cellOverlay"] = new SortedDisplayObjectContainer(TILES * 2);
+            zoomLayer["content"] = new SortedDisplayObjectContainer(TILES * 2);
 
-            main.addChild(ground);
-            main.addChild(content);
+            main.addChild(zoomLayer["ground"]);
+            main.addChild(zoomLayer["cellOverlay"]);
+            main.addChild(zoomLayer["content"]);
         }
     };
     WorldRenderer.prototype.clearLayers = function () {
@@ -550,6 +584,7 @@ var Game = (function () {
     };
     Game.prototype.initLayers = function () {
         this.layers["ground"] = this.worldRenderer.layers["zoom1"]["ground"];
+        this.layers["cellOverlay"] = this.worldRenderer.layers["zoom1"]["cellOverlay"];
         this.layers["content"] = this.worldRenderer.layers["zoom1"]["content"];
     };
     Game.prototype.initTools = function () {

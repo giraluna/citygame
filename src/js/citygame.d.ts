@@ -40,7 +40,12 @@ declare class Content {
     public modifiers: any;
     public modifiedProfit: number;
     public player: Player;
-    constructor(cell: Cell, type: any, player?: Player);
+    constructor(props: {
+        cell: Cell;
+        type: any;
+        player?: Player;
+        id?: number;
+    });
     public init(type: any): void;
     public applyModifiers(): void;
 }
@@ -63,6 +68,7 @@ declare class Cell {
     public gridPos: number[];
     public flags: string[];
     public modifiers: any;
+    public hasOverlay: boolean;
     constructor(gridPos: any, type: any, board: any);
     public init(type: any): void;
     public getScreenPos(container: any): number[];
@@ -81,6 +87,7 @@ declare class Cell {
     public removePropagatedModifier(modifier: any): void;
     public getValidModifiers(): any;
     public applyModifiersToContent(): void;
+    public addOverlay(color: any): void;
 }
 declare class WorldRenderer {
     public layers: any;

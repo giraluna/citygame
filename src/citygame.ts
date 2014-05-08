@@ -92,10 +92,19 @@ class Content
   modifiedProfit: number = 0;
   player: Player;
 
-  constructor( cell: Cell, type: any, player?: Player)
+  constructor(props:
   {
-    this.cell = cell;
-    this.type = type;
+    cell: Cell;
+    type: any;
+
+    player?: Player;
+    id?: number;
+  })
+  {
+    this.cell = props.cell;
+    var type = this.type = props.type;
+    this.id = props.id || idGenerator.content++;
+
     this.baseType = type["baseType"] || undefined;
     this.categoryType = type["categoryType"] || undefined;
     this.flags = type["flags"] ? type["flags"].slice(0) : [];
@@ -103,10 +112,10 @@ class Content
 
     this.baseProfit = type.baseProfit || undefined;
     
-    if (player)
+    if (props.player)
     {
-      this.player = player;
-      player.addContent(this);
+      this.player = props.player;
+      props.player.addContent(this);
     }
 
     this.init( type );
@@ -164,6 +173,7 @@ class Cell
   gridPos: number[];
   flags: string[];
   modifiers: any = {};
+  hasOverlay: boolean = false;
 
   constructor( gridPos, type, board)
   {
@@ -388,7 +398,12 @@ class Cell
   }
   addContent( type: any, player?: Player )
   {
-    this.content = new Content( this, type, player);
+    this.content = new Content(
+    {
+      cell: this,
+      type: type,
+      player: player
+    });
     this.applyModifiersToContent();
 
     if (type.effect)
@@ -406,6 +421,7 @@ class Cell
     }
     if (this.content.player)
     {
+      console.log("removed");
       this.content.player.removeContent(this.content);
     }
     if (this.content.type.effect)
@@ -502,6 +518,32 @@ class Cell
     this.content.modifiers = this.getValidModifiers();
     this.content.applyModifiers();
   }
+  addOverlay(color)
+  {
+    if (this.hasOverlay) return;
+    
+    var gfx = new PIXI.Graphics();
+    var poly = this.type.hitArea;
+
+    poly.push(this.type.hitArea[0]);
+    drawPolygon(gfx, poly,
+    {
+      width: 3,
+      color: color,
+      alpha: 1
+    },
+    {
+      width: 1,
+      color: 0x000000,
+      alpha: 0
+    });
+    gfx.position = this.sprite.position.clone();
+    game.layers["cellOverlay"]._addChildAt(gfx, this.gridPos[0], this.gridPos[1]);
+
+    this.hasOverlay = true;
+
+    game.updateWorld();
+  }
 }
 
 class WorldRenderer
@@ -575,11 +617,13 @@ class WorldRenderer
       var zoomLayer = this.layers[zoomStr];
       var main = zoomLayer["main"];
 
-      var ground  = zoomLayer["ground"]  = new PIXI.DisplayObjectContainer();
-      var content = zoomLayer["content"] = new SortedDisplayObjectContainer(TILES * 2);
+      zoomLayer["ground"]  = new PIXI.DisplayObjectContainer();
+      zoomLayer["cellOverlay"] = new SortedDisplayObjectContainer(TILES * 2);
+      zoomLayer["content"] = new SortedDisplayObjectContainer(TILES * 2);
 
-      main.addChild(ground);
-      main.addChild(content);
+      main.addChild(zoomLayer["ground"]);
+      main.addChild(zoomLayer["cellOverlay"]);
+      main.addChild(zoomLayer["content"]);
     }
   }
   clearLayers()
@@ -719,6 +763,7 @@ class Game
     initLayers()
     {
       this.layers["ground"] = this.worldRenderer.layers["zoom1"]["ground"];
+      this.layers["cellOverlay"] = this.worldRenderer.layers["zoom1"]["cellOverlay"];
       this.layers["content"] = this.worldRenderer.layers["zoom1"]["content"];
     }
     initTools()

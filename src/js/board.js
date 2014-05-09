@@ -24,6 +24,13 @@ var Board = (function () {
     Board.prototype.getCells = function (arr) {
         return getFrom2dArray(this.cells, arr);
     };
+    Board.prototype.destroy = function () {
+        for (var i = 0; i < this.cells.length; i++) {
+            for (var j = 0; j < this.cells[i].length; j++) {
+                this.cells[i][j] = null;
+            }
+        }
+    };
     return Board;
 })();
 //# sourceMappingURL=board.js.map

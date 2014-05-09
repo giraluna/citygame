@@ -115,7 +115,6 @@ class Content
     if (props.player)
     {
       props.player.addContent(this);
-      console.log(props.player.ownedContent);
     }
 
     this.init( type );
@@ -634,6 +633,14 @@ class WorldRenderer
       var zoomLayer = this.layers[zoomStr];
       var main = zoomLayer["main"];
 
+      for (var layer in zoomLayer)
+      {
+        if (zoomLayer[layer].children.length > 0)
+        {
+          zoomLayer[layer].removeChildren();
+        }
+      }
+      
       if(main.children.length > 0) main.removeChildren();
     }
   }
@@ -936,6 +943,7 @@ class Game
     }
     localStorage.setItem(name, JSON.stringify(toSave));
   }
+  //todo memory leak
   load(name: string)
   {
     var parsed = JSON.parse(localStorage.getItem(name));
@@ -981,6 +989,7 @@ class Game
   loadBoard(data: any)
   {
     this.resetLayers();
+    this.board.destroy();
 
     for (var i = 0; i < data.cells.length; i++)
     {
@@ -1271,19 +1280,24 @@ class MouseEventHandler
   {
     game.uiDrawer.removeActive();
     if (event.originalEvent.button === 2 &&
-      this.currAction !== undefined)
+      this.currAction !== undefined &&
+      targetType === "stage")
     {
       this.currAction = undefined;
       this.startPoint = undefined;
       this.scroller.end();
       game.highlighter.clearSprites();
       game.updateWorld();
+      console.log(targetType);
+      console.log("stop");
     }
     else if (event.originalEvent.ctrlKey ||
       event.originalEvent.metaKey ||
       event.originalEvent.button === 2)
     {
       this.startScroll(event);
+      console.log(targetType);
+      console.log("scroll")
     }
     else if (event.originalEvent.shiftKey)
     {

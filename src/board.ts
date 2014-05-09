@@ -42,4 +42,14 @@ class Board
   {
     return getFrom2dArray(this.cells, arr);
   }
+  destroy()
+  {
+    for (var i = 0; i < this.cells.length; i++)
+    {
+      for (var j = 0; j < this.cells[i].length; j++)
+      {
+        this.cells[i][j] = null;
+      }
+    }
+  }
 }

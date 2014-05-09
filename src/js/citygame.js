@@ -82,7 +82,6 @@ var Content = (function () {
 
         if (props.player) {
             props.player.addContent(this);
-            console.log(props.player.ownedContent);
         }
 
         this.init(type);
@@ -485,6 +484,12 @@ var WorldRenderer = (function () {
             var zoomLayer = this.layers[zoomStr];
             var main = zoomLayer["main"];
 
+            for (var layer in zoomLayer) {
+                if (zoomLayer[layer].children.length > 0) {
+                    zoomLayer[layer].removeChildren();
+                }
+            }
+
             if (main.children.length > 0)
                 main.removeChildren();
         }
@@ -724,6 +729,8 @@ var Game = (function () {
         };
         localStorage.setItem(name, JSON.stringify(toSave));
     };
+
+    //todo memory leak
     Game.prototype.load = function (name) {
         var parsed = JSON.parse(localStorage.getItem(name));
         this.loadPlayer(parsed.player);
@@ -759,6 +766,7 @@ var Game = (function () {
     };
     Game.prototype.loadBoard = function (data) {
         this.resetLayers();
+        this.board.destroy();
 
         for (var i = 0; i < data.cells.length; i++) {
             for (var j = 0; j < data.cells[i].length; j++) {
@@ -980,14 +988,18 @@ var MouseEventHandler = (function () {
     }
     MouseEventHandler.prototype.mouseDown = function (event, targetType) {
         game.uiDrawer.removeActive();
-        if (event.originalEvent.button === 2 && this.currAction !== undefined) {
+        if (event.originalEvent.button === 2 && this.currAction !== undefined && targetType === "stage") {
             this.currAction = undefined;
             this.startPoint = undefined;
             this.scroller.end();
             game.highlighter.clearSprites();
             game.updateWorld();
+            console.log(targetType);
+            console.log("stop");
         } else if (event.originalEvent.ctrlKey || event.originalEvent.metaKey || event.originalEvent.button === 2) {
             this.startScroll(event);
+            console.log(targetType);
+            console.log("scroll");
         } else if (event.originalEvent.shiftKey) {
             this.startZoom(event);
         } else if (targetType === "world") {

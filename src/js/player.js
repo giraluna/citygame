@@ -60,11 +60,7 @@ var Player = (function () {
 
     Player.prototype.addCell = function (cell) {
         if (!this.ownedCells[cell.gridPos]) {
-            console.log(cell.gridPos);
             this.ownedCells[cell.gridPos] = cell;
-            console.log(this.ownedCells);
-            console.log(game.players.player0);
-            console.log(game.players.player0 === this);
 
             cell.player = this;
             cell.addOverlay(this.color);

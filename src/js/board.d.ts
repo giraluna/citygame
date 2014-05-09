@@ -11,4 +11,5 @@ declare class Board {
     });
     public getCell(arr: number[]): any;
     public getCells(arr: number[]): any;
+    public destroy(): void;
 }

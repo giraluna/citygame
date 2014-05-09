@@ -69,6 +69,7 @@ declare class Cell {
     public flags: string[];
     public modifiers: any;
     public hasOverlay: boolean;
+    public player: Player;
     constructor(gridPos: any, type: any, board: any);
     public init(type: any): void;
     public getScreenPos(container: any): number[];
@@ -132,12 +133,12 @@ declare class Game {
     public updateWorld(clear?: boolean): void;
     public resize(): void;
     public changeTool(tool: any): void;
-    public save(): void;
-    public load(): void;
-    public saveBoard(board: Board): void;
-    public loadBoard(): void;
-    public savePlayer(): void;
-    public loadPlayer(): void;
+    public save(name: string): void;
+    public load(name: string): void;
+    public saveBoard(board: Board): any;
+    public loadBoard(data: any): void;
+    public savePlayer(player: Player): any;
+    public loadPlayer(data: any): void;
     public render(): void;
     public resetLayers(): void;
     public switchEditingMode(): void;

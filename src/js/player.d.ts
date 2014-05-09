@@ -3,6 +3,7 @@
 /// <reference path="../../data/js/cg.d.ts" />
 declare class Player {
     public id: string;
+    public color: number;
     public money: number;
     public eventListener: any;
     public ownedContent: any;
@@ -12,7 +13,7 @@ declare class Player {
     public modifiers: any;
     public moneySpan: HTMLElement;
     public incomeSpan: HTMLElement;
-    constructor(id: number);
+    constructor(id: number, color?: number);
     public bindElements(): void;
     public updateElements(): void;
     public init(): void;

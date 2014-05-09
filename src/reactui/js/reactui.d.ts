@@ -8,6 +8,7 @@
 /// <reference path="employee.d.ts" />
 /// <reference path="employeeaction.d.ts" />
 /// <reference path="employeeactionpopup.d.ts" />
+/// <reference path="inputpopup.d.ts" />
 /// <reference path="actioninfo.d.ts" />
 /// <reference path="stage.d.ts" />
 declare class ReactUI {
@@ -76,6 +77,13 @@ declare class ReactUI {
         buildingTemplate: any;
         cell: any;
         text?: any;
+    }): void;
+    public makeInputPopup(props: {
+        text: any;
+        onOk: (string: any) => any;
+        okBtnText?: string;
+        onClose: any;
+        closeBtnText?: string;
     }): void;
     public incrementZIndex(key?: any): number;
     public destroyPopup(key: any, callback?: any): void;

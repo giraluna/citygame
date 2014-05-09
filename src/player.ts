@@ -6,6 +6,7 @@
 class Player
 {
   id: string;
+  color: number;
   money: number = 0;
   eventListener: any;
 
@@ -19,9 +20,10 @@ class Player
   moneySpan: HTMLElement;
   incomeSpan: HTMLElement;
 
-  constructor(id: number)
+  constructor(id: number, color: number=0xFF0000)
   {
     this.id = "player" + id;
+    this.color = color;
     this.bindElements();
     this.init();
   }
@@ -81,7 +83,14 @@ class Player
   {
     if (!this.ownedCells[cell.gridPos])
     {
+      console.log(cell.gridPos);
       this.ownedCells[cell.gridPos] = cell;
+      console.log(this.ownedCells);
+      console.log(game.players.player0);
+      console.log(game.players.player0 === this);
+
+      cell.player = this;
+      cell.addOverlay(this.color);
     }
   }
   removeCell( cell )
@@ -95,6 +104,7 @@ class Player
   {
     var type = content.categoryType;
     this.ownedContent[type].push(content);
+    content.player = this;
   }
   removeContent( content )
   {

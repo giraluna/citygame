@@ -39,10 +39,16 @@ var mapGeneration;
         var cells = props.board.cells;
         for (var i = 0; i < props.board.width; i++) {
             for (var j = 0; j < props.board.height; j++) {
-                cells[i][j].replace(props.savedCells[i][j].type);
+                var cell = cells[i][j];
+                var savedCell = props.savedCells[i][j];
 
-                if (props.savedCells[i][j].content) {
-                    cells[i][j].changeContent(props.savedCells[i][j].content.type, true, props.savedCells[i][j].content.player);
+                cell.replace(savedCell.type);
+
+                if (savedCell.content) {
+                    cell.changeContent(savedCell.content.type, true, savedCell.player);
+                }
+                if (savedCell.player) {
+                    savedCell.player.addCell(cell);
                 }
             }
         }

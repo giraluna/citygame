@@ -2,7 +2,8 @@
 /// <reference path="js/employee.d.ts" />
 /// <reference path="../data/js/cg.d.ts" />
 var Player = (function () {
-    function Player(id) {
+    function Player(id, color) {
+        if (typeof color === "undefined") { color = 0xFF0000; }
         this.money = 0;
         this.ownedContent = {};
         this.ownedCells = {};
@@ -10,6 +11,7 @@ var Player = (function () {
         this.usedInitialRecruit = false;
         this.modifiers = {};
         this.id = "player" + id;
+        this.color = color;
         this.bindElements();
         this.init();
     }
@@ -58,7 +60,14 @@ var Player = (function () {
 
     Player.prototype.addCell = function (cell) {
         if (!this.ownedCells[cell.gridPos]) {
+            console.log(cell.gridPos);
             this.ownedCells[cell.gridPos] = cell;
+            console.log(this.ownedCells);
+            console.log(game.players.player0);
+            console.log(game.players.player0 === this);
+
+            cell.player = this;
+            cell.addOverlay(this.color);
         }
     };
     Player.prototype.removeCell = function (cell) {
@@ -69,6 +78,7 @@ var Player = (function () {
     Player.prototype.addContent = function (content) {
         var type = content.categoryType;
         this.ownedContent[type].push(content);
+        content.player = this;
     };
     Player.prototype.removeContent = function (content) {
     };

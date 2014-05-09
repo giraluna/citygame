@@ -31,7 +31,6 @@ var actions;
             } else {
                 player.addCell(cell);
                 player.addMoney(-price);
-                cell.addOverlay(0xFF0000);
                 eventManager.dispatchEvent({ type: "updateWorld", content: "" });
 
                 return true;

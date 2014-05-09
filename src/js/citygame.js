@@ -81,8 +81,8 @@ var Content = (function () {
         this.baseProfit = type.baseProfit || undefined;
 
         if (props.player) {
-            this.player = props.player;
             props.player.addContent(this);
+            console.log(props.player.ownedContent);
         }
 
         this.init(type);
@@ -319,7 +319,6 @@ var Cell = (function () {
             return;
         }
         if (this.content.player) {
-            console.log("removed");
             this.content.player.removeContent(this.content);
         }
         if (this.content.type.effect) {
@@ -402,7 +401,7 @@ var Cell = (function () {
         drawPolygon(gfx, poly, {
             width: 3,
             color: color,
-            alpha: 1
+            alpha: 0.6
         }, {
             width: 1,
             color: 0x000000,
@@ -624,10 +623,30 @@ var Game = (function () {
         var saveBtn = document.getElementById("saveBtn");
         var loadBtn = document.getElementById("loadBtn");
         addClickAndTouchEventListener(saveBtn, function () {
-            self.save();
+            eventManager.dispatchEvent({
+                type: "makeInputPopup",
+                content: {
+                    text: "Save as",
+                    onOk: function (name) {
+                        self.save(name);
+                    },
+                    okBtnText: "Save",
+                    closeBtnText: "Cancel"
+                }
+            });
         });
         addClickAndTouchEventListener(loadBtn, function () {
-            self.load();
+            eventManager.dispatchEvent({
+                type: "makeInputPopup",
+                content: {
+                    text: "Load",
+                    onOk: function (name) {
+                        self.load(name);
+                    },
+                    okBtnText: "Load",
+                    closeBtnText: "Cancel"
+                }
+            });
         });
 
         //recruit
@@ -698,13 +717,17 @@ var Game = (function () {
     Game.prototype.changeTool = function (tool) {
         this.activeTool = this.tools[tool];
     };
-    Game.prototype.save = function () {
-        this.savePlayer();
-        this.saveBoard(this.board);
+    Game.prototype.save = function (name) {
+        var toSave = {
+            player: this.savePlayer(this.players["player0"]),
+            board: this.saveBoard(this.board)
+        };
+        localStorage.setItem(name, JSON.stringify(toSave));
     };
-    Game.prototype.load = function () {
-        this.loadPlayer();
-        this.loadBoard();
+    Game.prototype.load = function (name) {
+        var parsed = JSON.parse(localStorage.getItem(name));
+        this.loadPlayer(parsed.player);
+        this.loadBoard(parsed.board);
     };
     Game.prototype.saveBoard = function (board) {
         var data = {};
@@ -718,6 +741,9 @@ var Game = (function () {
                 var boardCell = board.cells[i][j];
                 var cell = data.cells[i][j] = {};
                 cell.type = boardCell.type;
+                if (boardCell.player) {
+                    cell.player = boardCell.player.id;
+                }
                 if (boardCell.content) {
                     cell.content = {
                         type: boardCell.content.type,
@@ -729,51 +755,42 @@ var Game = (function () {
                 }
             }
         }
-        localStorage.setItem("board", JSON.stringify(data));
+        return data;
     };
-    Game.prototype.loadBoard = function () {
+    Game.prototype.loadBoard = function (data) {
         this.resetLayers();
-        var parsed = JSON.parse(localStorage.getItem("board"), function reviverFN(key, value) {
-            switch (key) {
-                case "player": {
-                    return game.players[value];
-                }
-                default: {
-                    return value;
+
+        for (var i = 0; i < data.cells.length; i++) {
+            for (var j = 0; j < data.cells[i].length; j++) {
+                var cell = data.cells[i][j];
+                if (cell.player) {
+                    cell.player = this.players[cell.player];
+                    if (cell.content) {
+                        cell.content.player = this.players[cell.player];
+                    }
                 }
             }
-        });
+        }
+
         var board = this.board = new Board({
-            width: parsed["width"],
-            height: parsed["height"],
-            savedCells: parsed["cells"]
+            width: data.width,
+            height: data.height,
+            savedCells: data.cells
         });
         eventManager.dispatchEvent({ type: "updateWorld", content: { clear: true } });
     };
 
-    // TODO
-    Game.prototype.savePlayer = function () {
-        var player = this.players["player0"];
-        var toSave = JSON.stringify(player, function replacerFN(key, value) {
-            switch (key) {
-                case "moneySpan":
-                case "incomeSpan":
-                    return undefined;
+    Game.prototype.savePlayer = function (player) {
+        var data = {};
+        data.id = player.id;
+        data.money = player.money;
 
-                case "ownedContent":
-                    return undefined;
+        data.employees = player.employees;
+        data.modifiers = player.modifiers;
 
-                case "ownedCells":
-                    return Object.keys(value);
-
-                default:
-                    return value;
-            }
-        });
-        localStorage.setItem("player", toSave);
+        return data;
     };
-    Game.prototype.loadPlayer = function () {
-        var data = JSON.parse(localStorage.getItem("player"));
+    Game.prototype.loadPlayer = function (data) {
         for (var employee in data.employees) {
             data.employees[employee] = new Employee(TEMPNAMES, data.employees[employee]);
         }
@@ -783,14 +800,7 @@ var Game = (function () {
                 newPlayer[prop] = data[prop];
             }
         }
-        if (data.ownedCells) {
-            var cells = {};
-            for (var i = 0; i < data.ownedCells.length; i++) {
-                var pos = [data.ownedCells[i].slice(0, 2), data.ownedCells[i].slice(3, 5)];
-                var cell = game.board.getCell(pos);
-                newPlayer.addCell(cell);
-            }
-        }
+
         this.players["player0"] = newPlayer;
         newPlayer.updateElements();
     };

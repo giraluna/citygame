@@ -11,6 +11,7 @@
 /// <reference path="js/employee.d.ts" />
 /// <reference path="js/employeeaction.d.ts" />
 /// <reference path="js/employeeactionpopup.d.ts" />
+/// <reference path="js/inputpopup.d.ts" />
 /// <reference path="js/actioninfo.d.ts" />
 /// <reference path="js/stage.d.ts" />
 var ReactUI = (function () {
@@ -53,6 +54,9 @@ var ReactUI = (function () {
         });
         eventManager.addEventListener("makeBuildingSelectPopup", function (event) {
             self.makeBuildingSelectPopup(event.content);
+        });
+        eventManager.addEventListener("makeInputPopup", function (event) {
+            self.makeInputPopup(event.content);
         });
         eventManager.addEventListener("closeTopPopup", function (event) {
             self.closeTopPopup();
@@ -241,6 +245,10 @@ var ReactUI = (function () {
                 exactCost: props.buildingTemplate.cost
             }
         });
+    };
+
+    ReactUI.prototype.makeInputPopup = function (props) {
+        this.makePopup("InputPopup", props);
     };
 
     ///// OTHER METHODS /////

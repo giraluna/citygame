@@ -11,6 +11,7 @@
 /// <reference path="js/employee.d.ts" />
 /// <reference path="js/employeeaction.d.ts" />
 /// <reference path="js/employeeactionpopup.d.ts" />
+/// <reference path="js/inputpopup.d.ts" />
 /// <reference path="js/actioninfo.d.ts" />
 /// <reference path="js/stage.d.ts" />
 
@@ -79,6 +80,10 @@ class ReactUI
     eventManager.addEventListener("makeBuildingSelectPopup", function(event)
     {
       self.makeBuildingSelectPopup(event.content)
+    });
+    eventManager.addEventListener("makeInputPopup", function(event)
+    {
+      self.makeInputPopup(event.content)
     });
     eventManager.addEventListener("closeTopPopup", function(event)
     {
@@ -359,6 +364,18 @@ class ReactUI
         
       }
     });
+  }
+
+  makeInputPopup(props:
+  {
+    text: any;
+    onOk: (string) => any;
+    okBtnText?: string;
+    onClose: any;
+    closeBtnText?: string;
+  })
+  {
+    this.makePopup("InputPopup", props);
   }
 
   ///// OTHER METHODS /////

@@ -913,6 +913,7 @@ class Game
   {
     var _canvas = document.getElementById("pixi-container");
     _canvas.appendChild(this.renderer.view);
+    this.renderer.view.setAttribute("id", "pixi-canvas");
   }
   updateWorld(clear?: boolean)
   {
@@ -943,7 +944,6 @@ class Game
     }
     localStorage.setItem(name, JSON.stringify(toSave));
   }
-  //todo memory leak
   load(name: string)
   {
     var parsed = JSON.parse(localStorage.getItem(name));
@@ -1288,16 +1288,12 @@ class MouseEventHandler
       this.scroller.end();
       game.highlighter.clearSprites();
       game.updateWorld();
-      console.log(targetType);
-      console.log("stop");
     }
     else if (event.originalEvent.ctrlKey ||
       event.originalEvent.metaKey ||
       event.originalEvent.button === 2)
     {
       this.startScroll(event);
-      console.log(targetType);
-      console.log("scroll")
     }
     else if (event.originalEvent.shiftKey)
     {

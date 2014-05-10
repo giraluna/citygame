@@ -706,6 +706,7 @@ var Game = (function () {
     Game.prototype.bindRenderer = function () {
         var _canvas = document.getElementById("pixi-container");
         _canvas.appendChild(this.renderer.view);
+        this.renderer.view.setAttribute("id", "pixi-canvas");
     };
     Game.prototype.updateWorld = function (clear) {
         eventManager.dispatchEvent({ type: "updateWorld", content: { clear: clear } });
@@ -729,8 +730,6 @@ var Game = (function () {
         };
         localStorage.setItem(name, JSON.stringify(toSave));
     };
-
-    //todo memory leak
     Game.prototype.load = function (name) {
         var parsed = JSON.parse(localStorage.getItem(name));
         this.loadPlayer(parsed.player);
@@ -994,12 +993,8 @@ var MouseEventHandler = (function () {
             this.scroller.end();
             game.highlighter.clearSprites();
             game.updateWorld();
-            console.log(targetType);
-            console.log("stop");
         } else if (event.originalEvent.ctrlKey || event.originalEvent.metaKey || event.originalEvent.button === 2) {
             this.startScroll(event);
-            console.log(targetType);
-            console.log("scroll");
         } else if (event.originalEvent.shiftKey) {
             this.startZoom(event);
         } else if (targetType === "world") {

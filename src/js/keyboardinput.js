@@ -75,6 +75,9 @@ var KeyboardEventHandler = (function () {
     };
     KeyboardEventHandler.prototype.handleKeydown = function (event) {
         if (this.statesObj[this.currState]["keydown"][event.keyCode]) {
+            if (event.target.tagName === "INPUT" && event.target.type === "text") {
+                return;
+            }
             event.preventDefault();
             this.statesObj[this.currState]["keydown"][event.keyCode].call();
         }

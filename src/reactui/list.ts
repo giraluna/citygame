@@ -177,6 +177,7 @@ export var List = React.createClass({
       headerLabels.push(
         React.DOM.th(
           {
+            className: !column.notSortable ? "sortable-column" : null,
             title: column.title,
             onClick: self.handleSelectColumn.bind(null, column),
             key: column.key

@@ -177,6 +177,9 @@ body {
 .popup .popup-buttons button {
   margin: 0 20px;
 }
+.sortable-column:hover {
+  cursor: pointer;
+}
 #info-container {
   height: 100%;
   width: 100%;

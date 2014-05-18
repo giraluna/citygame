@@ -17,7 +17,6 @@
 */
 declare class SystemsManager {
     public systems: any;
-    public entities: any;
     public timer: Strawb.Timer;
     public tickTime: number;
     public tickNumber: number;
@@ -92,4 +91,9 @@ declare class DelayedActionSystem extends System {
     public addEventListeners(): void;
     public addAction(currTick: number, time: number, action: any): void;
     public activate(currTick: number): void;
+}
+declare class AutoSaveSystem extends System {
+    public game: any;
+    constructor(activationRate: number, systemsManager: SystemsManager, game: any);
+    public activate(): void;
 }

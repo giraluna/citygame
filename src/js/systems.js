@@ -24,7 +24,6 @@ var __extends = this.__extends || function (d, b) {
 var SystemsManager = (function () {
     function SystemsManager(tickTime) {
         this.systems = {};
-        this.entities = {};
         this.tickNumber = 0;
         this.accumulated = 0;
         this.paused = false;
@@ -35,8 +34,6 @@ var SystemsManager = (function () {
         this.init();
     }
     SystemsManager.prototype.init = function () {
-        var e = this.entities;
-        e.ownedBuildings = [];
         this.addEventListeners();
     };
     SystemsManager.prototype.addSystem = function (name, system) {
@@ -46,14 +43,6 @@ var SystemsManager = (function () {
         var self = this;
         var slider = document.getElementById("speed-control");
 
-        eventManager.addEventListener("builtBuilding", function (event) {
-            // TEMPORARY
-            self.entities.ownedBuildings.push("temp");
-        });
-        eventManager.addEventListener("destroyBuilding", function (event) {
-            // TEMPORARY
-            self.entities.ownedBuildings.pop();
-        });
         eventManager.addEventListener("togglePause", function (event) {
             self.togglePause();
         });
@@ -280,5 +269,18 @@ var DelayedActionSystem = (function (_super) {
         }
     };
     return DelayedActionSystem;
+})(System);
+
+var AutoSaveSystem = (function (_super) {
+    __extends(AutoSaveSystem, _super);
+    function AutoSaveSystem(activationRate, systemsManager, game) {
+        _super.call(this, activationRate, systemsManager.tickNumber);
+        this.systemsManager = systemsManager;
+        this.game = game;
+    }
+    AutoSaveSystem.prototype.activate = function () {
+        this.game.save("autosave");
+    };
+    return AutoSaveSystem;
 })(System);
 //# sourceMappingURL=systems.js.map

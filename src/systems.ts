@@ -19,7 +19,6 @@
 class SystemsManager
 {
   systems: any = {};
-  entities: any = {};
   timer: Strawb.Timer;
   tickTime: number;
   tickNumber: number = 0;
@@ -37,8 +36,6 @@ class SystemsManager
   }
   init()
   {
-    var e = this.entities;
-    e.ownedBuildings = [];
     this.addEventListeners();
   }
   addSystem(name: string, system: System)
@@ -50,16 +47,6 @@ class SystemsManager
     var self = this;
     var slider = <HTMLInputElement> document.getElementById("speed-control");
 
-    eventManager.addEventListener("builtBuilding", function(event)
-    {
-      // TEMPORARY
-      self.entities.ownedBuildings.push("temp");
-    });
-    eventManager.addEventListener("destroyBuilding", function(event)
-    {
-      // TEMPORARY
-      self.entities.ownedBuildings.pop();
-    });
     eventManager.addEventListener("togglePause", function(event)
     {
       self.togglePause();
@@ -353,5 +340,21 @@ class DelayedActionSystem extends System
       this.callbacks[currTick] = null;
       delete this.callbacks[currTick];
     }
+  }
+}
+
+class AutoSaveSystem extends System
+{
+  game: any;
+  constructor(activationRate: number, systemsManager: SystemsManager, game)
+  {
+    super(activationRate, systemsManager.tickNumber);
+    this.systemsManager = systemsManager;
+    this.game = game;
+  }
+
+  activate()
+  {
+    this.game.save("autosave");
   }
 }

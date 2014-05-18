@@ -711,6 +711,8 @@ class Game
       document.getElementById("date") );
     this.systemsManager.addSystem("date", dateSystem);
 
+    this.systemsManager.addSystem("autoSave", new AutoSaveSystem(30, this.systemsManager, this));
+
     this.resize();
     this.render();
     this.updateWorld();

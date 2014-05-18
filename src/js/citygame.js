@@ -544,6 +544,8 @@ var Game = (function () {
         var dateSystem = new DateSystem(1, this.systemsManager, document.getElementById("date"));
         this.systemsManager.addSystem("date", dateSystem);
 
+        this.systemsManager.addSystem("autoSave", new AutoSaveSystem(30, this.systemsManager, this));
+
         this.resize();
         this.render();
         this.updateWorld();

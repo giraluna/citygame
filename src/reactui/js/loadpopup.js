@@ -59,6 +59,7 @@ var UIComponents;
                     data: {
                         name: savedGame,
                         date: prettyDate,
+                        accurateDate: date,
                         del: React.DOM.a({
                             href: "#",
                             onClick: function (name) {
@@ -89,6 +90,7 @@ var UIComponents;
                     label: "Date",
                     key: "date",
                     defaultOrder: "asc",
+                    propToSortBy: "accurateDate",
                     sortingFunCtion: function (a, b) {
                         return new Date(a).getTime() - new Date(b).getTime();
                     }

@@ -85,11 +85,12 @@ var UIComponents;
             });
         },
         sort: function () {
-            var propToSortBy = this.state.sortBy.column.key;
+            var selectedColumn = this.state.sortBy.column;
+            var propToSortBy = selectedColumn.propToSortBy || selectedColumn.key;
             var itemsToSort = this.props.listItems;
 
-            if (this.state.sortBy.column.sortingFunction) {
-                itemsToSort.sort(this.state.sortBy.column.sortingFunction);
+            if (selectedColumn.sortingFunction) {
+                itemsToSort.sort(selectedColumn.sortingFunction);
             } else {
                 itemsToSort.sort(function (a, b) {
                     return a.data[propToSortBy] > b.data[propToSortBy] ? 1 : -1;

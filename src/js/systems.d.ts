@@ -94,6 +94,7 @@ declare class DelayedActionSystem extends System {
 }
 declare class AutoSaveSystem extends System {
     public game: any;
+    public autoSaveLimit: number;
     constructor(activationRate: number, systemsManager: SystemsManager, game: any);
-    public activate(): void;
+    public activate(tick: any): void;
 }

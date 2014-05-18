@@ -835,6 +835,11 @@ class Game
       {
         eventManager.dispatchEvent(
         {
+          type: "makeLoadPopup", content: ""
+        });
+        /*
+        eventManager.dispatchEvent(
+        {
           type: "makeInputPopup",
           content:
           {
@@ -847,6 +852,12 @@ class Game
             closeBtnText: "Cancel"
           }
         });
+        */
+      });
+
+      eventManager.addEventListener("loadGame", function(event)
+      {
+        self.load(event.content);
       });
 
       //recruit
@@ -940,7 +951,8 @@ class Game
     var toSave =
     {
       player: this.savePlayer(this.players["player0"]),
-      board: this.saveBoard(this.board)
+      board: this.saveBoard(this.board),
+      date: new Date()
     }
     localStorage.setItem(name, JSON.stringify(toSave));
   }

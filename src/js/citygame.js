@@ -642,16 +642,28 @@ var Game = (function () {
         });
         addClickAndTouchEventListener(loadBtn, function () {
             eventManager.dispatchEvent({
-                type: "makeInputPopup",
-                content: {
-                    text: "Load",
-                    onOk: function (name) {
-                        self.load(name);
-                    },
-                    okBtnText: "Load",
-                    closeBtnText: "Cancel"
-                }
+                type: "makeLoadPopup", content: ""
             });
+            /*
+            eventManager.dispatchEvent(
+            {
+            type: "makeInputPopup",
+            content:
+            {
+            text: "Load",
+            onOk: function(name: string)
+            {
+            self.load(name);
+            },
+            okBtnText: "Load",
+            closeBtnText: "Cancel"
+            }
+            });
+            */
+        });
+
+        eventManager.addEventListener("loadGame", function (event) {
+            self.load(event.content);
         });
 
         //recruit
@@ -726,7 +738,8 @@ var Game = (function () {
     Game.prototype.save = function (name) {
         var toSave = {
             player: this.savePlayer(this.players["player0"]),
-            board: this.saveBoard(this.board)
+            board: this.saveBoard(this.board),
+            date: new Date()
         };
         localStorage.setItem(name, JSON.stringify(toSave));
     };

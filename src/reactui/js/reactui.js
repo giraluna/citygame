@@ -58,6 +58,9 @@ var ReactUI = (function () {
         eventManager.addEventListener("makeInputPopup", function (event) {
             self.makeInputPopup(event.content);
         });
+        eventManager.addEventListener("makeLoadPopup", function (event) {
+            self.makeLoadPopup();
+        });
         eventManager.addEventListener("closeTopPopup", function (event) {
             self.closeTopPopup();
         });
@@ -105,6 +108,16 @@ var ReactUI = (function () {
 
     ReactUI.prototype.makeInfoPopup = function (props) {
         this.makePopup("InfoPopup", props);
+    };
+    ReactUI.prototype.makeLoadPopup = function () {
+        this.makePopup("LoadPopup", {
+            onOk: function (name) {
+                eventManager.dispatchEvent({
+                    type: "loadGame",
+                    content: name
+                });
+            }
+        });
     };
 
     ReactUI.prototype.makeRecruitPopup = function (props) {

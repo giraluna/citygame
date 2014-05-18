@@ -85,6 +85,10 @@ class ReactUI
     {
       self.makeInputPopup(event.content)
     });
+    eventManager.addEventListener("makeLoadPopup", function(event)
+    {
+      self.makeLoadPopup()
+    });
     eventManager.addEventListener("closeTopPopup", function(event)
     {
       self.closeTopPopup()
@@ -156,6 +160,20 @@ class ReactUI
   makeInfoPopup(props: any)
   {
     this.makePopup("InfoPopup", props);
+  }
+  makeLoadPopup()
+  {
+    this.makePopup("LoadPopup",
+      {
+        onOk: function(name)
+        {
+          eventManager.dispatchEvent(
+          {
+            type: "loadGame",
+            content: name
+          });
+        }
+      });
   }
 
   makeRecruitPopup(props:

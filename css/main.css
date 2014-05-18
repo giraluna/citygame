@@ -136,6 +136,9 @@ body {
 .popup .popup-content tr {
   text-align: center;
 }
+.popup .popup-content td {
+  padding: 0 5px;
+}
 .popup .popup-content .employee {
   color: #000;
 }

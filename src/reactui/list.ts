@@ -1,6 +1,4 @@
-/// <reference path="../lib/react.d.ts" />
-/// 
-/// <reference path="js/listitem.d.ts" />
+/// <reference path="../../lib/react.d.ts" />
 
 module UIComponents
 {
@@ -8,6 +6,7 @@ module UIComponents
   /**
    * props:
    *   listItems
+   *   initialColumns
    * 
    * state:
    *   selected
@@ -31,9 +30,10 @@ export var List = React.createClass({
 
   getInitialState: function()
   {
-    var sortedItems = this.props.listItems;
+    var initialColumn = this.props.initialColumn ||
+      this.props.initialColumns[0];
 
-    var initialSelected = sortedItems[0];
+    var initialSelected = this.props.listItems[0];
 
     return(
     {
@@ -41,9 +41,18 @@ export var List = React.createClass({
       selected: initialSelected,
       sortBy:
       {
-        column: this.props.initialColumns[0],
-        order: "desc"
+        column: initialColumn,
+        order: initialColumn.defaultOrder || "desc"
       }
+    });
+  },
+
+  componentWillMount: function()
+  {
+    this.sort();
+    this.setState(
+    {
+      selected: this.props.sortedItems[0]
     });
   },
 
@@ -74,6 +83,7 @@ export var List = React.createClass({
 
   handleSelectColumn: function(column)
   {
+    if (column.notSortable) return;
     var order;
     if (this.state.sortBy.column.key === column.key)
     {
@@ -102,6 +112,32 @@ export var List = React.createClass({
     {
       selected: row
     });
+  },
+
+  sort: function()
+  {
+    var propToSortBy = this.state.sortBy.column.key;
+    var itemsToSort = this.props.listItems;
+
+    if (this.state.sortBy.column.sortingFunction)
+    {
+      itemsToSort.sort(this.state.sortBy.column.sortingFunction);
+    }
+    else
+    {
+      itemsToSort.sort(function(a, b)
+      {
+        return a.data[propToSortBy] > b.data[propToSortBy] ? 1 : -1;
+      });
+    }
+
+    if (this.state.sortBy.order === "asc")
+    {
+      itemsToSort.reverse();
+    }
+    //else if (this.state.sortBy.order !== "desc") throw new Error("Invalid sort parameter");
+
+    this.props.sortedItems = itemsToSort;
   },
 
   shiftSelection: function(amountToShift: number)
@@ -148,28 +184,9 @@ export var List = React.createClass({
       );
     });
 
-    // doing sorting here should be good enough
-    var propToSortBy = this.state.sortBy.column.key;
-    var itemsToSort = this.props.listItems;
+    this.sort();
 
-    if (this.state.sortBy.order === "desc")
-    {
-      itemsToSort.sort(function(a, b)
-      {
-        return a.data[propToSortBy] > b.data[propToSortBy] ? 1 : -1;
-      });
-    }
-    else if (this.state.sortBy.order === "asc")
-    {
-      itemsToSort.sort(function(a, b)
-      {
-        return a.data[propToSortBy] > b.data[propToSortBy] ? -1 : 1;
-      });
-    }
-    else throw new Error("Invalid sort parameter");
-
-    var sortedItems = itemsToSort;
-    this.props.sortedItems = sortedItems;
+    var sortedItems = this.props.sortedItems;
     
     var rows = [];
     sortedItems.forEach(function(item)
@@ -226,73 +243,4 @@ export var List = React.createClass({
 
 }
 
-document.addEventListener('DOMContentLoaded', function()
-{
-  React.renderComponent(
-    UIComponents.List(
-      {
-        // typescript qq without these
-        selected: null,
-        columns: null,
-        sortBy: null,
 
-        initialColumns:
-        [
-          {
-            label: "name",
-            key: "name",
-            defaultOrder: "desc"
-          },
-          {
-            label: "age",
-            key: "age",
-            defaultOrder: "asc"
-          }
-        ],
-        listItems:
-        [
-          {
-            data:
-            {
-              name: "a",
-              age: 10
-            },
-            key: "a"
-          },
-          {
-            data:
-            {
-              name: "d",
-              age: 11
-            },
-            key: "d"
-          },
-          {
-            data:
-            {
-              name: "b",
-              age: 15
-            },
-            key: "b"
-          },
-          {
-            data:
-            {
-              name: "c",
-              age: 12
-            },
-            key: "c"
-          },
-          {
-            data:
-            {
-              name: "e",
-              age: 20
-            },
-            key: "e"
-          }
-        ]
-      }),
-    document.getElementById("react-container")
-  );
-});

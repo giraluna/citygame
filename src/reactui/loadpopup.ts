@@ -57,8 +57,10 @@ module UIComponents
         var prettyDate = 
         [
           [
-            date.toLocaleDateString()
-          ],
+            date.getDate(),
+            date.getMonth() + 1,
+            date.getFullYear().toString().slice(2,4)
+          ].join("/"),
           [
             date.getHours(),
             date.getMinutes()
@@ -81,7 +83,8 @@ module UIComponents
                     type: "makeConfirmPopup",
                     content:
                     {
-                      text: "Are you sure you want to delete this save?",
+                      text: ["Are you sure you want to delete this save?",
+                      name],
                       onOk: function()
                       {
                         localStorage.removeItem(name);

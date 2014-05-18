@@ -20,6 +20,8 @@ module UIComponents
    *     }
    *   ]
    */
+  
+  // TODO merge stuff with savepopups
   export var LoadPopup = React.createClass({
     mixins: [Draggable, SplitMultilineText],
 
@@ -63,7 +65,7 @@ module UIComponents
           ].join("/"),
           [
             date.getHours(),
-            date.getMinutes()
+            date.getMinutes().toString().length < 2 ? "0" + date.getMinutes() : date.getMinutes().toString()
           ].join(":")
         ].join(" ");
         savedGames.push(

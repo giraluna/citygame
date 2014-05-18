@@ -18,6 +18,7 @@ var UIComponents;
     *     }
     *   ]
     */
+    // TODO merge stuff with load popups
     UIComponents.SavePopup = React.createClass({
         mixins: [UIComponents.Draggable, UIComponents.SplitMultilineText],
         componentDidMount: function () {
@@ -78,7 +79,7 @@ var UIComponents;
                     ].join("/"),
                     [
                         date.getHours(),
-                        date.getMinutes()
+                        date.getMinutes().toString().length < 2 ? "0" + date.getMinutes() : date.getMinutes().toString()
                     ].join(":")
                 ].join(" ");
                 savedGames.push({

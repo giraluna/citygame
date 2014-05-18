@@ -4,15 +4,5 @@
 /// <reference path="splitmultilinetext.d.ts" />
 /// <reference path="list.d.ts" />
 declare module UIComponents {
-    /**
-    * props:
-    *   games:
-    *   [
-    *     {
-    *       name: string;
-    *       date: date;
-    *     }
-    *   ]
-    */
     var LoadPopup: React.ReactComponentFactory<{}, React.ReactComponent<{}, {}>>;
 }

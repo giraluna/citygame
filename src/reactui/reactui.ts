@@ -89,6 +89,10 @@ class ReactUI
     {
       self.makeLoadPopup()
     });
+    eventManager.addEventListener("makeSavePopup", function(event)
+    {
+      self.makeSavePopup()
+    });
     eventManager.addEventListener("closeTopPopup", function(event)
     {
       self.closeTopPopup()
@@ -164,16 +168,31 @@ class ReactUI
   makeLoadPopup()
   {
     this.makePopup("LoadPopup",
+    {
+      onOk: function(name)
       {
-        onOk: function(name)
+        eventManager.dispatchEvent(
         {
-          eventManager.dispatchEvent(
-          {
-            type: "loadGame",
-            content: name
-          });
-        }
-      });
+          type: "loadGame",
+          content: name
+        });
+      }
+    });
+  }
+
+  makeSavePopup()
+  {
+    this.makePopup("SavePopup",
+    {
+      onOk: function(name)
+      {
+        eventManager.dispatchEvent(
+        {
+          type: "saveGame",
+          content: name
+        });
+      }
+    });
   }
 
   makeRecruitPopup(props:

@@ -80,6 +80,8 @@ var UIComponents;
             });
         },
         handleSelectRow: function (row) {
+            if (this.props.onRowChange)
+                this.props.onRowChange.call(null, row);
             this.setState({
                 selected: row
             });

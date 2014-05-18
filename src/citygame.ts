@@ -820,17 +820,7 @@ class Game
       {
         eventManager.dispatchEvent(
         {
-          type: "makeInputPopup",
-          content:
-          {
-            text: "Save as",
-            onOk: function(name: string)
-            {
-              self.save(name);
-            },
-            okBtnText: "Save",
-            closeBtnText: "Cancel"
-          }
+          type: "makeSavePopup", content: ""
         });
       });
       addClickAndTouchEventListener(loadBtn, function()
@@ -857,6 +847,10 @@ class Game
         */
       });
 
+      eventManager.addEventListener("saveGame", function(event)
+      {
+        self.save(event.content);
+      });
       eventManager.addEventListener("loadGame", function(event)
       {
         self.load(event.content);

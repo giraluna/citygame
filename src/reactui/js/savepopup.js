@@ -18,26 +18,53 @@ var UIComponents;
     *     }
     *   ]
     */
-    UIComponents.LoadPopup = React.createClass({
+    UIComponents.SavePopup = React.createClass({
         mixins: [UIComponents.Draggable, UIComponents.SplitMultilineText],
+        componentDidMount: function () {
+            this.refs.inputElement.getDOMNode().value = this.refs.savedGameList.state.selected.data.name;
+        },
         handleOk: function (e) {
-            var selected = this.refs.savedGameList.state.selected;
-            if (!selected) {
+            var toSaveAs = this.refs.inputElement.getDOMNode().value;
+            var overwriting = false;
+            for (var save in localStorage) {
+                if (toSaveAs === save)
+                    overwriting = true;
+            }
+
+            if (!toSaveAs) {
                 eventManager.dispatchEvent({
-                    type: "makeInfoPopup", content: { text: "No saved game selected" }
+                    type: "makeInfoPopup", content: { text: "Select a name to save as" }
                 });
                 return false;
             }
 
-            var callbackSuccessful = this.props.onOk.call(null, selected.data.name);
-            if (callbackSuccessful !== false) {
-                this.handleClose();
+            if (overwriting) {
+                eventManager.dispatchEvent({
+                    type: "makeConfirmPopup",
+                    content: {
+                        text: [
+                            "Are you sure you want to overwrite this save?",
+                            toSaveAs],
+                        onOk: onOkFN.bind(this)
+                    }
+                });
+                return false;
             }
+
+            function onOkFN() {
+                var callbackSuccessful = this.props.onOk.call(null, toSaveAs);
+                if (callbackSuccessful !== false) {
+                    this.handleClose();
+                }
+            }
+
+            onOkFN();
         },
         handleClose: function () {
             this.props.onClose.call();
         },
         render: function () {
+            var self = this;
             var savedGames = [];
 
             for (var savedGame in localStorage) {
@@ -112,7 +139,7 @@ var UIComponents;
                 onTouchStart: this.handleOk,
                 draggable: true,
                 onDrag: stopBubble
-            }, this.props.okBtnText || "Load");
+            }, this.props.okBtnText || "Save");
 
             var closeBtn = React.DOM.button({
                 onClick: this.handleClose,
@@ -120,6 +147,11 @@ var UIComponents;
                 draggable: true,
                 onDrag: stopBubble
             }, this.props.closeBtnText || "Cancel");
+
+            var inputElement = React.DOM.input({
+                ref: "inputElement",
+                type: "text"
+            });
 
             return (React.DOM.div({
                 className: "popup",
@@ -129,7 +161,7 @@ var UIComponents;
                 onDrag: this.handleDrag,
                 onDragEnd: this.handleDragEnd,
                 onTouchStart: this.handleDragStart
-            }, React.DOM.p({ className: "popup-text" }, "Select game to load"), React.DOM.div({ className: "popup-content", draggable: true, onDrag: stopBubble }, UIComponents.List({
+            }, React.DOM.p({ className: "popup-text" }, "Select name to save as"), React.DOM.div({ className: "popup-content", draggable: true, onDrag: stopBubble }, UIComponents.List({
                 // TODO fix declaration file and remove
                 // typescript qq without these
                 selected: null,
@@ -138,9 +170,12 @@ var UIComponents;
                 initialColumn: columns[1],
                 ref: "savedGameList",
                 listItems: savedGames,
-                initialColumns: columns
-            })), React.DOM.div({ className: "popup-buttons" }, okBtn, closeBtn)));
+                initialColumns: columns,
+                onRowChange: function (row) {
+                    self.refs.inputElement.getDOMNode().value = row.data.name;
+                }
+            }), React.DOM.br(null), inputElement), React.DOM.div({ className: "popup-buttons" }, okBtn, closeBtn)));
         }
     });
 })(UIComponents || (UIComponents = {}));
-//# sourceMappingURL=loadpopup.js.map
+//# sourceMappingURL=savepopup.js.map

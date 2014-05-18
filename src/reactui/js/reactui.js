@@ -61,6 +61,9 @@ var ReactUI = (function () {
         eventManager.addEventListener("makeLoadPopup", function (event) {
             self.makeLoadPopup();
         });
+        eventManager.addEventListener("makeSavePopup", function (event) {
+            self.makeSavePopup();
+        });
         eventManager.addEventListener("closeTopPopup", function (event) {
             self.closeTopPopup();
         });
@@ -114,6 +117,17 @@ var ReactUI = (function () {
             onOk: function (name) {
                 eventManager.dispatchEvent({
                     type: "loadGame",
+                    content: name
+                });
+            }
+        });
+    };
+
+    ReactUI.prototype.makeSavePopup = function () {
+        this.makePopup("SavePopup", {
+            onOk: function (name) {
+                eventManager.dispatchEvent({
+                    type: "saveGame",
                     content: name
                 });
             }

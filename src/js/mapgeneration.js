@@ -37,15 +37,25 @@ var mapGeneration;
 
     function readSavedMap(props) {
         var cells = props.board.cells;
+        var typeIndexes = {};
+
+        function getIndexedType(typeName) {
+            if (!typeIndexes[typeName]) {
+                typeIndexes[typeName] = findType(typeName);
+            }
+
+            return typeIndexes[typeName];
+        }
+
         for (var i = 0; i < props.board.width; i++) {
             for (var j = 0; j < props.board.height; j++) {
                 var cell = cells[i][j];
                 var savedCell = props.savedCells[i][j];
 
-                cell.replace(savedCell.type);
+                cell.replace(getIndexedType(savedCell.type));
 
                 if (savedCell.content) {
-                    cell.changeContent(savedCell.content.type, true, savedCell.player);
+                    cell.changeContent(getIndexedType(savedCell.content.type), true, savedCell.player);
                 }
                 if (savedCell.player) {
                     savedCell.player.addCell(cell);

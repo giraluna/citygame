@@ -300,6 +300,20 @@ var cg = {
     }
 };
 
+function findType(typeName, target) {
+    if (typeof target === "undefined") { target = cg; }
+    for (var prop in target) {
+        if (target[prop].type === typeName) {
+            return target[prop];
+        } else if (typeof target[prop] === "object" && !target[prop].type) {
+            var matchFound = findType(typeName, target[prop]);
+            if (matchFound)
+                return matchFound;
+        }
+    }
+}
+;
+
 (function translateModifierEffects(target) {
     for (var prop in target) {
         if (prop === "effect") {

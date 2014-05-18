@@ -759,13 +759,13 @@ var Game = (function () {
             for (var j = 0; j < board.cells[i].length; j++) {
                 var boardCell = board.cells[i][j];
                 var cell = data.cells[i][j] = {};
-                cell.type = boardCell.type;
+                cell.type = boardCell.type.type;
                 if (boardCell.player) {
                     cell.player = boardCell.player.id;
                 }
                 if (boardCell.content) {
                     cell.content = {
-                        type: boardCell.content.type,
+                        type: boardCell.content.type.type,
                         player: boardCell.content.player ? boardCell.content.player.id : null
                     };
                     if (cell.content.type.baseType === "road") {

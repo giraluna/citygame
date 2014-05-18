@@ -976,7 +976,7 @@ class Game
       {
         var boardCell = board.cells[i][j];
         var cell: any = data.cells[i][j] = {};
-        cell.type = boardCell.type;
+        cell.type = boardCell.type.type;
         if (boardCell.player)
         {
           cell.player = boardCell.player.id;
@@ -985,7 +985,7 @@ class Game
         {
           cell.content =
           {
-            type: boardCell.content.type,
+            type: boardCell.content.type.type,
             player: boardCell.content.player ?
               boardCell.content.player.id : null
           }

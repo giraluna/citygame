@@ -33,6 +33,8 @@ module UIComponents
 
     handleOk: function(e)
     {
+      var self = this;
+
       var toSaveAs = this.refs.inputElement.getDOMNode().value;
       var overwriting = false;
       for (var save in localStorage)
@@ -57,7 +59,7 @@ module UIComponents
           {
             text: ["Are you sure you want to overwrite this save?",
             toSaveAs],
-            onOk: onOkFN.bind(this)
+            onOk: onOkFN
           }
         });
         return false;
@@ -66,10 +68,10 @@ module UIComponents
       function onOkFN()
       {
         var callbackSuccessful =
-          this.props.onOk.call(null, toSaveAs);
+          self.props.onOk.call(null, toSaveAs);
         if (callbackSuccessful !== false)
         {
-          this.handleClose();
+          self.handleClose();
         }
       }
 

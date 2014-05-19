@@ -25,6 +25,8 @@ var UIComponents;
             this.refs.inputElement.getDOMNode().value = this.refs.savedGameList.state.selected.data.name;
         },
         handleOk: function (e) {
+            var self = this;
+
             var toSaveAs = this.refs.inputElement.getDOMNode().value;
             var overwriting = false;
             for (var save in localStorage) {
@@ -46,16 +48,16 @@ var UIComponents;
                         text: [
                             "Are you sure you want to overwrite this save?",
                             toSaveAs],
-                        onOk: onOkFN.bind(this)
+                        onOk: onOkFN
                     }
                 });
                 return false;
             }
 
             function onOkFN() {
-                var callbackSuccessful = this.props.onOk.call(null, toSaveAs);
+                var callbackSuccessful = self.props.onOk.call(null, toSaveAs);
                 if (callbackSuccessful !== false) {
-                    this.handleClose();
+                    self.handleClose();
                 }
             }
 

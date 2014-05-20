@@ -137,13 +137,9 @@ class Content
     for (var _modifier in this.modifiers)
     {
       var modifier = this.modifiers[_modifier];
-      var scaleModifierFN = modifier.scaling || function(strength)
-      {
-        return 1+Math.log(strength);
-      };
       for (var prop in modifier.effect)
       {
-        totals[prop] += scaleModifierFN(modifier.strength) * modifier.effect[prop];
+        totals[prop] += modifier.scaling(modifier.strength) * modifier.effect[prop];
       }
     }
     this.modifiedProfit = totals.addedProfit * totals.multiplier;
@@ -315,13 +311,13 @@ class Cell
       }
     }
 
-    if (_oldType.effect)
+    if (_oldType.effects)
     {
-      this.removePropagatedModifier(_oldType.translatedEffect);
+      this.removeAllPropagatedModifiers(_oldType.translatedEffects);
     }
-    if (type.effect)
+    if (type.effects)
     {
-      this.propagateModifier(type.translatedEffect);
+      this.propagateAllModifiers(type.translatedEffects);
     }
   }
   changeContent( type:string, update:boolean=true, player?: Player)
@@ -406,9 +402,9 @@ class Cell
     });
     this.applyModifiersToContent();
 
-    if (type.effect)
+    if (type.effects)
     {
-      this.propagateModifier(type.translatedEffect);
+      this.propagateAllModifiers(type.translatedEffects);
     }
     
     return this.content;
@@ -423,9 +419,9 @@ class Cell
     {
       this.content.player.removeContent(this.content);
     }
-    if (this.content.type.effect)
+    if (this.content.type.effects)
     {
-      this.removePropagatedModifier(this.content.type.translatedEffect);
+      this.removeAllPropagatedModifiers(this.content.type.translatedEffects);
     }
     game.layers["content"]._removeChildAt(this.content.sprite,
       this.gridPos[0] + this.gridPos[1]);
@@ -484,12 +480,26 @@ class Cell
       }
     }
   }
+  propagateAllModifiers(modifiers: any[])
+  {
+    for (var i = 0; i < modifiers.length; i++)
+    {
+      this.propagateModifier(modifiers[i]);
+    }
+  }
   removePropagatedModifier(modifier)
   {
     var effectedCells = this.getArea(modifier.range);
     for (var cell in effectedCells)
     {
       effectedCells[cell].removeModifier(modifier);
+    }
+  }
+  removeAllPropagatedModifiers(modifiers: any[])
+  {
+    for (var i = 0; i < modifiers.length; i++)
+    {
+      this.removePropagatedModifier(modifiers[i]);
     }
   }
   // todo: rework later to only update modifiers that have changed
@@ -1536,7 +1546,7 @@ class UIDrawer
         var _mod = cell.content.modifiers[modifier];
         text += "Modifier: " + _mod.translate + "\n";
         text += "Strength: " + _mod.strength + "\n";
-        text += "Adj strength: " + (1 + Math.log(_mod.strength)) + "\n";
+        text += "Adj strength: " + _mod.scaling(_mod.strength) + "\n";
         text += "--------------\n";
       }
       text += "Modified profit: " + cell.content.modifiedProfit;

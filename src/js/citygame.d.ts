@@ -85,7 +85,9 @@ declare class Cell {
     public addModifier(modifier: any): void;
     public removeModifier(modifier: any): void;
     public propagateModifier(modifier: any): void;
+    public propagateAllModifiers(modifiers: any[]): void;
     public removePropagatedModifier(modifier: any): void;
+    public removeAllPropagatedModifiers(modifiers: any[]): void;
     public getValidModifiers(): any;
     public applyModifiersToContent(): void;
     public addOverlay(color: any): void;

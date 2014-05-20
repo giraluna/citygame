@@ -100,11 +100,8 @@ var Content = (function () {
         };
         for (var _modifier in this.modifiers) {
             var modifier = this.modifiers[_modifier];
-            var scaleModifierFN = modifier.scaling || function (strength) {
-                return 1 + Math.log(strength);
-            };
             for (var prop in modifier.effect) {
-                totals[prop] += scaleModifierFN(modifier.strength) * modifier.effect[prop];
+                totals[prop] += modifier.scaling(modifier.strength) * modifier.effect[prop];
             }
         }
         this.modifiedProfit = totals.addedProfit * totals.multiplier;
@@ -233,11 +230,11 @@ var Cell = (function () {
             }
         }
 
-        if (_oldType.effect) {
-            this.removePropagatedModifier(_oldType.translatedEffect);
+        if (_oldType.effects) {
+            this.removeAllPropagatedModifiers(_oldType.translatedEffects);
         }
-        if (type.effect) {
-            this.propagateModifier(type.translatedEffect);
+        if (type.effects) {
+            this.propagateAllModifiers(type.translatedEffects);
         }
     };
     Cell.prototype.changeContent = function (type, update, player) {
@@ -307,8 +304,8 @@ var Cell = (function () {
         });
         this.applyModifiersToContent();
 
-        if (type.effect) {
-            this.propagateModifier(type.translatedEffect);
+        if (type.effects) {
+            this.propagateAllModifiers(type.translatedEffects);
         }
 
         return this.content;
@@ -320,8 +317,8 @@ var Cell = (function () {
         if (this.content.player) {
             this.content.player.removeContent(this.content);
         }
-        if (this.content.type.effect) {
-            this.removePropagatedModifier(this.content.type.translatedEffect);
+        if (this.content.type.effects) {
+            this.removeAllPropagatedModifiers(this.content.type.translatedEffects);
         }
         game.layers["content"]._removeChildAt(this.content.sprite, this.gridPos[0] + this.gridPos[1]);
 
@@ -360,10 +357,20 @@ var Cell = (function () {
             }
         }
     };
+    Cell.prototype.propagateAllModifiers = function (modifiers) {
+        for (var i = 0; i < modifiers.length; i++) {
+            this.propagateModifier(modifiers[i]);
+        }
+    };
     Cell.prototype.removePropagatedModifier = function (modifier) {
         var effectedCells = this.getArea(modifier.range);
         for (var cell in effectedCells) {
             effectedCells[cell].removeModifier(modifier);
+        }
+    };
+    Cell.prototype.removeAllPropagatedModifiers = function (modifiers) {
+        for (var i = 0; i < modifiers.length; i++) {
+            this.removePropagatedModifier(modifiers[i]);
         }
     };
 
@@ -1193,7 +1200,7 @@ var UIDrawer = (function () {
                 var _mod = cell.content.modifiers[modifier];
                 text += "Modifier: " + _mod.translate + "\n";
                 text += "Strength: " + _mod.strength + "\n";
-                text += "Adj strength: " + (1 + Math.log(_mod.strength)) + "\n";
+                text += "Adj strength: " + _mod.scaling(_mod.strength) + "\n";
                 text += "--------------\n";
             }
             text += "Modified profit: " + cell.content.modifiedProfit;

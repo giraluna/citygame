@@ -713,8 +713,12 @@ class Game
     player.addMoney(100);
     this.reactUI = new ReactUI(player, this.frameImages);
     this.players[player.id] = player;
-    var apartmentProfitSystem = new ProfitSystem(1, this.systemsManager, this.players, "apartment");
-    this.systemsManager.addSystem("apartmentProfit", apartmentProfitSystem);
+    // TODO have content types register themselves
+    var dailyProfitSystem = new ProfitSystem(1, this.systemsManager, this.players,
+      ["apartment", "fastfood"]);
+    this.systemsManager.addSystem("apartmentProfit", dailyProfitSystem);
+
+
     this.systemsManager.addSystem("delayedAction", new DelayedActionSystem(1, this.systemsManager));
 
     var dateSystem = new DateSystem(1, this.systemsManager,
@@ -1786,8 +1790,18 @@ class HouseTool extends Tool
   } 
   onActivate(target: Cell)
   {
-    target.changeContent(
-      getRandomProperty(cg["content"]["buildings"]) );
+    // TODO
+    var toChange;
+    while (true)
+    {
+      toChange = getRandomProperty(cg["content"]["buildings"])
+      if (toChange.categoryType && toChange.categoryType === "apartment")
+      {
+        break;
+      }
+    }
+    
+    target.changeContent( toChange );
   }
 }
 class RoadTool extends Tool

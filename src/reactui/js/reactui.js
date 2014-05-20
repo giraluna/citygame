@@ -213,7 +213,6 @@ var ReactUI = (function () {
             this.makeInfoPopup({ text: "Recruit some employees first" });
             return;
         }
-        console.log(props.player.ownedCells);
         if (!props.player.ownedCells["" + props.cell.gridPos[0] + "," + props.cell.gridPos[1]]) {
             this.makeInfoPopup({ text: "You need to purchase that plot first" });
             return;

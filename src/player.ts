@@ -104,7 +104,11 @@ class Player
   }
   removeContent( content )
   {
-
+    var type = content.categoryType;
+    this.ownedContent[type] = this.ownedContent[type].filter(function(building)
+    {
+      return building.id !== content.id;
+    });
   }
   addMoney(amount)
   {

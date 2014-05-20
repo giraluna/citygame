@@ -77,6 +77,10 @@ var Player = (function () {
         content.player = this;
     };
     Player.prototype.removeContent = function (content) {
+        var type = content.categoryType;
+        this.ownedContent[type] = this.ownedContent[type].filter(function (building) {
+            return building.id !== content.id;
+        });
     };
     Player.prototype.addMoney = function (amount) {
         this.money += amount;

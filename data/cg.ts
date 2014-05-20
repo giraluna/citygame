@@ -410,7 +410,7 @@ var cg: any =
         "baseProfit": 1,
         "cost": 25,
         "buildTime": 14,
-        "anchor": [0.5, 1.1],
+        "anchor": [0.5, 1],
         "frame": "fastfood.png",
         "canNotBuildOn": ["water", "building", "road"],
         "effects":

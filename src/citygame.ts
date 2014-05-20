@@ -725,8 +725,6 @@ class Game
       document.getElementById("date") );
     this.systemsManager.addSystem("date", dateSystem);
 
-    this.systemsManager.addSystem("autoSave", new AutoSaveSystem(30, this.systemsManager, this));
-
     this.resize();
     this.render();
     this.updateWorld();
@@ -929,6 +927,8 @@ class Game
 
       //resize
       window.addEventListener('resize', game.resize, false);
+
+      window.setInterval(self.autosave.bind(self), 1000 * 60);
   }
   bindRenderer()
   {
@@ -965,6 +965,28 @@ class Game
       date: new Date()
     }
     localStorage.setItem(name, JSON.stringify(toSave));
+  }
+  autosave()
+  {
+    // TODO
+    var AUTOSAVELIMIT = 3;
+
+    var autosaves = [];
+    for (var saveGame in localStorage)
+    {
+      if (saveGame.match(/autosave/))
+      {
+        autosaves.push(saveGame);
+      }
+    }
+    autosaves.sort();
+    autosaves = autosaves.slice(0, AUTOSAVELIMIT - 1)
+    for (var i = autosaves.length - 1; i >= 0; i--)
+    {
+      localStorage.setItem("autosave" + (i + 2),
+        localStorage.getItem(autosaves[i]));
+    }
+    this.save("autosave");
   }
   load(name: string)
   {
@@ -1800,7 +1822,7 @@ class HouseTool extends Tool
         break;
       }
     }
-    
+
     target.changeContent( toChange );
   }
 }

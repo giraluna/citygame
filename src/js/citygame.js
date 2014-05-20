@@ -554,8 +554,6 @@ var Game = (function () {
         var dateSystem = new DateSystem(1, this.systemsManager, document.getElementById("date"));
         this.systemsManager.addSystem("date", dateSystem);
 
-        this.systemsManager.addSystem("autoSave", new AutoSaveSystem(30, this.systemsManager, this));
-
         this.resize();
         this.render();
         this.updateWorld();
@@ -721,6 +719,8 @@ var Game = (function () {
 
         //resize
         window.addEventListener('resize', game.resize, false);
+
+        window.setInterval(self.autosave.bind(self), 1000 * 60);
     };
     Game.prototype.bindRenderer = function () {
         var _canvas = document.getElementById("pixi-container");
@@ -749,6 +749,23 @@ var Game = (function () {
             date: new Date()
         };
         localStorage.setItem(name, JSON.stringify(toSave));
+    };
+    Game.prototype.autosave = function () {
+        // TODO
+        var AUTOSAVELIMIT = 3;
+
+        var autosaves = [];
+        for (var saveGame in localStorage) {
+            if (saveGame.match(/autosave/)) {
+                autosaves.push(saveGame);
+            }
+        }
+        autosaves.sort();
+        autosaves = autosaves.slice(0, AUTOSAVELIMIT - 1);
+        for (var i = autosaves.length - 1; i >= 0; i--) {
+            localStorage.setItem("autosave" + (i + 2), localStorage.getItem(autosaves[i]));
+        }
+        this.save("autosave");
     };
     Game.prototype.load = function (name) {
         var parsed = JSON.parse(localStorage.getItem(name));

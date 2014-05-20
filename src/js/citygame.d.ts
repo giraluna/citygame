@@ -136,6 +136,7 @@ declare class Game {
     public resize(): void;
     public changeTool(tool: any): void;
     public save(name: string): void;
+    public autosave(): void;
     public load(name: string): void;
     public saveBoard(board: Board): any;
     public loadBoard(data: any): void;

@@ -273,29 +273,4 @@ var DelayedActionSystem = (function (_super) {
     };
     return DelayedActionSystem;
 })(System);
-
-var AutoSaveSystem = (function (_super) {
-    __extends(AutoSaveSystem, _super);
-    function AutoSaveSystem(activationRate, systemsManager, game) {
-        _super.call(this, activationRate, systemsManager.tickNumber);
-        this.systemsManager = systemsManager;
-        this.game = game;
-        this.autoSaveLimit = 3;
-    }
-    AutoSaveSystem.prototype.activate = function (tick) {
-        var autosaves = [];
-        for (var saveGame in localStorage) {
-            if (saveGame.match(/autosave/)) {
-                autosaves.push(saveGame);
-            }
-        }
-        autosaves.sort();
-        autosaves = autosaves.slice(0, this.autoSaveLimit - 1);
-        for (var i = autosaves.length - 1; i >= 0; i--) {
-            localStorage.setItem("autosave" + (i + 2), localStorage.getItem(autosaves[i]));
-        }
-        this.game.save("autosave");
-    };
-    return AutoSaveSystem;
-})(System);
 //# sourceMappingURL=systems.js.map

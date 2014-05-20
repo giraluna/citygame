@@ -1,152 +1,157 @@
 {
 "frames": {
 	"cactus.png": {
-		"frame": {"x":212, "y":256, "w":16, "h":22},
-		"spriteSourceSize": {"x":0,"y":0,"w":16,"h":22},
+		"frame": {"x":130, "y":256, "w":10, "h":22},
+		"spriteSourceSize": {"x":3,"y":0,"w":16,"h":22},
 		"sourceSize": {"w":16,"h":22}
 	},
+	"fastfood.png": {
+		"frame": {"x":195, "y":92, "w":54, "h":39},
+		"spriteSourceSize": {"x":3,"y":0,"w":64,"h":43},
+		"sourceSize": {"w":64,"h":43}
+	},
 	"grass.png": {
-		"frame": {"x":65, "y":242, "w":64, "h":31},
+		"frame": {"x":0, "y":218, "w":64, "h":31},
 		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":31},
 		"sourceSize": {"w":64,"h":31}
 	},
 	"house1.png": {
-		"frame": {"x":130, "y":64, "w":64, "h":43},
+		"frame": {"x":195, "y":51, "w":57, "h":40},
 		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":43},
 		"sourceSize": {"w":64,"h":43}
 	},
 	"house2.png": {
-		"frame": {"x":195, "y":0, "w":64, "h":94},
+		"frame": {"x":0, "y":32, "w":64, "h":94},
 		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":94},
 		"sourceSize": {"w":64,"h":94}
 	},
 	"house3.png": {
-		"frame": {"x":130, "y":172, "w":64, "h":51},
-		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":51},
+		"frame": {"x":195, "y":0, "w":59, "h":50},
+		"spriteSourceSize": {"x":3,"y":0,"w":64,"h":51},
 		"sourceSize": {"w":64,"h":51}
 	},
 	"house4.png": {
-		"frame": {"x":195, "y":165, "w":64, "h":90},
+		"frame": {"x":0, "y":127, "w":64, "h":90},
 		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":90},
 		"sourceSize": {"w":64,"h":90}
 	},
 	"house5.png": {
-		"frame": {"x":195, "y":95, "w":64, "h":69},
+		"frame": {"x":65, "y":128, "w":64, "h":69},
 		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":69},
 		"sourceSize": {"w":64,"h":69}
 	},
 	"house6.png": {
-		"frame": {"x":130, "y":224, "w":64, "h":75},
+		"frame": {"x":65, "y":198, "w":64, "h":75},
 		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":75},
 		"sourceSize": {"w":64,"h":75}
 	},
 	"pineapple2.png": {
-		"frame": {"x":260, "y":65, "w":24, "h":56},
+		"frame": {"x":255, "y":0, "w":24, "h":56},
 		"spriteSourceSize": {"x":0,"y":0,"w":24,"h":56},
 		"sourceSize": {"w":24,"h":56}
 	},
-	"road_h2.png": {
-		"frame": {"x":130, "y":108, "w":64, "h":31},
-		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":31},
-		"sourceSize": {"w":64,"h":31}
-	},
-	"road_ne.png": {
-		"frame": {"x":130, "y":140, "w":64, "h":31},
-		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":31},
-		"sourceSize": {"w":64,"h":31}
-	},
-	"road_new.png": {
-		"frame": {"x":65, "y":274, "w":64, "h":31},
-		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":31},
-		"sourceSize": {"w":64,"h":31}
-	},
-	"road_news.png": {
-		"frame": {"x":65, "y":50, "w":64, "h":31},
-		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":31},
-		"sourceSize": {"w":64,"h":31}
-	},
-	"road_nse.png": {
-		"frame": {"x":130, "y":32, "w":64, "h":31},
-		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":31},
-		"sourceSize": {"w":64,"h":31}
-	},
-	"road_nsw.png": {
+	"road_h.png": {
 		"frame": {"x":130, "y":0, "w":64, "h":31},
 		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":31},
 		"sourceSize": {"w":64,"h":31}
 	},
+	"road_ne.png": {
+		"frame": {"x":130, "y":32, "w":64, "h":31},
+		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":31},
+		"sourceSize": {"w":64,"h":31}
+	},
+	"road_new.png": {
+		"frame": {"x":130, "y":224, "w":64, "h":31},
+		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":31},
+		"sourceSize": {"w":64,"h":31}
+	},
+	"road_news.png": {
+		"frame": {"x":130, "y":64, "w":64, "h":31},
+		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":31},
+		"sourceSize": {"w":64,"h":31}
+	},
+	"road_nse.png": {
+		"frame": {"x":130, "y":128, "w":64, "h":31},
+		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":31},
+		"sourceSize": {"w":64,"h":31}
+	},
+	"road_nsw.png": {
+		"frame": {"x":130, "y":160, "w":64, "h":31},
+		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":31},
+		"sourceSize": {"w":64,"h":31}
+	},
 	"road_nw.png": {
-		"frame": {"x":0, "y":269, "w":64, "h":31},
+		"frame": {"x":130, "y":192, "w":64, "h":31},
 		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":31},
 		"sourceSize": {"w":64,"h":31}
 	},
 	"road_se.png": {
-		"frame": {"x":0, "y":0, "w":64, "h":31},
+		"frame": {"x":65, "y":96, "w":64, "h":31},
 		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":31},
 		"sourceSize": {"w":64,"h":31}
 	},
 	"road_sew.png": {
-		"frame": {"x":65, "y":210, "w":64, "h":31},
+		"frame": {"x":65, "y":64, "w":64, "h":31},
 		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":31},
 		"sourceSize": {"w":64,"h":31}
 	},
 	"road_sw.png": {
-		"frame": {"x":65, "y":178, "w":64, "h":31},
+		"frame": {"x":65, "y":0, "w":64, "h":31},
 		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":31},
 		"sourceSize": {"w":64,"h":31}
 	},
 	"road_v.png": {
-		"frame": {"x":65, "y":146, "w":64, "h":31},
+		"frame": {"x":0, "y":250, "w":64, "h":31},
 		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":31},
 		"sourceSize": {"w":64,"h":31}
 	},
 	"sand.png": {
-		"frame": {"x":65, "y":114, "w":64, "h":31},
+		"frame": {"x":0, "y":0, "w":64, "h":31},
 		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":31},
 		"sourceSize": {"w":64,"h":31}
 	},
 	"snow.png": {
-		"frame": {"x":65, "y":82, "w":64, "h":31},
+		"frame": {"x":130, "y":96, "w":64, "h":31},
 		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":31},
 		"sourceSize": {"w":64,"h":31}
 	},
 	"snowman.png": {
-		"frame": {"x":260, "y":0, "w":32, "h":64},
+		"frame": {"x":242, "y":132, "w":32, "h":64},
 		"spriteSourceSize": {"x":0,"y":0,"w":32,"h":64},
 		"sourceSize": {"w":32,"h":64}
 	},
 	"tentacle.png": {
-		"frame": {"x":195, "y":256, "w":16, "h":32},
-		"spriteSourceSize": {"x":0,"y":0,"w":16,"h":32},
+		"frame": {"x":253, "y":57, "w":13, "h":32},
+		"spriteSourceSize": {"x":2,"y":0,"w":16,"h":32},
 		"sourceSize": {"w":16,"h":32}
 	},
 	"tree1.png": {
-		"frame": {"x":65, "y":0, "w":64, "h":49},
-		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":49},
+		"frame": {"x":228, "y":219, "w":32, "h":35},
+		"spriteSourceSize": {"x":6,"y":0,"w":64,"h":49},
 		"sourceSize": {"w":64,"h":49}
 	},
 	"tree2.png": {
-		"frame": {"x":0, "y":227, "w":64, "h":41},
-		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":41},
+		"frame": {"x":250, "y":92, "w":31, "h":28},
+		"spriteSourceSize": {"x":8,"y":0,"w":64,"h":41},
 		"sourceSize": {"w":64,"h":41}
 	},
 	"tree3.png": {
-		"frame": {"x":0, "y":177, "w":64, "h":49},
-		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":49},
+		"frame": {"x":195, "y":219, "w":32, "h":35},
+		"spriteSourceSize": {"x":6,"y":0,"w":64,"h":49},
 		"sourceSize": {"w":64,"h":49}
 	},
 	"tree4.png": {
-		"frame": {"x":0, "y":121, "w":64, "h":55},
-		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":55},
+		"frame": {"x":195, "y":132, "w":46, "h":42},
+		"spriteSourceSize": {"x":1,"y":0,"w":64,"h":55},
 		"sourceSize": {"w":64,"h":55}
 	},
 	"tree5.png": {
-		"frame": {"x":0, "y":64, "w":64, "h":56},
-		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":56},
+		"frame": {"x":195, "y":175, "w":46, "h":43},
+		"spriteSourceSize": {"x":1,"y":0,"w":64,"h":56},
 		"sourceSize": {"w":64,"h":56}
 	},
 	"water.png": {
-		"frame": {"x":0, "y":32, "w":64, "h":31},
+		"frame": {"x":65, "y":32, "w":64, "h":31},
 		"spriteSourceSize": {"x":0,"y":0,"w":64,"h":31},
 		"sourceSize": {"w":64,"h":31}
 	}
@@ -154,7 +159,7 @@
 },
 "meta": {
 	"image": "sprites.png",
-	"size": {"w": 293, "h": 306},
+	"size": {"w": 282, "h": 282},
 	"scale": "1"
 }
 }

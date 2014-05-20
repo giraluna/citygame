@@ -165,7 +165,7 @@ var cg: any =
         "type": "road_h",
         "baseType": "road",
         "anchor": [0.5, 1.0],
-        "frame": "road_h2.png"
+        "frame": "road_h.png"
       },
       "road_v":
       {
@@ -347,6 +347,18 @@ var cg: any =
           "range": 2,
           "strength": 2
         }
+      },
+      "fastfood":
+      {
+        "type": "fastfood",
+        "baseType": "building",
+        "categoryType": "fastfood",
+        "baseProfit": 1,
+        "cost": 25,
+        "buildTime": 14,
+        "anchor": [0.5, 1.1],
+        "frame": "fastfood.png",
+        "canNotBuildOn": ["water", "building", "road"]
       }
     }
   }

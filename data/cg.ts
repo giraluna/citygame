@@ -21,12 +21,14 @@ var cg: any =
       "interactive": true,
       "hitArea": [[0, -32], [32, -16], [0, 0], [-32, -16]],
       "flags": ["water"],
-      "effect":
-      {
-        "type": "testModifier",
-        "range": 2,
-        "strength": 1
-      }
+      "effects":
+      [
+        {
+          "type": "niceEnviroment",
+          "range": 2,
+          "strength": 1
+        }
+      ]
     },
     "sand":
     {
@@ -60,12 +62,14 @@ var cg: any =
           "anchor": [0.5, 1],
           "frame": "tree1.png",
           "canBuildOn": ["grass"],
-          "effect":
-          {
-            "type": "testModifier",
-            "range": 2,
-            "strength": 1
-          }
+          "effects":
+          [
+            {
+              "type": "niceEnviroment",
+              "range": 2,
+              "strength": 1
+            }
+          ]
         },
         "tree2":
         {
@@ -74,12 +78,14 @@ var cg: any =
           "anchor": [0.5, 1],
           "frame": "tree2.png",
           "canBuildOn": ["grass"],
-          "effect":
-          {
-            "type": "testModifier",
-            "range": 2,
-            "strength": 1
-          }
+          "effects":
+          [
+            {
+              "type": "niceEnviroment",
+              "range": 2,
+              "strength": 1
+            }
+          ]
         },
         "tree3":
         {
@@ -88,12 +94,14 @@ var cg: any =
           "anchor": [0.5, 1],
           "frame": "tree3.png",
           "canBuildOn": ["grass"],
-          "effect":
-          {
-            "type": "testModifier",
-            "range": 2,
-            "strength": 1
-          }
+          "effects":
+          [
+            {
+              "type": "niceEnviroment",
+              "range": 2,
+              "strength": 1
+            }
+          ]
         },
         "tree4":
         {
@@ -102,12 +110,14 @@ var cg: any =
           "anchor": [0.5, 1],
           "frame": "tree4.png",
           "canBuildOn": ["grass"],
-          "effect":
-          {
-            "type": "testModifier",
-            "range": 2,
-            "strength": 1
-          }
+          "effects":
+          [
+            {
+              "type": "niceEnviroment",
+              "range": 2,
+              "strength": 1
+            }
+          ]
         },
         "tree5":
         {
@@ -116,12 +126,14 @@ var cg: any =
           "anchor": [0.5, 1],
           "frame": "tree5.png",
           "canBuildOn": ["grass"],
-          "effect":
-          {
-            "type": "testModifier",
-            "range": 2,
-            "strength": 1
-          }
+          "effects":
+          [
+            {
+              "type": "niceEnviroment",
+              "range": 2,
+              "strength": 1
+            }
+          ]
         },
       },
       "sand":
@@ -251,12 +263,19 @@ var cg: any =
         "anchor": [0.5, 1],
         "frame": "house1.png",
         "canNotBuildOn": ["water", "building", "road"],
-        "effect":
-        {
-          "type": "testModifier2",
-          "range": 1,
-          "strength": 1
-        }
+        "effects":
+        [
+          {
+            "type": "crowded",
+            "range": 1,
+            "strength": 1
+          },
+          {
+            "type": "population",
+            "range": 2,
+            "strength": 1
+          }
+        ]
       },
       "house2":
       {
@@ -269,12 +288,19 @@ var cg: any =
         "anchor": [0.5, 1],
         "frame": "house2.png",
         "canNotBuildOn": ["water", "building", "road"],
-        "effect":
-        {
-          "type": "testModifier2",
-          "range": 2,
-          "strength": 2
-        }
+        "effects":
+        [
+          {
+            "type": "crowded",
+            "range": 2,
+            "strength": 2
+          },
+          {
+            "type": "population",
+            "range": 2,
+            "strength": 2
+          }
+        ]
       },
       "house3":
       {
@@ -287,12 +313,19 @@ var cg: any =
         "anchor": [0.5, 1],
         "frame": "house3.png",
         "canNotBuildOn": ["water", "building", "road"],
-        "effect":
-        {
-          "type": "testModifier2",
-          "range": 1,
-          "strength": 1
-        }
+        "effects":
+        [
+          {
+            "type": "crowded",
+            "range": 1,
+            "strength": 1
+          },
+          {
+            "type": "population",
+            "range": 2,
+            "strength": 1
+          }
+        ]
       },
       "house4":
       {
@@ -305,12 +338,19 @@ var cg: any =
         "anchor": [0.5, 1],
         "frame": "house4.png",
         "canNotBuildOn": ["water", "building", "road"],
-        "effect":
-        {
-          "type": "testModifier2",
-          "range": 2,
-          "strength": 2
-        }
+        "effects":
+        [
+          {
+            "type": "crowded",
+            "range": 2,
+            "strength": 2
+          },
+          {
+            "type": "population",
+            "range": 2,
+            "strength": 2
+          }
+        ]
       },
       "house5":
       {
@@ -323,12 +363,19 @@ var cg: any =
         "anchor": [0.5, 1],
         "frame": "house5.png",
         "canNotBuildOn": ["water", "building", "road"],
-        "effect":
-        {
-          "type": "testModifier2",
-          "range": 2,
-          "strength": 2
-        }
+        "effects":
+        [
+          {
+            "type": "crowded",
+            "range": 2,
+            "strength": 2
+          },
+          {
+            "type": "population",
+            "range": 2,
+            "strength": 2
+          }
+        ]
       },
       "house6":
       {
@@ -341,12 +388,19 @@ var cg: any =
         "anchor": [0.5, 1],
         "frame": "house6.png",
         "canNotBuildOn": ["water", "building", "road"],
-        "effect":
-        {
-          "type": "testModifier2",
-          "range": 2,
-          "strength": 2
-        }
+        "effects":
+        [
+          {
+            "type": "crowded",
+            "range": 2,
+            "strength": 2
+          },
+          {
+            "type": "population",
+            "range": 2,
+            "strength": 2
+          }
+        ]
       },
       "fastfood":
       {
@@ -358,7 +412,15 @@ var cg: any =
         "buildTime": 14,
         "anchor": [0.5, 1.1],
         "frame": "fastfood.png",
-        "canNotBuildOn": ["water", "building", "road"]
+        "canNotBuildOn": ["water", "building", "road"],
+        "effects":
+        [
+          {
+            "type": "fastfoodCompetition",
+            "range": 3,
+            "strength": 1
+          }
+        ]
       }
     }
   }
@@ -384,13 +446,27 @@ function findType(typeName: string, target: any = cg)
 {
   for (var prop in target)
   {
-    if (prop === "effect")
+    if (prop === "effects")
     {
-      var e = target[prop];
-      if (!cellModifiers[e.type]) console.error("Invalid effect defined on ",
-        target)
-      target.translatedEffect = cellModifiers[e.type].call(null,
-        e.range, e.strength)
+      var newEffects = [];
+      for (var i = 0; i < target.effects.length; i++)
+      {
+        var e = target.effects[i];
+        if (!cellModifiers[e.type]) console.error("Invalid effect defined on ",
+          target)
+
+        var translated = cellModifiers[e.type].call(null,
+          e.range, e.strength)
+
+        translated.scaling = translated.scaling ||
+          function(strength)
+          {
+            return 1+Math.log(strength);
+          };
+
+        newEffects.push(translated);
+      }
+      target.translatedEffects = newEffects;
     }
     else if (typeof target[prop] === "object")
     {

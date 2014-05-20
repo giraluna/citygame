@@ -1,42 +1,73 @@
 /// <reference path="../src/js/arraylogic.d.ts" />
 var cellModifiers;
 (function (cellModifiers) {
-    function testModifier(range, strength) {
+    function niceEnviroment(range, strength) {
         if (typeof range === "undefined") { range = 1; }
         if (typeof strength === "undefined") { strength = 1; }
         return ({
-            type: "testModifier",
+            type: "niceEnviroment",
             translate: "Nice enviroment",
             range: range,
             strength: strength,
             targets: ["apartment"],
-            effect: cellModifiers.effects.testEffect
+            effect: {
+                multiplier: 0.25
+            }
         });
     }
-    cellModifiers.testModifier = testModifier;
+    cellModifiers.niceEnviroment = niceEnviroment;
 
-    function testModifier2(range, strength) {
+    function crowded(range, strength) {
         if (typeof range === "undefined") { range = 1; }
         if (typeof strength === "undefined") { strength = 1; }
         return ({
-            type: "testModifier2",
+            type: "crowded",
             translate: "Crowded",
             range: range,
             strength: strength,
             targets: ["apartment"],
-            effect: cellModifiers.effects.testEffect2
+            effect: {
+                addedProfit: -0.1,
+                multiplier: -0.15
+            }
         });
     }
-    cellModifiers.testModifier2 = testModifier2;
+    cellModifiers.crowded = crowded;
 
-    cellModifiers.effects = {
-        testEffect: {
-            multiplier: 0.25
-        },
-        testEffect2: {
-            addedProfit: -0.1,
-            multiplier: -0.15
-        }
-    };
+    function population(range, strength) {
+        if (typeof range === "undefined") { range = 1; }
+        if (typeof strength === "undefined") { strength = 1; }
+        return ({
+            type: "population",
+            translate: "Nearby customers",
+            range: range,
+            strength: strength,
+            targets: ["fastfood"],
+            effect: {
+                addedProfit: 0.1
+            },
+            scaling: function (strength) {
+                return strength;
+            }
+        });
+    }
+    cellModifiers.population = population;
+
+    function fastfoodCompetition(range, strength) {
+        if (typeof range === "undefined") { range = 1; }
+        if (typeof strength === "undefined") { strength = 1; }
+        return ({
+            type: "fastfoodCompetition",
+            translate: "Competing restaurants",
+            range: range,
+            strength: strength,
+            targets: ["fastfood"],
+            effect: {
+                addedProfit: -0.2,
+                multiplier: -0.35
+            }
+        });
+    }
+    cellModifiers.fastfoodCompetition = fastfoodCompetition;
 })(cellModifiers || (cellModifiers = {}));
 //# sourceMappingURL=cellmodifiers.js.map

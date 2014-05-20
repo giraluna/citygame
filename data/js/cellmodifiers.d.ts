@@ -1,6 +1,6 @@
 /// <reference path="../../src/js/arraylogic.d.ts" />
 declare module cellModifiers {
-    function testModifier(range?: number, strength?: number): {
+    function niceEnviroment(range?: number, strength?: number): {
         type: string;
         translate: string;
         range: number;
@@ -10,7 +10,7 @@ declare module cellModifiers {
             multiplier: number;
         };
     };
-    function testModifier2(range?: number, strength?: number): {
+    function crowded(range?: number, strength?: number): {
         type: string;
         translate: string;
         range: number;
@@ -21,11 +21,24 @@ declare module cellModifiers {
             multiplier: number;
         };
     };
-    var effects: {
-        testEffect: {
-            multiplier: number;
+    function population(range?: number, strength?: number): {
+        type: string;
+        translate: string;
+        range: number;
+        strength: number;
+        targets: string[];
+        effect: {
+            addedProfit: number;
         };
-        testEffect2: {
+        scaling: (strength: any) => any;
+    };
+    function fastfoodCompetition(range?: number, strength?: number): {
+        type: string;
+        translate: string;
+        range: number;
+        strength: number;
+        targets: string[];
+        effect: {
             addedProfit: number;
             multiplier: number;
         };

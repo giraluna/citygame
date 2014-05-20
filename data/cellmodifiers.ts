@@ -2,42 +2,73 @@
 
 module cellModifiers
 {
-  export function testModifier(range: number = 1, strength: number = 1)
+  export function niceEnviroment(range: number = 1, strength: number = 1)
   {
     return(
     {
-      type: "testModifier",
+      type: "niceEnviroment",
       translate: "Nice enviroment",
       range: range,
       strength: strength,
       targets: ["apartment"],
-      effect: effects.testEffect
+      effect:
+      {
+        multiplier: 0.25
+      }
     });
   }
 
-  export function testModifier2(range: number = 1, strength: number = 1)
+  export function crowded(range: number = 1, strength: number = 1)
   {
     return(
     {
-      type: "testModifier2",
+      type: "crowded",
       translate: "Crowded",
       range: range,
       strength: strength,
       targets: ["apartment"],
-      effect: effects.testEffect2
+      effect:
+      {
+        addedProfit: -0.1,
+        multiplier: -0.15
+      }
     });
   }
 
-  export var effects =
+  export function population(range: number = 1, strength: number = 1)
   {
-    testEffect:
+    return(
     {
-      multiplier: 0.25
-    },
-    testEffect2:
+      type: "population",
+      translate: "Nearby customers",
+      range: range,
+      strength: strength,
+      targets: ["fastfood"],
+      effect:
+      {
+        addedProfit: 0.1,
+      },
+      scaling: function(strength)
+      {
+        return strength;
+      }
+    });
+  }
+
+  export function fastfoodCompetition(range: number = 1, strength: number = 1)
+  {
+    return(
     {
-      addedProfit: -0.1,
-      multiplier: -0.15
-    }
+      type: "fastfoodCompetition",
+      translate: "Competing restaurants",
+      range: range,
+      strength: strength,
+      targets: ["fastfood"],
+      effect:
+      {
+        addedProfit: -0.2,
+        multiplier: -0.35,
+      }
+    });
   }
 }

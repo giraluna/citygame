@@ -112,7 +112,7 @@ var Content = (function () {
 var Cell = (function () {
     function Cell(gridPos, type, board) {
         this.modifiers = {};
-        this.hasOverlay = false;
+        this.overlay = undefined;
         this.gridPos = gridPos;
         this.type = type;
         this.landValue = randInt(40, 50);
@@ -396,29 +396,72 @@ var Cell = (function () {
         this.content.modifiers = this.getValidModifiers();
         this.content.applyModifiers();
     };
-    Cell.prototype.addOverlay = function (color) {
-        if (this.hasOverlay)
-            return;
+    Cell.prototype.addOverlay = function (color, depth) {
+        if (typeof depth === "undefined") { depth = 1; }
+        if (this.overlay) {
+            game.layers["cellOverlay"]._removeChildAt(this.overlay, this.gridPos[0], this.gridPos[1]);
+        }
 
-        var gfx = new PIXI.Graphics();
+        var neighbors = this.getNeighbors();
+        var hitArea = this.type.hitArea;
+        var linesToDraw = {
+            n: true,
+            e: true,
+            s: true,
+            w: true
+        };
+        for (var _dir in neighbors) {
+            var neighborCell = neighbors[_dir];
+            if (neighborCell !== undefined) {
+                if (neighborCell.player && neighborCell.player.id === this.player.id) {
+                    linesToDraw[_dir] = false;
+                }
+            }
+        }
+
         var poly = this.type.hitArea;
 
-        poly.push(this.type.hitArea[0]);
-        drawPolygon(gfx, poly, {
-            width: 3,
-            color: color,
-            alpha: 0.6
-        }, {
-            width: 1,
-            color: 0x000000,
-            alpha: 0
-        });
+        // loop back
+        poly.push(poly[0]);
+
+        var gfx = new PIXI.Graphics();
+        gfx.lineStyle(3, color, 0.6);
+
+        gfx.moveTo(poly[0][0], poly[0][1]);
+        var nextIndex = 1;
+
+        for (var _dir in linesToDraw) {
+            var nextPoint = poly[nextIndex];
+
+            if (linesToDraw[_dir] === true) {
+                gfx.lineTo(nextPoint[0], nextPoint[1]);
+            } else {
+                gfx.moveTo(nextPoint[0], nextPoint[1]);
+            }
+
+            nextIndex++;
+        }
+
         gfx.position = this.sprite.position.clone();
         game.layers["cellOverlay"]._addChildAt(gfx, this.gridPos[0], this.gridPos[1]);
 
-        this.hasOverlay = true;
+        this.overlay = gfx;
+        ;
 
-        game.updateWorld();
+        var willUpdateNeighbors = false;
+
+        if (depth > 0) {
+            for (var _dir in linesToDraw) {
+                if (linesToDraw[_dir] === false) {
+                    willUpdateNeighbors = true;
+                    neighbors[_dir].addOverlay(color, depth - 1);
+                }
+            }
+        }
+
+        if (willUpdateNeighbors === false) {
+            game.updateWorld();
+        }
     };
     return Cell;
 })();

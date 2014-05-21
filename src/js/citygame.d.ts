@@ -68,7 +68,7 @@ declare class Cell {
     public gridPos: number[];
     public flags: string[];
     public modifiers: any;
-    public hasOverlay: boolean;
+    public overlay: PIXI.Graphics;
     public player: Player;
     constructor(gridPos: any, type: any, board: any);
     public init(type: any): void;
@@ -90,7 +90,7 @@ declare class Cell {
     public removeAllPropagatedModifiers(modifiers: any[]): void;
     public getValidModifiers(): any;
     public applyModifiersToContent(): void;
-    public addOverlay(color: any): void;
+    public addOverlay(color: any, depth?: number): void;
 }
 declare class WorldRenderer {
     public layers: any;

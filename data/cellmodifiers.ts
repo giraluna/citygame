@@ -2,7 +2,7 @@
 
 module cellModifiers
 {
-  export function niceEnviroment(range: number = 1, strength: number = 1)
+  export function niceEnviroment(range: number, strength: number = 1)
   {
     return(
     {
@@ -18,7 +18,7 @@ module cellModifiers
     });
   }
 
-  export function crowded(range: number = 1, strength: number = 1)
+  export function crowded(range: number, strength: number = 1)
   {
     return(
     {
@@ -35,7 +35,7 @@ module cellModifiers
     });
   }
 
-  export function population(range: number = 1, strength: number = 1)
+  export function population(range: number, strength: number = 1)
   {
     return(
     {
@@ -43,7 +43,7 @@ module cellModifiers
       translate: "Nearby customers",
       range: range,
       strength: strength,
-      targets: ["fastfood"],
+      targets: ["fastfood", "shopping"],
       effect:
       {
         addedProfit: 0.1,
@@ -55,7 +55,7 @@ module cellModifiers
     });
   }
 
-  export function fastfoodCompetition(range: number = 1, strength: number = 1)
+  export function fastfoodCompetition(range: number, strength: number = 1)
   {
     return(
     {
@@ -66,8 +66,41 @@ module cellModifiers
       targets: ["fastfood"],
       effect:
       {
-        addedProfit: -0.2,
-        multiplier: -0.35,
+        addedProfit: -0.15,
+        multiplier: -0.25,
+      }
+    });
+  }
+
+  export function shoppingCompetition(range: number, strength: number = 1)
+  {
+    return(
+    {
+      type: "shoppingCompetition",
+      translate: "Competing stores",
+      range: range,
+      strength: strength,
+      targets: ["shopping"],
+      effect:
+      {
+        addedProfit: -0.075,
+        multiplier: -0.15,
+      }
+    });
+  }
+
+  export function nearbyShopping(range: number, strength: number = 1)
+  {
+    return(
+    {
+      type: "nearbyShopping",
+      translate: "Nearby stores",
+      range: range,
+      strength: strength,
+      targets: ["fastfood"],
+      effect:
+      {
+        addedProfit: 0.2
       }
     });
   }

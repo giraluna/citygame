@@ -2,7 +2,6 @@
 var cellModifiers;
 (function (cellModifiers) {
     function niceEnviroment(range, strength) {
-        if (typeof range === "undefined") { range = 1; }
         if (typeof strength === "undefined") { strength = 1; }
         return ({
             type: "niceEnviroment",
@@ -18,7 +17,6 @@ var cellModifiers;
     cellModifiers.niceEnviroment = niceEnviroment;
 
     function crowded(range, strength) {
-        if (typeof range === "undefined") { range = 1; }
         if (typeof strength === "undefined") { strength = 1; }
         return ({
             type: "crowded",
@@ -35,14 +33,13 @@ var cellModifiers;
     cellModifiers.crowded = crowded;
 
     function population(range, strength) {
-        if (typeof range === "undefined") { range = 1; }
         if (typeof strength === "undefined") { strength = 1; }
         return ({
             type: "population",
             translate: "Nearby customers",
             range: range,
             strength: strength,
-            targets: ["fastfood"],
+            targets: ["fastfood", "shopping"],
             effect: {
                 addedProfit: 0.1
             },
@@ -54,7 +51,6 @@ var cellModifiers;
     cellModifiers.population = population;
 
     function fastfoodCompetition(range, strength) {
-        if (typeof range === "undefined") { range = 1; }
         if (typeof strength === "undefined") { strength = 1; }
         return ({
             type: "fastfoodCompetition",
@@ -63,11 +59,42 @@ var cellModifiers;
             strength: strength,
             targets: ["fastfood"],
             effect: {
-                addedProfit: -0.2,
-                multiplier: -0.35
+                addedProfit: -0.15,
+                multiplier: -0.25
             }
         });
     }
     cellModifiers.fastfoodCompetition = fastfoodCompetition;
+
+    function shoppingCompetition(range, strength) {
+        if (typeof strength === "undefined") { strength = 1; }
+        return ({
+            type: "shoppingCompetition",
+            translate: "Competing stores",
+            range: range,
+            strength: strength,
+            targets: ["shopping"],
+            effect: {
+                addedProfit: -0.075,
+                multiplier: -0.15
+            }
+        });
+    }
+    cellModifiers.shoppingCompetition = shoppingCompetition;
+
+    function nearbyShopping(range, strength) {
+        if (typeof strength === "undefined") { strength = 1; }
+        return ({
+            type: "nearbyShopping",
+            translate: "Nearby stores",
+            range: range,
+            strength: strength,
+            targets: ["fastfood"],
+            effect: {
+                addedProfit: 0.2
+            }
+        });
+    }
+    cellModifiers.nearbyShopping = nearbyShopping;
 })(cellModifiers || (cellModifiers = {}));
 //# sourceMappingURL=cellmodifiers.js.map

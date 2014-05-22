@@ -421,6 +421,31 @@ var cg: any =
             "strength": 1
           }
         ]
+      },
+      "conveniencestore":
+      {
+        "type": "conveniencestore",
+        "baseType": "building",
+        "categoryType": "shopping",
+        "baseProfit": 1,
+        "cost": 25,
+        "buildTime": 14,
+        "anchor": [0.5, 1],
+        "frame": "conveniencestore.png",
+        "canNotBuildOn": ["water", "building", "road"],
+        "effects":
+        [
+          {
+            "type": "shoppingCompetition",
+            "range": 2,
+            "strength": 1
+          },
+          {
+            "type": "nearbyShopping",
+            "range": 2,
+            "strength": 1
+          }
+        ]
       }
     }
   }

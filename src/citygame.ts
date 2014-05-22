@@ -1617,17 +1617,17 @@ class UIDrawer
     if (cell.content && cell.content.baseProfit)
     {
       text += "\n--------------\n";
-      text += "Base profit: " + cell.content.baseProfit + "\n";
+      text += "Base profit: " + cell.content.baseProfit.toFixed(2) + "\n";
       text += "-------\n";
       for (var modifier in cell.content.modifiers)
       {
         var _mod = cell.content.modifiers[modifier];
         text += "Modifier: " + _mod.translate + "\n";
         text += "Strength: " + _mod.strength + "\n";
-        text += "Adj strength: " + _mod.scaling(_mod.strength) + "\n";
+        text += "Adj strength: " + _mod.scaling(_mod.strength).toFixed(3) + "\n";
         text += "--------------\n";
       }
-      text += "Modified profit: " + cell.content.modifiedProfit;
+      text += "Modified profit: " + cell.content.modifiedProfit.toFixed(3);
     }
 
     var font = this.fonts["base"];

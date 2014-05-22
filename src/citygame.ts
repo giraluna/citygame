@@ -1387,7 +1387,8 @@ class MouseEventHandler
     }
     else if (event.originalEvent.ctrlKey ||
       event.originalEvent.metaKey ||
-      event.originalEvent.button === 2)
+      (event.originalEvent.button === 1 ||
+      event.originalEvent.button === 2) )
     {
       this.startScroll(event);
     }

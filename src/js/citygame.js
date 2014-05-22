@@ -1073,7 +1073,7 @@ var MouseEventHandler = (function () {
             this.scroller.end();
             game.highlighter.clearSprites();
             game.updateWorld();
-        } else if (event.originalEvent.ctrlKey || event.originalEvent.metaKey || event.originalEvent.button === 2) {
+        } else if (event.originalEvent.ctrlKey || event.originalEvent.metaKey || (event.originalEvent.button === 1 || event.originalEvent.button === 2)) {
             this.startScroll(event);
         } else if (event.originalEvent.shiftKey) {
             this.startZoom(event);

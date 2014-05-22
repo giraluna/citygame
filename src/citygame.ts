@@ -767,7 +767,7 @@ class Game
     this.players[player.id] = player;
     // TODO have content types register themselves
     var dailyProfitSystem = new ProfitSystem(1, this.systemsManager, this.players,
-      ["apartment", "fastfood"]);
+      ["apartment", "fastfood", "shopping"]);
     this.systemsManager.addSystem("apartmentProfit", dailyProfitSystem);
 
 

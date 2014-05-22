@@ -589,7 +589,7 @@ var Game = (function () {
         this.players[player.id] = player;
 
         // TODO have content types register themselves
-        var dailyProfitSystem = new ProfitSystem(1, this.systemsManager, this.players, ["apartment", "fastfood"]);
+        var dailyProfitSystem = new ProfitSystem(1, this.systemsManager, this.players, ["apartment", "fastfood", "shopping"]);
         this.systemsManager.addSystem("apartmentProfit", dailyProfitSystem);
 
         this.systemsManager.addSystem("delayedAction", new DelayedActionSystem(1, this.systemsManager));

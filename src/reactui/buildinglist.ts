@@ -71,7 +71,7 @@ module UIComponents
               }
             )
           ),
-          React.DOM.td({className: "building-title"}, buildingTemplate.type),
+          React.DOM.td({className: "building-title"}, buildingTemplate.translate),
           React.DOM.td(costProps, buildingTemplate.cost + "$")
         )
 

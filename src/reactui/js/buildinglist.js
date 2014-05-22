@@ -52,7 +52,7 @@ var UIComponents;
                     src: image.src,
                     width: image.width / 2,
                     height: image.height / 2
-                })), React.DOM.td({ className: "building-title" }, buildingTemplate.type), React.DOM.td(costProps, buildingTemplate.cost + "$"));
+                })), React.DOM.td({ className: "building-title" }, buildingTemplate.translate), React.DOM.td(costProps, buildingTemplate.cost + "$"));
 
                 rows.push(row);
             }

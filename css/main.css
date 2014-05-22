@@ -177,6 +177,9 @@ body {
 .popup .popup-buttons button {
   margin: 0 20px;
 }
+.building-list tr {
+  height: 30px;
+}
 .sortable-column:hover {
   cursor: pointer;
 }

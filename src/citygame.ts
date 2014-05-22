@@ -1613,7 +1613,7 @@ class UIDrawer
     var screenX = event.global.x;
     var screenY = event.global.y;
 
-    var text = cell.content ? cell.content.type["type"] : cell.type["type"];
+    var text = cell.content ? cell.content.type["translate"] : cell.type["type"];
 
     if (cell.content && cell.content.baseProfit)
     {

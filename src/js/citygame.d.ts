@@ -37,8 +37,10 @@ declare class Content {
     public cell: Cell;
     public flags: string[];
     public baseProfit: number;
+    public baseProfitPerDay: number;
     public modifiers: any;
     public modifiedProfit: number;
+    public modifiedProfitPerDay: number;
     public player: Player;
     constructor(props: {
         cell: Cell;

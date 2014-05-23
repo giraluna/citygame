@@ -79,6 +79,7 @@ var Content = (function () {
         this.flags.push(this.baseType, this.categoryType);
 
         this.baseProfit = type.baseProfit || undefined;
+        this.baseProfitPerDay = type.baseProfit ? type.baseProfit / type.daysForProfitTick : undefined;
 
         if (props.player) {
             props.player.addContent(this);
@@ -105,6 +106,7 @@ var Content = (function () {
             }
         }
         this.modifiedProfit = totals.addedProfit * totals.multiplier;
+        this.modifiedProfitPerDay = this.modifiedProfit / this.type.daysForProfitTick;
     };
     return Content;
 })();
@@ -1257,13 +1259,11 @@ var UIDrawer = (function () {
         var screenX = event.global.x;
         var screenY = event.global.y;
 
-        var text = cell.content ? cell.content.type["translate"] : cell.type["type"];
+        var text = cell.content ? cell.content.type["translate"] || cell.content.baseType : cell.type["type"];
 
         if (cell.content && cell.content.baseProfit) {
-            var profitPerDay = cell.content.type.baseProfit / cell.content.type.daysForProfitTick;
-
             text += "\n--------------\n";
-            text += "Base profit: " + profitPerDay.toFixed(2) + "/d" + "\n";
+            text += "Base profit: " + cell.content.baseProfitPerDay.toFixed(2) + "/d" + "\n";
             text += "-------\n";
             for (var modifier in cell.content.modifiers) {
                 var _mod = cell.content.modifiers[modifier];
@@ -1272,7 +1272,7 @@ var UIDrawer = (function () {
                 text += "Adj strength: " + _mod.scaling(_mod.strength).toFixed(3) + "\n";
                 text += "--------------\n";
             }
-            text += "Final profit: " + cell.content.modifiedProfit.toFixed(2) + "every" + cell.content.type.daysForProfitTick + "days";
+            text += "Final profit: " + cell.content.modifiedProfitPerDay.toFixed(2) + "/d";
         }
 
         var font = this.fonts["base"];

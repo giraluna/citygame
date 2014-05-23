@@ -232,19 +232,23 @@ html, body
     {
       padding: 0 5px;
     }
+    tbody tr:hover
+    {
+      background-color: lighten(@dark-blue, 25%);
+    }
     .employee
     {
       color: #000;
-    }
-    .active:hover
-    {
-      background-color: lighten(@dark-blue, 25%);
     }
     .active
     {
 
     }
     .selected
+    {
+      background-color: @dark-blue;
+    }
+    .selected:hover
     {
       background-color: @dark-blue;
     }
@@ -268,6 +272,10 @@ html, body
       {
         color: #AAA;
       }
+    }
+    .inactive:hover
+    {
+      background-color: rgb(185, 200, 204);
     }
     .insufficient
     {

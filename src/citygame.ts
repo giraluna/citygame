@@ -88,8 +88,10 @@ class Content
   flags: string[];
 
   baseProfit: number = 0;
+  baseProfitPerDay: number;
   modifiers: any = {};
   modifiedProfit: number = 0;
+  modifiedProfitPerDay: number;
   player: Player;
 
   constructor(props:
@@ -111,6 +113,7 @@ class Content
     this.flags.push(this.baseType, this.categoryType);
 
     this.baseProfit = type.baseProfit || undefined;
+    this.baseProfitPerDay = type.baseProfit ? type.baseProfit / type.daysForProfitTick : undefined;
     
     if (props.player)
     {
@@ -143,6 +146,7 @@ class Content
       }
     }
     this.modifiedProfit = totals.addedProfit * totals.multiplier;
+    this.modifiedProfitPerDay = this.modifiedProfit / this.type.daysForProfitTick;
   }
 }
 
@@ -1619,14 +1623,12 @@ class UIDrawer
     var screenX = event.global.x;
     var screenY = event.global.y;
 
-    var text = cell.content ? cell.content.type["translate"] : cell.type["type"];
+    var text = cell.content ? cell.content.type["translate"] || cell.content.baseType : cell.type["type"];
 
     if (cell.content && cell.content.baseProfit)
     {
-      var profitPerDay = cell.content.type.baseProfit / cell.content.type.daysForProfitTick;
-      
       text += "\n--------------\n";
-      text += "Base profit: " + profitPerDay.toFixed(2) + "/d" + "\n";
+      text += "Base profit: " + cell.content.baseProfitPerDay.toFixed(2) + "/d" + "\n";
       text += "-------\n";
       for (var modifier in cell.content.modifiers)
       {
@@ -1636,8 +1638,7 @@ class UIDrawer
         text += "Adj strength: " + _mod.scaling(_mod.strength).toFixed(3) + "\n";
         text += "--------------\n";
       }
-      text += "Final profit: " + cell.content.modifiedProfit.toFixed(2) +
-        "every" + cell.content.type.daysForProfitTick + "days";
+      text += "Final profit: " + cell.content.modifiedProfitPerDay.toFixed(2) + "/d";
     }
 
     var font = this.fonts["base"];

@@ -139,13 +139,16 @@ body {
 .popup .popup-content td {
   padding: 0 5px;
 }
+.popup .popup-content tbody tr:hover {
+  background-color: #9db6bd;
+}
 .popup .popup-content .employee {
   color: #000;
 }
-.popup .popup-content .active:hover {
-  background-color: #9db6bd;
-}
 .popup .popup-content .selected {
+  background-color: #587982;
+}
+.popup .popup-content .selected:hover {
   background-color: #587982;
 }
 .popup .popup-content .employee-name {
@@ -163,6 +166,9 @@ body {
 }
 .popup .popup-content .inactive * {
   color: #AAA;
+}
+.popup .popup-content .inactive:hover {
+  background-color: #b9c8cc;
 }
 .popup .popup-content .insufficient {
   color: red;

@@ -767,8 +767,14 @@ class Game
     this.players[player.id] = player;
     // TODO have content types register themselves
     var dailyProfitSystem = new ProfitSystem(1, this.systemsManager, this.players,
-      ["apartment", "fastfood", "shopping"]);
-    this.systemsManager.addSystem("apartmentProfit", dailyProfitSystem);
+      ["fastfood", "shopping"]);
+    var monthlyProfitSystem = new ProfitSystem(30, this.systemsManager, this.players,
+      ["apartment"]);
+    var biYearlyProfitSystem = new ProfitSystem(180, this.systemsManager, this.players,
+      ["office"]);
+    this.systemsManager.addSystem("dailyProfitSystem", dailyProfitSystem);
+    this.systemsManager.addSystem("monthlyProfitSystem", monthlyProfitSystem);
+    this.systemsManager.addSystem("biYearlyProfitSystem", biYearlyProfitSystem);
 
 
     this.systemsManager.addSystem("delayedAction", new DelayedActionSystem(1, this.systemsManager));
@@ -1615,10 +1621,12 @@ class UIDrawer
 
     var text = cell.content ? cell.content.type["translate"] : cell.type["type"];
 
+    var profitPerDay = cell.content.type.baseProfit / cell.content.type.daysForProfitTick;
+
     if (cell.content && cell.content.baseProfit)
     {
       text += "\n--------------\n";
-      text += "Base profit: " + cell.content.baseProfit.toFixed(2) + "\n";
+      text += "Base profit: " + profitPerDay.toFixed(2) + "/d" + "\n";
       text += "-------\n";
       for (var modifier in cell.content.modifiers)
       {
@@ -1628,7 +1636,8 @@ class UIDrawer
         text += "Adj strength: " + _mod.scaling(_mod.strength).toFixed(3) + "\n";
         text += "--------------\n";
       }
-      text += "Modified profit: " + cell.content.modifiedProfit.toFixed(3);
+      text += "Final profit: " + cell.content.modifiedProfit.toFixed(2) +
+        "every" + cell.content.type.daysForProfitTick + "days";
     }
 
     var font = this.fonts["base"];

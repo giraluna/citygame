@@ -1259,9 +1259,9 @@ var UIDrawer = (function () {
 
         var text = cell.content ? cell.content.type["translate"] : cell.type["type"];
 
-        var profitPerDay = cell.content.type.baseProfit / cell.content.type.daysForProfitTick;
-
         if (cell.content && cell.content.baseProfit) {
+            var profitPerDay = cell.content.type.baseProfit / cell.content.type.daysForProfitTick;
+
             text += "\n--------------\n";
             text += "Base profit: " + profitPerDay.toFixed(2) + "/d" + "\n";
             text += "-------\n";

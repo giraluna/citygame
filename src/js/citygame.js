@@ -546,6 +546,7 @@ var WorldRenderer = (function () {
 
             zoomLayer["ground"] = new PIXI.DisplayObjectContainer();
             zoomLayer["mapmodeOverlay"] = new PIXI.DisplayObjectContainer();
+            zoomLayer["mapmodeOverlay"].alpha = 0.5;
             zoomLayer["cellOverlay"] = new SortedDisplayObjectContainer(TILES * 2);
             zoomLayer["content"] = new SortedDisplayObjectContainer(TILES * 2);
 

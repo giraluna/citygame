@@ -2,7 +2,7 @@
 
 /**
  * add base land value
- * add random modifier of land value to tiles
+ * 
  * create water
  *   coasts
  *     amount

@@ -29,3 +29,18 @@ declare function spritesheetToImages(sheetData: ISpritesheetData, baseUrl: strin
     [id: string]: HTMLImageElement;
 };
 declare function addClickAndTouchEventListener(target: any, callback: any): void;
+/**
+* http://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c
+*
+* Converts an HSL color value to RGB. Conversion formula
+* adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+* Assumes h, s, and l are contained in the set [0, 1] and
+* returns r, g, and b in the set [0, 255].
+*
+* @param   Number  h       The hue
+* @param   Number  s       The saturation
+* @param   Number  l       The lightness
+* @return  Array           The RGB representation
+*/
+declare function hslToRgb(h: any, s: any, l: any): any[];
+declare function hslToHex(h: any, s: any, l: any): number;

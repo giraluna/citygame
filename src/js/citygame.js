@@ -15,6 +15,8 @@
 /// <reference path="js/mapgeneration.d.ts" />
 /// <reference path="js/board.d.ts" />
 ///
+/// <reference path="js/landvalueoverlay.d.ts" />
+///
 /// <reference path="js/utility.d.ts" />
 /// <reference path="js/arraylogic.d.ts" />
 var __extends = this.__extends || function (d, b) {
@@ -117,7 +119,7 @@ var Cell = (function () {
         this.overlay = undefined;
         this.gridPos = gridPos;
         this.type = type;
-        this.landValue = randInt(40, 50);
+        this.landValue = randInt(30, 40);
         this.board = board;
 
         this.init(type);
@@ -472,6 +474,7 @@ var WorldRenderer = (function () {
     function WorldRenderer(width, height) {
         this.layers = {};
         this.zoomLevel = ZOOM_LEVELS[0];
+        this.mapmodes = {};
         this.initContainers(width, height);
         this.initLayers();
         this.addEventListeners();
@@ -483,6 +486,25 @@ var WorldRenderer = (function () {
         });
         eventManager.addEventListener("updateWorld", function (event) {
             self.render(event.content.clear);
+        });
+
+        var mapmodeSelect = document.getElementById("mapmode-select");
+
+        mapmodeSelect.addEventListener("change", function (event) {
+            switch (mapmodeSelect.value) {
+                case "ground": {
+                    self.removeMapmodeOverlay();
+                    return;
+                }
+                case "landValue": {
+                    var zoomLayer = self.mapmodes["zoom" + self.zoomLevel];
+
+                    zoomLayer.landValue = makeLandValueOverlay(game.board);
+
+                    self.changeMapmode("landValue");
+                    return;
+                }
+            }
         });
     };
     WorldRenderer.prototype.initContainers = function (width, height) {
@@ -496,6 +518,7 @@ var WorldRenderer = (function () {
         for (var i = 0; i < ZOOM_LEVELS.length; i++) {
             var zoomStr = "zoom" + ZOOM_LEVELS[i];
             var zoomLayer = this.layers[zoomStr] = {};
+            this.mapmodes[zoomStr] = {};
 
             var main = zoomLayer["main"] = new PIXI.DisplayObjectContainer();
         }
@@ -522,10 +545,12 @@ var WorldRenderer = (function () {
             var main = zoomLayer["main"];
 
             zoomLayer["ground"] = new PIXI.DisplayObjectContainer();
+            zoomLayer["mapmodeOverlay"] = new PIXI.DisplayObjectContainer();
             zoomLayer["cellOverlay"] = new SortedDisplayObjectContainer(TILES * 2);
             zoomLayer["content"] = new SortedDisplayObjectContainer(TILES * 2);
 
             main.addChild(zoomLayer["ground"]);
+            main.addChild(zoomLayer["mapmodeOverlay"]);
             main.addChild(zoomLayer["cellOverlay"]);
             main.addChild(zoomLayer["content"]);
         }
@@ -548,6 +573,24 @@ var WorldRenderer = (function () {
     };
     WorldRenderer.prototype.changeZoomLevel = function (level) {
         this.zoomLevel = level;
+        this.render();
+    };
+    WorldRenderer.prototype.changeMapmode = function (newMapmode) {
+        var zoomStr = "zoom" + this.zoomLevel;
+        var zoomLayer = this.layers[zoomStr];
+
+        if (this.currentMapmode) {
+            zoomLayer.mapmodeOverlay.removeChildren();
+        }
+
+        zoomLayer.mapmodeOverlay.addChild(this.mapmodes[zoomStr][newMapmode]);
+
+        this.currentMapmode = newMapmode;
+        this.render();
+    };
+    WorldRenderer.prototype.removeMapmodeOverlay = function () {
+        this.layers["zoom" + this.zoomLevel].mapmodeOverlay.removeChildren();
+        this.currentMapmode = undefined;
         this.render();
     };
     WorldRenderer.prototype.render = function (clear) {
@@ -1260,6 +1303,10 @@ var UIDrawer = (function () {
         var screenY = event.global.y;
 
         var text = cell.content ? cell.content.type["translate"] || cell.content.baseType : cell.type["type"];
+
+        if (game.worldRenderer.currentMapmode === "landValue") {
+            text += "\nLand value: " + cell.landValue;
+        }
 
         if (cell.content && cell.content.baseProfit) {
             text += "\n--------------\n";

@@ -22,6 +22,7 @@ declare module PIXI
 	export function autoDetectRenderer(width: number, height: number, view?: HTMLCanvasElement, transparent?: boolean, antialias?: boolean): IPixiRenderer;
 	export function FilterBlock( mask:Graphics ):void;
 	export function MaskFilter( graphics:Graphics ):void;
+	export function rgb2hex( rgb:number[] ):number;
 
 
 	/* DEBUG METHODS */

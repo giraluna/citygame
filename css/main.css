@@ -40,6 +40,9 @@ body {
 #side-menu input {
   width: 66px;
 }
+#side-menu select {
+  width: 70px;
+}
 #side-menu #removeBtn {
   margin-top: 25px;
 }

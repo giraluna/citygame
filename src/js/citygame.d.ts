@@ -11,6 +11,7 @@
 /// <reference path="keyboardinput.d.ts" />
 /// <reference path="mapgeneration.d.ts" />
 /// <reference path="board.d.ts" />
+/// <reference path="landvalueoverlay.d.ts" />
 /// <reference path="utility.d.ts" />
 /// <reference path="arraylogic.d.ts" />
 declare var SCREEN_WIDTH: number, SCREEN_HEIGHT: number, TILE_WIDTH: number, TILE_HEIGHT: number, TILES: number, WORLD_WIDTH: number, WORLD_HEIGHT: number, ZOOM_LEVELS: number[];
@@ -99,12 +100,16 @@ declare class WorldRenderer {
     public renderTexture: PIXI.RenderTexture;
     public worldSprite: PIXI.Sprite;
     public zoomLevel: number;
+    public mapmodes: any;
+    public currentMapmode: string;
     constructor(width: any, height: any);
     public addEventListeners(): void;
     public initContainers(width: any, height: any): void;
     public initLayers(): void;
     public clearLayers(): void;
     public changeZoomLevel(level: any): void;
+    public changeMapmode(newMapmode: string): void;
+    public removeMapmodeOverlay(): void;
     public render(clear?: boolean): void;
 }
 declare class Game {

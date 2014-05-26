@@ -15,6 +15,8 @@
 /// <reference path="js/mapgeneration.d.ts" />
 /// <reference path="js/board.d.ts" />
 /// 
+/// <reference path="js/landvalueoverlay.d.ts" />
+/// 
 /// <reference path="js/utility.d.ts" />
 /// <reference path="js/arraylogic.d.ts" />
 
@@ -179,7 +181,7 @@ class Cell
   {
     this.gridPos = gridPos;
     this.type = type;
-    this.landValue = randInt(40, 50);
+    this.landValue = randInt(30, 40);
     this.board = board;
 
     this.init(type);
@@ -617,6 +619,8 @@ class WorldRenderer
   renderTexture: PIXI.RenderTexture;
   worldSprite: PIXI.Sprite;
   zoomLevel: number = ZOOM_LEVELS[0];
+  mapmodes: any = {};
+  currentMapmode: string;
   
   constructor(width, height)
   {
@@ -636,6 +640,29 @@ class WorldRenderer
     {
       self.render(event.content.clear);
     });
+
+    var mapmodeSelect = <HTMLInputElement> document.getElementById("mapmode-select");
+
+    mapmodeSelect.addEventListener("change", function(event)
+    {
+      switch (mapmodeSelect.value)
+      {
+        case "ground":
+        {
+          self.removeMapmodeOverlay();
+          return;
+        }
+        case "landValue":
+        {
+          var zoomLayer = self.mapmodes["zoom" + self.zoomLevel];
+
+          zoomLayer.landValue = makeLandValueOverlay(game.board);
+
+          self.changeMapmode("landValue");
+          return;
+        }
+      }
+    });
   }
   initContainers(width, height)
   {
@@ -651,6 +678,7 @@ class WorldRenderer
     {
       var zoomStr = "zoom" + ZOOM_LEVELS[i];
       var zoomLayer = this.layers[zoomStr] = {};
+      this.mapmodes[zoomStr] = {};
 
       var main = zoomLayer["main"] = new PIXI.DisplayObjectContainer();
     }
@@ -683,10 +711,12 @@ class WorldRenderer
       var main = zoomLayer["main"];
 
       zoomLayer["ground"]  = new PIXI.DisplayObjectContainer();
+      zoomLayer["mapmodeOverlay"] = new PIXI.DisplayObjectContainer();
       zoomLayer["cellOverlay"] = new SortedDisplayObjectContainer(TILES * 2);
       zoomLayer["content"] = new SortedDisplayObjectContainer(TILES * 2);
 
       main.addChild(zoomLayer["ground"]);
+      main.addChild(zoomLayer["mapmodeOverlay"]);
       main.addChild(zoomLayer["cellOverlay"]);
       main.addChild(zoomLayer["content"]);
     }
@@ -713,6 +743,27 @@ class WorldRenderer
   changeZoomLevel(level)
   {
     this.zoomLevel = level;
+    this.render();
+  }
+  changeMapmode(newMapmode: string)
+  {
+    var zoomStr = "zoom" + this.zoomLevel;
+    var zoomLayer = this.layers[zoomStr];
+
+    if (this.currentMapmode)
+    {
+      zoomLayer.mapmodeOverlay.removeChildren();
+    }
+    
+    zoomLayer.mapmodeOverlay.addChild(this.mapmodes[zoomStr][newMapmode]);
+    
+    this.currentMapmode = newMapmode;
+    this.render();
+  }
+  removeMapmodeOverlay()
+  {
+    this.layers["zoom" + this.zoomLevel].mapmodeOverlay.removeChildren();
+    this.currentMapmode = undefined;
     this.render();
   }
   render(clear: boolean = true)
@@ -1624,6 +1675,11 @@ class UIDrawer
     var screenY = event.global.y;
 
     var text = cell.content ? cell.content.type["translate"] || cell.content.baseType : cell.type["type"];
+
+    if (game.worldRenderer.currentMapmode === "landValue")
+    {
+      text += "\nLand value: " + cell.landValue;
+    }
 
     if (cell.content && cell.content.baseProfit)
     {

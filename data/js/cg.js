@@ -148,67 +148,135 @@ var cg = {
                 "type": "road_h",
                 "baseType": "road",
                 "anchor": [0.5, 1.0],
-                "frame": "road_h.png"
+                "frame": "tube_h.png"
             },
             "road_v": {
                 "type": "road_v",
                 "baseType": "road",
                 "anchor": [0.5, 1.0],
-                "frame": "road_v.png"
+                "frame": "tube_v.png"
             },
             "road_ne": {
                 "type": "road_ne",
                 "baseType": "road",
                 "anchor": [0.5, 1.0],
-                "frame": "road_ne.png"
+                "frame": "tube_ne.png"
             },
             "road_nw": {
                 "type": "road_nw",
                 "baseType": "road",
                 "anchor": [0.5, 1.0],
-                "frame": "road_nw.png"
+                "frame": "tube_nw.png"
             },
             "road_sw": {
                 "type": "road_sw",
                 "baseType": "road",
                 "anchor": [0.5, 1.0],
-                "frame": "road_sw.png"
+                "frame": "tube_sw.png"
             },
             "road_es": {
                 "type": "road_es",
                 "baseType": "road",
                 "anchor": [0.5, 1.0],
-                "frame": "road_se.png"
+                "frame": "tube_se.png"
             },
             "road_nesw": {
                 "type": "road_nesw",
                 "baseType": "road",
                 "anchor": [0.5, 1.0],
-                "frame": "road_news.png"
+                "frame": "tube_news.png"
             },
             "road_new": {
                 "type": "road_new",
                 "baseType": "road",
                 "anchor": [0.5, 1.0],
-                "frame": "road_new.png"
+                "frame": "tube_new.png"
             },
             "road_nsw": {
                 "type": "road_nsw",
                 "baseType": "road",
                 "anchor": [0.5, 1.0],
-                "frame": "road_nsw.png"
+                "frame": "tube_nsw.png"
             },
             "road_esw": {
                 "type": "road_esw",
                 "baseType": "road",
                 "anchor": [0.5, 1.0],
-                "frame": "road_sew.png"
+                "frame": "tube_sew.png"
             },
             "road_nes": {
                 "type": "road_nes",
                 "baseType": "road",
                 "anchor": [0.5, 1.0],
-                "frame": "road_nse.png"
+                "frame": "tube_nse.png"
+            }
+        },
+        "tubes": {
+            "tube_h": {
+                "type": "tube_h",
+                "baseType": "tube",
+                "anchor": [0.5, 1.0],
+                "frame": "tube_h.png"
+            },
+            "tube_v": {
+                "type": "tube_v",
+                "baseType": "tube",
+                "anchor": [0.5, 1.0],
+                "frame": "tube_v.png"
+            },
+            "tube_ne": {
+                "type": "tube_ne",
+                "baseType": "tube",
+                "anchor": [0.5, 1.0],
+                "frame": "tube_ne.png"
+            },
+            "tube_nw": {
+                "type": "tube_nw",
+                "baseType": "tube",
+                "anchor": [0.5, 1.0],
+                "frame": "tube_nw.png"
+            },
+            "tube_sw": {
+                "type": "tube_sw",
+                "baseType": "tube",
+                "anchor": [0.5, 1.0],
+                "frame": "tube_sw.png"
+            },
+            "tube_es": {
+                "type": "tube_es",
+                "baseType": "tube",
+                "anchor": [0.5, 1.0],
+                "frame": "tube_se.png"
+            },
+            "tube_nesw": {
+                "type": "tube_nesw",
+                "baseType": "tube",
+                "anchor": [0.5, 1.0],
+                "frame": "tube_news.png"
+            },
+            "tube_new": {
+                "type": "tube_new",
+                "baseType": "tube",
+                "anchor": [0.5, 1.0],
+                "frame": "tube_new.png"
+            },
+            "tube_nsw": {
+                "type": "tube_nsw",
+                "baseType": "tube",
+                "anchor": [0.5, 1.0],
+                "frame": "tube_nsw.png"
+            },
+            "tube_esw": {
+                "type": "tube_esw",
+                "baseType": "tube",
+                "anchor": [0.5, 1.0],
+                "frame": "tube_sew.png"
+            },
+            "tube_nes": {
+                "type": "tube_nes",
+                "baseType": "tube",
+                "anchor": [0.5, 1.0],
+                "frame": "tube_nse.png"
             }
         },
         "buildings": {

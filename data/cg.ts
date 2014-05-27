@@ -250,6 +250,86 @@ var cg: any =
         "frame": "road_nse.png"
       }
     },
+    "tubes":
+    {
+      "tube_h":
+      {
+        "type": "tube_h",
+        "baseType": "tube",
+        "anchor": [0.5, 1.0],
+        "frame": "tube_h.png"
+      },
+      "tube_v":
+      {
+        "type": "tube_v",
+        "baseType": "tube",
+        "anchor": [0.5, 1.0],
+        "frame": "tube_v.png"
+      },
+      "tube_ne":
+      {
+        "type": "tube_ne",
+        "baseType": "tube",
+        "anchor": [0.5, 1.0],
+        "frame": "tube_ne.png"
+      },
+      "tube_nw":
+      {
+        "type": "tube_nw",
+        "baseType": "tube",
+        "anchor": [0.5, 1.0],
+        "frame": "tube_nw.png"
+      },
+      "tube_sw":
+      {
+        "type": "tube_sw",
+        "baseType": "tube",
+        "anchor": [0.5, 1.0],
+        "frame": "tube_sw.png"
+      },
+      "tube_es":
+      {
+        "type": "tube_es",
+        "baseType": "tube",
+        "anchor": [0.5, 1.0],
+        "frame": "tube_se.png"
+      },
+      "tube_nesw":
+      {
+        "type": "tube_nesw",
+        "baseType": "tube",
+        "anchor": [0.5, 1.0],
+        "frame": "tube_news.png"
+      },
+      "tube_new":
+      {
+        "type": "tube_new",
+        "baseType": "tube",
+        "anchor": [0.5, 1.0],
+        "frame": "tube_new.png"
+      },
+      "tube_nsw":
+      {
+        "type": "tube_nsw",
+        "baseType": "tube",
+        "anchor": [0.5, 1.0],
+        "frame": "tube_nsw.png"
+      },
+      "tube_esw":
+      {
+        "type": "tube_esw",
+        "baseType": "tube",
+        "anchor": [0.5, 1.0],
+        "frame": "tube_sew.png"
+      },
+      "tube_nes":
+      {
+        "type": "tube_nes",
+        "baseType": "tube",
+        "anchor": [0.5, 1.0],
+        "frame": "tube_nse.png"
+      }
+    },
     "buildings":
     {
       "house1":

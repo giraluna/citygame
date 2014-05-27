@@ -242,16 +242,24 @@ class ReactUI
       props.player.addEmployee(selected.employee);
       if (props.recruitingEmployee)
       {
-        props.recruitingEmployee.active = true;
         props.recruitingEmployee.trainSkill("recruitment");
       }
-      self.updateReact();
     };
+
+    var recruitCloseFN = function(selected)
+    {
+      if (props.recruitingEmployee)
+      {
+        props.recruitingEmployee.active = true;
+        self.updateReact();
+      }
+    }
     this.makeEmployeeActionPopup(
     {
       employees: props.employees,
       text: props.text || "Choose employee to recruit",
       onOk: recruitConfirmFN,
+      onClose: recruitCloseFN,
       okBtnText: "Recruit"
     });
   }

@@ -79,12 +79,6 @@ var actions;
 
         var newEmployees = makeNewEmployees(employeeCount.actual, employee.skills["recruitment"]);
 
-        var onConfirmFN = function () {
-            employee.active = true;
-            employee.currentAction = undefined;
-            employee.trainSkill("recruitment");
-        };
-
         var recruitCompleteFN = function () {
             eventManager.dispatchEvent({
                 type: "makeRecruitCompletePopup",

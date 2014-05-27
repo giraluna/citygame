@@ -2111,6 +2111,7 @@ class BuyTool extends Tool
     super();
     this.selectType = singleSelect;
     this.tintColor = 0x22EE22;
+    this.mapmode = undefined;
   }
   onActivate(target: Cell)
   {
@@ -2130,6 +2131,7 @@ class BuildTool extends Tool
     super();
     this.selectType = singleSelect;
     this.tintColor = 0x696969;
+    this.mapmode = undefined;
   }
   onActivate(target: Cell)
   {

@@ -1666,6 +1666,7 @@ var BuyTool = (function (_super) {
         _super.call(this);
         this.selectType = singleSelect;
         this.tintColor = 0x22EE22;
+        this.mapmode = undefined;
     }
     BuyTool.prototype.onActivate = function (target) {
         eventManager.dispatchEvent({
@@ -1684,6 +1685,7 @@ var BuildTool = (function (_super) {
         _super.call(this);
         this.selectType = singleSelect;
         this.tintColor = 0x696969;
+        this.mapmode = undefined;
     }
     BuildTool.prototype.onActivate = function (target) {
         eventManager.dispatchEvent({

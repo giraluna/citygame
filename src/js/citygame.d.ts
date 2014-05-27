@@ -105,14 +105,23 @@ declare class WorldRenderer {
     public zoomLevel: number;
     public mapmodes: {
         default: {
-            type: string;
-        }[];
+            layers: {
+                type: string;
+            }[];
+        };
         landValue: {
-            type: string;
-        }[];
+            layers: {
+                type: string;
+            }[];
+        };
         underground: {
-            type: string;
-        }[];
+            layers: {
+                type: string;
+            }[];
+            properties: {
+                offsetY: number;
+            };
+        };
     };
     public currentMapmode: string;
     constructor(width: any, height: any);

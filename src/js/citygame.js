@@ -494,22 +494,31 @@ var WorldRenderer = (function () {
         this.layers = {};
         this.zoomLevel = ZOOM_LEVELS[0];
         this.mapmodes = {
-            default: [
-                { type: "ground" },
-                { type: "cellOverlay" },
-                { type: "content" }
-            ],
-            landValue: [
-                { type: "ground" },
-                { type: "landValueOverlay", alpha: 0.5 },
-                { type: "cellOverlay" },
-                { type: "content" }
-            ],
-            underground: [
-                { type: "underground" },
-                { type: "undergroundContent" },
-                { type: "ground", alpha: 0.15 }
-            ]
+            default: {
+                layers: [
+                    { type: "ground" },
+                    { type: "cellOverlay" },
+                    { type: "content" }
+                ]
+            },
+            landValue: {
+                layers: [
+                    { type: "ground" },
+                    { type: "landValueOverlay", alpha: 0.5 },
+                    { type: "cellOverlay" },
+                    { type: "content" }
+                ]
+            },
+            underground: {
+                layers: [
+                    { type: "underground" },
+                    { type: "undergroundContent" },
+                    { type: "ground", alpha: 0.15 }
+                ],
+                properties: {
+                    offsetY: 32
+                }
+            }
         };
         this.initContainers(width, height);
         this.initLayers();
@@ -572,9 +581,7 @@ var WorldRenderer = (function () {
             var main = zoomLayer["main"];
 
             zoomLayer["underground"] = new PIXI.DisplayObjectContainer();
-            zoomLayer["underground"].y += 16;
             zoomLayer["undergroundContent"] = new SortedDisplayObjectContainer(TILES * 2);
-            zoomLayer["undergroundContent"].y += 16;
             zoomLayer["ground"] = new PIXI.DisplayObjectContainer();
             zoomLayer["landValueOverlay"] = new PIXI.DisplayObjectContainer();
             zoomLayer["cellOverlay"] = new SortedDisplayObjectContainer(TILES * 2);
@@ -622,17 +629,16 @@ var WorldRenderer = (function () {
                 return;
             }
             case "underground": {
-                if (zoomLayer.underground.children === 0) {
+                if (zoomLayer.underground.children <= 0) {
                     for (var i = 0; i < zoomLayer.ground.children.length; i++) {
-                        var currSprite = zoomLayer.ground.children[i].sprite;
+                        var currSprite = zoomLayer.ground.children[i];
 
                         var _s = PIXI.Sprite.fromFrame("underground.png");
                         _s.position = currSprite.position.clone();
                         _s.anchor = currSprite.anchor.clone();
-                        zoomLayer.underground.children.addChild(_s);
+                        zoomLayer.underground.addChild(_s);
                     }
                 }
-
                 this.changeMapmode("underground");
                 return;
             }
@@ -646,12 +652,16 @@ var WorldRenderer = (function () {
             zoomLayer.main.removeChildren();
         }
 
-        for (var i = 0; i < this.mapmodes[newMapmode].length; i++) {
-            var layerToAdd = this.mapmodes[newMapmode][i];
+        for (var i = 0; i < this.mapmodes[newMapmode].layers.length; i++) {
+            var layerToAdd = this.mapmodes[newMapmode].layers[i];
             zoomLayer.main.addChild(zoomLayer[layerToAdd.type]);
 
             zoomLayer[layerToAdd.type].alpha = layerToAdd.alpha || 1;
         }
+
+        var props = this.mapmodes[newMapmode].properties || {};
+
+        this.worldSprite.y = props.offsetY || 0;
 
         this.currentMapmode = newMapmode;
         this.render();

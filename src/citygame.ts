@@ -1440,6 +1440,8 @@ class MouseEventHandler
   scroller: Scroller
   constructor()
   {
+    var self = this;
+
     this.currAction = undefined;
     window.oncontextmenu = function(event)
     {
@@ -1448,6 +1450,16 @@ class MouseEventHandler
       event.preventDefault();
       event.stopPropagation();
     };
+
+    var _canvas = document.getElementById("pixi-container");
+    _canvas.addEventListener("DOMMouseScroll", function(e: any)
+    {
+      self.scroller.deltaZoom(-e.detail, 0.05);
+    });
+    _canvas.addEventListener("mousewheel", function(e: any)
+    {
+      self.scroller.deltaZoom(e.wheelDelta / 40, 0.05);
+    });
   }
   mouseDown(event, targetType: string)
   {

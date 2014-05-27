@@ -1115,6 +1115,8 @@ var Scroller = (function () {
 
 var MouseEventHandler = (function () {
     function MouseEventHandler() {
+        var self = this;
+
         this.currAction = undefined;
         window.oncontextmenu = function (event) {
             var eventTarget = event.target;
@@ -1123,6 +1125,14 @@ var MouseEventHandler = (function () {
             event.preventDefault();
             event.stopPropagation();
         };
+
+        var _canvas = document.getElementById("pixi-container");
+        _canvas.addEventListener("DOMMouseScroll", function (e) {
+            self.scroller.deltaZoom(-e.detail, 0.05);
+        });
+        _canvas.addEventListener("mousewheel", function (e) {
+            self.scroller.deltaZoom(e.wheelDelta / 40, 0.05);
+        });
     }
     MouseEventHandler.prototype.mouseDown = function (event, targetType) {
         game.uiDrawer.removeActive();

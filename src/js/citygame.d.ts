@@ -100,7 +100,11 @@ declare class WorldRenderer {
     public renderTexture: PIXI.RenderTexture;
     public worldSprite: PIXI.Sprite;
     public zoomLevel: number;
-    public mapmodes: any;
+    public mapmodes: {
+        default: string[];
+        landValue: string[];
+        underground: string[];
+    };
     public currentMapmode: string;
     constructor(width: any, height: any);
     public addEventListeners(): void;
@@ -108,8 +112,8 @@ declare class WorldRenderer {
     public initLayers(): void;
     public clearLayers(): void;
     public changeZoomLevel(level: any): void;
+    public setMapmode(newMapmode: string): void;
     public changeMapmode(newMapmode: string): void;
-    public removeMapmodeOverlay(): void;
     public render(clear?: boolean): void;
 }
 declare class Game {

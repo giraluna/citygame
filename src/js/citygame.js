@@ -474,7 +474,17 @@ var WorldRenderer = (function () {
     function WorldRenderer(width, height) {
         this.layers = {};
         this.zoomLevel = ZOOM_LEVELS[0];
-        this.mapmodes = {};
+        this.mapmodes = {
+            default: [
+                "ground", "cellOverlay", "content"
+            ],
+            landValue: [
+                "ground", "landValueOverlay", "cellOverlay", "content"
+            ],
+            underground: [
+                "underground", "undergroundContent"
+            ]
+        };
         this.initContainers(width, height);
         this.initLayers();
         this.addEventListeners();
@@ -491,20 +501,7 @@ var WorldRenderer = (function () {
         var mapmodeSelect = document.getElementById("mapmode-select");
 
         mapmodeSelect.addEventListener("change", function (event) {
-            switch (mapmodeSelect.value) {
-                case "ground": {
-                    self.removeMapmodeOverlay();
-                    return;
-                }
-                case "landValue": {
-                    var zoomLayer = self.mapmodes["zoom" + self.zoomLevel];
-
-                    zoomLayer.landValue = makeLandValueOverlay(game.board);
-
-                    self.changeMapmode("landValue");
-                    return;
-                }
-            }
+            self.setMapmode(mapmodeSelect.value);
         });
     };
     WorldRenderer.prototype.initContainers = function (width, height) {
@@ -544,17 +541,15 @@ var WorldRenderer = (function () {
             var zoomLayer = this.layers[zoomStr];
             var main = zoomLayer["main"];
 
+            zoomLayer["underground"] = new PIXI.DisplayObjectContainer();
+            zoomLayer["undergroundContent"] = new SortedDisplayObjectContainer(TILES * 2);
             zoomLayer["ground"] = new PIXI.DisplayObjectContainer();
-            zoomLayer["mapmodeOverlay"] = new PIXI.DisplayObjectContainer();
-            zoomLayer["mapmodeOverlay"].alpha = 0.5;
+            zoomLayer["landValueOverlay"] = new PIXI.DisplayObjectContainer();
             zoomLayer["cellOverlay"] = new SortedDisplayObjectContainer(TILES * 2);
             zoomLayer["content"] = new SortedDisplayObjectContainer(TILES * 2);
-
-            main.addChild(zoomLayer["ground"]);
-            main.addChild(zoomLayer["mapmodeOverlay"]);
-            main.addChild(zoomLayer["cellOverlay"]);
-            main.addChild(zoomLayer["content"]);
         }
+
+        this.setMapmode("default");
     };
     WorldRenderer.prototype.clearLayers = function () {
         for (var i = 0; i < ZOOM_LEVELS.length; i++) {
@@ -576,22 +571,36 @@ var WorldRenderer = (function () {
         this.zoomLevel = level;
         this.render();
     };
+    WorldRenderer.prototype.setMapmode = function (newMapmode) {
+        var zoomLayer = this.layers["zoom" + this.zoomLevel];
+        switch (newMapmode) {
+            case "default": {
+                this.changeMapmode("default");
+                return;
+            }
+            case "landValue": {
+                zoomLayer.landValueOverlay = makeLandValueOverlay(game.board);
+                zoomLayer.landValueOverlay.alpha = 0.5;
+
+                this.changeMapmode("landValue");
+                return;
+            }
+        }
+    };
     WorldRenderer.prototype.changeMapmode = function (newMapmode) {
         var zoomStr = "zoom" + this.zoomLevel;
         var zoomLayer = this.layers[zoomStr];
 
         if (this.currentMapmode) {
-            zoomLayer.mapmodeOverlay.removeChildren();
+            zoomLayer.main.removeChildren();
         }
 
-        zoomLayer.mapmodeOverlay.addChild(this.mapmodes[zoomStr][newMapmode]);
+        for (var i = 0; i < this.mapmodes[newMapmode].length; i++) {
+            var layerToAdd = this.mapmodes[newMapmode][i];
+            zoomLayer.main.addChild(zoomLayer[layerToAdd]);
+        }
 
         this.currentMapmode = newMapmode;
-        this.render();
-    };
-    WorldRenderer.prototype.removeMapmodeOverlay = function () {
-        this.layers["zoom" + this.zoomLevel].mapmodeOverlay.removeChildren();
-        this.currentMapmode = undefined;
         this.render();
     };
     WorldRenderer.prototype.render = function (clear) {
@@ -1440,7 +1449,7 @@ var WaterTool = (function (_super) {
     __extends(WaterTool, _super);
     function WaterTool() {
         _super.call(this);
-        this.selectType = manhattanSelect;
+        this.selectType = rectSelect;
         this.tintColor = 0x4444FF;
     }
     WaterTool.prototype.onActivate = function (target) {

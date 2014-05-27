@@ -122,8 +122,7 @@ function makeToolTip(data, text) {
 }
 
 function drawPolygon(gfx, polygon, lineStyle, fillStyle) {
-    // BUG : floating point errors
-    // TODO : round them maybe
+    //TODO : floating point errors
     gfx.lineStyle(lineStyle.width, lineStyle.color, lineStyle.alpha);
     gfx.beginFill(fillStyle.color, fillStyle.alpha);
 

@@ -1,7 +1,7 @@
 /// <reference path="../data/js/cg.d.ts" />
 /**
 * add base land value
-* add random modifier of land value to tiles
+*
 * create water
 *   coasts
 *     amount
@@ -56,6 +56,9 @@ var mapGeneration;
 
                 if (savedCell.content) {
                     cell.changeContent(getIndexedType(savedCell.content.type), true, savedCell.player);
+                }
+                if (savedCell.undergroundContent) {
+                    cell.changeUndergroundContent(cg["content"]["tubes"]["tube_nesw"]);
                 }
                 if (savedCell.player) {
                     savedCell.player.addCell(cell);

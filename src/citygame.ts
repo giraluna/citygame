@@ -103,6 +103,8 @@ class Content
 
     player?: Player;
     id?: number;
+
+    layer?: string;
   })
   {
     this.cell = props.cell;
@@ -121,16 +123,15 @@ class Content
     {
       props.player.addContent(this);
     }
-
-    this.init( type );
+    this.init( type, props.layer );
   }
-  init( type )
+  init( type, layer: string = "content" )
   {
     var _s = this.sprite = new ContentSprite( type, this );
     var cellSprite = this.cell.sprite;
     var gridPos = this.cell.gridPos;
     _s.position = this.cell.sprite.position.clone();
-    game.layers["content"]._addChildAt(_s, gridPos[0] + gridPos[1]);
+    game.layers[layer]._addChildAt(_s, gridPos[0] + gridPos[1]);
   }
   applyModifiers()
   {
@@ -170,6 +171,7 @@ class Cell
   board: Board;
   sprite: Sprite;
   content: Content;
+  undergroundContent: Content;
   landValue: number;
   gridPos: number[];
   flags: string[];
@@ -324,6 +326,30 @@ class Cell
     if (type.effects)
     {
       this.propagateAllModifiers(type.translatedEffects);
+    }
+  }
+  changeUndergroundContent( type?: string, update: boolean = true)
+  {
+    if (this.undergroundContent)
+    {
+      game.layers["undergroundContent"]._removeChildAt(this.undergroundContent.sprite,
+        this.gridPos[0] + this.gridPos[1]);
+      this.undergroundContent = undefined;
+    }
+
+    if (type)
+    {
+      this.undergroundContent = new Content(
+      {
+        cell: this,
+        type: type,
+        layer: "undergroundContent"
+      });
+    }
+    
+    if (update)
+    {
+      getTubeConnections(this, 1);
     }
   }
   changeContent( type:string, update:boolean=true, player?: Player)
@@ -623,15 +649,22 @@ class WorldRenderer
   {
     default:
     [
-      "ground", "cellOverlay", "content"
+      {type: "ground"},
+      {type: "cellOverlay"},
+      {type: "content"}
     ],
     landValue:
     [
-      "ground", "landValueOverlay", "cellOverlay", "content"
+      {type: "ground"},
+      {type: "landValueOverlay", alpha: 0.5},
+      {type: "cellOverlay"},
+      {type: "content"}
     ],
     underground:
     [
-      "underground", "undergroundContent"
+      {type: "underground"},
+      {type: "undergroundContent"},
+      {type: "ground", alpha: 0.15}
     ]
   };
   currentMapmode: string;
@@ -656,10 +689,15 @@ class WorldRenderer
     });
 
     var mapmodeSelect = <HTMLInputElement> document.getElementById("mapmode-select");
-
     mapmodeSelect.addEventListener("change", function(event)
     {
       self.setMapmode(mapmodeSelect.value);
+    });
+
+    eventManager.addEventListener("changeMapmode", function(event)
+    {
+      self.setMapmode(event.content);
+      mapmodeSelect.value = event.content;
     });
   }
   initContainers(width, height)
@@ -709,7 +747,9 @@ class WorldRenderer
       var main = zoomLayer["main"];
 
       zoomLayer["underground"] = new PIXI.DisplayObjectContainer();
+      zoomLayer["underground"].y += 16;
       zoomLayer["undergroundContent"] = new SortedDisplayObjectContainer(TILES * 2);
+      zoomLayer["undergroundContent"].y += 16;
       zoomLayer["ground"]  = new PIXI.DisplayObjectContainer();
       zoomLayer["landValueOverlay"] = new PIXI.DisplayObjectContainer();
       zoomLayer["cellOverlay"] = new SortedDisplayObjectContainer(TILES * 2);
@@ -736,6 +776,8 @@ class WorldRenderer
       
       if(main.children.length > 0) main.removeChildren();
     }
+
+    this.currentMapmode = undefined;
   }
   changeZoomLevel(level)
   {
@@ -744,6 +786,10 @@ class WorldRenderer
   }
   setMapmode(newMapmode: string)
   {
+    if (this.currentMapmode === newMapmode)
+    {
+      return;
+    }
     var zoomLayer = this.layers["zoom" + this.zoomLevel];
     switch (newMapmode)
     {
@@ -755,10 +801,26 @@ class WorldRenderer
       case "landValue":
       {
         zoomLayer.landValueOverlay = makeLandValueOverlay(game.board);
-        zoomLayer.landValueOverlay.alpha = 0.5;
-
 
         this.changeMapmode("landValue");
+        return;
+      }
+      case "underground":
+      {
+        if (zoomLayer.underground.children === 0)
+        {
+          for (var i = 0; i < zoomLayer.ground.children.length; i++)
+          {
+            var currSprite = zoomLayer.ground.children[i].sprite;
+
+            var _s = PIXI.Sprite.fromFrame("underground.png");
+            _s.position = currSprite.position.clone();
+            _s.anchor = currSprite.anchor.clone();
+            zoomLayer.underground.children.addChild(_s);
+          }
+        }
+
+        this.changeMapmode("underground");
         return;
       }
     }
@@ -768,7 +830,7 @@ class WorldRenderer
     var zoomStr = "zoom" + this.zoomLevel;
     var zoomLayer = this.layers[zoomStr];
 
-    if (this.currentMapmode)
+    if (zoomLayer.main.children.length > 0)
     {
       zoomLayer.main.removeChildren();
     }
@@ -776,7 +838,9 @@ class WorldRenderer
     for (var i = 0; i < this.mapmodes[newMapmode].length; i++)
     {
       var layerToAdd = this.mapmodes[newMapmode][i];
-      zoomLayer.main.addChild(zoomLayer[layerToAdd]);
+      zoomLayer.main.addChild(zoomLayer[layerToAdd.type]);
+
+      zoomLayer[layerToAdd.type].alpha = layerToAdd.alpha || 1;
     }
     
     this.currentMapmode = newMapmode;
@@ -915,6 +979,8 @@ class Game
       this.layers["ground"] = this.worldRenderer.layers["zoom1"]["ground"];
       this.layers["cellOverlay"] = this.worldRenderer.layers["zoom1"]["cellOverlay"];
       this.layers["content"] = this.worldRenderer.layers["zoom1"]["content"];
+      this.layers["undergroundContent"] =
+        this.worldRenderer.layers["zoom1"]["undergroundContent"];
     }
     initTools()
     {
@@ -926,6 +992,7 @@ class Game
       this.tools.plant = new PlantTool();
       this.tools.house = new HouseTool();
       this.tools.road = new RoadTool();
+      this.tools.subway = new SubwayTool();
 
       this.tools.buy = new BuyTool();
       this.tools.build = new BuildTool(); 
@@ -951,6 +1018,15 @@ class Game
           addClickAndTouchEventListener(btn, function()
           {
             self.changeTool([tool]);
+
+            if (self.tools[tool].mapmode)
+            {
+              eventManager.dispatchEvent(
+              {
+                type: "changeMapmode",
+                content: self.tools[tool].mapmode
+              });
+            }
           });
         })(btn, tool);
       }
@@ -1154,6 +1230,10 @@ class Game
           {
             cell.content.type = cg["content"]["roads"]["road_nesw"];
           }
+        }
+        if (boardCell.undergroundContent)
+        {
+          cell.undergroundContent = true;
         }
       }
     }
@@ -1851,9 +1931,10 @@ interface Tool
 
 class Tool
 {
-  selectType: any;//
+  selectType: any;
   tintColor: number;
   activateCost: number;
+  mapmode: string = "default";
 
   activate(target:Cell[])
   {
@@ -1928,10 +2009,18 @@ class RemoveTool extends Tool
     super();
     this.selectType = rectSelect;
     this.tintColor = 0xFF5555;
+    this.mapmode = undefined;
   } 
   onActivate(target: Cell)
   {
-    target.changeContent("none");
+    if (game.worldRenderer.currentMapmode !== "underground")
+    {
+      target.changeContent("none");
+    }
+    else
+    {
+      target.changeUndergroundContent();
+    }
   }
 }
 
@@ -1986,6 +2075,20 @@ class RoadTool extends Tool
     target.changeContent( cg["content"]["roads"]["road_nesw"] );
   }
 }
+class SubwayTool extends Tool
+{
+  constructor()
+  {
+    super();
+    this.selectType = manhattanSelect;
+    this.tintColor = 0x696969;
+    this.mapmode = "underground";
+  }
+  onActivate(target: Cell)
+  {
+    target.changeUndergroundContent( cg["content"]["tubes"]["tube_nesw"] );
+  }
+}
 
 class BuyTool extends Tool
 {
@@ -2024,6 +2127,7 @@ class BuildTool extends Tool
     });
   }
 }
+
 
 
 function getRoadConnections(target: Cell, depth:number)
@@ -2068,6 +2172,51 @@ function getRoadConnections(target: Cell, depth:number)
   {
     var finalRoad = cg["content"]["roads"]["road_" + dir];
     target.changeContent(finalRoad, false);
+  }
+}
+
+function getTubeConnections(target: Cell, depth:number)
+{
+  var connections = {};
+  var dir = "";
+  var neighbors = target.getNeighbors(false);
+  for ( var cell in neighbors )
+  {
+    if (neighbors[cell] && neighbors[cell].undergroundContent
+      && neighbors[cell].undergroundContent.baseType === "tube")
+    {
+      connections[cell] = true;
+    }
+  }
+
+  if (depth > 0)
+  {
+    for (var connection in connections)
+    {
+      getTubeConnections( neighbors[connection], depth - 1 );
+    }
+  }
+
+  for (var connection in connections)
+  {
+    dir += connection;
+  }
+  if (dir === "")
+  {
+    return null;
+  }
+  else if (dir === "n" || dir === "s" || dir === "ns")
+  {
+    dir = "v";
+  }
+  else if (dir === "e" || dir === "w" || dir === "ew")
+  {
+    dir = "h";
+  }
+  if (target.undergroundContent && target.undergroundContent.baseType === "tube")
+  {
+    var finalTube = cg["content"]["tubes"]["tube_" + dir];
+    target.changeUndergroundContent(finalTube, false);
   }
 }
 

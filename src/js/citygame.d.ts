@@ -48,8 +48,9 @@ declare class Content {
         type: any;
         player?: Player;
         id?: number;
+        layer?: string;
     });
-    public init(type: any): void;
+    public init(type: any, layer?: string): void;
     public applyModifiers(): void;
 }
 interface neighborCells {
@@ -67,6 +68,7 @@ declare class Cell {
     public board: Board;
     public sprite: Sprite;
     public content: Content;
+    public undergroundContent: Content;
     public landValue: number;
     public gridPos: number[];
     public flags: string[];
@@ -79,6 +81,7 @@ declare class Cell {
     public getNeighbors(diagonal?: boolean): neighborCells;
     public getArea(size: number, anchor?: string): any;
     public replace(type: any): void;
+    public changeUndergroundContent(type?: string, update?: boolean): void;
     public changeContent(type: string, update?: boolean, player?: Player): void;
     public checkBuildable(type: any, checkContent?: boolean): boolean;
     public addPlant(): void;
@@ -101,9 +104,15 @@ declare class WorldRenderer {
     public worldSprite: PIXI.Sprite;
     public zoomLevel: number;
     public mapmodes: {
-        default: string[];
-        landValue: string[];
-        underground: string[];
+        default: {
+            type: string;
+        }[];
+        landValue: {
+            type: string;
+        }[];
+        underground: {
+            type: string;
+        }[];
     };
     public currentMapmode: string;
     constructor(width: any, height: any);
@@ -224,6 +233,7 @@ declare class Tool {
     public selectType: any;
     public tintColor: number;
     public activateCost: number;
+    public mapmode: string;
     public activate(target: Cell[]): void;
     public onActivate(target: Cell): void;
 }
@@ -259,6 +269,10 @@ declare class RoadTool extends Tool {
     constructor();
     public onActivate(target: Cell): void;
 }
+declare class SubwayTool extends Tool {
+    constructor();
+    public onActivate(target: Cell): void;
+}
 declare class BuyTool extends Tool {
     constructor();
     public onActivate(target: Cell): void;
@@ -268,6 +282,7 @@ declare class BuildTool extends Tool {
     public onActivate(target: Cell): void;
 }
 declare function getRoadConnections(target: Cell, depth: number): any;
+declare function getTubeConnections(target: Cell, depth: number): any;
 declare function singleSelect(a: number[], b: number[]): number[][];
 declare function rectSelect(a: number[], b: number[]): number[];
 declare function manhattanSelect(a: any, b: any): number[];

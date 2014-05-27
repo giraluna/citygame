@@ -86,15 +86,15 @@ var Content = (function () {
         if (props.player) {
             props.player.addContent(this);
         }
-
-        this.init(type);
+        this.init(type, props.layer);
     }
-    Content.prototype.init = function (type) {
+    Content.prototype.init = function (type, layer) {
+        if (typeof layer === "undefined") { layer = "content"; }
         var _s = this.sprite = new ContentSprite(type, this);
         var cellSprite = this.cell.sprite;
         var gridPos = this.cell.gridPos;
         _s.position = this.cell.sprite.position.clone();
-        game.layers["content"]._addChildAt(_s, gridPos[0] + gridPos[1]);
+        game.layers[layer]._addChildAt(_s, gridPos[0] + gridPos[1]);
     };
     Content.prototype.applyModifiers = function () {
         var totals = {
@@ -239,6 +239,25 @@ var Cell = (function () {
         }
         if (type.effects) {
             this.propagateAllModifiers(type.translatedEffects);
+        }
+    };
+    Cell.prototype.changeUndergroundContent = function (type, update) {
+        if (typeof update === "undefined") { update = true; }
+        if (this.undergroundContent) {
+            game.layers["undergroundContent"]._removeChildAt(this.undergroundContent.sprite, this.gridPos[0] + this.gridPos[1]);
+            this.undergroundContent = undefined;
+        }
+
+        if (type) {
+            this.undergroundContent = new Content({
+                cell: this,
+                type: type,
+                layer: "undergroundContent"
+            });
+        }
+
+        if (update) {
+            getTubeConnections(this, 1);
         }
     };
     Cell.prototype.changeContent = function (type, update, player) {
@@ -476,13 +495,20 @@ var WorldRenderer = (function () {
         this.zoomLevel = ZOOM_LEVELS[0];
         this.mapmodes = {
             default: [
-                "ground", "cellOverlay", "content"
+                { type: "ground" },
+                { type: "cellOverlay" },
+                { type: "content" }
             ],
             landValue: [
-                "ground", "landValueOverlay", "cellOverlay", "content"
+                { type: "ground" },
+                { type: "landValueOverlay", alpha: 0.5 },
+                { type: "cellOverlay" },
+                { type: "content" }
             ],
             underground: [
-                "underground", "undergroundContent"
+                { type: "underground" },
+                { type: "undergroundContent" },
+                { type: "ground", alpha: 0.15 }
             ]
         };
         this.initContainers(width, height);
@@ -499,9 +525,13 @@ var WorldRenderer = (function () {
         });
 
         var mapmodeSelect = document.getElementById("mapmode-select");
-
         mapmodeSelect.addEventListener("change", function (event) {
             self.setMapmode(mapmodeSelect.value);
+        });
+
+        eventManager.addEventListener("changeMapmode", function (event) {
+            self.setMapmode(event.content);
+            mapmodeSelect.value = event.content;
         });
     };
     WorldRenderer.prototype.initContainers = function (width, height) {
@@ -542,7 +572,9 @@ var WorldRenderer = (function () {
             var main = zoomLayer["main"];
 
             zoomLayer["underground"] = new PIXI.DisplayObjectContainer();
+            zoomLayer["underground"].y += 16;
             zoomLayer["undergroundContent"] = new SortedDisplayObjectContainer(TILES * 2);
+            zoomLayer["undergroundContent"].y += 16;
             zoomLayer["ground"] = new PIXI.DisplayObjectContainer();
             zoomLayer["landValueOverlay"] = new PIXI.DisplayObjectContainer();
             zoomLayer["cellOverlay"] = new SortedDisplayObjectContainer(TILES * 2);
@@ -566,12 +598,17 @@ var WorldRenderer = (function () {
             if (main.children.length > 0)
                 main.removeChildren();
         }
+
+        this.currentMapmode = undefined;
     };
     WorldRenderer.prototype.changeZoomLevel = function (level) {
         this.zoomLevel = level;
         this.render();
     };
     WorldRenderer.prototype.setMapmode = function (newMapmode) {
+        if (this.currentMapmode === newMapmode) {
+            return;
+        }
         var zoomLayer = this.layers["zoom" + this.zoomLevel];
         switch (newMapmode) {
             case "default": {
@@ -580,9 +617,23 @@ var WorldRenderer = (function () {
             }
             case "landValue": {
                 zoomLayer.landValueOverlay = makeLandValueOverlay(game.board);
-                zoomLayer.landValueOverlay.alpha = 0.5;
 
                 this.changeMapmode("landValue");
+                return;
+            }
+            case "underground": {
+                if (zoomLayer.underground.children === 0) {
+                    for (var i = 0; i < zoomLayer.ground.children.length; i++) {
+                        var currSprite = zoomLayer.ground.children[i].sprite;
+
+                        var _s = PIXI.Sprite.fromFrame("underground.png");
+                        _s.position = currSprite.position.clone();
+                        _s.anchor = currSprite.anchor.clone();
+                        zoomLayer.underground.children.addChild(_s);
+                    }
+                }
+
+                this.changeMapmode("underground");
                 return;
             }
         }
@@ -591,13 +642,15 @@ var WorldRenderer = (function () {
         var zoomStr = "zoom" + this.zoomLevel;
         var zoomLayer = this.layers[zoomStr];
 
-        if (this.currentMapmode) {
+        if (zoomLayer.main.children.length > 0) {
             zoomLayer.main.removeChildren();
         }
 
         for (var i = 0; i < this.mapmodes[newMapmode].length; i++) {
             var layerToAdd = this.mapmodes[newMapmode][i];
-            zoomLayer.main.addChild(zoomLayer[layerToAdd]);
+            zoomLayer.main.addChild(zoomLayer[layerToAdd.type]);
+
+            zoomLayer[layerToAdd.type].alpha = layerToAdd.alpha || 1;
         }
 
         this.currentMapmode = newMapmode;
@@ -702,6 +755,7 @@ var Game = (function () {
         this.layers["ground"] = this.worldRenderer.layers["zoom1"]["ground"];
         this.layers["cellOverlay"] = this.worldRenderer.layers["zoom1"]["cellOverlay"];
         this.layers["content"] = this.worldRenderer.layers["zoom1"]["content"];
+        this.layers["undergroundContent"] = this.worldRenderer.layers["zoom1"]["undergroundContent"];
     };
     Game.prototype.initTools = function () {
         this.tools.water = new WaterTool();
@@ -712,6 +766,7 @@ var Game = (function () {
         this.tools.plant = new PlantTool();
         this.tools.house = new HouseTool();
         this.tools.road = new RoadTool();
+        this.tools.subway = new SubwayTool();
 
         this.tools.buy = new BuyTool();
         this.tools.build = new BuildTool();
@@ -732,6 +787,13 @@ var Game = (function () {
             (function addBtnFn(btn, tool) {
                 addClickAndTouchEventListener(btn, function () {
                     self.changeTool([tool]);
+
+                    if (self.tools[tool].mapmode) {
+                        eventManager.dispatchEvent({
+                            type: "changeMapmode",
+                            content: self.tools[tool].mapmode
+                        });
+                    }
                 });
             })(btn, tool);
         }
@@ -897,6 +959,9 @@ var Game = (function () {
                     if (cell.content.type.baseType === "road") {
                         cell.content.type = cg["content"]["roads"]["road_nesw"];
                     }
+                }
+                if (boardCell.undergroundContent) {
+                    cell.undergroundContent = true;
                 }
             }
         }
@@ -1444,6 +1509,7 @@ activate(target:Cell[]);
 */
 var Tool = (function () {
     function Tool() {
+        this.mapmode = "default";
     }
     Tool.prototype.activate = function (target) {
         for (var i = 0; i < target.length; i++) {
@@ -1512,9 +1578,14 @@ var RemoveTool = (function (_super) {
         _super.call(this);
         this.selectType = rectSelect;
         this.tintColor = 0xFF5555;
+        this.mapmode = undefined;
     }
     RemoveTool.prototype.onActivate = function (target) {
-        target.changeContent("none");
+        if (game.worldRenderer.currentMapmode !== "underground") {
+            target.changeContent("none");
+        } else {
+            target.changeUndergroundContent();
+        }
     };
     return RemoveTool;
 })(Tool);
@@ -1564,6 +1635,19 @@ var RoadTool = (function (_super) {
         target.changeContent(cg["content"]["roads"]["road_nesw"]);
     };
     return RoadTool;
+})(Tool);
+var SubwayTool = (function (_super) {
+    __extends(SubwayTool, _super);
+    function SubwayTool() {
+        _super.call(this);
+        this.selectType = manhattanSelect;
+        this.tintColor = 0x696969;
+        this.mapmode = "underground";
+    }
+    SubwayTool.prototype.onActivate = function (target) {
+        target.changeUndergroundContent(cg["content"]["tubes"]["tube_nesw"]);
+    };
+    return SubwayTool;
 })(Tool);
 
 var BuyTool = (function (_super) {
@@ -1631,6 +1715,38 @@ function getRoadConnections(target, depth) {
     if (target.content && target.content.baseType === "road") {
         var finalRoad = cg["content"]["roads"]["road_" + dir];
         target.changeContent(finalRoad, false);
+    }
+}
+
+function getTubeConnections(target, depth) {
+    var connections = {};
+    var dir = "";
+    var neighbors = target.getNeighbors(false);
+    for (var cell in neighbors) {
+        if (neighbors[cell] && neighbors[cell].undergroundContent && neighbors[cell].undergroundContent.baseType === "tube") {
+            connections[cell] = true;
+        }
+    }
+
+    if (depth > 0) {
+        for (var connection in connections) {
+            getTubeConnections(neighbors[connection], depth - 1);
+        }
+    }
+
+    for (var connection in connections) {
+        dir += connection;
+    }
+    if (dir === "") {
+        return null;
+    } else if (dir === "n" || dir === "s" || dir === "ns") {
+        dir = "v";
+    } else if (dir === "e" || dir === "w" || dir === "ew") {
+        dir = "h";
+    }
+    if (target.undergroundContent && target.undergroundContent.baseType === "tube") {
+        var finalTube = cg["content"]["tubes"]["tube_" + dir];
+        target.changeUndergroundContent(finalTube, false);
     }
 }
 

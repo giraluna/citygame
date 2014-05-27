@@ -148,67 +148,67 @@ var cg = {
                 "type": "road_h",
                 "baseType": "road",
                 "anchor": [0.5, 1.0],
-                "frame": "tube_h.png"
+                "frame": "road_h.png"
             },
             "road_v": {
                 "type": "road_v",
                 "baseType": "road",
                 "anchor": [0.5, 1.0],
-                "frame": "tube_v.png"
+                "frame": "road_v.png"
             },
             "road_ne": {
                 "type": "road_ne",
                 "baseType": "road",
                 "anchor": [0.5, 1.0],
-                "frame": "tube_ne.png"
+                "frame": "road_ne.png"
             },
             "road_nw": {
                 "type": "road_nw",
                 "baseType": "road",
                 "anchor": [0.5, 1.0],
-                "frame": "tube_nw.png"
+                "frame": "road_nw.png"
             },
             "road_sw": {
                 "type": "road_sw",
                 "baseType": "road",
                 "anchor": [0.5, 1.0],
-                "frame": "tube_sw.png"
+                "frame": "road_sw.png"
             },
             "road_es": {
                 "type": "road_es",
                 "baseType": "road",
                 "anchor": [0.5, 1.0],
-                "frame": "tube_se.png"
+                "frame": "road_se.png"
             },
             "road_nesw": {
                 "type": "road_nesw",
                 "baseType": "road",
                 "anchor": [0.5, 1.0],
-                "frame": "tube_news.png"
+                "frame": "road_news.png"
             },
             "road_new": {
                 "type": "road_new",
                 "baseType": "road",
                 "anchor": [0.5, 1.0],
-                "frame": "tube_new.png"
+                "frame": "road_new.png"
             },
             "road_nsw": {
                 "type": "road_nsw",
                 "baseType": "road",
                 "anchor": [0.5, 1.0],
-                "frame": "tube_nsw.png"
+                "frame": "road_nsw.png"
             },
             "road_esw": {
                 "type": "road_esw",
                 "baseType": "road",
                 "anchor": [0.5, 1.0],
-                "frame": "tube_sew.png"
+                "frame": "road_sew.png"
             },
             "road_nes": {
                 "type": "road_nes",
                 "baseType": "road",
                 "anchor": [0.5, 1.0],
-                "frame": "tube_nse.png"
+                "frame": "road_nse.png"
             }
         },
         "tubes": {

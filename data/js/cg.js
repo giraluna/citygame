@@ -487,6 +487,18 @@ var cg = {
                 "anchor": [0.5, 1],
                 "frame": "smalloffice.png",
                 "canNotBuildOn": ["water", "building", "road"]
+            },
+            "smallstation": {
+                "type": "smallstation",
+                "baseType": "building",
+                "categoryType": "station",
+                "translate": "Small station",
+                "cost": 0,
+                "buildTime": 1,
+                "anchor": [0.5, 1],
+                "frame": "smallstation.png",
+                "canNotBuildOn": ["water", "building", "road"],
+                "underground": "tube_nesw"
             }
         }
     }

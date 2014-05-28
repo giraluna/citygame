@@ -438,6 +438,11 @@ class Cell
     {
       this.propagateAllModifiers(type.translatedEffects);
     }
+    // todo
+    if (type.underground)
+    {
+      this.changeUndergroundContent(cg.content.tubes[type.underground])
+    }
     
     return this.content;
   }

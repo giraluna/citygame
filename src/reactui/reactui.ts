@@ -353,7 +353,8 @@ class ReactUI
       player: props.player,
       buildingTemplates: cg.content.buildings,
       buildingImages: this.frameImages,
-      onOk: buildSelected
+      onOk: buildSelected,
+      cell: props.cell
     });
   }
   makeBuildingConstructPopup(props:

@@ -238,7 +238,8 @@ var ReactUI = (function () {
             player: props.player,
             buildingTemplates: cg.content.buildings,
             buildingImages: this.frameImages,
-            onOk: buildSelected
+            onOk: buildSelected,
+            cell: props.cell
         });
     };
     ReactUI.prototype.makeBuildingConstructPopup = function (props) {

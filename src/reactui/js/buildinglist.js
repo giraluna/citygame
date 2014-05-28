@@ -13,7 +13,13 @@ var UIComponents;
     UIComponents.BuildingList = React.createClass({
         getInitialState: function () {
             var templates = this.props.buildingTemplates;
-            return { selected: templates[Object.keys(templates)[0]].type };
+            for (var _type in templates) {
+                var building = templates[_type];
+                if (this.props.player.money >= building.cost && this.props.cell.checkBuildable(building)) {
+                    return { selected: building };
+                }
+            }
+            return { selected: null };
         },
         handleSelectRow: function (selectedBuildingType) {
             this.setState({
@@ -28,11 +34,16 @@ var UIComponents;
                 var playerCanBuildBuilding = true;
                 var rowProps = { key: buildingTemplate.type };
                 var costProps = { className: "money" };
+                var nameProps = { className: "building-title" };
 
                 if (player.money < buildingTemplate.cost) {
                     playerCanBuildBuilding = false;
                     rowProps.className = "inactive";
                     costProps.className = "insufficient";
+                } else if (this.props.cell && !this.props.cell.checkBuildable(buildingTemplate)) {
+                    playerCanBuildBuilding = false;
+                    rowProps.className = "inactive";
+                    nameProps.className = "insufficient";
                 }
                 ;
 
@@ -52,7 +63,7 @@ var UIComponents;
                     src: image.src,
                     width: image.width / 2,
                     height: image.height / 2
-                })), React.DOM.td({ className: "building-title" }, buildingTemplate.translate), React.DOM.td(costProps, buildingTemplate.cost + "$"));
+                })), React.DOM.td(nameProps, buildingTemplate.translate), React.DOM.td(costProps, buildingTemplate.cost + "$"));
 
                 rows.push(row);
             }

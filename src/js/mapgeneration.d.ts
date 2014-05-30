@@ -6,11 +6,11 @@
 *
 */
 declare module mapGeneration {
-    function makeBlankMap(props: {
+    function makeBlankCells(props: {
         width: number;
         height?: number;
-        board: any;
-    }): any[];
+    }): string[][];
+    function convertCells(cells: string[][], board: any): void;
     function readSavedMap(props: {
         board: any;
         savedCells: any;
@@ -33,9 +33,12 @@ declare module mapGeneration {
         falloffType?: number;
         landThreshhold?: number;
     }): any;
-    function applyCoastsToBoard(props: {
-        board: any;
+    function applyCoastsToCells(props: {
+        cells: string[][];
+        coasts?: any;
         coastProps?: any;
     }): void;
+    function smoothCells(cells: any, minToChange?: number, times?: number): any;
 }
 declare function drawCoastInConsole(coast: any): void;
+declare function drawNeighbors(neighs: any, center: any): void;

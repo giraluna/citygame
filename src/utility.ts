@@ -244,3 +244,57 @@ function hslToHex(h, s, l)
 {
   return PIXI.rgb2hex ( hslToRgb(h, s, l) );
 }
+
+function getNeighbors(targetArray: any[], gridPos: number[],
+  diagonal:boolean = false)
+{
+  var neighbors =
+  {
+    n: undefined,
+    e: undefined,
+    s: undefined,
+    w: undefined,
+    ne: undefined,
+    nw: undefined,
+    se: undefined,
+    sw: undefined
+  };
+  var hasNeighbor =
+  {
+    n: undefined,
+    e: undefined,
+    s: undefined,
+    w: undefined
+  };
+  var cells = targetArray;
+  var sizeX = targetArray.length;
+  var sizeY = targetArray[0].length;
+  var x = gridPos[0];
+  var y = gridPos[1];
+
+
+  hasNeighbor.s = (y+1 < sizeY) ? true : false;
+  hasNeighbor.e = (x+1 < sizeX) ? true : false;
+  hasNeighbor.n = (y-1 >= 0)   ? true : false;
+  hasNeighbor.w = (x-1 >= 0)   ? true : false;
+
+
+  neighbors.s = hasNeighbor["s"] ? cells[x]  [y+1] : undefined;
+  neighbors.e = hasNeighbor["e"] ? cells[x+1][y]   : undefined;
+  neighbors.n = hasNeighbor["n"] ? cells[x]  [y-1] : undefined;
+  neighbors.w = hasNeighbor["w"] ? cells[x-1][y]   : undefined;
+
+  if (diagonal === true)
+  {
+    neighbors.ne = (hasNeighbor["n"] && hasNeighbor["e"]) ?
+      cells[x+1][y-1] : undefined;
+    neighbors.nw = (hasNeighbor["n"] && hasNeighbor["w"]) ?
+      cells[x-1][y-1] : undefined;
+    neighbors.se = (hasNeighbor["s"] && hasNeighbor["e"]) ?
+      cells[x+1][y+1] : undefined;
+    neighbors.sw = (hasNeighbor["s"] && hasNeighbor["w"]) ?
+      cells[x-1][y+1] : undefined;
+  }
+
+  return neighbors; 
+}

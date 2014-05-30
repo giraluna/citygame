@@ -16,26 +16,43 @@ class Board
     this.width = props.width;
     this.height = props.height || props.width;
 
-    this.cells = mapGeneration.makeBlankMap(
+    var startTime = window.performance.now();
+
+    this.cells = mapGeneration.makeBlankCells(
     {
       width: this.width,
       height: this.height,
-      board: this
     });
 
     if (props.savedCells)
     {
+      mapGeneration.convertCells(this.cells, this);
       mapGeneration.readSavedMap(
       {
         board: this,
-        savedCells: props.savedCells,
+        savedCells: props.savedCells
       });
     }
     else
     {
-      mapGeneration.applyCoastsToBoard({board: this});
+      mapGeneration.applyCoastsToCells(
+        {
+          cells: this.cells,
+          coastProps:
+          {
+            amountWeights: [1, 0.7, 0.5, 0.33],
+            depth: 7,
+            variation: 3,
+            falloff: 0.1,
+            landThreshhold: 0.6
+          }
+        });
+      this.cells = mapGeneration.smoothCells( this.cells, 0.6, 4 );
+      mapGeneration.convertCells(this.cells, this);
     }
-          
+    
+    var elapsed = window.performance.now() - startTime;
+    console.log("map gen in " + Math.round(elapsed) + " ms" );  
   }
   
   getCell(arr: number[])

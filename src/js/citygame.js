@@ -114,7 +114,8 @@ var Content = (function () {
 })();
 
 var Cell = (function () {
-    function Cell(gridPos, type, board) {
+    function Cell(gridPos, type, board, autoInit) {
+        if (typeof autoInit === "undefined") { autoInit = true; }
         this.modifiers = {};
         this.overlay = undefined;
         this.gridPos = gridPos;
@@ -122,13 +123,14 @@ var Cell = (function () {
         this.landValue = randInt(30, 40);
         this.board = board;
 
-        this.init(type);
+        if (autoInit)
+            this.init();
     }
-    Cell.prototype.init = function (type) {
-        var _s = this.sprite = new GroundSprite(type, this);
+    Cell.prototype.init = function () {
+        var _s = this.sprite = new GroundSprite(this.type, this);
         _s.position = arrayToPoint(getIsoCoord(this.gridPos[0], this.gridPos[1], TILE_WIDTH, TILE_HEIGHT, [WORLD_WIDTH / 2, TILE_HEIGHT]));
         game.layers["ground"].addChild(_s);
-        this.flags = type["flags"].slice(0);
+        this.flags = this.type["flags"].slice(0);
     };
     Cell.prototype.getScreenPos = function (container) {
         var wt = container.worldTransform;
@@ -139,45 +141,7 @@ var Cell = (function () {
     };
     Cell.prototype.getNeighbors = function (diagonal) {
         if (typeof diagonal === "undefined") { diagonal = false; }
-        var neighbors = {
-            n: undefined,
-            e: undefined,
-            s: undefined,
-            w: undefined,
-            ne: undefined,
-            nw: undefined,
-            se: undefined,
-            sw: undefined
-        };
-        var hasNeighbor = {
-            n: undefined,
-            e: undefined,
-            s: undefined,
-            w: undefined
-        };
-        var cells = this.board.cells;
-        var size = this.board.width;
-        var x = this.gridPos[0];
-        var y = this.gridPos[1];
-
-        hasNeighbor.s = (y + 1 < size) ? true : false;
-        hasNeighbor.e = (x + 1 < size) ? true : false;
-        hasNeighbor.n = (y - 1 >= 0) ? true : false;
-        hasNeighbor.w = (x - 1 >= 0) ? true : false;
-
-        neighbors.s = hasNeighbor["s"] ? cells[x][y + 1] : undefined;
-        neighbors.e = hasNeighbor["e"] ? cells[x + 1][y] : undefined;
-        neighbors.n = hasNeighbor["n"] ? cells[x][y - 1] : undefined;
-        neighbors.w = hasNeighbor["w"] ? cells[x - 1][y] : undefined;
-
-        if (diagonal === true) {
-            neighbors.ne = (hasNeighbor["n"] && hasNeighbor["e"]) ? cells[x + 1][y - 1] : undefined;
-            neighbors.nw = (hasNeighbor["n"] && hasNeighbor["w"]) ? cells[x - 1][y - 1] : undefined;
-            neighbors.se = (hasNeighbor["s"] && hasNeighbor["e"]) ? cells[x + 1][y + 1] : undefined;
-            neighbors.sw = (hasNeighbor["s"] && hasNeighbor["w"]) ? cells[x - 1][y + 1] : undefined;
-        }
-
-        return neighbors;
+        return getNeighbors(this.board.cells, this.gridPos, diagonal);
     };
     Cell.prototype.getArea = function (size, anchor) {
         if (typeof anchor === "undefined") { anchor = "center"; }

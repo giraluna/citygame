@@ -75,8 +75,8 @@ declare class Cell {
     public modifiers: any;
     public overlay: PIXI.Graphics;
     public player: Player;
-    constructor(gridPos: any, type: any, board: any);
-    public init(type: any): void;
+    constructor(gridPos: any, type: any, board: any, autoInit?: boolean);
+    public init(): void;
     public getScreenPos(container: any): number[];
     public getNeighbors(diagonal?: boolean): neighborCells;
     public getArea(size: number, anchor?: string): any;

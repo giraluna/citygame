@@ -179,23 +179,23 @@ class Cell
   overlay: PIXI.Graphics = undefined;
   player: Player;
 
-  constructor( gridPos, type, board)
+  constructor( gridPos, type, board, autoInit:boolean = true)
   {
     this.gridPos = gridPos;
     this.type = type;
     this.landValue = randInt(30, 40);
     this.board = board;
 
-    this.init(type);
+    if (autoInit) this.init();
   }
-  init( type )
+  init()
   {
-    var _s = this.sprite = new GroundSprite( type, this );
+    var _s = this.sprite = new GroundSprite( this.type, this );
     _s.position = arrayToPoint( getIsoCoord(this.gridPos[0], this.gridPos[1],
       TILE_WIDTH, TILE_HEIGHT,
       [WORLD_WIDTH/2, TILE_HEIGHT]) );
     game.layers["ground"].addChild(_s);
-    this.flags = type["flags"].slice(0);
+    this.flags = this.type["flags"].slice(0);
   }
   getScreenPos(container)
   {
@@ -207,54 +207,7 @@ class Cell
   }
   getNeighbors(diagonal:boolean = false): neighborCells
   {
-    var neighbors: neighborCells =
-    {
-      n: undefined,
-      e: undefined,
-      s: undefined,
-      w: undefined,
-      ne: undefined,
-      nw: undefined,
-      se: undefined,
-      sw: undefined
-    };
-    var hasNeighbor =
-    {
-      n: undefined,
-      e: undefined,
-      s: undefined,
-      w: undefined
-    };
-    var cells = this.board.cells;
-    var size = this.board.width;
-    var x = this.gridPos[0];
-    var y = this.gridPos[1];
-
-
-    hasNeighbor.s = (y+1 < size) ? true : false;
-    hasNeighbor.e = (x+1 < size) ? true : false;
-    hasNeighbor.n = (y-1 >= 0)   ? true : false;
-    hasNeighbor.w = (x-1 >= 0)   ? true : false;
-
-
-    neighbors.s = hasNeighbor["s"] ? cells[x]  [y+1] : undefined;
-    neighbors.e = hasNeighbor["e"] ? cells[x+1][y]   : undefined;
-    neighbors.n = hasNeighbor["n"] ? cells[x]  [y-1] : undefined;
-    neighbors.w = hasNeighbor["w"] ? cells[x-1][y]   : undefined;
-
-    if (diagonal === true)
-    {
-      neighbors.ne = (hasNeighbor["n"] && hasNeighbor["e"]) ?
-        cells[x+1][y-1] : undefined;
-      neighbors.nw = (hasNeighbor["n"] && hasNeighbor["w"]) ?
-        cells[x-1][y-1] : undefined;
-      neighbors.se = (hasNeighbor["s"] && hasNeighbor["e"]) ?
-        cells[x+1][y+1] : undefined;
-      neighbors.sw = (hasNeighbor["s"] && hasNeighbor["w"]) ?
-        cells[x-1][y+1] : undefined;
-    }
-
-    return neighbors; 
+    return getNeighbors(this.board.cells, this.gridPos, diagonal); 
   }
   getArea(size: number, anchor:string="center")
   {

@@ -44,3 +44,13 @@ declare function addClickAndTouchEventListener(target: any, callback: any): void
 */
 declare function hslToRgb(h: any, s: any, l: any): any[];
 declare function hslToHex(h: any, s: any, l: any): number;
+declare function getNeighbors(targetArray: any[], gridPos: number[], diagonal?: boolean): {
+    n: any;
+    e: any;
+    s: any;
+    w: any;
+    ne: any;
+    nw: any;
+    se: any;
+    sw: any;
+};

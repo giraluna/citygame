@@ -9,30 +9,55 @@
 
 module mapGeneration
 {
-  export function makeBlankMap(props:
+
+  var typeIndexes: any = {};
+  function getIndexedType(typeName: string)
+  {
+    if (!typeIndexes[typeName])
+    {
+      typeIndexes[typeName] = findType(typeName);
+    }
+
+    return typeIndexes[typeName];
+  }
+
+
+
+  export function makeBlankCells(props:
   {
     width: number;
     height?: number;
-    board: any;
   })
   {
     props.height = props.height || props.width;
 
-    var cells: any[] = [];
-    // TODO circular reference
-    var _: any = window;
-    var Cell = _.Cell;
+    var cells: string[][] = [];
 
     for (var i = 0; i < props.width; i++)
     {
       cells[i] = [];
       for (var j = 0; j < props.height; j++)
       {
-        cells[i][j] = new Cell([i, j], cg["terrain"]["grass"], props.board);
+        cells[i][j] = "grass";
       }
     }
 
     return cells;
+  }
+
+  export function convertCells(cells: string[][], board)
+  {
+    // TODO circular refernce
+    var _: any = window;
+    var Cell = _.Cell;
+
+    for (var i = 0; i < cells.length; i++)
+    {
+      for (var j = 0; j < cells[i].length; j++)
+      {
+        cells[i][j] = new Cell([i, j], getIndexedType(cells[i][j]), board);
+      }
+    }
   }
 
   export function readSavedMap(props:
@@ -42,17 +67,6 @@ module mapGeneration
   })
   {
     var cells = props.board.cells;
-    var typeIndexes: any = {};
-
-    function getIndexedType(typeName: string)
-    {
-      if (!typeIndexes[typeName])
-      {
-        typeIndexes[typeName] = findType(typeName);
-      }
-
-      return typeIndexes[typeName];
-    }
 
     for (var i = 0; i < props.board.width; i++)
     {
@@ -144,7 +158,6 @@ module mapGeneration
               }
               else break;
             }
-            console.log(amountOfCoasts);
           }
           if (amountOfCoasts === 0)
           {
@@ -241,30 +254,20 @@ module mapGeneration
     return coasts;
   }
 
-  export function applyCoastsToBoard(props:
+  export function applyCoastsToCells(props:
   {
-    board: any;
+    cells: string[][];
 
+    coasts?: any;
     coastProps?: any;
   })
   {
     props.coastProps = props.coastProps || {};
-    props.coastProps.mapWidth = props.board.width;
-    props.coastProps.mapHeight = props.board.height;
-    var coasts = makeCoasts(props.coastProps);
+    props.coastProps.mapWidth = props.cells.length;
+    props.coastProps.mapHeight = props.cells[0].length;
+    var coasts = props.coasts || makeCoasts(props.coastProps);
 
-    var typeIndexes: any = {};
     var alreadyPlaced: any = {};
-
-    function getIndexedType(typeName: string)
-    {
-      if (!typeIndexes[typeName])
-      {
-        typeIndexes[typeName] = findType(typeName);
-      }
-
-      return typeIndexes[typeName];
-    }
 
     for (var _dir in coasts)
     {
@@ -313,13 +316,13 @@ module mapGeneration
           }
           case "e":
           {
-            coast.startPoint = [props.board.cells.length - coast.depth, 0];
+            coast.startPoint = [props.cells.length - coast.depth, 0];
             break;
           }
           case "s":
           {
             //coast.startPoint = [0, 0];
-            coast.startPoint = [0, props.board.cells.length - coast.depth];
+            coast.startPoint = [0, props.cells.length - coast.depth];
             break;
           }
         }
@@ -331,8 +334,6 @@ module mapGeneration
           {
             var x = coast.startPoint[0] + j;
             var y = coast.startPoint[1] + i;
-            if (x > props.board.cells.length) return;
-            if (y > props.board.cells.length) return;
 
             var type = (coast.finalCoast[i][j] === 1) ?
               "grass" :
@@ -347,11 +348,71 @@ module mapGeneration
               alreadyPlaced[""+x+y] = type;
             }
 
-            props.board.cells[x][y].replace(getIndexedType(type));
+            props.cells[x][y] = type;
           }
         }
       }
     }
+  }
+  export function smoothCells(cells, minToChange: number = 0.4, times:number = 1)
+  {
+    var newCells = [];
+    for (var i = 0; i < cells.length; i++)
+    {
+      newCells[i] = [];
+      for (var j = 0; j < cells[i].length; j++)
+      {
+        var cell = cells[i][j];
+
+        var neighbors = getNeighbors(cells, [i, j], true);
+        var totalNeighborCount = 0;
+
+        var neighborTypes: any = {};
+        for (var _neigh in neighbors)
+        {
+          var neigh = neighbors[_neigh];
+          if (neigh !== undefined)
+          {
+            if (!neighborTypes[neigh])
+            {
+              neighborTypes[neigh] = 0;
+            }
+            neighborTypes[neigh]++;
+            totalNeighborCount++;
+          }
+        }
+
+        var mostNeighborsType = undefined;
+        var mostNeighborsCount = 0;
+        for (var _type in neighborTypes)
+        {
+          if (neighborTypes[_type] > mostNeighborsCount)
+          {
+            mostNeighborsType = _type;
+            mostNeighborsCount = neighborTypes[_type];
+          }
+        };
+        if (mostNeighborsCount / totalNeighborCount >= minToChange)
+        {
+          newCells[i][j] = mostNeighborsType;
+        }
+        else
+        {
+          newCells[i][j] = cells[i][j];
+        }
+      }
+    };
+
+    times--;
+    if (times > 0)
+    {
+      return smoothCells(newCells, minToChange, times);
+    }
+    else
+    {
+      return newCells;
+    }
+    
   }
 }
 
@@ -363,11 +424,40 @@ function drawCoastInConsole(coast)
     var args = [""];
     for (var j = 0; j < coast.finalCoast[i].length; j++)
     {
-      var c = (coast.finalCoast[i][j] > coast.landThreshhold) ? "#0F0" : "#00F";
+      var c = (coast.finalCoast[i][j] === 1) ? "#0F0" : "#00F";
       line += "%c    ";
       args.push("background: " + c);
     }
     args[0] = line;
     console.log.apply(console, args);
   };
+}
+
+function drawNeighbors(neighs, center)
+{
+  var dirs = [
+    ["nw", "n", "ne"],
+    ["w", "_c", "e"],
+    ["sw", "s", "se"]
+  ];
+
+  neighs._c = center;
+
+  for (var i = 0; i < dirs.length; i++)
+  {
+    var line = "" + i;
+    var args = [""];
+    for (var j = 0; j < dirs[i].length; j++)
+    {
+      var dir = dirs[i][j];
+
+      if (!neighs[dir]) continue;
+
+      var c = (neighs[dir] === "grass") ? "#0F0" : "#00F";
+      line += "%c    ";
+      args.push("background: " + c);
+    }
+  }
+  args[0] = line;
+  console.log.apply(console, args);
 }

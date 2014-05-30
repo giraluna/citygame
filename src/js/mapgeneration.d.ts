@@ -1,15 +1,7 @@
 /// <reference path="../../data/js/cg.d.ts" />
+/// <reference path="utility.d.ts" />
 /**
 * add base land value
-*
-* create water
-*   coasts
-*     amount
-*     directions
-*     types
-*       coast
-*       bay
-*       broken
 *
 *
 */
@@ -23,4 +15,27 @@ declare module mapGeneration {
         board: any;
         savedCells: any;
     }): void;
+    interface ICardinalDirections {
+        n: any;
+        e: any;
+        s: any;
+        w: any;
+    }
+    function makeCoasts(props?: {
+        mapWidth: number;
+        mapHeight?: number;
+        coasts?: any;
+        amount?: number;
+        amountWeights?: number[];
+        depth?: number;
+        variation?: number;
+        falloff?: number;
+        falloffType?: number;
+        landThreshhold?: number;
+    }): any;
+    function applyCoastsToBoard(props: {
+        board: any;
+        coastProps?: any;
+    }): void;
 }
+declare function drawCoastInConsole(coast: any): void;

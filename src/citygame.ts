@@ -46,7 +46,7 @@ class Sprite extends PIXI.Sprite
       template.frame);
     super(_texture); //pixi caches and reuses the texture as needed
     
-    this.type    = template.type;
+    this.type   = template.type;
     this.anchor = arrayToPoint(template.anchor);
 
     if (template.interactive === true)
@@ -1801,7 +1801,7 @@ class UIDrawer
     var screenX = event.global.x;
     var screenY = event.global.y;
 
-    var text = cell.content ? cell.content.type["translate"] || cell.content.baseType : cell.type["type"];
+    var text = cell.content ? cell.content.type["translate"] || cell.content.type.type : cell.type["type"];
 
     if (game.worldRenderer.currentMapmode === "landValue")
     {

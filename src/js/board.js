@@ -16,6 +16,8 @@ var Board = (function () {
                 board: this,
                 savedCells: props.savedCells
             });
+        } else {
+            mapGeneration.applyCoastsToBoard({ board: this });
         }
     }
     Board.prototype.getCell = function (arr) {

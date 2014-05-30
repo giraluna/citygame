@@ -56,7 +56,7 @@ module UIComponents
           rowProps.className = "inactive";
           costProps.className = "insufficient";
         }
-        else if (this.props.cell && !this.props.cell.checkBuildable(buildingTemplate))
+        if (this.props.cell && !this.props.cell.checkBuildable(buildingTemplate))
         {
           playerCanBuildBuilding = false;
           rowProps.className = "inactive";
@@ -73,7 +73,7 @@ module UIComponents
         if (this.state.selected && this.state.selected === buildingTemplate.type)
         {
           rowProps.className = "selected";
-        }
+        };
 
         var image = this.props.buildingImages[buildingTemplate.frame];
 

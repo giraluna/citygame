@@ -31,6 +31,10 @@ class Board
         savedCells: props.savedCells,
       });
     }
+    else
+    {
+      mapGeneration.applyCoastsToBoard({board: this});
+    }
           
   }
   

@@ -104,7 +104,7 @@ function randInt(min, max) {
 }
 
 function randRange(min, max) {
-    return Math.random() * (max - min + 1) + min;
+    return Math.random() * (max - min) + min;
 }
 
 function rollDice(dice, sides) {

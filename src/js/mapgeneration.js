@@ -77,14 +77,15 @@ var mapGeneration;
 
                 if (amountOfCoasts === undefined) {
                     var amountOfCoasts = 0;
-                    var amountWeights = props.amountWeights || [0.5, 0.5, 0.5, 0];
+                    var amountWeights = props.amountWeights || [1, 0.5, 0.5, 0];
 
                     for (var i = 0; i < amountWeights.length; i++) {
-                        if (1 - Math.random() > amountWeights[i]) {
+                        if (1 - Math.random() < amountWeights[i]) {
                             amountOfCoasts++;
                         } else
                             break;
                     }
+                    console.log(amountOfCoasts);
                 }
                 if (amountOfCoasts === 0) {
                     for (var dir in directionOfCoasts) {
@@ -153,6 +154,7 @@ var mapGeneration;
                 }
                 for (var j = 0; j < x; j++) {
                     var n = (Math.random() + randRange(-dir.variation, dir.variation)) * falloff;
+                    n = n > dir.landThreshhold ? 1 : 0;
                     finalCoast[i][j] = n;
                 }
             }
@@ -168,6 +170,17 @@ var mapGeneration;
         props.coastProps.mapWidth = props.board.width;
         props.coastProps.mapHeight = props.board.height;
         var coasts = makeCoasts(props.coastProps);
+
+        var typeIndexes = {};
+        var alreadyPlaced = {};
+
+        function getIndexedType(typeName) {
+            if (!typeIndexes[typeName]) {
+                typeIndexes[typeName] = findType(typeName);
+            }
+
+            return typeIndexes[typeName];
+        }
 
         for (var _dir in coasts) {
             var coast = coasts[_dir];
@@ -217,16 +230,6 @@ var mapGeneration;
                     }
                 }
 
-                var typeIndexes = {};
-
-                function getIndexedType(typeName) {
-                    if (!typeIndexes[typeName]) {
-                        typeIndexes[typeName] = findType(typeName);
-                    }
-
-                    return typeIndexes[typeName];
-                }
-
                 for (var i = 0; i < coast.finalCoast.length; i++) {
                     for (var j = 0; j < coast.finalCoast[i].length; j++) {
                         var x = coast.startPoint[0] + j;
@@ -236,7 +239,13 @@ var mapGeneration;
                         if (y > props.board.cells.length)
                             return;
 
-                        var type = (coast.finalCoast[i][j] > coast.landThreshhold) ? "grass" : "water";
+                        var type = (coast.finalCoast[i][j] === 1) ? "grass" : "water";
+
+                        if (alreadyPlaced["" + x + y] && alreadyPlaced["" + x + y] === "water") {
+                            type = "water";
+                        } else {
+                            alreadyPlaced["" + x + y] = type;
+                        }
 
                         props.board.cells[x][y].replace(getIndexedType(type));
                     }

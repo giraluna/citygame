@@ -23,9 +23,8 @@ var Board = (function () {
                 cells: this.cells,
                 coastProps: {
                     amountWeights: [1, 0.7, 0.5, 0.33],
-                    depth: 7,
                     variation: 3,
-                    falloff: 0.1,
+                    falloff: 0.07,
                     landThreshhold: 0.6
                 }
             });

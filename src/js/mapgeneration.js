@@ -136,7 +136,7 @@ var mapGeneration;
                 var x = isHorizontal ? props.mapWidth : props.mapHeight;
                 var y = isHorizontal ? props.mapHeight : props.mapWidth;
 
-                dir.depth = dir.depth || props.depth || Math.floor(y / 5);
+                dir.depth = dir.depth || props.depth || Math.floor(y / 4);
                 dir.variation = dir.variation || props.variation || 0.05;
                 dir.falloff = dir.falloff || props.falloff || 0.40;
                 dir.falloffType = dir.falloffType || props.falloffType || "logarithmic";

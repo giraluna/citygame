@@ -210,7 +210,7 @@ module mapGeneration
 
 
         dir.depth          = dir.depth          || props.depth          ||
-          Math.floor(y / 5);
+          Math.floor(y / 4);
         dir.variation      = dir.variation      || props.variation      ||
           0.05;
         dir.falloff        = dir.falloff        || props.falloff        ||

@@ -79,7 +79,7 @@ declare class Cell {
     public init(): void;
     public getScreenPos(container: any): number[];
     public getNeighbors(diagonal?: boolean): neighborCells;
-    public getArea(size: number, anchor?: string): any;
+    public getArea(size: number, anchor?: string, excludeStart?: boolean): any;
     public replace(type: any): void;
     public changeUndergroundContent(type?: string, update?: boolean): void;
     public changeContent(type: string, update?: boolean, player?: Player): void;
@@ -292,11 +292,6 @@ declare class BuildTool extends Tool {
 }
 declare function getRoadConnections(target: Cell, depth: number): any;
 declare function getTubeConnections(target: Cell, depth: number): any;
-declare function singleSelect(a: number[], b: number[]): number[][];
-declare function rectSelect(a: number[], b: number[]): number[];
-declare function manhattanSelect(a: any, b: any): number[];
-declare function arrayToPolygon(points: any): PIXI.Polygon;
-declare function arrayToPoint(point: any): PIXI.Point;
 declare function pineapple(): void;
 declare var game: Game;
 declare var loader: Loader;

@@ -42,11 +42,15 @@ class Board
           {
             amountWeights: [1, 0.7, 0.5, 0.33],
             variation: 3,
-            falloff: 0.07,
-            landThreshhold: 0.6
+            yFalloff: 0.1,
+            xCutoff: 0.2,
+            landThreshhold: 0.4
           }
         });
-      this.cells = mapGeneration.smoothCells( this.cells, 0.6, 4 );
+      this.cells = mapGeneration.smoothCells( this.cells, 0.6, 1, 3 );
+      this.cells = mapGeneration.smoothCells( this.cells, 0.6, 2, 2 );
+      this.cells = mapGeneration.smoothCells( this.cells, 0.7, 3, 1 );
+      this.cells = mapGeneration.smoothCells( this.cells, 0.6, 1, 1 );
       mapGeneration.convertCells(this.cells, this);
     }
     

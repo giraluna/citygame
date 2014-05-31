@@ -143,44 +143,10 @@ var Cell = (function () {
         if (typeof diagonal === "undefined") { diagonal = false; }
         return getNeighbors(this.board.cells, this.gridPos, diagonal);
     };
-    Cell.prototype.getArea = function (size, anchor) {
+    Cell.prototype.getArea = function (size, anchor, excludeStart) {
         if (typeof anchor === "undefined") { anchor = "center"; }
-        var gridPos = this.gridPos;
-        var start = [gridPos[0], gridPos[1]];
-        var end = [gridPos[0], gridPos[1]];
-        var boardSize = this.board.width;
-
-        var adjust = [[0, 0], [0, 0]];
-
-        if (anchor === "center") {
-            adjust = [[-1, -1], [1, 1]];
-        }
-        ;
-        if (anchor === "ne") {
-            adjust[1] = [-1, 1];
-        }
-        ;
-        if (anchor === "se") {
-            adjust[1] = [-1, -1];
-        }
-        ;
-        if (anchor === "sw") {
-            adjust[1] = [1, -1];
-        }
-        ;
-        if (anchor === "nw") {
-            adjust[1] = [1, 1];
-        }
-        ;
-
-        for (var i = 0; i < size; i++) {
-            start[0] += adjust[0][0];
-            start[1] += adjust[0][1];
-            end[0] += adjust[1][0];
-            end[1] += adjust[1][1];
-        }
-        var rect = rectSelect(start, end);
-        return this.board.getCells(rect);
+        if (typeof excludeStart === "undefined") { excludeStart = false; }
+        return getArea(this.board.cells, this.gridPos, size, anchor, excludeStart);
     };
     Cell.prototype.replace = function (type) {
         var _oldType = this.type;
@@ -1264,7 +1230,10 @@ var MouseEventHandler = (function () {
 
         if (!this.currCell || gridPos[0] !== this.currCell[0] || gridPos[1] !== this.currCell[1]) {
             this.currCell = gridPos;
-            var selectedCells = game.board.getCells(game.activeTool.selectType(this.startCell, this.currCell));
+
+            //var selectedCells = game.board.getCells(
+            //    game.activeTool.selectType(this.startCell, this.currCell));
+            var selectedCells = getArea(game.board.cells, this.currCell, 3, "center", true);
 
             game.highlighter.clearSprites();
             game.highlighter.tintCells(selectedCells, game.activeTool.tintColor);
@@ -1729,67 +1698,6 @@ function getTubeConnections(target, depth) {
         var finalTube = cg["content"]["tubes"]["tube_" + dir];
         target.changeUndergroundContent(finalTube, false);
     }
-}
-
-function singleSelect(a, b) {
-    return [a];
-}
-
-function rectSelect(a, b) {
-    var cells = [];
-    var xLen = Math.abs(a[0] - b[0]);
-    var yLen = Math.abs(a[1] - b[1]);
-    var xDir = (b[0] < a[0]) ? -1 : 1;
-    var yDir = (b[1] < a[1]) ? -1 : 1;
-    var x, y;
-    for (var i = 0; i <= xLen; i++) {
-        x = a[0] + i * xDir;
-        for (var j = 0; j <= yLen; j++) {
-            y = a[1] + j * yDir;
-            cells.push([x, y]);
-        }
-    }
-    return cells;
-}
-
-function manhattanSelect(a, b) {
-    var xLen = Math.abs(a[0] - b[0]);
-    var yLen = Math.abs(a[1] - b[1]);
-    var xDir = (b[0] < a[0]) ? -1 : 1;
-    var yDir = (b[1] < a[1]) ? -1 : 1;
-    var y, x;
-    var cells = [];
-    if (xLen >= yLen) {
-        for (var i = 0; i <= xLen; i++) {
-            x = a[0] + i * xDir;
-            cells.push([x, a[1]]);
-        }
-        for (var j = 1; j <= yLen; j++) {
-            y = a[1] + j * yDir;
-            cells.push([b[0], y]);
-        }
-    } else {
-        for (var j = 0; j <= yLen; j++) {
-            y = a[1] + j * yDir;
-            cells.push([a[0], y]);
-        }
-        for (var i = 1; i <= xLen; i++) {
-            x = a[0] + i * xDir;
-            cells.push([x, b[1]]);
-        }
-    }
-    return cells;
-}
-function arrayToPolygon(points) {
-    var _points = [];
-    for (var i = 0; i < points.length; i++) {
-        _points.push(new PIXI.Point(points[i][0], points[i][1]));
-    }
-    return new PIXI.Polygon(_points);
-}
-
-function arrayToPoint(point) {
-    return new PIXI.Point(point[0], point[1]);
 }
 
 function pineapple() {

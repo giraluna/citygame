@@ -29,8 +29,11 @@ declare module mapGeneration {
         amountWeights?: number[];
         depth?: number;
         variation?: number;
-        falloff?: number;
-        falloffType?: number;
+        yFalloff?: number;
+        yFalloffType?: number;
+        xCutoff?: number;
+        xFalloff?: number;
+        xFalloffType?: number;
         landThreshhold?: number;
     }): any;
     function applyCoastsToCells(props: {
@@ -38,7 +41,7 @@ declare module mapGeneration {
         coasts?: any;
         coastProps?: any;
     }): void;
-    function smoothCells(cells: any, minToChange?: number, times?: number): any;
+    function smoothCells(cells: any, minToChange?: number, radius?: number, times?: number): any;
 }
 declare function drawCoastInConsole(coast: any): void;
 declare function drawNeighbors(neighs: any, center: any): void;

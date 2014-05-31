@@ -44,7 +44,7 @@ declare function addClickAndTouchEventListener(target: any, callback: any): void
 */
 declare function hslToRgb(h: any, s: any, l: any): any[];
 declare function hslToHex(h: any, s: any, l: any): number;
-declare function getNeighbors(targetArray: any[], gridPos: number[], diagonal?: boolean): {
+declare function getNeighbors(targetArray: any[][], gridPos: number[], diagonal?: boolean): {
     n: any;
     e: any;
     s: any;
@@ -54,3 +54,9 @@ declare function getNeighbors(targetArray: any[], gridPos: number[], diagonal?: 
     se: any;
     sw: any;
 };
+declare function getArea(targetArray: any[][], gridPos: number[], size: number, anchor?: string, excludeStart?: boolean): any;
+declare function singleSelect(a: number[], b: number[]): number[][];
+declare function rectSelect(a: number[], b: number[]): number[];
+declare function manhattanSelect(a: any, b: any): number[];
+declare function arrayToPolygon(points: any): PIXI.Polygon;
+declare function arrayToPoint(point: any): PIXI.Point;

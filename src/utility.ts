@@ -7,6 +7,7 @@ function getFrom2dArray(target, arr: number[]): any
   {
     if 
     ( 
+      (arr[i] !== undefined) &&
       (arr[i][0] >= 0 && arr[i][0] < target.length) &&
       (arr[i][1] >= 0 && arr[i][1] < target.length)
     )
@@ -245,7 +246,7 @@ function hslToHex(h, s, l)
   return PIXI.rgb2hex ( hslToRgb(h, s, l) );
 }
 
-function getNeighbors(targetArray: any[], gridPos: number[],
+function getNeighbors(targetArray: any[][], gridPos: number[],
   diagonal:boolean = false)
 {
   var neighbors =
@@ -297,4 +298,144 @@ function getNeighbors(targetArray: any[], gridPos: number[],
   }
 
   return neighbors; 
+}
+
+function getArea(
+  targetArray: any[][],
+  gridPos: number[],
+  size: number,
+  anchor:string = "center",
+  excludeStart: boolean = false
+)
+{
+
+  var start = [gridPos[0], gridPos[1]];
+  var curr = start.slice(0);
+  var end = [gridPos[0], gridPos[1]];
+
+  var adjust = [[0,0], [0,0]];
+
+  if (anchor === "center")
+  {
+    adjust = [[-1, -1], [1, 1]];
+  };
+  if (anchor === "ne")    
+  {
+    adjust[1] = [-1, 1];
+  };
+  if (anchor === "se")    
+  {
+    adjust[1] = [-1, -1];
+  };
+  if (anchor === "sw")    
+  {
+    adjust[1] = [1, -1];
+  };
+  if (anchor === "nw")    
+  {
+    adjust[1] = [1, 1];
+  };
+
+  for (var i = 0; i < size; i++)
+  {
+    curr[0] += adjust[0][0];
+    curr[1] += adjust[0][1];
+    end[0] += adjust[1][0];
+    end[1] += adjust[1][1];
+  }
+  var rect = rectSelect(curr, end);
+
+  if (excludeStart)
+  {
+    var indexOfStart = -1;
+    for (var i = 0; i < rect.length; i++)
+    {
+      if (rect[i][0] === start[0] && rect[i][1] === start[1])
+      {
+        indexOfStart = i;
+        break;
+      }
+    }
+    if (indexOfStart === -1) throw new Error();
+
+    rect[indexOfStart] = undefined;
+  }
+
+  return getFrom2dArray(targetArray, rect);
+}
+
+function singleSelect(a:number[], b: number[])
+{
+  return [a];
+}
+
+function rectSelect(a:number[], b:number[]): number[]
+{
+  var cells = [];
+  var xLen = Math.abs(a[0] - b[0]);
+  var yLen = Math.abs(a[1] - b[1]);
+  var xDir = (b[0] < a[0]) ? -1 : 1;
+  var yDir = (b[1] < a[1]) ? -1 : 1;
+  var x,y;
+  for (var i = 0; i <= xLen; i++)
+  {
+    x = a[0] + i * xDir;
+    for (var j = 0; j <= yLen; j++)
+    {
+      y = a[1] + j * yDir;
+      cells.push([x,y]);
+    }
+  }
+  return cells;
+}
+
+function manhattanSelect(a, b) : number[]
+{
+  var xLen = Math.abs(a[0] - b[0]);
+  var yLen = Math.abs(a[1] - b[1]);
+  var xDir = (b[0] < a[0]) ? -1 : 1;
+  var yDir = (b[1] < a[1]) ? -1 : 1;
+  var y, x;
+  var cells = [];
+  if (xLen >= yLen)
+  {
+    for (var i = 0; i <= xLen; i++)
+    {
+      x = a[0] + i * xDir;
+      cells.push([x, a[1]]);
+    }
+    for (var j = 1; j <= yLen; j++)
+    {
+      y = a[1] + j * yDir;
+      cells.push([b[0], y]);
+    }
+  }
+  else
+  {
+    for (var j = 0; j <= yLen; j++)
+    {
+      y = a[1] + j * yDir;
+      cells.push([a[0], y]);
+    }
+    for (var i = 1; i <= xLen; i++)
+    {
+      x = a[0] + i * xDir;
+      cells.push([x, b[1]]);
+    }
+  }
+  return cells;
+}
+function arrayToPolygon(points)
+{
+  var _points = [];
+  for (var i = 0; i < points.length; i++)
+  {
+    _points.push( new PIXI.Point(points[i][0], points[i][1]) );
+  }
+  return new PIXI.Polygon(_points);
+}
+
+function arrayToPoint(point)
+{
+  return new PIXI.Point(point[0], point[1]);
 }

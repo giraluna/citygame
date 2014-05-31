@@ -116,8 +116,11 @@ module mapGeneration
 
     depth?: number;
     variation?: number;
-    falloff?: number;
-    falloffType?: number;
+    yFalloff?: number;
+    yFalloffType?: number;
+    xCutoff?: number;
+    xFalloff?: number;
+    xFalloffType?: number;
     landThreshhold?: number;
   })
   {
@@ -213,39 +216,71 @@ module mapGeneration
           Math.floor(y / 4);
         dir.variation      = dir.variation      || props.variation      ||
           0.05;
-        dir.falloff        = dir.falloff        || props.falloff        ||
-          0.40;
-        dir.falloffType    = dir.falloffType    || props.falloffType    ||
+        dir.yFalloff        = dir.yFalloff        || props.yFalloff        ||
+          dir.depth / 50;
+        dir.yFalloffType    = dir.yFalloffType    || props.yFalloffType    ||
+          "logarithmic";
+        dir.xCutoff    = dir.xCutoff    || props.xCutoff    ||
+          0.3;
+        dir.xFalloff        = dir.xFalloff        || props.xFalloff        ||
+          props.mapWidth / 150;
+        dir.xFalloffType    = dir.xFalloffType    || props.xFalloffType    ||
           "logarithmic";
         dir.landThreshhold = dir.landThreshhold || props.landThreshhold ||
           0.20;
 
       }
-
       var finalCoast: number[][] = dir.finalCoast = [];
 
       for (var i = 0; i < dir.depth; i++)
       {
         finalCoast[i] = [];
 
-        var falloff: number;
+        var yFalloff: number;
 
-        switch (dir.falloffType)
+        switch (dir.yFalloffType)
         {
           case "linear":
           {
-            falloff = 1 - dir.falloff * i;
+            yFalloff = 1 - dir.yFalloff * i;
             break;
           }
           case "logarithmic":
           {
-            falloff = 1 - Math.log( 1 + dir.falloff * i);
+            //yFalloff = 1 - dir.yFalloff * Math.log(1.5*i);
+            yFalloff = 1 - Math.log(1 + dir.yFalloff * i)
+
+            if (yFalloff < 0) yFalloff = 0;
             break;
           }
         }
+        var distanceOfCutoffStart = props.mapWidth / 2 - props.mapWidth / 2 * dir.xCutoff;
         for (var j = 0; j < x; j++)
         {
-          var n = (Math.random() + randRange(-dir.variation, dir.variation)) * falloff;
+          var xFalloff: number = 1;
+          var distanceFromCenter = Math.abs(props.mapWidth / 2 - (j+0.5));
+          
+          var relativeX = 1 - distanceFromCenter / (props.mapWidth / 2);
+
+          if ( relativeX < dir.xCutoff )
+          {
+            var xDepth = (distanceFromCenter - distanceOfCutoffStart);
+            switch (dir.xFalloffType)
+            {
+              case "linear":
+              {
+                xFalloff = 1 - dir.xFalloff * xDepth;
+                break;
+              }
+              case "logarithmic":
+              {
+                xFalloff = 1 - dir.xFalloff * Math.log(xDepth);
+                if (xFalloff < 0) xFalloff = 0;
+                break;
+              }
+            }
+          }
+          var n = (Math.random() + randRange(-dir.variation, dir.variation)) * yFalloff * xFalloff;
           n = n > dir.landThreshhold ? 1 : 0;
           finalCoast[i][j] = n;
         }
@@ -266,8 +301,6 @@ module mapGeneration
     props.coastProps.mapWidth = props.cells.length;
     props.coastProps.mapHeight = props.cells[0].length;
     var coasts = props.coasts || makeCoasts(props.coastProps);
-
-    var alreadyPlaced: any = {};
 
     for (var _dir in coasts)
     {
@@ -321,7 +354,6 @@ module mapGeneration
           }
           case "s":
           {
-            //coast.startPoint = [0, 0];
             coast.startPoint = [0, props.cells.length - coast.depth];
             break;
           }
@@ -339,22 +371,16 @@ module mapGeneration
               "grass" :
               "water";
 
-            if (alreadyPlaced[""+x+y]  && alreadyPlaced[""+x+y] === "water")
-            {
-              type = "water";
-            }
-            else
-            {
-              alreadyPlaced[""+x+y] = type;
-            }
-
             props.cells[x][y] = type;
           }
         }
       }
     }
   }
-  export function smoothCells(cells, minToChange: number = 0.4, times:number = 1)
+  export function smoothCells(cells,
+    minToChange: number = 0.4,
+    radius: number = 1,
+    times: number = 1)
   {
     var newCells = [];
     for (var i = 0; i < cells.length; i++)
@@ -364,13 +390,14 @@ module mapGeneration
       {
         var cell = cells[i][j];
 
-        var neighbors = getNeighbors(cells, [i, j], true);
+        var neighbors = getArea(cells, [i, j], radius, "center", true);
         var totalNeighborCount = 0;
 
         var neighborTypes: any = {};
-        for (var _neigh in neighbors)
+        for (var k = 0; k < neighbors.length; k++)
         {
-          var neigh = neighbors[_neigh];
+          var neigh = neighbors[k];
+
           if (neigh !== undefined)
           {
             if (!neighborTypes[neigh])
@@ -425,7 +452,7 @@ function drawCoastInConsole(coast)
     for (var j = 0; j < coast.finalCoast[i].length; j++)
     {
       var c = (coast.finalCoast[i][j] === 1) ? "#0F0" : "#00F";
-      line += "%c    ";
+      line += "%c  ";
       args.push("background: " + c);
     }
     args[0] = line;

@@ -1606,9 +1606,8 @@ class MouseEventHandler
     if ( !this.currCell || gridPos[0] !== this.currCell[0] || gridPos[1] !== this.currCell[1] )
     {
       this.currCell = gridPos;
-      //var selectedCells = game.board.getCells(
-      //    game.activeTool.selectType(this.startCell, this.currCell));
-      var selectedCells = getArea(game.board.cells, this.currCell, 3, "center", true);
+      var selectedCells = game.board.getCells(
+          game.activeTool.selectType(this.startCell, this.currCell));
 
       game.highlighter.clearSprites();
       game.highlighter.tintCells(selectedCells, game.activeTool.tintColor);

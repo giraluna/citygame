@@ -21,8 +21,8 @@ declare module mapGeneration {
         s: any;
         w: any;
     }
-    function makeCoasts(props?: {
-        mapWidth: number;
+    function generateCellNoise(props: {
+        width: number;
         mapHeight?: number;
         coasts?: any;
         amount?: number;
@@ -34,13 +34,17 @@ declare module mapGeneration {
         xCutoff?: number;
         xFalloff?: number;
         xFalloffType?: number;
+        xFalloffPerY?: number;
         landThreshhold?: number;
     }): any;
     function applyCoastsToCells(props: {
         cells: string[][];
-        coasts?: any;
-        coastProps?: any;
+        primaryType: string;
+        subType: string;
+        coasts: any;
+        offset?: number[];
     }): void;
+    function makeRivers(coasts: any, genChance: any, riverProps: any, offset: any, maxCoastsToDrawRiver?: number): any;
     function smoothCells(cells: any, minToChange?: number, radius?: number, times?: number): any;
 }
 declare function drawCoastInConsole(coast: any): void;

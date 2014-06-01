@@ -355,4 +355,33 @@ function arrayToPolygon(points) {
 function arrayToPoint(point) {
     return new PIXI.Point(point[0], point[1]);
 }
+
+function getReverseDir(dir) {
+    switch (dir) {
+        case "n": {
+            return "s";
+        }
+        case "s": {
+            return "n";
+        }
+        case "e": {
+            return "w";
+        }
+        case "w": {
+            return "e";
+        }
+        case "ne": {
+            return "sw";
+        }
+        case "nw": {
+            return "se";
+        }
+        case "se": {
+            return "nw";
+        }
+        case "sw": {
+            return "ne";
+        }
+    }
+}
 //# sourceMappingURL=utility.js.map

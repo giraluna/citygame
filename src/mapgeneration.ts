@@ -104,9 +104,9 @@ module mapGeneration
     w: any;
   }
 
-  export function makeCoasts(props?:
+  export function generateCellNoise(props:
   {
-    mapWidth: number;
+    width: number;
     mapHeight?: number;
 
     coasts?: any;
@@ -121,11 +121,12 @@ module mapGeneration
     xCutoff?: number;
     xFalloff?: number;
     xFalloffType?: number;
+    xFalloffPerY?: number;
     landThreshhold?: number;
   })
   {
 
-    props.mapHeight = props.mapHeight || props.mapWidth;
+    props.mapHeight = props.mapHeight || props.width;
 
 
     var coasts = (function getcoastDirectionsFN(props)
@@ -208,27 +209,28 @@ module mapGeneration
       if (dir.hasCoast)
       {
         var isHorizontal = (_dir === "n" || _dir === "s");
-        var x = isHorizontal ? props.mapWidth  : props.mapHeight;
-        var y = isHorizontal ? props.mapHeight : props.mapWidth;
+        var x = props.width;
+        var y = props.mapHeight;
 
 
         dir.depth          = dir.depth          || props.depth          ||
           Math.floor(y / 4);
         dir.variation      = dir.variation      || props.variation      ||
           0.05;
-        dir.yFalloff        = dir.yFalloff        || props.yFalloff        ||
+        dir.yFalloff       = dir.yFalloff       || props.yFalloff       ||
           dir.depth / 50;
-        dir.yFalloffType    = dir.yFalloffType    || props.yFalloffType    ||
+        dir.yFalloffType   = dir.yFalloffType   || props.yFalloffType   ||
           "logarithmic";
-        dir.xCutoff    = dir.xCutoff    || props.xCutoff    ||
+        dir.xCutoff        = dir.xCutoff        || props.xCutoff        ||
           0.3;
-        dir.xFalloff        = dir.xFalloff        || props.xFalloff        ||
-          props.mapWidth / 150;
-        dir.xFalloffType    = dir.xFalloffType    || props.xFalloffType    ||
+        dir.xFalloff       = dir.xFalloff       || props.xFalloff       ||
+          props.width / 150;
+        dir.xFalloffType   = dir.xFalloffType   || props.xFalloffType   ||
           "logarithmic";
         dir.landThreshhold = dir.landThreshhold || props.landThreshhold ||
           0.20;
-
+        dir.xFalloffPerY   = dir.xFalloffPerY   || props.xFalloffPerY   ||
+          0;
       }
       var finalCoast: number[][] = dir.finalCoast = [];
 
@@ -254,13 +256,13 @@ module mapGeneration
             break;
           }
         }
-        var distanceOfCutoffStart = props.mapWidth / 2 - props.mapWidth / 2 * dir.xCutoff;
+        var distanceOfCutoffStart = props.width / 2 - props.width / 2 * dir.xCutoff;
         for (var j = 0; j < x; j++)
         {
           var xFalloff: number = 1;
-          var distanceFromCenter = Math.abs(props.mapWidth / 2 - (j+0.5));
+          var distanceFromCenter = Math.abs(props.width / 2 - (j+0.5));
           
-          var relativeX = 1 - distanceFromCenter / (props.mapWidth / 2);
+          var relativeX = 1 - distanceFromCenter / (props.width / 2);
 
           if ( relativeX < dir.xCutoff )
           {
@@ -279,6 +281,7 @@ module mapGeneration
                 break;
               }
             }
+            xFalloff *= 1 - dir.xFalloffPerY * Math.log(i);
           }
           var n = (Math.random() + randRange(-dir.variation, dir.variation)) * yFalloff * xFalloff;
           n = n > dir.landThreshhold ? 1 : 0;
@@ -292,19 +295,19 @@ module mapGeneration
   export function applyCoastsToCells(props:
   {
     cells: string[][];
+    primaryType: string;
+    subType: string;
 
-    coasts?: any;
-    coastProps?: any;
+    coasts: any;
+    offset?: number[];
   })
   {
-    props.coastProps = props.coastProps || {};
-    props.coastProps.mapWidth = props.cells.length;
-    props.coastProps.mapHeight = props.cells[0].length;
-    var coasts = props.coasts || makeCoasts(props.coastProps);
+    var coasts = props.coasts;
 
     for (var _dir in coasts)
     {
       var coast = coasts[_dir];
+      var offset = coast.offset || [0, 0];
       if (coast.hasCoast)
       {
         switch (_dir)
@@ -339,22 +342,22 @@ module mapGeneration
         {
           case "w":
           {
-            coast.startPoint = [0, 0];
+            coast.startPoint = [offset[1], offset[0]];
             break;
           }
           case "n":
           {
-            coast.startPoint = [0, 0];
+            coast.startPoint = offset;
             break;
           }
           case "e":
           {
-            coast.startPoint = [props.cells.length - coast.depth, 0];
+            coast.startPoint = [props.cells.length - coast.depth + offset[1], offset[0]];
             break;
           }
           case "s":
           {
-            coast.startPoint = [0, props.cells.length - coast.depth];
+            coast.startPoint = [offset[0], props.cells.length - coast.depth + offset[1]];
             break;
           }
         }
@@ -368,13 +371,53 @@ module mapGeneration
             var y = coast.startPoint[1] + i;
 
             var type = (coast.finalCoast[i][j] === 1) ?
-              "grass" :
-              "water";
+              props.primaryType :
+              props.subType;
 
             props.cells[x][y] = type;
           }
         }
       }
+    }
+  }
+  export function makeRivers(coasts, genChance,
+    riverProps, offset, maxCoastsToDrawRiver:number = 1)
+  {
+    var coastDirs = [];
+    for (var dir in coasts)
+    {
+      if (coasts[dir].hasCoast)
+      {
+        coastDirs.push(dir);
+      }
+    }
+    if (coastDirs.length < 1)
+    {
+      genChance += 0.2;
+      riverProps.xFalloffPerY = 0;
+      riverProps.yFalloff = 0.0000001;
+      coastDirs.push(getRandomArrayItem(["n", "e", "s", "w"]));
+    }
+
+    if (coastDirs.length > maxCoastsToDrawRiver || Math.random() > genChance) return null;
+    else
+    {
+      var randomDir = getRandomArrayItem(coastDirs);
+      var directionToFlowFrom = getReverseDir(randomDir);
+
+      riverProps.coasts =
+      {
+        n: {hasCoast: false},
+        e: {hasCoast: false},
+        s: {hasCoast: false},
+        w: {hasCoast: false}
+      }
+      riverProps.coasts[directionToFlowFrom].hasCoast = true;
+      riverProps.coasts[directionToFlowFrom].offset = offset;
+
+      var river = generateCellNoise(riverProps);
+      return river;
+      //return generateCellNoise(riverProps);
     }
   }
   export function smoothCells(cells,

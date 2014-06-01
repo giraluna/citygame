@@ -60,3 +60,4 @@ declare function rectSelect(a: number[], b: number[]): number[];
 declare function manhattanSelect(a: any, b: any): number[];
 declare function arrayToPolygon(points: any): PIXI.Polygon;
 declare function arrayToPoint(point: any): PIXI.Point;
+declare function getReverseDir(dir: string): string;

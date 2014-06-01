@@ -1,11 +1,7 @@
 /// <reference path="../data/js/cg.d.ts" />
 /// <reference path="js/utility.d.ts" />
 
-/**
- * add base land value
- * 
- * 
- */
+
 
 module mapGeneration
 {

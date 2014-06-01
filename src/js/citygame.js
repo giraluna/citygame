@@ -854,6 +854,8 @@ var Game = (function () {
 
         //regen world
         addClickAndTouchEventListener(document.getElementById("regen-world"), function () {
+            self.resetLayers();
+            self.board.destroy();
             game.board = new Board({ width: TILES });
             eventManager.dispatchEvent({ type: "updateWorld", content: "" });
         });

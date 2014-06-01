@@ -10,7 +10,7 @@ var cellModifiers;
             strength: strength,
             targets: ["apartment"],
             effect: {
-                multiplier: 0.25
+                multiplier: 0.1
             }
         });
     }

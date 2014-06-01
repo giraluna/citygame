@@ -13,7 +13,7 @@ var Board = (function () {
         });
 
         if (props.savedCells) {
-            mapGeneration.convertCells(this.cells, this);
+            mapGeneration.convertCells(this.cells, this, true);
             mapGeneration.readSavedMap({
                 board: this,
                 savedCells: props.savedCells
@@ -58,7 +58,7 @@ var Board = (function () {
             this.cells = mapGeneration.smoothCells(this.cells, 0.6, 2, 2);
             this.cells = mapGeneration.smoothCells(this.cells, 0.7, 3, 1);
             this.cells = mapGeneration.smoothCells(this.cells, 0.6, 1, 1);
-            mapGeneration.convertCells(this.cells, this);
+            mapGeneration.convertCells(this.cells, this, false);
         }
 
         var elapsed = window.performance.now() - startTime;

@@ -10,7 +10,7 @@ declare module mapGeneration {
         width: number;
         height?: number;
     }): string[][];
-    function convertCells(cells: string[][], board: any): void;
+    function convertCells(cells: any[][], board: any, autoInit: boolean): void;
     function readSavedMap(props: {
         board: any;
         savedCells: any;

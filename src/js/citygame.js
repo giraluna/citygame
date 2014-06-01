@@ -122,6 +122,7 @@ var Cell = (function () {
         this.type = type;
         this.landValue = randInt(30, 40);
         this.board = board;
+        this.flags = this.type["flags"].slice(0);
 
         if (autoInit)
             this.init();
@@ -130,7 +131,10 @@ var Cell = (function () {
         var _s = this.sprite = new GroundSprite(this.type, this);
         _s.position = arrayToPoint(getIsoCoord(this.gridPos[0], this.gridPos[1], TILE_WIDTH, TILE_HEIGHT, [WORLD_WIDTH / 2, TILE_HEIGHT]));
         game.layers["ground"].addChild(_s);
-        this.flags = this.type["flags"].slice(0);
+
+        if (this.type.effects) {
+            this.propagateAllModifiers(this.type.translatedEffects);
+        }
     };
     Cell.prototype.getScreenPos = function (container) {
         var wt = container.worldTransform;

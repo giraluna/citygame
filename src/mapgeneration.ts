@@ -45,7 +45,7 @@ module mapGeneration
     return cells;
   }
 
-  export function convertCells(cells: string[][], board)
+  export function convertCells(cells: any[][], board, autoInit: boolean)
   {
     // TODO circular refernce
     var _: any = window;
@@ -55,7 +55,17 @@ module mapGeneration
     {
       for (var j = 0; j < cells[i].length; j++)
       {
-        cells[i][j] = new Cell([i, j], getIndexedType(cells[i][j]), board);
+        cells[i][j] = new Cell([i, j], getIndexedType(cells[i][j]), board, autoInit);
+      }
+    }
+    if (autoInit !== true)
+    {
+      for (var i = 0; i < cells.length; i++)
+      {
+        for (var j = 0; j < cells[i].length; j++)
+        {
+          cells[i][j].init();
+        }
       }
     }
   }

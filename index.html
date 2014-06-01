@@ -77,7 +77,13 @@
   </div>
    
   <div id="side-menu">
-    <div id="tool-buttons">
+    <select name="editmode" id="editmode-select">
+      <option value="edit-world">edit</option>
+      <option value="play">play</option>
+    </select>
+    <div id="tool-buttons" class="edit-world">
+      <button id="regen-world">regen</button>
+
       <button id="grassBtn">grass</button>
       <button id="waterBtn">water</button>
       <button id="sandBtn">sand</button>
@@ -89,7 +95,7 @@
       
     </div>
     <button id="removeBtn">remove</button>
-    <div id="action-buttons">
+    <div id="action-buttons" class="play">
       <button id="recruitBtn"><u>r</u>ecruit</button>
       <button id="buyBtn">b<u>u</u>y</button>
       <button id="buildBtn"><u>b</u>uild</button>

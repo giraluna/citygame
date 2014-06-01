@@ -812,6 +812,9 @@ class Game
   systemsManager: SystemsManager;
   worldRenderer: WorldRenderer;
   players: {[id: string]: Player;} = {};
+  toolCache: any = {};
+  editModes: string[] = [];
+  currentMode: string;
 
   frameImages: {[id: string]: HTMLImageElement;};
   constructor()
@@ -847,11 +850,11 @@ class Game
       ["fastfood", "shopping"]);
     var monthlyProfitSystem = new ProfitSystem(30, this.systemsManager, this.players,
       ["apartment"]);
-    var biYearlyProfitSystem = new ProfitSystem(180, this.systemsManager, this.players,
+    var quarterlyProfitSystem = new ProfitSystem(90, this.systemsManager, this.players,
       ["office"]);
     this.systemsManager.addSystem("dailyProfitSystem", dailyProfitSystem);
     this.systemsManager.addSystem("monthlyProfitSystem", monthlyProfitSystem);
-    this.systemsManager.addSystem("biYearlyProfitSystem", biYearlyProfitSystem);
+    this.systemsManager.addSystem("quarterlyProfitSystem", quarterlyProfitSystem);
 
 
     this.systemsManager.addSystem("delayedAction", new DelayedActionSystem(1, this.systemsManager));
@@ -859,6 +862,9 @@ class Game
     var dateSystem = new DateSystem(1, this.systemsManager,
       document.getElementById("date") );
     this.systemsManager.addSystem("date", dateSystem);
+
+    this.editModes = ["play", "edit-world"];
+    this.switchEditingMode("play");
 
     this.resize();
     this.render();
@@ -926,6 +932,8 @@ class Game
     }
     initTools()
     {
+      this.tools.nothing = new NothingTool();
+
       this.tools.water = new WaterTool();
       this.tools.grass = new GrassTool();
       this.tools.sand = new SandTool();
@@ -957,9 +965,12 @@ class Game
         var btn = document.getElementById( ""+tool+"Btn" );
         (function addBtnFn(btn, tool)
         {
+          var type = self.tools[tool].type;
+          if (self.tools[tool].hasButton === false) return;
+
           addClickAndTouchEventListener(btn, function()
           {
-            self.changeTool([tool]);
+            self.changeTool([type]);
 
             if (self.tools[tool].mapmode)
             {
@@ -1076,6 +1087,21 @@ class Game
       window.addEventListener('resize', game.resize, false);
 
       window.setInterval(self.autosave.bind(self), 1000 * 60);
+
+      //edit mode select
+      var editmodeSelect = <HTMLInputElement> document.getElementById("editmode-select");
+      editmodeSelect.addEventListener("change", function(event)
+      {
+        self.switchEditingMode(editmodeSelect.value);
+      });
+
+      //regen world
+      addClickAndTouchEventListener(
+      document.getElementById("regen-world"), function()
+      {
+        game.board = new Board({width: TILES});
+        eventManager.dispatchEvent({type: "updateWorld", content:""});
+      });
   }
   bindRenderer()
   {
@@ -1256,10 +1282,45 @@ class Game
     this.initLayers();
     this.worldRenderer.render();
   }
-  switchEditingMode()
+  switchEditingMode(newMode: string)
   {
-    document.getElementById("tool-buttons").classList.toggle("hidden");
-    document.getElementById("action-buttons").classList.toggle("hidden");
+    if (newMode === this.currentMode) return;
+
+
+    this.toolCache[this.currentMode] = this.activeTool.type;
+
+    if (!this.toolCache[newMode])
+    {
+      this.changeTool("nothing");
+    }
+    else
+    {
+      this.changeTool(this.toolCache[newMode]);
+    }
+    for (var j = 0; j < this.editModes.length; j++)
+    {
+      var editMode = this.editModes[j];
+
+      if (newMode !== editMode)
+      {
+        var toToggle = <any> document.getElementsByClassName(editMode);
+        for (var i = 0; i < toToggle.length; i++)
+        {
+          toToggle[i].classList.add("hidden");
+        }
+      }
+      else
+      {
+        var toToggle = <any> document.getElementsByClassName(editMode);
+        for (var i = 0; i < toToggle.length; i++)
+        {
+          toToggle[i].classList.remove("hidden");
+        }
+      }
+    }
+    this.currentMode = newMode;
+    var el = <HTMLInputElement> document.getElementById("editmode-select")
+    el.value = newMode;
   }
 }
 
@@ -1873,10 +1934,12 @@ interface Tool
 
 class Tool
 {
+  type: string;
   selectType: any;
   tintColor: number;
   activateCost: number;
   mapmode: string = "default";
+  hasButton: boolean = true;
 
   activate(target:Cell[])
   {
@@ -1894,6 +1957,7 @@ class WaterTool extends Tool
   constructor()
   {
     super();
+    this.type = "water";
     this.selectType = rectSelect;
     this.tintColor = 0x4444FF;
   } 
@@ -1908,6 +1972,7 @@ class GrassTool extends Tool
   constructor()
   {
     super();
+    this.type = "grass";
     this.selectType = rectSelect;
     this.tintColor = 0x617A4E;
   } 
@@ -1922,6 +1987,7 @@ class SandTool extends Tool
   constructor()
   {
     super();
+    this.type = "sand";
     this.selectType = rectSelect;
     this.tintColor = 0xE2BF93;
   } 
@@ -1936,6 +2002,7 @@ class SnowTool extends Tool
   constructor()
   {
     super();
+    this.type = "snow";
     this.selectType = rectSelect;
     this.tintColor = 0xBBDFD7;
   } 
@@ -1949,6 +2016,7 @@ class RemoveTool extends Tool
   constructor()
   {
     super();
+    this.type = "remove";
     this.selectType = rectSelect;
     this.tintColor = 0xFF5555;
     this.mapmode = undefined;
@@ -1971,6 +2039,7 @@ class PlantTool extends Tool
   constructor()
   {
     super();
+    this.type = "plant";
     this.selectType = rectSelect;
     this.tintColor = 0x338833;
   } 
@@ -1985,6 +2054,7 @@ class HouseTool extends Tool
   constructor()
   {
     super();
+    this.type = "house";
     this.selectType = rectSelect;
     this.tintColor = 0x696969;
   } 
@@ -2009,6 +2079,7 @@ class RoadTool extends Tool
   constructor()
   {
     super();
+    this.type = "road";
     this.selectType = manhattanSelect;
     this.tintColor = 0x696969;
   } 
@@ -2022,6 +2093,7 @@ class SubwayTool extends Tool
   constructor()
   {
     super();
+    this.type = "subway";
     this.selectType = manhattanSelect;
     this.tintColor = 0x696969;
     this.mapmode = "underground";
@@ -2037,6 +2109,7 @@ class BuyTool extends Tool
   constructor()
   {
     super();
+    this.type = "buy";
     this.selectType = singleSelect;
     this.tintColor = 0x22EE22;
     this.mapmode = undefined;
@@ -2057,6 +2130,7 @@ class BuildTool extends Tool
   constructor()
   {
     super();
+    this.type = "build";
     this.selectType = singleSelect;
     this.tintColor = 0x696969;
     this.mapmode = undefined;
@@ -2069,6 +2143,22 @@ class BuildTool extends Tool
         cell: target
       }
     });
+  }
+}
+
+class NothingTool extends Tool
+{
+  constructor()
+  {
+    super();
+    this.type = "nothing";
+    this.selectType = singleSelect;
+    this.tintColor = 0xFFFFFF;
+    this.mapmode = undefined;
+    this.hasButton = false;
+  }
+  onActivate(target: Cell)
+  {
   }
 }
 

@@ -151,6 +151,9 @@ declare class Game {
     public players: {
         [id: string]: Player;
     };
+    public toolCache: any;
+    public editModes: string[];
+    public currentMode: string;
     public frameImages: {
         [id: string]: HTMLImageElement;
     };
@@ -173,7 +176,7 @@ declare class Game {
     public loadPlayer(data: any): void;
     public render(): void;
     public resetLayers(): void;
-    public switchEditingMode(): void;
+    public switchEditingMode(newMode: string): void;
 }
 declare class SortedDisplayObjectContainer extends PIXI.DisplayObjectContainer {
     public container: PIXI.DisplayObjectContainer;
@@ -239,10 +242,12 @@ declare class UIDrawer {
     public clearLayer(): void;
 }
 declare class Tool {
+    public type: string;
     public selectType: any;
     public tintColor: number;
     public activateCost: number;
     public mapmode: string;
+    public hasButton: boolean;
     public activate(target: Cell[]): void;
     public onActivate(target: Cell): void;
 }
@@ -287,6 +292,10 @@ declare class BuyTool extends Tool {
     public onActivate(target: Cell): void;
 }
 declare class BuildTool extends Tool {
+    constructor();
+    public onActivate(target: Cell): void;
+}
+declare class NothingTool extends Tool {
     constructor();
     public onActivate(target: Cell): void;
 }

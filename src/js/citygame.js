@@ -615,6 +615,8 @@ var Game = (function () {
         this.tools = {};
         this.layers = {};
         this.players = {};
+        this.toolCache = {};
+        this.editModes = [];
     }
     Game.prototype.init = function () {
         this.resize();
@@ -644,15 +646,18 @@ var Game = (function () {
         // TODO have content types register themselves
         var dailyProfitSystem = new ProfitSystem(1, this.systemsManager, this.players, ["fastfood", "shopping"]);
         var monthlyProfitSystem = new ProfitSystem(30, this.systemsManager, this.players, ["apartment"]);
-        var biYearlyProfitSystem = new ProfitSystem(180, this.systemsManager, this.players, ["office"]);
+        var quarterlyProfitSystem = new ProfitSystem(90, this.systemsManager, this.players, ["office"]);
         this.systemsManager.addSystem("dailyProfitSystem", dailyProfitSystem);
         this.systemsManager.addSystem("monthlyProfitSystem", monthlyProfitSystem);
-        this.systemsManager.addSystem("biYearlyProfitSystem", biYearlyProfitSystem);
+        this.systemsManager.addSystem("quarterlyProfitSystem", quarterlyProfitSystem);
 
         this.systemsManager.addSystem("delayedAction", new DelayedActionSystem(1, this.systemsManager));
 
         var dateSystem = new DateSystem(1, this.systemsManager, document.getElementById("date"));
         this.systemsManager.addSystem("date", dateSystem);
+
+        this.editModes = ["play", "edit-world"];
+        this.switchEditingMode("play");
 
         this.resize();
         this.render();
@@ -703,6 +708,8 @@ var Game = (function () {
         this.layers["undergroundContent"] = this.worldRenderer.layers["zoom1"]["undergroundContent"];
     };
     Game.prototype.initTools = function () {
+        this.tools.nothing = new NothingTool();
+
         this.tools.water = new WaterTool();
         this.tools.grass = new GrassTool();
         this.tools.sand = new SandTool();
@@ -730,8 +737,12 @@ var Game = (function () {
         for (var tool in this.tools) {
             var btn = document.getElementById("" + tool + "Btn");
             (function addBtnFn(btn, tool) {
+                var type = self.tools[tool].type;
+                if (self.tools[tool].hasButton === false)
+                    return;
+
                 addClickAndTouchEventListener(btn, function () {
-                    self.changeTool([tool]);
+                    self.changeTool([type]);
 
                     if (self.tools[tool].mapmode) {
                         eventManager.dispatchEvent({
@@ -830,6 +841,18 @@ var Game = (function () {
         window.addEventListener('resize', game.resize, false);
 
         window.setInterval(self.autosave.bind(self), 1000 * 60);
+
+        //edit mode select
+        var editmodeSelect = document.getElementById("editmode-select");
+        editmodeSelect.addEventListener("change", function (event) {
+            self.switchEditingMode(editmodeSelect.value);
+        });
+
+        //regen world
+        addClickAndTouchEventListener(document.getElementById("regen-world"), function () {
+            game.board = new Board({ width: TILES });
+            eventManager.dispatchEvent({ type: "updateWorld", content: "" });
+        });
     };
     Game.prototype.bindRenderer = function () {
         var _canvas = document.getElementById("pixi-container");
@@ -974,9 +997,35 @@ var Game = (function () {
         this.initLayers();
         this.worldRenderer.render();
     };
-    Game.prototype.switchEditingMode = function () {
-        document.getElementById("tool-buttons").classList.toggle("hidden");
-        document.getElementById("action-buttons").classList.toggle("hidden");
+    Game.prototype.switchEditingMode = function (newMode) {
+        if (newMode === this.currentMode)
+            return;
+
+        this.toolCache[this.currentMode] = this.activeTool.type;
+
+        if (!this.toolCache[newMode]) {
+            this.changeTool("nothing");
+        } else {
+            this.changeTool(this.toolCache[newMode]);
+        }
+        for (var j = 0; j < this.editModes.length; j++) {
+            var editMode = this.editModes[j];
+
+            if (newMode !== editMode) {
+                var toToggle = document.getElementsByClassName(editMode);
+                for (var i = 0; i < toToggle.length; i++) {
+                    toToggle[i].classList.add("hidden");
+                }
+            } else {
+                var toToggle = document.getElementsByClassName(editMode);
+                for (var i = 0; i < toToggle.length; i++) {
+                    toToggle[i].classList.remove("hidden");
+                }
+            }
+        }
+        this.currentMode = newMode;
+        var el = document.getElementById("editmode-select");
+        el.value = newMode;
     };
     return Game;
 })();
@@ -1455,6 +1504,7 @@ activate(target:Cell[]);
 var Tool = (function () {
     function Tool() {
         this.mapmode = "default";
+        this.hasButton = true;
     }
     Tool.prototype.activate = function (target) {
         for (var i = 0; i < target.length; i++) {
@@ -1470,6 +1520,7 @@ var WaterTool = (function (_super) {
     __extends(WaterTool, _super);
     function WaterTool() {
         _super.call(this);
+        this.type = "water";
         this.selectType = rectSelect;
         this.tintColor = 0x4444FF;
     }
@@ -1483,6 +1534,7 @@ var GrassTool = (function (_super) {
     __extends(GrassTool, _super);
     function GrassTool() {
         _super.call(this);
+        this.type = "grass";
         this.selectType = rectSelect;
         this.tintColor = 0x617A4E;
     }
@@ -1496,6 +1548,7 @@ var SandTool = (function (_super) {
     __extends(SandTool, _super);
     function SandTool() {
         _super.call(this);
+        this.type = "sand";
         this.selectType = rectSelect;
         this.tintColor = 0xE2BF93;
     }
@@ -1509,6 +1562,7 @@ var SnowTool = (function (_super) {
     __extends(SnowTool, _super);
     function SnowTool() {
         _super.call(this);
+        this.type = "snow";
         this.selectType = rectSelect;
         this.tintColor = 0xBBDFD7;
     }
@@ -1521,6 +1575,7 @@ var RemoveTool = (function (_super) {
     __extends(RemoveTool, _super);
     function RemoveTool() {
         _super.call(this);
+        this.type = "remove";
         this.selectType = rectSelect;
         this.tintColor = 0xFF5555;
         this.mapmode = undefined;
@@ -1539,6 +1594,7 @@ var PlantTool = (function (_super) {
     __extends(PlantTool, _super);
     function PlantTool() {
         _super.call(this);
+        this.type = "plant";
         this.selectType = rectSelect;
         this.tintColor = 0x338833;
     }
@@ -1552,6 +1608,7 @@ var HouseTool = (function (_super) {
     __extends(HouseTool, _super);
     function HouseTool() {
         _super.call(this);
+        this.type = "house";
         this.selectType = rectSelect;
         this.tintColor = 0x696969;
     }
@@ -1573,6 +1630,7 @@ var RoadTool = (function (_super) {
     __extends(RoadTool, _super);
     function RoadTool() {
         _super.call(this);
+        this.type = "road";
         this.selectType = manhattanSelect;
         this.tintColor = 0x696969;
     }
@@ -1585,6 +1643,7 @@ var SubwayTool = (function (_super) {
     __extends(SubwayTool, _super);
     function SubwayTool() {
         _super.call(this);
+        this.type = "subway";
         this.selectType = manhattanSelect;
         this.tintColor = 0x696969;
         this.mapmode = "underground";
@@ -1599,6 +1658,7 @@ var BuyTool = (function (_super) {
     __extends(BuyTool, _super);
     function BuyTool() {
         _super.call(this);
+        this.type = "buy";
         this.selectType = singleSelect;
         this.tintColor = 0x22EE22;
         this.mapmode = undefined;
@@ -1618,6 +1678,7 @@ var BuildTool = (function (_super) {
     __extends(BuildTool, _super);
     function BuildTool() {
         _super.call(this);
+        this.type = "build";
         this.selectType = singleSelect;
         this.tintColor = 0x696969;
         this.mapmode = undefined;
@@ -1631,6 +1692,21 @@ var BuildTool = (function (_super) {
         });
     };
     return BuildTool;
+})(Tool);
+
+var NothingTool = (function (_super) {
+    __extends(NothingTool, _super);
+    function NothingTool() {
+        _super.call(this);
+        this.type = "nothing";
+        this.selectType = singleSelect;
+        this.tintColor = 0xFFFFFF;
+        this.mapmode = undefined;
+        this.hasButton = false;
+    }
+    NothingTool.prototype.onActivate = function (target) {
+    };
+    return NothingTool;
 })(Tool);
 
 function getRoadConnections(target, depth) {

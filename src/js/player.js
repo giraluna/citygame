@@ -73,7 +73,7 @@ var Player = (function () {
     };
     Player.prototype.addContent = function (content) {
         var type = content.categoryType;
-        if (!this.ownedContent.type)
+        if (!this.ownedContent[type])
             return;
 
         this.ownedContent[type].push(content);

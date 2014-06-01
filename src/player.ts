@@ -99,7 +99,7 @@ class Player
   addContent( content )
   {
     var type = content.categoryType;
-    if (!this.ownedContent.type) return;
+    if (!this.ownedContent[type]) return;
     
     this.ownedContent[type].push(content);
     content.player = this;

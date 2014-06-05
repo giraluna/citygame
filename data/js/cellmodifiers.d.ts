@@ -9,6 +9,10 @@ declare module cellModifiers {
         effect: {
             multiplier: number;
         };
+        landValue: {
+            valueChange: number;
+            multiplier: number;
+        };
     };
     function crowded(range: number, strength?: number): {
         type: string;
@@ -62,6 +66,21 @@ declare module cellModifiers {
         targets: string[];
         effect: {
             addedProfit: number;
+        };
+    };
+    function nearbyStation(range: number, strength?: number): {
+        type: string;
+        translate: string;
+        range: number;
+        strength: number;
+        targets: string[];
+        effect: {
+            addedProfit: number;
+            multiplier: number;
+        };
+        landValue: {
+            valueChange: number;
+            multiplier: number;
         };
     };
 }

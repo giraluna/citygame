@@ -7,6 +7,7 @@ class Board
   width: number;
   height: number;
   cells: any[][];
+  mapGenInfo: any = {};
   constructor(props:
   {
     width: number;
@@ -44,7 +45,7 @@ class Board
   {
     var startTime = window.performance.now();
 
-    var coasts = mapGeneration.generateCellNoise(
+    var coasts = this.mapGenInfo.coasts = mapGeneration.generateCellNoise(
     {
       width: this.width,
       mapHeight: this.height,
@@ -64,7 +65,7 @@ class Board
       coasts: coasts
     });
 
-    var rivers = mapGeneration.makeRivers(
+    var rivers = this.mapGenInfo.rivers = mapGeneration.makeRivers(
       coasts,
       0.4,
     {
@@ -107,7 +108,9 @@ class Board
 
   generateCity()
   {
-    cityGeneration.placeMainStation(this, 0.4);
+    this.mapGenInfo.mainStationPos =
+      cityGeneration.placeStation(this, "smallstation", 0.4);
+    cityGeneration.placeMainSubwayLines(this);
   }
   
   getCell(arr: number[])

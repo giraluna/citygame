@@ -120,7 +120,7 @@ var Cell = (function () {
         this.overlay = undefined;
         this.gridPos = gridPos;
         this.type = type;
-        this.landValue = randInt(30, 40);
+        this.baseLandValue = this.landValue = randInt(30, 40);
         this.board = board;
         this.flags = this.type["flags"].slice(0);
 
@@ -298,6 +298,8 @@ var Cell = (function () {
         if (this.content && (arrayLogic.or(modifier.targets, this.flags) || (this.content && arrayLogic.or(modifier.targets, this.content.flags)))) {
             this.applyModifiersToContent();
         }
+
+        this.updateLandValue();
     };
     Cell.prototype.removeModifier = function (modifier) {
         if (!this.modifiers[modifier.type])
@@ -310,6 +312,8 @@ var Cell = (function () {
         if (this.content && (arrayLogic.or(modifier.targets, this.flags) || (this.content && arrayLogic.or(modifier.targets, this.content.flags)))) {
             this.applyModifiersToContent();
         }
+
+        this.updateLandValue();
     };
     Cell.prototype.propagateModifier = function (modifier) {
         var effectedCells = this.getArea(modifier.range);
@@ -357,6 +361,25 @@ var Cell = (function () {
 
         this.content.modifiers = this.getValidModifiers();
         this.content.applyModifiers();
+    };
+    Cell.prototype.updateLandValue = function () {
+        var totals = {
+            valueChange: 0,
+            multiplier: 1
+        };
+        for (var _modifier in this.modifiers) {
+            var modifier = this.modifiers[_modifier];
+            if (!modifier.landValue)
+                continue;
+            else {
+                for (var prop in modifier.landValue) {
+                    totals[prop] += modifier.landValue[prop];
+                }
+            }
+        }
+
+        // TODO
+        this.landValue = Math.round((this.baseLandValue + totals.valueChange) * totals.multiplier);
     };
     Cell.prototype.addOverlay = function (color, depth) {
         if (typeof depth === "undefined") { depth = 1; }

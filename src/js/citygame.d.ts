@@ -69,6 +69,7 @@ declare class Cell {
     public sprite: Sprite;
     public content: Content;
     public undergroundContent: Content;
+    public baseLandValue: number;
     public landValue: number;
     public gridPos: number[];
     public flags: string[];
@@ -96,6 +97,7 @@ declare class Cell {
     public removeAllPropagatedModifiers(modifiers: any[]): void;
     public getValidModifiers(): any;
     public applyModifiersToContent(): void;
+    public updateLandValue(): void;
     public addOverlay(color: any, depth?: number): void;
 }
 declare class WorldRenderer {

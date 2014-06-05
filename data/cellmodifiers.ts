@@ -14,6 +14,11 @@ module cellModifiers
       effect:
       {
         multiplier: 0.1
+      },
+      landValue:
+      {
+        valueChange: 2,
+        multiplier: 0.1
       }
     });
   }
@@ -101,6 +106,28 @@ module cellModifiers
       effect:
       {
         addedProfit: 0.2
+      }
+    });
+  }
+
+  export function nearbyStation(range: number, strength: number = 1)
+  {
+    return(
+    {
+      type: "nearbyStation",
+      translate: "Nearby station",
+      range: range,
+      strength: strength,
+      targets: ["fastfood", "shopping", "office", "apartment"],
+      effect:
+      {
+        addedProfit: 0.5,
+        multiplier: 0.2
+      },
+      landValue:
+      {
+        valueChange: 2,
+        multiplier: 0.2
       }
     });
   }

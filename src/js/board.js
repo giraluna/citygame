@@ -3,6 +3,7 @@
 /// <reference path="js/citygeneration.d.ts" />
 var Board = (function () {
     function Board(props) {
+        this.mapGenInfo = {};
         this.width = props.width;
         this.height = props.height || props.width;
 
@@ -25,7 +26,7 @@ var Board = (function () {
     Board.prototype.generateMap = function () {
         var startTime = window.performance.now();
 
-        var coasts = mapGeneration.generateCellNoise({
+        var coasts = this.mapGenInfo.coasts = mapGeneration.generateCellNoise({
             width: this.width,
             mapHeight: this.height,
             amountWeights: [1, 0.5, 0.4, 0.3],
@@ -43,7 +44,7 @@ var Board = (function () {
             coasts: coasts
         });
 
-        var rivers = mapGeneration.makeRivers(coasts, 0.4, {
+        var rivers = this.mapGenInfo.rivers = mapGeneration.makeRivers(coasts, 0.4, {
             width: this.width / 4,
             mapHeight: this.height,
             depth: this.height,
@@ -78,7 +79,8 @@ var Board = (function () {
     };
 
     Board.prototype.generateCity = function () {
-        cityGeneration.placeMainStation(this, 0.4);
+        this.mapGenInfo.mainStationPos = cityGeneration.placeStation(this, "smallstation", 0.4);
+        cityGeneration.placeMainSubwayLines(this);
     };
 
     Board.prototype.getCell = function (arr) {

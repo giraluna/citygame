@@ -172,6 +172,7 @@ class Cell
   sprite: Sprite;
   content: Content;
   undergroundContent: Content;
+  baseLandValue: number;
   landValue: number;
   gridPos: number[];
   flags: string[];
@@ -183,7 +184,7 @@ class Cell
   {
     this.gridPos = gridPos;
     this.type = type;
-    this.landValue = randInt(30, 40);
+    this.baseLandValue = this.landValue = randInt(30, 40);
     this.board = board;
     this.flags = this.type["flags"].slice(0);
 
@@ -414,6 +415,8 @@ class Cell
     {
       this.applyModifiersToContent();
     }
+
+    this.updateLandValue();
   }
   removeModifier(modifier)
   {
@@ -433,6 +436,8 @@ class Cell
     {
       this.applyModifiersToContent();
     }
+
+    this.updateLandValue();
   }
   propagateModifier(modifier)
   {
@@ -491,6 +496,31 @@ class Cell
 
     this.content.modifiers = this.getValidModifiers();
     this.content.applyModifiers();
+  }
+  updateLandValue()
+  {
+    var totals =
+    {
+      valueChange: 0,
+      multiplier: 1
+    };
+    for (var _modifier in this.modifiers)
+    {
+      var modifier = this.modifiers[_modifier];
+      if (!modifier.landValue) continue;
+
+      else
+      {
+        for (var prop in modifier.landValue)
+        {
+          totals[prop] += modifier.landValue[prop];
+        }
+      }
+    }
+
+    // TODO
+    this.landValue = Math.round(
+      (this.baseLandValue + totals.valueChange) * totals.multiplier );
   }
   addOverlay(color, depth:number = 1)
   {

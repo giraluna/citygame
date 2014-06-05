@@ -568,7 +568,15 @@ var cg: any =
         "anchor": [0.5, 1],
         "frame": "smallstation.png",
         "canNotBuildOn": ["water", "building", "road"],
-        "underground": "tube_nesw"
+        "underground": "tube_nesw",
+        "effects":
+        [
+          {
+            "type": "nearbyStation",
+            "range": 3,
+            "strength": 1
+          }
+        ]
       }
     }
   }

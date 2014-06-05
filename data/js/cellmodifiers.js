@@ -11,6 +11,10 @@ var cellModifiers;
             targets: ["apartment"],
             effect: {
                 multiplier: 0.1
+            },
+            landValue: {
+                valueChange: 2,
+                multiplier: 0.1
             }
         });
     }
@@ -96,5 +100,25 @@ var cellModifiers;
         });
     }
     cellModifiers.nearbyShopping = nearbyShopping;
+
+    function nearbyStation(range, strength) {
+        if (typeof strength === "undefined") { strength = 1; }
+        return ({
+            type: "nearbyStation",
+            translate: "Nearby station",
+            range: range,
+            strength: strength,
+            targets: ["fastfood", "shopping", "office", "apartment"],
+            effect: {
+                addedProfit: 0.5,
+                multiplier: 0.2
+            },
+            landValue: {
+                valueChange: 2,
+                multiplier: 0.2
+            }
+        });
+    }
+    cellModifiers.nearbyStation = nearbyStation;
 })(cellModifiers || (cellModifiers = {}));
 //# sourceMappingURL=cellmodifiers.js.map

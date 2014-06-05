@@ -1,10 +1,5 @@
 /// <reference path="../data/js/cg.d.ts" />
 /// <reference path="js/utility.d.ts" />
-/**
-* add base land value
-*
-*
-*/
 var mapGeneration;
 (function (mapGeneration) {
     var typeIndexes = {};
@@ -145,6 +140,7 @@ var mapGeneration;
 
                 dir.depth = dir.depth || props.depth || Math.floor(y / 4);
                 dir.variation = dir.variation || props.variation || 0.05;
+                dir.baseVariation = dir.baseVariation || props.baseVariation || [0, 1];
                 dir.yFalloff = dir.yFalloff || props.yFalloff || dir.depth / 50;
                 dir.yFalloffType = dir.yFalloffType || props.yFalloffType || "logarithmic";
                 dir.xCutoff = dir.xCutoff || props.xCutoff || 0.3;
@@ -197,7 +193,7 @@ var mapGeneration;
                         }
                         xFalloff *= 1 - dir.xFalloffPerY * Math.log(i);
                     }
-                    var n = (Math.random() + randRange(-dir.variation, dir.variation)) * yFalloff * xFalloff;
+                    var n = (randRange(dir.baseVariation[0], dir.baseVariation[1]) + randRange(-dir.variation, dir.variation)) * yFalloff * xFalloff;
                     n = n > dir.landThreshhold ? 1 : 0;
                     finalCoast[i][j] = n;
                 }
@@ -214,7 +210,7 @@ var mapGeneration;
 
         for (var _dir in coasts) {
             var coast = coasts[_dir];
-            var offset = coast.offset || [0, 0];
+            var offset = coast.offset ? [Math.round(coast.offset[0]), Math.round(coast.offset[1])] : [0, 0];
             if (coast.hasCoast) {
                 switch (_dir) {
                     case "n":

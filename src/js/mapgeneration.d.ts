@@ -1,10 +1,5 @@
 /// <reference path="../../data/js/cg.d.ts" />
 /// <reference path="utility.d.ts" />
-/**
-* add base land value
-*
-*
-*/
 declare module mapGeneration {
     function makeBlankCells(props: {
         width: number;
@@ -29,6 +24,7 @@ declare module mapGeneration {
         amountWeights?: number[];
         depth?: number;
         variation?: number;
+        baseVariation?: number[];
         yFalloff?: number;
         yFalloffType?: number;
         xCutoff?: number;

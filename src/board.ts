@@ -40,10 +40,12 @@ class Board
         width: this.width,
         mapHeight: this.height,
         amountWeights: [1, 0.5, 0.4, 0.3],
-        variation: 1,
-        yFalloff: 0.07,
-        xCutoff: 0.2,
-        landThreshhold: 0.45
+        variation: 0.5,
+        yFalloff: 0.14,
+        xCutoff: 0.3,
+        xFalloff: 0.1,
+        xFalloffPerY: 0.3,
+        landThreshhold: 0.4
       });
       mapGeneration.applyCoastsToCells(
       {
@@ -52,21 +54,27 @@ class Board
         subType: "water",
         coasts: coasts
       });
+
       var rivers = mapGeneration.makeRivers(
         coasts,
         0.4,
       {
-        width: this.width / 6,
+        width: this.width / 4,
         mapHeight: this.height,
         depth: this.height,
-        variation: 0.2,
-        yFalloff: 0.0001,
+        variation: 0.000001,
+        baseVariation: [0.8, 1],
+        yFalloff: 0.00001,
         xCutoff: 0.7,
-        xFalloff: 0.4,
-        xFalloffPerY: 0.2,
-        landThreshhold: 0.1
+        xFalloff: 0.6,
+        xFalloffPerY: 0.4,
+        landThreshhold: 0.2
       },
       [this.width / 2 - this.width / 8, 0]);
+
+      this.cells = mapGeneration.smoothCells( this.cells, 0.6, 1, 3 );
+      this.cells = mapGeneration.smoothCells( this.cells, 0.7, 2, 2 );
+      this.cells = mapGeneration.smoothCells( this.cells, 0.8, 3, 1 );
 
       if (rivers)
       {
@@ -78,10 +86,9 @@ class Board
           coasts: rivers
         });
       }
-      this.cells = mapGeneration.smoothCells( this.cells, 0.6, 1, 3 );
-      this.cells = mapGeneration.smoothCells( this.cells, 0.6, 2, 2 );
-      this.cells = mapGeneration.smoothCells( this.cells, 0.7, 3, 1 );
-      this.cells = mapGeneration.smoothCells( this.cells, 0.6, 1, 1 );
+
+      this.cells = mapGeneration.smoothCells( this.cells, 0.6, 1, 2 );
+
       mapGeneration.convertCells(this.cells, this, false);
     }
     

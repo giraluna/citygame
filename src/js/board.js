@@ -1,11 +1,10 @@
 /// <reference path="js/utility.d.ts" />
 /// <reference path="js/mapgeneration.d.ts" />
+/// <reference path="js/citygeneration.d.ts" />
 var Board = (function () {
     function Board(props) {
         this.width = props.width;
         this.height = props.height || props.width;
-
-        var startTime = window.performance.now();
 
         this.cells = mapGeneration.makeBlankCells({
             width: this.width,
@@ -19,58 +18,69 @@ var Board = (function () {
                 savedCells: props.savedCells
             });
         } else {
-            var coasts = mapGeneration.generateCellNoise({
-                width: this.width,
-                mapHeight: this.height,
-                amountWeights: [1, 0.5, 0.4, 0.3],
-                variation: 0.5,
-                yFalloff: 0.14,
-                xCutoff: 0.3,
-                xFalloff: 0.1,
-                xFalloffPerY: 0.3,
-                landThreshhold: 0.4
-            });
+            this.generateMap();
+            this.generateCity();
+        }
+    }
+    Board.prototype.generateMap = function () {
+        var startTime = window.performance.now();
+
+        var coasts = mapGeneration.generateCellNoise({
+            width: this.width,
+            mapHeight: this.height,
+            amountWeights: [1, 0.5, 0.4, 0.3],
+            variation: 0.5,
+            yFalloff: 0.14,
+            xCutoff: 0.3,
+            xFalloff: 0.1,
+            xFalloffPerY: 0.3,
+            landThreshhold: 0.4
+        });
+        mapGeneration.applyCoastsToCells({
+            cells: this.cells,
+            primaryType: "grass",
+            subType: "water",
+            coasts: coasts
+        });
+
+        var rivers = mapGeneration.makeRivers(coasts, 0.4, {
+            width: this.width / 4,
+            mapHeight: this.height,
+            depth: this.height,
+            variation: 0.000001,
+            baseVariation: [0.8, 1],
+            yFalloff: 0.00001,
+            xCutoff: 0.7,
+            xFalloff: 0.6,
+            xFalloffPerY: 0.4,
+            landThreshhold: 0.2
+        }, [this.width / 2 - this.width / 8, 0]);
+
+        this.cells = mapGeneration.smoothCells(this.cells, 0.6, 1, 3);
+        this.cells = mapGeneration.smoothCells(this.cells, 0.6, 2, 2);
+        this.cells = mapGeneration.smoothCells(this.cells, 0.7, 3, 1);
+
+        if (rivers) {
             mapGeneration.applyCoastsToCells({
                 cells: this.cells,
-                primaryType: "grass",
-                subType: "water",
-                coasts: coasts
+                primaryType: "water",
+                subType: "grass",
+                coasts: rivers
             });
-
-            var rivers = mapGeneration.makeRivers(coasts, 0.4, {
-                width: this.width / 4,
-                mapHeight: this.height,
-                depth: this.height,
-                variation: 0.000001,
-                baseVariation: [0.8, 1],
-                yFalloff: 0.00001,
-                xCutoff: 0.7,
-                xFalloff: 0.6,
-                xFalloffPerY: 0.4,
-                landThreshhold: 0.2
-            }, [this.width / 2 - this.width / 8, 0]);
-
-            this.cells = mapGeneration.smoothCells(this.cells, 0.6, 1, 3);
-            this.cells = mapGeneration.smoothCells(this.cells, 0.7, 2, 2);
-            this.cells = mapGeneration.smoothCells(this.cells, 0.8, 3, 1);
-
-            if (rivers) {
-                mapGeneration.applyCoastsToCells({
-                    cells: this.cells,
-                    primaryType: "water",
-                    subType: "grass",
-                    coasts: rivers
-                });
-            }
-
-            this.cells = mapGeneration.smoothCells(this.cells, 0.6, 1, 2);
-
-            mapGeneration.convertCells(this.cells, this, false);
         }
+
+        this.cells = mapGeneration.smoothCells(this.cells, 0.6, 1, 1);
+
+        mapGeneration.convertCells(this.cells, this, false);
 
         var elapsed = window.performance.now() - startTime;
         console.log("map gen in " + Math.round(elapsed) + " ms");
-    }
+    };
+
+    Board.prototype.generateCity = function () {
+        cityGeneration.placeMainStation(this, 0.4);
+    };
+
     Board.prototype.getCell = function (arr) {
         return this.cells[arr[0]][arr[1]];
     };

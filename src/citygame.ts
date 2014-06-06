@@ -509,11 +509,13 @@ class Cell
       var strength;
       if (modifier.landValue.falloffFN) 
       {
-        if (!strengthIndexes[invertedDistance])
+        if (!strengthIndexes[distance])
         {
-          strengthIndexes[invertedDistance] = modifier.landValue.falloffFN(distance, invertedDistance)
+          strengthIndexes[distance] =
+            modifier.landValue.falloffFN(distance, invertedDistance,
+            effectedCells[_cell].invertedDistanceRatio);
         }
-        strength = strengthIndexes[invertedDistance];
+        strength = strengthIndexes[distance];
       }
       else strength = invertedDistance;
 
@@ -565,7 +567,9 @@ class Cell
       {
         if (!strengthIndexes[invertedDistance])
         {
-          strengthIndexes[invertedDistance] = modifier.landValue.falloffFN(distance, invertedDistance)
+          strengthIndexes[invertedDistance] =
+            modifier.landValue.falloffFN(distance, invertedDistance,
+            effectedCells[_cell].invertedDistanceRatio);
         }
         strength = strengthIndexes[invertedDistance];
       }
@@ -594,10 +598,14 @@ class Cell
     {
       var modifier = this.landValueModifiers[_modifier];
 
-      var strength = modifier.strength;
+      var strength;
       if (modifier.scalingFN)
       {
-        strength = modifier.scalingFN(strength);
+        strength = modifier.scalingFN(modifier.strength);
+      }
+      else
+      {
+        strength = modifier.strength;
       }
 
       for (var prop in modifier.effect)
@@ -1915,9 +1923,20 @@ class UIDrawer
     if (game.worldRenderer.currentMapmode === "landValue")
     {
       text += "\nLand value: " + cell.landValue;
+      for (var modifier in cell.landValueModifiers)
+      {
+        text += "\n-------\n";
+        var _mod = cell.landValueModifiers[modifier];
+        text += "Modifier: " + modifier + "\n";
+        text += "Strength: " + _mod.strength + "\n";
+        if (_mod.scalingFN)
+        {
+          text += "Adj strength: " + _mod.scalingFN(_mod.strength).toFixed(3) + "\n";
+        }
+      }
     }
 
-    if (cell.content && cell.content.baseProfit)
+    else if (cell.content && cell.content.baseProfit)
     {
       text += "\n--------------\n";
       text += "Base profit: " + cell.content.baseProfit.toFixed(2) + "/d" + "\n";

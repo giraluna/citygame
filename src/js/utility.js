@@ -260,7 +260,8 @@ function getDistanceFromCell(cells, center, maxDistance) {
                     indexedDistances[center.gridPos] = {
                         item: center,
                         distance: 1,
-                        invertedDistance: maxDistance + 1 - 1
+                        invertedDistance: maxDistance,
+                        invertedDistanceRatio: 1
                     };
                     return indexedDistances;
                 }
@@ -268,7 +269,8 @@ function getDistanceFromCell(cells, center, maxDistance) {
                 indexedDistances[neigh.gridPos] = {
                     item: neigh,
                     distance: dist,
-                    invertedDistance: maxDistance + 1 - dist
+                    invertedDistance: maxDistance + 1 - dist,
+                    invertedDistanceRatio: (maxDistance + 1 - dist) / maxDistance
                 };
                 toAnalyze.push(neigh);
             }

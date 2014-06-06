@@ -12,7 +12,7 @@ declare module cellModifiers {
         landValue: {
             radius: number;
             multiplier: number;
-            falloffFN: (distance: any, invertedDistance: any) => number;
+            scalingFN: (strength: any) => number;
         };
     };
     function crowded(range: number, strength?: number): {
@@ -86,7 +86,7 @@ declare module cellModifiers {
         landValue: {
             radius: number;
             multiplier: number;
-            falloffFN: (distance: any, invertedDistance: any) => number;
+            falloffFN: (distance: any, invertedDistance: any, invertedDistanceRatio: any) => number;
         };
     };
 }

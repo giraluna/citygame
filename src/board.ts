@@ -8,6 +8,7 @@ class Board
   height: number;
   cells: any[][];
   mapGenInfo: any = {};
+  population: number = 300;
   constructor(props:
   {
     width: number;

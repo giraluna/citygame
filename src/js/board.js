@@ -4,6 +4,7 @@
 var Board = (function () {
     function Board(props) {
         this.mapGenInfo = {};
+        this.population = 300;
         this.width = props.width;
         this.height = props.height || props.width;
 

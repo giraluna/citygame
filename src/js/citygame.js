@@ -374,10 +374,10 @@ var Cell = (function () {
             var distance = effectedCells[_cell].distance;
             var strength;
             if (modifier.landValue.falloffFN) {
-                if (!strengthIndexes[invertedDistance]) {
-                    strengthIndexes[invertedDistance] = modifier.landValue.falloffFN(distance, invertedDistance);
+                if (!strengthIndexes[distance]) {
+                    strengthIndexes[distance] = modifier.landValue.falloffFN(distance, invertedDistance, effectedCells[_cell].invertedDistanceRatio);
                 }
-                strength = strengthIndexes[invertedDistance];
+                strength = strengthIndexes[distance];
             } else
                 strength = invertedDistance;
 
@@ -420,7 +420,7 @@ var Cell = (function () {
             var strength;
             if (modifier.landValue.falloffFN) {
                 if (!strengthIndexes[invertedDistance]) {
-                    strengthIndexes[invertedDistance] = modifier.landValue.falloffFN(distance, invertedDistance);
+                    strengthIndexes[invertedDistance] = modifier.landValue.falloffFN(distance, invertedDistance, effectedCells[_cell].invertedDistanceRatio);
                 }
                 strength = strengthIndexes[invertedDistance];
             } else
@@ -443,10 +443,11 @@ var Cell = (function () {
         for (var _modifier in this.landValueModifiers) {
             var modifier = this.landValueModifiers[_modifier];
 
-            var strength = modifier.strength;
+            var strength;
             if (modifier.scalingFN) {
-                console.log(strength);
-                strength = modifier.scalingFN(strength);
+                strength = modifier.scalingFN(modifier.strength);
+            } else {
+                strength = modifier.strength;
             }
 
             for (var prop in modifier.effect) {
@@ -1490,9 +1491,16 @@ var UIDrawer = (function () {
 
         if (game.worldRenderer.currentMapmode === "landValue") {
             text += "\nLand value: " + cell.landValue;
-        }
-
-        if (cell.content && cell.content.baseProfit) {
+            for (var modifier in cell.landValueModifiers) {
+                text += "\n-------\n";
+                var _mod = cell.landValueModifiers[modifier];
+                text += "Modifier: " + modifier + "\n";
+                text += "Strength: " + _mod.strength + "\n";
+                if (_mod.scalingFN) {
+                    text += "Adj strength: " + _mod.scalingFN(_mod.strength).toFixed(3) + "\n";
+                }
+            }
+        } else if (cell.content && cell.content.baseProfit) {
             text += "\n--------------\n";
             text += "Base profit: " + cell.content.baseProfit.toFixed(2) + "/d" + "\n";
             text += "-------\n";

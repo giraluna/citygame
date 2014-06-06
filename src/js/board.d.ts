@@ -6,6 +6,7 @@ declare class Board {
     public height: number;
     public cells: any[][];
     public mapGenInfo: any;
+    public population: number;
     constructor(props: {
         width: number;
         height?: number;

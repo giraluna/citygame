@@ -144,6 +144,7 @@ module actions
       employee.currentAction = undefined;
 
       cell.changeContent(building, true, player);
+      eventManager.dispatchEvent({type:"updateLandValueMapmode", content:""});
       eventManager.dispatchEvent({type: "updateWorld", content: ""});
     };
     var constructBuildingCompleteFN = function()
@@ -158,7 +159,7 @@ module actions
           text: "Building at cell " + cell.gridPos + " has finished construction.",
           onClose: constructBuildingConfirmFN
         }
-      })
+      });
     }
 
     eventManager.dispatchEvent({type: "delayedAction", content:

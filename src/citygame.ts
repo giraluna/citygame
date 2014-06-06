@@ -584,7 +584,6 @@ class Cell
       }
 
       cell.updateLandValue();
-
     }
   }
   updateLandValue()
@@ -614,7 +613,7 @@ class Cell
       }
     }
 
-    // TODO
+    
     this.landValue = Math.round(
       (this.baseLandValue + totals.addedValue) * totals.multiplier );
   }
@@ -770,6 +769,14 @@ class WorldRenderer
     {
       self.setMapmode(event.content);
       mapmodeSelect.value = event.content;
+    });
+    eventManager.addEventListener("updateLandValueMapmode", function (event)
+    {
+      if (self.currentMapmode !== "landValue") return;
+
+      var zoomLayer = self.layers["zoom" + self.zoomLevel];
+      zoomLayer.landValueOverlay = makeLandValueOverlay(game.board);
+      self.changeMapmode("landValue");
     });
   }
   initContainers(width, height)
@@ -1230,10 +1237,21 @@ class Game
       addClickAndTouchEventListener(
       document.getElementById("regen-world"), function()
       {
+        var oldMapmode = game.worldRenderer.currentMapmode;
         self.resetLayers();
         self.board.destroy();
         game.board = new Board({width: TILES});
-        eventManager.dispatchEvent({type: "updateWorld", content:""});
+        
+        eventManager.dispatchEvent(
+        {
+          type: "changeMapmode",
+          content: oldMapmode
+        });
+        eventManager.dispatchEvent(
+        {
+          type: "updateWorld",
+          content: ""
+        });
       });
   }
   bindRenderer()
@@ -1821,6 +1839,9 @@ class MouseEventHandler
 
     game.highlighter.clearSprites();
     this.currAction = undefined;
+
+    eventManager.dispatchEvent({type:"updateLandValueMapmode", content:""});
+
     game.updateWorld(true);
     /* TEMPORARY
     var cell = game.board.getCell(this.currCell);
@@ -2104,6 +2125,7 @@ class WaterTool extends Tool
     this.type = "water";
     this.selectType = rectSelect;
     this.tintColor = 0x4444FF;
+    this.mapmode = undefined;
   } 
   onActivate(target: Cell)
   {
@@ -2119,6 +2141,7 @@ class GrassTool extends Tool
     this.type = "grass";
     this.selectType = rectSelect;
     this.tintColor = 0x617A4E;
+    this.mapmode = undefined;
   } 
   onActivate(target: Cell)
   {
@@ -2134,6 +2157,7 @@ class SandTool extends Tool
     this.type = "sand";
     this.selectType = rectSelect;
     this.tintColor = 0xE2BF93;
+    this.mapmode = undefined;
   } 
   onActivate(target: Cell)
   {
@@ -2149,6 +2173,7 @@ class SnowTool extends Tool
     this.type = "snow";
     this.selectType = rectSelect;
     this.tintColor = 0xBBDFD7;
+    this.mapmode = undefined;
   } 
   onActivate(target: Cell)
   {
@@ -2186,6 +2211,7 @@ class PlantTool extends Tool
     this.type = "plant";
     this.selectType = rectSelect;
     this.tintColor = 0x338833;
+    this.mapmode = undefined;
   } 
   onActivate(target: Cell)
   {
@@ -2201,6 +2227,7 @@ class HouseTool extends Tool
     this.type = "house";
     this.selectType = rectSelect;
     this.tintColor = 0x696969;
+    this.mapmode = undefined;
   } 
   onActivate(target: Cell)
   {

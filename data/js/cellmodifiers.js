@@ -13,7 +13,7 @@ var cellModifiers;
                 multiplier: 0.1
             },
             landValue: {
-                radius: 5,
+                radius: 8,
                 multiplier: 0.05,
                 scalingFN: function (strength) {
                     return 1 + Math.log(strength);
@@ -124,7 +124,7 @@ var cellModifiers;
                 radius: 20,
                 multiplier: 0.05,
                 falloffFN: function (distance, invertedDistance, invertedDistanceRatio) {
-                    return invertedDistance * invertedDistanceRatio;
+                    return invertedDistance * Math.pow(invertedDistanceRatio, 2);
                 }
             }
         });

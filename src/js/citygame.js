@@ -455,7 +455,6 @@ var Cell = (function () {
             }
         }
 
-        // TODO
         this.landValue = Math.round((this.baseLandValue + totals.addedValue) * totals.multiplier);
     };
     Cell.prototype.addOverlay = function (color, depth) {
@@ -580,6 +579,14 @@ var WorldRenderer = (function () {
         eventManager.addEventListener("changeMapmode", function (event) {
             self.setMapmode(event.content);
             mapmodeSelect.value = event.content;
+        });
+        eventManager.addEventListener("updateLandValueMapmode", function (event) {
+            if (self.currentMapmode !== "landValue")
+                return;
+
+            var zoomLayer = self.layers["zoom" + self.zoomLevel];
+            zoomLayer.landValueOverlay = makeLandValueOverlay(game.board);
+            self.changeMapmode("landValue");
         });
     };
     WorldRenderer.prototype.initContainers = function (width, height) {
@@ -954,10 +961,19 @@ var Game = (function () {
 
         //regen world
         addClickAndTouchEventListener(document.getElementById("regen-world"), function () {
+            var oldMapmode = game.worldRenderer.currentMapmode;
             self.resetLayers();
             self.board.destroy();
             game.board = new Board({ width: TILES });
-            eventManager.dispatchEvent({ type: "updateWorld", content: "" });
+
+            eventManager.dispatchEvent({
+                type: "changeMapmode",
+                content: oldMapmode
+            });
+            eventManager.dispatchEvent({
+                type: "updateWorld",
+                content: ""
+            });
         });
     };
     Game.prototype.bindRenderer = function () {
@@ -1403,6 +1419,9 @@ var MouseEventHandler = (function () {
 
         game.highlighter.clearSprites();
         this.currAction = undefined;
+
+        eventManager.dispatchEvent({ type: "updateLandValueMapmode", content: "" });
+
         game.updateWorld(true);
         /* TEMPORARY
         var cell = game.board.getCell(this.currCell);
@@ -1636,6 +1655,7 @@ var WaterTool = (function (_super) {
         this.type = "water";
         this.selectType = rectSelect;
         this.tintColor = 0x4444FF;
+        this.mapmode = undefined;
     }
     WaterTool.prototype.onActivate = function (target) {
         target.replace(cg["terrain"]["water"]);
@@ -1650,6 +1670,7 @@ var GrassTool = (function (_super) {
         this.type = "grass";
         this.selectType = rectSelect;
         this.tintColor = 0x617A4E;
+        this.mapmode = undefined;
     }
     GrassTool.prototype.onActivate = function (target) {
         target.replace(cg["terrain"]["grass"]);
@@ -1664,6 +1685,7 @@ var SandTool = (function (_super) {
         this.type = "sand";
         this.selectType = rectSelect;
         this.tintColor = 0xE2BF93;
+        this.mapmode = undefined;
     }
     SandTool.prototype.onActivate = function (target) {
         target.replace(cg["terrain"]["sand"]);
@@ -1678,6 +1700,7 @@ var SnowTool = (function (_super) {
         this.type = "snow";
         this.selectType = rectSelect;
         this.tintColor = 0xBBDFD7;
+        this.mapmode = undefined;
     }
     SnowTool.prototype.onActivate = function (target) {
         target.replace(cg["terrain"]["snow"]);
@@ -1710,6 +1733,7 @@ var PlantTool = (function (_super) {
         this.type = "plant";
         this.selectType = rectSelect;
         this.tintColor = 0x338833;
+        this.mapmode = undefined;
     }
     PlantTool.prototype.onActivate = function (target) {
         target.addPlant();
@@ -1724,6 +1748,7 @@ var HouseTool = (function (_super) {
         this.type = "house";
         this.selectType = rectSelect;
         this.tintColor = 0x696969;
+        this.mapmode = undefined;
     }
     HouseTool.prototype.onActivate = function (target) {
         // TODO

@@ -119,6 +119,7 @@ var actions;
             employee.currentAction = undefined;
 
             cell.changeContent(building, true, player);
+            eventManager.dispatchEvent({ type: "updateLandValueMapmode", content: "" });
             eventManager.dispatchEvent({ type: "updateWorld", content: "" });
         };
         var constructBuildingCompleteFN = function () {

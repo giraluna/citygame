@@ -119,7 +119,17 @@ var Cell = (function () {
         this.overlay = undefined;
         this.gridPos = gridPos;
         this.type = type;
-        this.baseLandValue = this.landValue = randInt(30, 30);
+        var distanceFromXCenter = Math.abs((board.width - 1) / 2 - gridPos[0]);
+        var distanceFromYCenter = Math.abs((board.height - 1) / 2 - gridPos[1]);
+        var meanDistance = (distanceFromYCenter + distanceFromXCenter) / 2;
+        var maxDist = (board.width - 1 + board.height - 1) / 2;
+
+        var relativeInverseDist = 1 - (meanDistance / maxDist);
+
+        var baseVal = 15;
+
+        this.baseLandValue = this.landValue = Math.round(baseVal + baseVal * relativeInverseDist);
+
         this.board = board;
         this.flags = this.type["flags"].slice(0);
 

@@ -4,9 +4,12 @@
 var Board = (function () {
     function Board(props) {
         this.mapGenInfo = {};
-        this.population = randInt(100, 200);
         this.width = props.width;
         this.height = props.height || props.width;
+
+        var amtOfCells = this.width * this.height;
+
+        this.population = randInt(amtOfCells / 15, amtOfCells / 10);
 
         this.cells = mapGeneration.makeBlankCells({
             width: this.width,

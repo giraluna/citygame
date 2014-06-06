@@ -6,7 +6,14 @@ function makeLandValueOverlay(board) {
     var colorIndexes = {};
 
     function getRelativeValue(val) {
-        return (val - minValue) / (maxValue - minValue);
+        var difference = maxValue - minValue;
+        if (difference < 1)
+            difference = 1;
+        var ababa = difference / 5;
+        if (ababa < 1)
+            ababa = 1;
+        var relative = (Math.round(val / ababa) * ababa - minValue) / (difference);
+        return relative;
     }
 
     for (var i = 0; i < board.width; i++) {
@@ -37,6 +44,10 @@ function makeLandValueOverlay(board) {
 
         if (!colorIndexes[cell.value]) {
             var relativeValue = getRelativeValue(cell.value);
+            if (relativeValue < 0)
+                relativeValue = 0;
+            else if (relativeValue > 1)
+                relativeValue = 1;
 
             var hue = 100 - 100 * relativeValue;
             var saturation = 1 - 0.2 * relativeValue;

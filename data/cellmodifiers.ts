@@ -137,7 +137,7 @@ module cellModifiers
         multiplier: 0.05,
         falloffFN: function(distance, invertedDistance, invertedDistanceRatio)
         {
-          return invertedDistance * Math.pow(invertedDistanceRatio, 2);
+          return invertedDistance * invertedDistanceRatio;
         }
       }
     });

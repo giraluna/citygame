@@ -124,7 +124,7 @@ var cellModifiers;
                 radius: 20,
                 multiplier: 0.05,
                 falloffFN: function (distance, invertedDistance, invertedDistanceRatio) {
-                    return invertedDistance * Math.pow(invertedDistanceRatio, 2);
+                    return invertedDistance * invertedDistanceRatio;
                 }
             }
         });

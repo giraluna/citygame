@@ -8,7 +8,7 @@ class Board
   height: number;
   cells: any[][];
   mapGenInfo: any = {};
-  population: number = randInt(100, 200);
+  population: number;
   constructor(props:
   {
     width: number;
@@ -19,6 +19,9 @@ class Board
     this.width = props.width;
     this.height = props.height || props.width;
 
+    var amtOfCells = this.width * this.height;
+
+    this.population = randInt(amtOfCells / 15, amtOfCells / 10);
 
     this.cells = mapGeneration.makeBlankCells(
     {

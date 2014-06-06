@@ -120,7 +120,7 @@ var Cell = (function () {
         this.overlay = undefined;
         this.gridPos = gridPos;
         this.type = type;
-        this.baseLandValue = this.landValue = randInt(30, 40);
+        this.baseLandValue = this.landValue = randInt(30, 30);
         this.board = board;
         this.flags = this.type["flags"].slice(0);
 
@@ -363,6 +363,7 @@ var Cell = (function () {
         this.content.applyModifiers();
     };
     Cell.prototype.updateLandValue = function () {
+        return;
         var totals = {
             valueChange: 0,
             multiplier: 1
@@ -466,7 +467,7 @@ var WorldRenderer = (function () {
             landValue: {
                 layers: [
                     { type: "ground" },
-                    { type: "landValueOverlay", alpha: 0.5 },
+                    { type: "landValueOverlay", alpha: 0.7 },
                     { type: "cellOverlay" },
                     { type: "content" }
                 ]

@@ -111,6 +111,14 @@ class Board
     this.mapGenInfo.mainStationPos =
       cityGeneration.placeStation(this, "smallstation", 0.4);
     cityGeneration.placeMainSubwayLines(this);
+
+    var a = 
+      getDistanceFromCell(this.cells, this.getCell(this.mapGenInfo.mainStationPos), 20);
+
+    for (var cell in a)
+    {
+      a[cell].item.landValue += a[cell].invertedDistance * 1;
+    }
   }
   
   getCell(arr: number[])

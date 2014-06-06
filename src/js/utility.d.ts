@@ -54,6 +54,7 @@ declare function getNeighbors(targetArray: any[][], gridPos: number[], diagonal?
     se: any;
     sw: any;
 };
+declare function getDistanceFromCell(cells: any[][], center: any, maxDistance: number): any;
 declare function getArea(targetArray: any[][], gridPos: number[], size: number, anchor?: string, excludeStart?: boolean): any;
 declare function singleSelect(a: number[], b: number[]): number[][];
 declare function rectSelect(a: number[], b: number[]): number[];

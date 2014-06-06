@@ -300,6 +300,53 @@ function getNeighbors(targetArray: any[][], gridPos: number[],
   return neighbors; 
 }
 
+function getDistanceFromCell(
+  cells: any[][],
+  center: any,
+  maxDistance: number
+  )
+{
+  var toAnalyze = [center];
+  var indexedDistances: any = {};
+  indexedDistances[center.gridPos] =
+  {
+    item: center,
+    distance: 0
+  }
+
+  while (true)
+  {
+    var current = toAnalyze.shift();
+    var neighs = getNeighbors(cells, current.gridPos);
+
+    for (var _neigh in neighs)
+    {
+      var neigh = neighs[_neigh];
+      if (neigh !== undefined && indexedDistances[neigh.gridPos] === undefined)
+      {
+        var dist = indexedDistances[current.gridPos].distance + 1;
+        indexedDistances[neigh.gridPos] =
+        {
+          item: neigh,
+          distance: dist,
+          invertedDistance: maxDistance + 1 - dist
+        }
+        toAnalyze.push(neigh);
+      }
+    }
+    if (indexedDistances[current.gridPos].distance > maxDistance)
+    {
+      indexedDistances[center.gridPos] =
+      {
+        item: center,
+        distance: 1,
+        invertedDistance: maxDistance + 1 - 1
+      }
+      return indexedDistances;
+    }
+  }
+}
+
 function getArea(
   targetArray: any[][],
   gridPos: number[],

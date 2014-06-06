@@ -47,10 +47,14 @@ function makeLandValueOverlay(board)
 
     if (!colorIndexes[cell.value])
     {
-      var hue = 100 - 100 * getRelativeValue(cell.value);
+      var relativeValue = getRelativeValue(cell.value);
+
+      var hue = 120 - 120 * relativeValue;
+      var saturation = 1 - 0.2 * relativeValue;
+      var luminesence = 0.75 + 0.25 * relativeValue;
 
       colorIndexes[cell.value] =
-        hslToHex(hue / 360, 1, 0.5);
+        hslToHex(hue / 360, saturation, luminesence / 2);
     }
     
     var color = colorIndexes[cell.value];

@@ -184,7 +184,7 @@ class Cell
   {
     this.gridPos = gridPos;
     this.type = type;
-    this.baseLandValue = this.landValue = randInt(30, 40);
+    this.baseLandValue = this.landValue = randInt(30, 30);
     this.board = board;
     this.flags = this.type["flags"].slice(0);
 
@@ -499,6 +499,7 @@ class Cell
   }
   updateLandValue()
   {
+    return;
     var totals =
     {
       valueChange: 0,
@@ -624,7 +625,7 @@ class WorldRenderer
       layers:
       [
         {type: "ground"},
-        {type: "landValueOverlay", alpha: 0.5},
+        {type: "landValueOverlay", alpha: 0.7},
         {type: "cellOverlay"},
         {type: "content"}
       ]

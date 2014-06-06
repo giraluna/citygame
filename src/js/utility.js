@@ -240,6 +240,41 @@ function getNeighbors(targetArray, gridPos, diagonal) {
     return neighbors;
 }
 
+function getDistanceFromCell(cells, center, maxDistance) {
+    var toAnalyze = [center];
+    var indexedDistances = {};
+    indexedDistances[center.gridPos] = {
+        item: center,
+        distance: 0
+    };
+
+    while (true) {
+        var current = toAnalyze.shift();
+        var neighs = getNeighbors(cells, current.gridPos);
+
+        for (var _neigh in neighs) {
+            var neigh = neighs[_neigh];
+            if (neigh !== undefined && indexedDistances[neigh.gridPos] === undefined) {
+                var dist = indexedDistances[current.gridPos].distance + 1;
+                indexedDistances[neigh.gridPos] = {
+                    item: neigh,
+                    distance: dist,
+                    invertedDistance: maxDistance + 1 - dist
+                };
+                toAnalyze.push(neigh);
+            }
+        }
+        if (indexedDistances[current.gridPos].distance > maxDistance) {
+            indexedDistances[center.gridPos] = {
+                item: center,
+                distance: 1,
+                invertedDistance: maxDistance + 1 - 1
+            };
+            return indexedDistances;
+        }
+    }
+}
+
 function getArea(targetArray, gridPos, size, anchor, excludeStart) {
     if (typeof anchor === "undefined") { anchor = "center"; }
     if (typeof excludeStart === "undefined") { excludeStart = false; }

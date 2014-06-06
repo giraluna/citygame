@@ -195,7 +195,7 @@ class ProfitSystem extends System
         var targets = player.ownedContent[this.targetTypes[ii]];
         for (var jj = 0; jj < targets.length; jj++)
         {
-          player.addMoney(targets[jj].modifiedProfit);
+          player.addMoney(targets[jj].modifiedProfit * targets[jj].type.daysForProfitTick);
         }
       }
     }

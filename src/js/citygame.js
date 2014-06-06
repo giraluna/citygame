@@ -81,7 +81,6 @@ var Content = (function () {
         this.flags.push(this.baseType, this.categoryType);
 
         this.baseProfit = type.baseProfit || undefined;
-        this.baseProfitPerDay = type.baseProfit ? type.baseProfit / type.daysForProfitTick : undefined;
 
         if (props.player) {
             props.player.addContent(this);
@@ -108,7 +107,6 @@ var Content = (function () {
             }
         }
         this.modifiedProfit = totals.addedProfit * totals.multiplier;
-        this.modifiedProfitPerDay = this.modifiedProfit / this.type.daysForProfitTick;
     };
     return Content;
 })();
@@ -117,6 +115,7 @@ var Cell = (function () {
     function Cell(gridPos, type, board, autoInit) {
         if (typeof autoInit === "undefined") { autoInit = true; }
         this.modifiers = {};
+        this.landValueModifiers = {};
         this.overlay = undefined;
         this.gridPos = gridPos;
         this.type = type;
@@ -151,6 +150,9 @@ var Cell = (function () {
         if (typeof anchor === "undefined") { anchor = "center"; }
         if (typeof excludeStart === "undefined") { excludeStart = false; }
         return getArea(this.board.cells, this.gridPos, size, anchor, excludeStart);
+    };
+    Cell.prototype.getDistances = function (radius) {
+        return getDistanceFromCell(this.board.cells, this, radius);
     };
     Cell.prototype.replace = function (type) {
         var _oldType = this.type;
@@ -298,8 +300,6 @@ var Cell = (function () {
         if (this.content && (arrayLogic.or(modifier.targets, this.flags) || (this.content && arrayLogic.or(modifier.targets, this.content.flags)))) {
             this.applyModifiersToContent();
         }
-
-        this.updateLandValue();
     };
     Cell.prototype.removeModifier = function (modifier) {
         if (!this.modifiers[modifier.type])
@@ -312,8 +312,6 @@ var Cell = (function () {
         if (this.content && (arrayLogic.or(modifier.targets, this.flags) || (this.content && arrayLogic.or(modifier.targets, this.content.flags)))) {
             this.applyModifiersToContent();
         }
-
-        this.updateLandValue();
     };
     Cell.prototype.propagateModifier = function (modifier) {
         var effectedCells = this.getArea(modifier.range);
@@ -322,6 +320,8 @@ var Cell = (function () {
                 effectedCells[cell].addModifier(modifier);
             }
         }
+        if (modifier.landValue)
+            this.propagateLandValueModifier(modifier);
     };
     Cell.prototype.propagateAllModifiers = function (modifiers) {
         for (var i = 0; i < modifiers.length; i++) {
@@ -333,6 +333,8 @@ var Cell = (function () {
         for (var cell in effectedCells) {
             effectedCells[cell].removeModifier(modifier);
         }
+        if (modifier.landValue)
+            this.removePropagatedLandValueModifier(modifier);
     };
     Cell.prototype.removeAllPropagatedModifiers = function (modifiers) {
         for (var i = 0; i < modifiers.length; i++) {
@@ -362,25 +364,98 @@ var Cell = (function () {
         this.content.modifiers = this.getValidModifiers();
         this.content.applyModifiers();
     };
+    Cell.prototype.propagateLandValueModifier = function (modifier) {
+        var effectedCells = this.getDistances(modifier.landValue.radius);
+
+        var strengthIndexes = {};
+
+        for (var _cell in effectedCells) {
+            var invertedDistance = effectedCells[_cell].invertedDistance;
+            var distance = effectedCells[_cell].distance;
+            var strength;
+            if (modifier.landValue.falloffFN) {
+                if (!strengthIndexes[invertedDistance]) {
+                    strengthIndexes[invertedDistance] = modifier.landValue.falloffFN(distance, invertedDistance);
+                }
+                strength = strengthIndexes[invertedDistance];
+            } else
+                strength = invertedDistance;
+
+            var cell = effectedCells[_cell].item;
+
+            if (cell.landValueModifiers[modifier.type] === undefined) {
+                cell.landValueModifiers[modifier.type] = {};
+
+                cell.landValueModifiers[modifier.type].strength = 0;
+                if (modifier.landValue.scalingFN) {
+                    cell.landValueModifiers[modifier.type].scalingFN = modifier.landValue.scalingFN;
+                }
+                cell.landValueModifiers[modifier.type].effect = {};
+                if (modifier.landValue.multiplier) {
+                    cell.landValueModifiers[modifier.type].effect.multiplier = modifier.landValue.multiplier;
+                }
+                if (modifier.landValue.addedValue) {
+                    cell.landValueModifiers[modifier.type].effect.addedValue = modifier.landValue.addedValue;
+                }
+            }
+
+            cell.landValueModifiers[modifier.type].strength += strength;
+
+            cell.updateLandValue();
+        }
+    };
+    Cell.prototype.removePropagatedLandValueModifier = function (modifier) {
+        var effectedCells = this.getDistances(modifier.landValue.radius);
+
+        var strengthIndexes = {};
+
+        for (var _cell in effectedCells) {
+            var cell = effectedCells[_cell].item;
+
+            if (!cell.landValueModifiers[modifier.type])
+                continue;
+
+            var invertedDistance = effectedCells[_cell].invertedDistance;
+            var distance = effectedCells[_cell].distance;
+            var strength;
+            if (modifier.landValue.falloffFN) {
+                if (!strengthIndexes[invertedDistance]) {
+                    strengthIndexes[invertedDistance] = modifier.landValue.falloffFN(distance, invertedDistance);
+                }
+                strength = strengthIndexes[invertedDistance];
+            } else
+                strength = invertedDistance;
+
+            cell.landValueModifiers[modifier.type].strength -= strength;
+
+            if (cell.landValueModifiers[modifier.type].strength <= 0) {
+                delete cell.landValueModifiers[modifier.type];
+            }
+
+            cell.updateLandValue();
+        }
+    };
     Cell.prototype.updateLandValue = function () {
-        return;
         var totals = {
-            valueChange: 0,
+            addedValue: 0,
             multiplier: 1
         };
-        for (var _modifier in this.modifiers) {
-            var modifier = this.modifiers[_modifier];
-            if (!modifier.landValue)
-                continue;
-            else {
-                for (var prop in modifier.landValue) {
-                    totals[prop] += modifier.landValue[prop];
-                }
+        for (var _modifier in this.landValueModifiers) {
+            var modifier = this.landValueModifiers[_modifier];
+
+            var strength = modifier.strength;
+            if (modifier.scalingFN) {
+                console.log(strength);
+                strength = modifier.scalingFN(strength);
+            }
+
+            for (var prop in modifier.effect) {
+                totals[prop] += modifier.effect[prop] * strength;
             }
         }
 
         // TODO
-        this.landValue = Math.round((this.baseLandValue + totals.valueChange) * totals.multiplier);
+        this.landValue = Math.round((this.baseLandValue + totals.addedValue) * totals.multiplier);
     };
     Cell.prototype.addOverlay = function (color, depth) {
         if (typeof depth === "undefined") { depth = 1; }
@@ -1419,7 +1494,7 @@ var UIDrawer = (function () {
 
         if (cell.content && cell.content.baseProfit) {
             text += "\n--------------\n";
-            text += "Base profit: " + cell.content.baseProfitPerDay.toFixed(2) + "/d" + "\n";
+            text += "Base profit: " + cell.content.baseProfit.toFixed(2) + "/d" + "\n";
             text += "-------\n";
             for (var modifier in cell.content.modifiers) {
                 var _mod = cell.content.modifiers[modifier];
@@ -1428,7 +1503,7 @@ var UIDrawer = (function () {
                 text += "Adj strength: " + _mod.scaling(_mod.strength).toFixed(3) + "\n";
                 text += "--------------\n";
             }
-            text += "Final profit: " + cell.content.modifiedProfitPerDay.toFixed(2) + "/d";
+            text += "Final profit: " + cell.content.modifiedProfit.toFixed(2) + "/d";
         }
 
         var font = this.fonts["base"];

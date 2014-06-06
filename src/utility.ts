@@ -325,6 +325,17 @@ function getDistanceFromCell(
       if (neigh !== undefined && indexedDistances[neigh.gridPos] === undefined)
       {
         var dist = indexedDistances[current.gridPos].distance + 1;
+        if (dist > maxDistance)
+        {
+          indexedDistances[center.gridPos] =
+          {
+            item: center,
+            distance: 1,
+            invertedDistance: maxDistance + 1 - 1
+          }
+          return indexedDistances;
+        }
+
         indexedDistances[neigh.gridPos] =
         {
           item: neigh,
@@ -333,16 +344,6 @@ function getDistanceFromCell(
         }
         toAnalyze.push(neigh);
       }
-    }
-    if (indexedDistances[current.gridPos].distance > maxDistance)
-    {
-      indexedDistances[center.gridPos] =
-      {
-        item: center,
-        distance: 1,
-        invertedDistance: maxDistance + 1 - 1
-      }
-      return indexedDistances;
     }
   }
 }

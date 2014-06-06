@@ -38,10 +38,8 @@ declare class Content {
     public cell: Cell;
     public flags: string[];
     public baseProfit: number;
-    public baseProfitPerDay: number;
     public modifiers: any;
     public modifiedProfit: number;
-    public modifiedProfitPerDay: number;
     public player: Player;
     constructor(props: {
         cell: Cell;
@@ -74,6 +72,7 @@ declare class Cell {
     public gridPos: number[];
     public flags: string[];
     public modifiers: any;
+    public landValueModifiers: any;
     public overlay: PIXI.Graphics;
     public player: Player;
     constructor(gridPos: any, type: any, board: any, autoInit?: boolean);
@@ -81,6 +80,7 @@ declare class Cell {
     public getScreenPos(container: any): number[];
     public getNeighbors(diagonal?: boolean): neighborCells;
     public getArea(size: number, anchor?: string, excludeStart?: boolean): any;
+    public getDistances(radius: number): any;
     public replace(type: any): void;
     public changeUndergroundContent(type?: string, update?: boolean): void;
     public changeContent(type: string, update?: boolean, player?: Player): void;
@@ -97,6 +97,8 @@ declare class Cell {
     public removeAllPropagatedModifiers(modifiers: any[]): void;
     public getValidModifiers(): any;
     public applyModifiersToContent(): void;
+    public propagateLandValueModifier(modifier: any): void;
+    public removePropagatedLandValueModifier(modifier: any): void;
     public updateLandValue(): void;
     public addOverlay(color: any, depth?: number): void;
 }

@@ -10,8 +10,9 @@ declare module cellModifiers {
             multiplier: number;
         };
         landValue: {
-            valueChange: number;
+            radius: number;
             multiplier: number;
+            falloffFN: (distance: any, invertedDistance: any) => number;
         };
     };
     function crowded(range: number, strength?: number): {
@@ -35,6 +36,10 @@ declare module cellModifiers {
             addedProfit: number;
         };
         scaling: (strength: any) => any;
+        landValue: {
+            radius: number;
+            multiplier: number;
+        };
     };
     function fastfoodCompetition(range: number, strength?: number): {
         type: string;
@@ -79,8 +84,9 @@ declare module cellModifiers {
             multiplier: number;
         };
         landValue: {
-            valueChange: number;
+            radius: number;
             multiplier: number;
+            falloffFN: (distance: any, invertedDistance: any) => number;
         };
     };
 }

@@ -161,7 +161,7 @@ var ProfitSystem = (function (_super) {
             for (var ii = 0; ii < this.targetTypes.length; ii++) {
                 var targets = player.ownedContent[this.targetTypes[ii]];
                 for (var jj = 0; jj < targets.length; jj++) {
-                    player.addMoney(targets[jj].modifiedProfit);
+                    player.addMoney(targets[jj].modifiedProfit * targets[jj].type.daysForProfitTick);
                 }
             }
         }

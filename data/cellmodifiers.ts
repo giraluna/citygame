@@ -2,6 +2,7 @@
 
 module cellModifiers
 {
+
   export function niceEnviroment(range: number, strength: number = 1)
   {
     return(
@@ -17,8 +18,9 @@ module cellModifiers
       },
       landValue:
       {
-        valueChange: 2,
-        multiplier: 0.1
+        radius: 5,
+        multiplier: 0.02,
+        falloffFN: function(distance, invertedDistance) { return 1/distance }
       }
     });
   }
@@ -56,6 +58,11 @@ module cellModifiers
       scaling: function(strength)
       {
         return strength;
+      },
+      landValue:
+      {
+        radius: 4,
+        multiplier: 0.01
       }
     });
   }
@@ -126,8 +133,9 @@ module cellModifiers
       },
       landValue:
       {
-        valueChange: 2,
-        multiplier: 0.2
+        radius: 20,
+        multiplier: 1,
+        falloffFN: function(distance, invertedDistance){ return 1; }
       }
     });
   }

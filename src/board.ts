@@ -8,7 +8,7 @@ class Board
   height: number;
   cells: any[][];
   mapGenInfo: any = {};
-  population: number = 300;
+  population: number = randInt(100, 200);
   constructor(props:
   {
     width: number;
@@ -110,18 +110,10 @@ class Board
   generateCity()
   {
     this.mapGenInfo.mainStationPos =
-      cityGeneration.placeStation(this, "smallstation", 0.4);
+      cityGeneration.placeBuilding(this, "smallstation", 0.4,
+      [{flags:["water"], radius: 4}]);
     cityGeneration.placeMainSubwayLines(this);
-
-    /*
-    var a = 
-      getDistanceFromCell(this.cells, this.getCell(this.mapGenInfo.mainStationPos), 20);
-
-    for (var cell in a)
-    {
-      a[cell].item.landValue += a[cell].invertedDistance * 1;
-    }
-    */
+    cityGeneration.placeInitialHousing(this);
   }
   
   getCell(arr: number[])

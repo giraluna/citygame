@@ -12,16 +12,23 @@ var cityGeneration;
         return typeIndexes[typeName];
     }
 
-    function getPlacability(cell, type, exclusions, radius) {
-        if (typeof radius === "undefined") { radius = 1; }
+    function getPlacability(cell, type, exclusions) {
         var canPlace = true;
 
         if (exclusions) {
-            var neighs = cell.getArea(radius);
-            for (var i = 0; i < neighs.length; i++) {
-                if (arrayLogic.or(exclusions, neighs[i].flags)) {
-                    canPlace = false;
-                    break;
+            for (var i = 0; i < exclusions.length; i++) {
+                var excludedFlags = exclusions[i].flags;
+
+                var neighs = cell.getArea(exclusions[i].radius);
+
+                for (var j = 0; j < neighs.length; j++) {
+                    if (arrayLogic.or(excludedFlags, neighs[j].flags)) {
+                        canPlace = false;
+                        break;
+                    } else if (neighs[j].content && arrayLogic.or(excludedFlags, neighs[j].content.flags)) {
+                        canPlace = false;
+                        break;
+                    }
                 }
             }
         }
@@ -35,42 +42,39 @@ var cityGeneration;
         return canPlace;
     }
 
-    function placeStation(board, _stationType, includedArea) {
-        var stationType = getIndexedType(_stationType);
+    function placeBuilding(board, _buildingType, includedArea, exclusions) {
+        var buildingType = getIndexedType(_buildingType);
 
         var invertedIncludedArea = 1 - includedArea;
         var horBorder = board.width / 2 * invertedIncludedArea;
         var vertBorder = board.height / 2 * invertedIncludedArea;
         var min = [horBorder, vertBorder];
-        var max = [board.width - horBorder, board.height - vertBorder];
+        var max = [board.width - horBorder - 1, board.height - vertBorder - 1];
 
         var finalPosition;
 
         for (var i = 0; i < 100; i++) {
-            if (finalPosition)
-                break;
-
             var randX = randInt(min[0], max[0]);
             var randY = randInt(min[1], max[1]);
 
             var cell = board.getCell([randX, randY]);
 
-            var canPlace = getPlacability(cell, stationType, ["water"], 3);
+            var canPlace = getPlacability(cell, buildingType, exclusions);
 
             if (canPlace) {
                 finalPosition = [randX, randY];
-                cell.changeContent(stationType);
+                break;
             }
         }
 
         if (!finalPosition)
-            throw new Error("Couldn't place station");
+            throw new Error("Couldn't place building");
         else {
-            cell.changeContent(stationType);
+            cell.changeContent(buildingType);
             return finalPosition;
         }
     }
-    cityGeneration.placeStation = placeStation;
+    cityGeneration.placeBuilding = placeBuilding;
 
     function placeMainSubwayLines(board) {
         var connectedToLand = [];
@@ -116,5 +120,27 @@ var cityGeneration;
         }
     }
     cityGeneration.placeMainSubwayLines = placeMainSubwayLines;
+
+    function placeInitialHousing(board) {
+        var populationToPlace = board.population;
+
+        // TODO
+        var apartmentBuildings = [];
+        for (var _b in cg.content.buildings) {
+            if (cg.content.buildings[_b].categoryType === "apartment" && cg.content.buildings[_b].population === 5) {
+                apartmentBuildings.push(_b);
+            }
+        }
+
+        while (populationToPlace > 0) {
+            var buildingToPlace = getRandomArrayItem(apartmentBuildings);
+
+            placeBuilding(board, buildingToPlace, 0.9, [
+                { radius: 1, flags: ["water"] }
+            ]);
+            populationToPlace -= getIndexedType(buildingToPlace).population;
+        }
+    }
+    cityGeneration.placeInitialHousing = placeInitialHousing;
 })(cityGeneration || (cityGeneration = {}));
 //# sourceMappingURL=citygeneration.js.map

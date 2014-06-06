@@ -436,6 +436,11 @@ var Cell = (function () {
         }
     };
     Cell.prototype.updateLandValue = function () {
+        if (this.type.type === "water") {
+            this.landValue = 0;
+            return;
+        }
+        ;
         var totals = {
             addedValue: 0,
             multiplier: 1

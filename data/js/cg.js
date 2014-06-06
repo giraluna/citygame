@@ -292,6 +292,7 @@ var cg = {
                 "anchor": [0.5, 1],
                 "frame": "house1.png",
                 "canNotBuildOn": ["water", "building", "road"],
+                "population": 5,
                 "effects": [
                     {
                         "type": "crowded",
@@ -317,6 +318,7 @@ var cg = {
                 "anchor": [0.5, 1],
                 "frame": "house2.png",
                 "canNotBuildOn": ["water", "building", "road"],
+                "population": 10,
                 "effects": [
                     {
                         "type": "crowded",
@@ -342,6 +344,7 @@ var cg = {
                 "anchor": [0.5, 1],
                 "frame": "house3.png",
                 "canNotBuildOn": ["water", "building", "road"],
+                "population": 5,
                 "effects": [
                     {
                         "type": "crowded",
@@ -367,6 +370,7 @@ var cg = {
                 "anchor": [0.5, 1],
                 "frame": "house4.png",
                 "canNotBuildOn": ["water", "building", "road"],
+                "population": 10,
                 "effects": [
                     {
                         "type": "crowded",
@@ -392,6 +396,7 @@ var cg = {
                 "anchor": [0.5, 1],
                 "frame": "house5.png",
                 "canNotBuildOn": ["water", "building", "road"],
+                "population": 10,
                 "effects": [
                     {
                         "type": "crowded",
@@ -417,6 +422,7 @@ var cg = {
                 "anchor": [0.5, 1],
                 "frame": "house6.png",
                 "canNotBuildOn": ["water", "building", "road"],
+                "population": 10,
                 "effects": [
                     {
                         "type": "crowded",

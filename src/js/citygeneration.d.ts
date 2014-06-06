@@ -2,6 +2,11 @@
 /// <reference path="utility.d.ts" />
 /// <reference path="arraylogic.d.ts" />
 declare module cityGeneration {
-    function placeStation(board: any, _stationType: string, includedArea: number): any;
+    interface IExclusionTypes {
+        radius: number;
+        flags: string[];
+    }
+    function placeBuilding(board: any, _buildingType: string, includedArea: number, exclusions?: IExclusionTypes[]): any;
     function placeMainSubwayLines(board: any): void;
+    function placeInitialHousing(board: any): void;
 }

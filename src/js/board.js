@@ -4,7 +4,7 @@
 var Board = (function () {
     function Board(props) {
         this.mapGenInfo = {};
-        this.population = 300;
+        this.population = randInt(100, 200);
         this.width = props.width;
         this.height = props.height || props.width;
 
@@ -80,17 +80,9 @@ var Board = (function () {
     };
 
     Board.prototype.generateCity = function () {
-        this.mapGenInfo.mainStationPos = cityGeneration.placeStation(this, "smallstation", 0.4);
+        this.mapGenInfo.mainStationPos = cityGeneration.placeBuilding(this, "smallstation", 0.4, [{ flags: ["water"], radius: 4 }]);
         cityGeneration.placeMainSubwayLines(this);
-        /*
-        var a =
-        getDistanceFromCell(this.cells, this.getCell(this.mapGenInfo.mainStationPos), 20);
-        
-        for (var cell in a)
-        {
-        a[cell].item.landValue += a[cell].invertedDistance * 1;
-        }
-        */
+        cityGeneration.placeInitialHousing(this);
     };
 
     Board.prototype.getCell = function (arr) {

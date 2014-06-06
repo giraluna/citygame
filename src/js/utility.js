@@ -240,6 +240,7 @@ function getNeighbors(targetArray, gridPos, diagonal) {
     return neighbors;
 }
 
+// TODO really stupid and inefficient
 function getDistanceFromCell(cells, center, maxDistance) {
     var toAnalyze = [center];
     var indexedDistances = {};

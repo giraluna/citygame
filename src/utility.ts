@@ -300,6 +300,7 @@ function getNeighbors(targetArray: any[][], gridPos: number[],
   return neighbors; 
 }
 
+// TODO really stupid and inefficient
 function getDistanceFromCell(
   cells: any[][],
   center: any,

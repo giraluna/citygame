@@ -176,6 +176,7 @@ class Cell
   landValueModifiers: any = {};
   overlay: PIXI.Graphics = undefined;
   player: Player;
+  neighbors: neighborCells;
 
   constructor( gridPos, type, board, autoInit:boolean = true)
   {
@@ -221,7 +222,12 @@ class Cell
   }
   getNeighbors(diagonal:boolean = false): neighborCells
   {
-    return getNeighbors(this.board.cells, this.gridPos, diagonal); 
+    if (!this.neighbors)
+    {
+      this.neighbors = getNeighbors(this.board.cells, this.gridPos, diagonal);
+    }
+
+    return this.neighbors;
   }
   getArea(size: number, anchor:string="center", excludeStart:boolean=false)
   {
@@ -976,8 +982,8 @@ class Game
 
     this.initContainers();
     this.initTools();
-    this.changeTool("grass");
     this.bindElements();
+    this.changeTool("grass");
 
     this.board = new Board({width: TILES});
 
@@ -1110,28 +1116,30 @@ class Game
           game.mouseEventHandler.scroller.zoom( zoomAmount );
         });
       //tools
-      for (var tool in this.tools)
+      for (var toolName in this.tools)
       {
-        var btn = document.getElementById( ""+tool+"Btn" );
-        (function addBtnFn(btn, tool)
+        var btn = document.getElementById( ""+toolName+"Btn" );
+        (function addBtnFn(btn, toolName)
         {
-          var type = self.tools[tool].type;
-          if (self.tools[tool].hasButton === false) return;
+          var tool = self.tools[toolName];
+          var type = tool.type;
+          if (tool.button === null) return;
+          else tool.button = btn;
 
           addClickAndTouchEventListener(btn, function()
           {
             self.changeTool([type]);
 
-            if (self.tools[tool].mapmode)
+            if (tool.mapmode)
             {
               eventManager.dispatchEvent(
               {
                 type: "changeMapmode",
-                content: self.tools[tool].mapmode
+                content: tool.mapmode
               });
             }
           });
-        })(btn, tool);
+        })(btn, toolName);
       }
       //save & load
       var saveBtn = document.getElementById("saveBtn");
@@ -1290,7 +1298,17 @@ class Game
 
   changeTool( tool )
   {
+    var oldTool = this.activeTool;
     this.activeTool = this.tools[tool];
+
+    if (oldTool && oldTool.button)
+    {
+      oldTool.button.classList.toggle("selected-tool");
+    }
+    if (this.activeTool.button)
+    {
+      this.activeTool.button.classList.toggle("selected-tool");
+    }
   }
   save(name: string)
   {
@@ -1602,6 +1620,22 @@ class Scroller
 
     var container = this.container;
     var oldZoom = this.currZoom;
+    /*
+    if (oldZoom <= 0.5 && zoomAmount > 0.5)
+    {
+      console.log("32>64");
+    }
+    else if ( oldZoom <= 1.5 && oldZoom >= 0.5)
+    {
+      if (zoomAmount < 0.5) console.log("64>32")
+      else if (zoomAmount > 1.5) console.log("64>128");
+    }
+    else if (oldZoom >= 1.5 && zoomAmount < 1.5)
+    {
+      console.log("128>64");
+    }*/
+    
+
     var zoomDelta = oldZoom - zoomAmount;
     var rect = container.getLocalBounds();
     //var centerX = SCREEN_WIDTH / 2 - rect.width / 2 * zoomAmount;
@@ -2116,7 +2150,7 @@ class Tool
   tintColor: number;
   activateCost: number;
   mapmode: string = "default";
-  hasButton: boolean = true;
+  button: HTMLInputElement;
 
   activate(target:Cell[])
   {
@@ -2338,7 +2372,7 @@ class NothingTool extends Tool
     this.selectType = singleSelect;
     this.tintColor = 0xFFFFFF;
     this.mapmode = undefined;
-    this.hasButton = false;
+    this.button = null;
   }
   onActivate(target: Cell)
   {

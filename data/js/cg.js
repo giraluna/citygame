@@ -436,6 +436,32 @@ var cg = {
                     }
                 ]
             },
+            "house7": {
+                "type": "house7",
+                "baseType": "building",
+                "categoryType": "apartment",
+                "translate": "Apartment 7",
+                "baseProfit": 1.2,
+                "daysForProfitTick": 30,
+                "cost": 25,
+                "buildTime": 14,
+                "anchor": [0.425, 1],
+                "frame": "house7.png",
+                "canNotBuildOn": ["water", "building", "road"],
+                "population": 5,
+                "effects": [
+                    {
+                        "type": "crowded",
+                        "range": 1,
+                        "strength": 1
+                    },
+                    {
+                        "type": "population",
+                        "range": 2,
+                        "strength": 1
+                    }
+                ]
+            },
             "fastfood": {
                 "type": "fastfood",
                 "baseType": "building",

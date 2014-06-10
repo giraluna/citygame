@@ -75,6 +75,7 @@ declare class Cell {
     public landValueModifiers: any;
     public overlay: PIXI.Graphics;
     public player: Player;
+    public neighbors: neighborCells;
     constructor(gridPos: any, type: any, board: any, autoInit?: boolean);
     public init(): void;
     public getScreenPos(container: any): number[];
@@ -251,7 +252,7 @@ declare class Tool {
     public tintColor: number;
     public activateCost: number;
     public mapmode: string;
-    public hasButton: boolean;
+    public button: HTMLInputElement;
     public activate(target: Cell[]): void;
     public onActivate(target: Cell): void;
 }

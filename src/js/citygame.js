@@ -154,7 +154,11 @@ var Cell = (function () {
     };
     Cell.prototype.getNeighbors = function (diagonal) {
         if (typeof diagonal === "undefined") { diagonal = false; }
-        return getNeighbors(this.board.cells, this.gridPos, diagonal);
+        if (!this.neighbors) {
+            this.neighbors = getNeighbors(this.board.cells, this.gridPos, diagonal);
+        }
+
+        return this.neighbors;
     };
     Cell.prototype.getArea = function (size, anchor, excludeStart) {
         if (typeof anchor === "undefined") { anchor = "center"; }
@@ -749,8 +753,8 @@ var Game = (function () {
 
         this.initContainers();
         this.initTools();
-        this.changeTool("grass");
         this.bindElements();
+        this.changeTool("grass");
 
         this.board = new Board({ width: TILES });
 
@@ -860,24 +864,27 @@ var Game = (function () {
             game.mouseEventHandler.scroller.zoom(zoomAmount);
         });
 
-        for (var tool in this.tools) {
-            var btn = document.getElementById("" + tool + "Btn");
-            (function addBtnFn(btn, tool) {
-                var type = self.tools[tool].type;
-                if (self.tools[tool].hasButton === false)
+        for (var toolName in this.tools) {
+            var btn = document.getElementById("" + toolName + "Btn");
+            (function addBtnFn(btn, toolName) {
+                var tool = self.tools[toolName];
+                var type = tool.type;
+                if (tool.button === null)
                     return;
+                else
+                    tool.button = btn;
 
                 addClickAndTouchEventListener(btn, function () {
                     self.changeTool([type]);
 
-                    if (self.tools[tool].mapmode) {
+                    if (tool.mapmode) {
                         eventManager.dispatchEvent({
                             type: "changeMapmode",
-                            content: self.tools[tool].mapmode
+                            content: tool.mapmode
                         });
                     }
                 });
-            })(btn, tool);
+            })(btn, toolName);
         }
 
         //save & load
@@ -1009,7 +1016,15 @@ var Game = (function () {
     };
 
     Game.prototype.changeTool = function (tool) {
+        var oldTool = this.activeTool;
         this.activeTool = this.tools[tool];
+
+        if (oldTool && oldTool.button) {
+            oldTool.button.classList.toggle("selected-tool");
+        }
+        if (this.activeTool.button) {
+            this.activeTool.button.classList.toggle("selected-tool");
+        }
     };
     Game.prototype.save = function (name) {
         var toSave = {
@@ -1253,6 +1268,21 @@ var Scroller = (function () {
 
         var container = this.container;
         var oldZoom = this.currZoom;
+
+        /*
+        if (oldZoom <= 0.5 && zoomAmount > 0.5)
+        {
+        console.log("32>64");
+        }
+        else if ( oldZoom <= 1.5 && oldZoom >= 0.5)
+        {
+        if (zoomAmount < 0.5) console.log("64>32")
+        else if (zoomAmount > 1.5) console.log("64>128");
+        }
+        else if (oldZoom >= 1.5 && zoomAmount < 1.5)
+        {
+        console.log("128>64");
+        }*/
         var zoomDelta = oldZoom - zoomAmount;
         var rect = container.getLocalBounds();
 
@@ -1651,7 +1681,6 @@ activate(target:Cell[]);
 var Tool = (function () {
     function Tool() {
         this.mapmode = "default";
-        this.hasButton = true;
     }
     Tool.prototype.activate = function (target) {
         for (var i = 0; i < target.length; i++) {
@@ -1855,7 +1884,7 @@ var NothingTool = (function (_super) {
         this.selectType = singleSelect;
         this.tintColor = 0xFFFFFF;
         this.mapmode = undefined;
-        this.hasButton = false;
+        this.button = null;
     }
     NothingTool.prototype.onActivate = function (target) {
     };

@@ -2,6 +2,9 @@
 @dark-blue: rgb(88, 121, 130);
 @near-white: #DDD;
 
+@light-button-top: hsv(0, 0, 100%);
+@light-button-bot: hsv(0, 0, 91%);
+
 .single-gradient(@dir, @col1, @col2)
 {
   background: linear-gradient(@dir, @col1, @col2);
@@ -77,6 +80,7 @@ html, body
   }
 }
 
+
 #side-menu
 {
   order: 2;
@@ -98,6 +102,14 @@ html, body
   select
   {
     width: 70px;
+  }
+
+  .selected-tool
+  {
+    .single-gradient(
+      to top, @light-button-top, @light-button-bot);
+    border-style: inset;
+    border-color: @light-button-top;
   }
 
 

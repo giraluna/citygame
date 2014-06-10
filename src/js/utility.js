@@ -242,28 +242,30 @@ function getNeighbors(targetArray, gridPos, diagonal) {
 
 // TODO really stupid and inefficient
 function getDistanceFromCell(cells, center, maxDistance) {
+    maxDistance++;
+
     var toAnalyze = [center];
     var indexedDistances = {};
     indexedDistances[center.gridPos] = {
         item: center,
-        distance: 0
+        distance: 1,
+        invertedDistance: maxDistance,
+        invertedDistanceRatio: 1
     };
-
     while (true) {
         var current = toAnalyze.shift();
-        var neighs = getNeighbors(cells, current.gridPos);
+        var neighs;
+        if (current.getNeighbors !== undefined) {
+            neighs = current.getNeighbors();
+        } else {
+            neighs = getNeighbors(cells, current.gridPos);
+        }
 
         for (var _neigh in neighs) {
             var neigh = neighs[_neigh];
             if (neigh !== undefined && indexedDistances[neigh.gridPos] === undefined) {
                 var dist = indexedDistances[current.gridPos].distance + 1;
                 if (dist > maxDistance) {
-                    indexedDistances[center.gridPos] = {
-                        item: center,
-                        distance: 1,
-                        invertedDistance: maxDistance,
-                        invertedDistanceRatio: 1
-                    };
                     return indexedDistances;
                 }
 

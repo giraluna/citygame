@@ -43,8 +43,10 @@ body {
 #side-menu select {
   width: 70px;
 }
-#side-menu #removeBtn {
-  margin-top: 25px;
+#side-menu .selected-tool {
+  background: linear-gradient(to top, #ffffff, #e8e8e8);
+  border-style: inset;
+  border-color: #ffffff;
 }
 #side-menu #action-buttons {
   margin-top: 25px;

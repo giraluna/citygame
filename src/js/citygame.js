@@ -1804,7 +1804,7 @@ var HouseTool = (function (_super) {
             }
         }
 
-        target.changeContent(cg["content"]["buildings"]["parkinglot"]);
+        target.changeContent(toChange);
     };
     return HouseTool;
 })(Tool);
@@ -1817,7 +1817,6 @@ var RoadTool = (function (_super) {
         this.tintColor = 0x696969;
     }
     RoadTool.prototype.onActivate = function (target) {
-        target.changeContent(cg["content"]["buildings"]["parkinglot"]);
         target.changeContent(cg["content"]["roads"]["road_nesw"]);
     };
     return RoadTool;

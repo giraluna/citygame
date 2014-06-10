@@ -2288,7 +2288,7 @@ class HouseTool extends Tool
       }
     }
 
-    target.changeContent( cg["content"]["buildings"]["parkinglot"] );
+    target.changeContent( toChange );
   }
 }
 class RoadTool extends Tool
@@ -2302,7 +2302,6 @@ class RoadTool extends Tool
   } 
   onActivate(target: Cell)
   {
-    target.changeContent( cg["content"]["buildings"]["parkinglot"] );
     target.changeContent( cg["content"]["roads"]["road_nesw"] );
   }
 }

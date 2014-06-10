@@ -13,10 +13,10 @@ var cellModifiers;
                 multiplier: 0.1
             },
             landValue: {
-                radius: 8,
-                multiplier: 0.05,
+                radius: 4,
+                multiplier: 0.1,
                 scalingFN: function (strength) {
-                    return 1 + Math.log(strength);
+                    return 1 + Math.log(strength / 2);
                 }
             }
         });

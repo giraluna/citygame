@@ -18,9 +18,9 @@ module cellModifiers
       },
       landValue:
       {
-        radius: 8,
-        multiplier: 0.05,
-        scalingFN: function(strength){ return 1+Math.log(strength); }
+        radius: 4,
+        multiplier: 0.1,
+        scalingFN: function(strength){ return 1+Math.log(strength/2); },
       }
     });
   }

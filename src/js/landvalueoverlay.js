@@ -9,10 +9,12 @@ function makeLandValueOverlay(board) {
         var difference = maxValue - minValue;
         if (difference < 1)
             difference = 1;
-        var ababa = difference / 5;
-        if (ababa < 1)
-            ababa = 1;
-        var relative = (Math.round(val / ababa) * ababa - minValue) / (difference);
+
+        // clamps to steps of difference / n
+        var threshhold = difference / 5;
+        if (threshhold < 1)
+            threshhold = 1;
+        var relative = (Math.round(val / threshhold) * threshhold - minValue) / (difference);
         return relative;
     }
 
@@ -44,6 +46,8 @@ function makeLandValueOverlay(board) {
 
         if (!colorIndexes[cell.value]) {
             var relativeValue = getRelativeValue(cell.value);
+
+            //relativeValue += relativeValue * 0.3;
             if (relativeValue < 0)
                 relativeValue = 0;
             else if (relativeValue > 1)

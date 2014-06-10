@@ -129,7 +129,7 @@ var Cell = (function () {
 
         var baseVal = 15;
 
-        this.baseLandValue = this.landValue = Math.round(baseVal + baseVal * relativeInverseDist);
+        this.baseLandValue = this.landValue = Math.round(baseVal + baseVal * relativeInverseDist * 0.5);
 
         this.board = board;
         this.flags = this.type["flags"].slice(0);
@@ -167,7 +167,7 @@ var Cell = (function () {
         return getArea(this.board.cells, this.gridPos, size, anchor, excludeStart);
     };
     Cell.prototype.getDistances = function (radius) {
-        return getDistanceFromCell(this.board.cells, this, radius);
+        return getDistanceFromCell(this.board.cells, this, radius, true);
     };
     Cell.prototype.replace = function (type) {
         var _oldType = this.type;

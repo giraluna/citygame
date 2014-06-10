@@ -193,7 +193,7 @@ class Cell
     var baseVal = 15;
 
     this.baseLandValue = this.landValue =
-      Math.round(baseVal + baseVal * relativeInverseDist);
+      Math.round(baseVal + baseVal * relativeInverseDist * 0.5);
       
     this.board = board;
     this.flags = this.type["flags"].slice(0);
@@ -242,7 +242,7 @@ class Cell
   }
   getDistances(radius: number)
   {
-    return getDistanceFromCell(this.board.cells, this, radius);
+    return getDistanceFromCell(this.board.cells, this, radius, true);
   }
   replace( type ) //change base type of tile
   {

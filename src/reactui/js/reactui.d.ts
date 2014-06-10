@@ -90,5 +90,6 @@ declare class ReactUI {
     public incrementZIndex(key?: any): number;
     public destroyPopup(key: any, callback?: any): void;
     public closeTopPopup(): void;
+    public clearAllPopups(): void;
     public updateReact(): void;
 }

@@ -1,122 +1,5 @@
 /// <reference path="js/utility.d.ts" />
-
-// TODO
-var TEMPNAMES =
-{
-  american:
-  {
-    male:
-    [
-      "James",
-      "Christopher",
-      "Ronald",
-      "John",
-      "Daniel",
-      "Anthony",
-      "Robert",
-      "Paul",
-      "Kevin",
-      "Michael",
-      "Mark",
-      "Jason",
-      "William",
-      "Donald",
-      "Robin",
-      "Jeff",
-      "David",
-      "George",
-      "Richard",
-      "Kenneth",
-      "Charles",
-      "Steven",
-      "Joseph",
-      "Edward",
-      "Thomas",
-      "Brian",
-      "Davis"
-    ],
-    female:
-    [
-      "Mary",
-      "Lisa",
-      "Michelle",
-      "Patricia",
-      "Nancy",
-      "Laura",
-      "Linda",
-      "Karen",
-      "Sarah",
-      "Barbara",
-      "Betty",
-      "Kimberly",
-      "Elizabeth",
-      "Helen",
-      "Deborah",
-      "Jennifer",
-      "Sandra",
-      "Maria",
-      "Donna",
-      "Susan",
-      "Carol",
-      "Margaret",
-      "Ruth"
-    ],
-    surnames:
-    [
-      "Smith",
-      "Anderson",
-      "Clark",
-      "Wright",
-      "Mitchell",
-      "Johnson",
-      "Thomas",
-      "Rodriguez",
-      "Lopez",
-      "Perez",
-      "Williams",
-      "Jackson",
-      "Lewis",
-      "Hill",
-      "Roberts",
-      "Jones",
-      "White",
-      "Lee",
-      "Scott",
-      "Turner",
-      "Brown",
-      "Harris",
-      "Walker",
-      "Green",
-      "Phillips",
-      "Davis",
-      "Martin",
-      "Hall",
-      "Adams",
-      "Campbell",
-      "Miller",
-      "Farmer",
-      "Thompson",
-      "Allen",
-      "Baker",
-      "Parker",
-      "Wilson",
-      "Garcia",
-      "Young",
-      "Gonzalez",
-      "Evans",
-      "Moore",
-      "Martinez",
-      "Hernandez",
-      "Nelson",
-      "Edwards",
-      "Taylor",
-      "Robinson",
-      "King",
-      "Carter",
-      "Collins"
-    ]
-  }
-}
+/// <reference path="../data/js/names.d.ts" />
 
 var idGenerator = idGenerator || {};
 idGenerator.employee = 0;
@@ -186,7 +69,17 @@ class Employee
     var first = getRandomArrayItem(names[ethnicity][gender]);
     var last = getRandomArrayItem(names[ethnicity]["surnames"]);
 
-    return "" + first + " " + last;
+    var final = "";
+    if (names[ethnicity].props && names[ethnicity].props.surname_first)
+    {
+      final += last + " " + first;
+    }
+    else
+    {
+      final += first + " " + last;
+    }
+
+    return final;
   }
   setSkillsByLevel(skillLevel, variance)
   {
@@ -274,7 +167,7 @@ function makeNewEmployees(employeeCount: number, recruitingSkill: number)
   for (var i = 0; i < employeeCount; i++)
   {
 
-    var newEmployee = new Employee(TEMPNAMES,
+    var newEmployee = new Employee(names,
     {
       skillLevel: recruitSkillLevel(recruitingSkill),
       growthLevel: Math.random(),

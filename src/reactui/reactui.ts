@@ -461,6 +461,10 @@ class ReactUI
       this.destroyPopup(key);
     }
   }
+  clearAllPopups()
+  {
+    this.popups = {};
+  }
 
   updateReact()
   {

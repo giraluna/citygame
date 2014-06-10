@@ -1,11 +1,5 @@
 /// <reference path="utility.d.ts" />
-declare var TEMPNAMES: {
-    american: {
-        male: string[];
-        female: string[];
-        surnames: string[];
-    };
-};
+/// <reference path="../../data/js/names.d.ts" />
 declare var idGenerator: any;
 interface ISkillsObj {
     negotiation: number;

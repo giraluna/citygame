@@ -316,6 +316,9 @@ var ReactUI = (function () {
             this.destroyPopup(key);
         }
     };
+    ReactUI.prototype.clearAllPopups = function () {
+        this.popups = {};
+    };
 
     ReactUI.prototype.updateReact = function () {
         React.renderComponent(UIComponents.Stage({ popups: this.popups }), document.getElementById("react-container"));

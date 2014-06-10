@@ -241,7 +241,8 @@ function getNeighbors(targetArray, gridPos, diagonal) {
 }
 
 // TODO really stupid and inefficient
-function getDistanceFromCell(cells, center, maxDistance) {
+function getDistanceFromCell(cells, center, maxDistance, diagonal) {
+    if (typeof diagonal === "undefined") { diagonal = false; }
     maxDistance++;
 
     var toAnalyze = [center];
@@ -252,21 +253,26 @@ function getDistanceFromCell(cells, center, maxDistance) {
         invertedDistance: maxDistance,
         invertedDistanceRatio: 1
     };
-    while (true) {
+    while (toAnalyze.length > 0) {
         var current = toAnalyze.shift();
-        var neighs;
+        var neighbors;
         if (current.getNeighbors !== undefined) {
-            neighs = current.getNeighbors();
+            neighbors = current.getNeighbors(diagonal);
         } else {
-            neighs = getNeighbors(cells, current.gridPos);
+            neighbors = getNeighbors(cells, current.gridPos, diagonal);
         }
 
-        for (var _neigh in neighs) {
-            var neigh = neighs[_neigh];
+        for (var direction in neighbors) {
+            var neigh = neighbors[direction];
             if (neigh !== undefined && indexedDistances[neigh.gridPos] === undefined) {
-                var dist = indexedDistances[current.gridPos].distance + 1;
+                var weight = 1;
+                if (diagonal && ["ne", "nw", "se", "sw"].indexOf(direction) !== -1) {
+                    weight = 1.375;
+                }
+
+                var dist = indexedDistances[current.gridPos].distance + weight;
                 if (dist > maxDistance) {
-                    return indexedDistances;
+                    break;
                 }
 
                 indexedDistances[neigh.gridPos] = {
@@ -279,6 +285,7 @@ function getDistanceFromCell(cells, center, maxDistance) {
             }
         }
     }
+    return indexedDistances;
 }
 
 function getArea(targetArray, gridPos, size, anchor, excludeStart) {

@@ -586,7 +586,7 @@ var cg: any =
         "baseProfit": 3,
         "daysForProfitTick": 90,
         "cost": 50,
-        "buildTime": 14,
+        "buildTime": 21,
         "anchor": [0.5, 1],
         "frame": "smalloffice.png",
         "canNotBuildOn": ["water", "building", "road"]
@@ -608,6 +608,33 @@ var cg: any =
           {
             "type": "nearbyStation",
             "range": 3,
+            "strength": 1
+          }
+        ]
+      },
+      "parkinglot":
+      {
+        "type": "parkinglot",
+        "baseType": "building",
+        "categoryType": "parking",
+        "translate": "Parking lot",
+        "baseProfit": 1,
+        "daysForProfitTick": 1,
+        "cost": 25,
+        "buildTime": 14,
+        "anchor": [0.5, 1],
+        "frame": "parkinglot.png",
+        "canNotBuildOn": ["water", "building", "road"],
+        "effects":
+        [
+          {
+            "type": "nearbyParking",
+            "range": 2,
+            "strength": 1
+          },
+          {
+            "type": "parkingCompetition",
+            "range": 2,
             "strength": 1
           }
         ]

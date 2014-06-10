@@ -142,4 +142,37 @@ module cellModifiers
       }
     });
   }
+
+  export function parkingCompetition(range: number, strength: number = 1)
+  {
+    return(
+    {
+      type: "parkingCompetition",
+      translate: "Competing stores",
+      range: range,
+      strength: strength,
+      targets: ["parking"],
+      effect:
+      {
+        addedProfit: -0.075,
+        multiplier: -0.15,
+      }
+    });
+  }
+
+  export function nearbyParking(range: number, strength: number = 1)
+  {
+    return(
+    {
+      type: "nearbyParking",
+      translate: "Nearby parking",
+      range: range,
+      strength: strength,
+      targets: ["fastfood", "shopping"],
+      effect:
+      {
+        addedProfit: 0.1
+      }
+    });
+  }
 }

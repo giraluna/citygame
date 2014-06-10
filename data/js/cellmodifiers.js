@@ -130,5 +130,36 @@ var cellModifiers;
         });
     }
     cellModifiers.nearbyStation = nearbyStation;
+
+    function parkingCompetition(range, strength) {
+        if (typeof strength === "undefined") { strength = 1; }
+        return ({
+            type: "parkingCompetition",
+            translate: "Competing stores",
+            range: range,
+            strength: strength,
+            targets: ["parking"],
+            effect: {
+                addedProfit: -0.075,
+                multiplier: -0.15
+            }
+        });
+    }
+    cellModifiers.parkingCompetition = parkingCompetition;
+
+    function nearbyParking(range, strength) {
+        if (typeof strength === "undefined") { strength = 1; }
+        return ({
+            type: "nearbyParking",
+            translate: "Nearby parking",
+            range: range,
+            strength: strength,
+            targets: ["fastfood", "shopping"],
+            effect: {
+                addedProfit: 0.1
+            }
+        });
+    }
+    cellModifiers.nearbyParking = nearbyParking;
 })(cellModifiers || (cellModifiers = {}));
 //# sourceMappingURL=cellmodifiers.js.map

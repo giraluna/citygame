@@ -89,4 +89,25 @@ declare module cellModifiers {
             falloffFN: (distance: any, invertedDistance: any, invertedDistanceRatio: any) => number;
         };
     };
+    function parkingCompetition(range: number, strength?: number): {
+        type: string;
+        translate: string;
+        range: number;
+        strength: number;
+        targets: string[];
+        effect: {
+            addedProfit: number;
+            multiplier: number;
+        };
+    };
+    function nearbyParking(range: number, strength?: number): {
+        type: string;
+        translate: string;
+        range: number;
+        strength: number;
+        targets: string[];
+        effect: {
+            addedProfit: number;
+        };
+    };
 }

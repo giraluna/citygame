@@ -178,6 +178,7 @@ class Cell
   overlay: PIXI.Graphics = undefined;
   player: Player;
   neighbors: neighborCells;
+  neighborsWithDiagonals: neighborCells;
 
   constructor( gridPos, type, board, autoInit:boolean = true)
   {
@@ -223,12 +224,22 @@ class Cell
   }
   getNeighbors(diagonal:boolean = false): neighborCells
   {
-    if (!this.neighbors)
+    if (diagonal)
     {
-      this.neighbors = getNeighbors(this.board.cells, this.gridPos, diagonal);
+      if (!this.neighborsWithDiagonals)
+      {
+        this.neighborsWithDiagonals = getNeighbors(this.board.cells, this.gridPos, diagonal);
+      }
+      return this.neighborsWithDiagonals;
     }
-
-    return this.neighbors;
+    else
+    {
+      if (!this.neighbors)
+      {
+        this.neighbors = getNeighbors(this.board.cells, this.gridPos, diagonal);
+      }
+      return this.neighbors;
+    }
   }
   getArea(size: number, anchor:string="center", excludeStart:boolean=false)
   {

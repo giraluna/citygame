@@ -155,11 +155,17 @@ var Cell = (function () {
     };
     Cell.prototype.getNeighbors = function (diagonal) {
         if (typeof diagonal === "undefined") { diagonal = false; }
-        if (!this.neighbors) {
-            this.neighbors = getNeighbors(this.board.cells, this.gridPos, diagonal);
+        if (diagonal) {
+            if (!this.neighborsWithDiagonals) {
+                this.neighborsWithDiagonals = getNeighbors(this.board.cells, this.gridPos, diagonal);
+            }
+            return this.neighborsWithDiagonals;
+        } else {
+            if (!this.neighbors) {
+                this.neighbors = getNeighbors(this.board.cells, this.gridPos, diagonal);
+            }
+            return this.neighbors;
         }
-
-        return this.neighbors;
     };
     Cell.prototype.getArea = function (size, anchor, excludeStart) {
         if (typeof anchor === "undefined") { anchor = "center"; }

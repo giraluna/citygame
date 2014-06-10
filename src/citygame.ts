@@ -3,6 +3,7 @@
 /// 
 /// <reference path="reactui/js/reactui.d.ts" />
 /// <reference path="../data/js/cg.d.ts" />
+/// <reference path="../data/js/names.d.ts" />
 /// 
 /// <reference path="js/ui.d.ts" />
 /// <reference path="js/loader.d.ts" />
@@ -1433,7 +1434,7 @@ class Game
   {
     for (var employee in data.employees)
     {
-      data.employees[employee] = new Employee(TEMPNAMES, data.employees[employee]);
+      data.employees[employee] = new Employee(names, data.employees[employee]);
     }
     var newPlayer = new Player(data.id);
     for (var prop in data)

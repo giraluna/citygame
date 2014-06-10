@@ -5,3 +5,4 @@
 *.old
 *js.map
 *jsx
+*.blend[12345]

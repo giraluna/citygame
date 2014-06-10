@@ -57,8 +57,8 @@ class Employee
     var skillVariance = Math.round(_params.skillVariance) || 1;
     this.skills = _params.skills || this.setSkillsByLevel(_params.skillLevel, skillVariance);
     this.growth = _params.growth || this.setGrowthByLevel(_params.growthLevel);
-    this.potential = _params.potential ||
-      50 * _params.skillLevel + 30 * Math.random();
+    this.potential = _params.potential || 80;
+      //50 * _params.skillLevel + 30 * Math.random();
 
     
     this.setSkillTotal();
@@ -112,7 +112,7 @@ class Employee
     for (var skill in skills)
     {
       var _growth = Math.random() * growthLevel;
-      skills[skill] = _growth > 0.1 ? _growth : 0.1;
+      skills[skill] = _growth > 0.4 ? _growth : 0.4;
     }
     return skills;
   }
@@ -136,9 +136,11 @@ class Employee
       var rand = Math.random();
 
       var adjustedGrowth =
-        this.growth[skill] * ( 1 / Math.log(this.skills[skill] + 0.5) );
+        this.growth[skill] * ( 2 / Math.log(this.skills[skill] + 0.5) );
+      console.log(rand, adjustedGrowth, this.growth[skill]);
       if (rand + adjustedGrowth > 1)
       {
+        console.log("levelup");
         this.skills[skill]++;
         this.skillTotal++;
       }

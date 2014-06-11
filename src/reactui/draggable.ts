@@ -15,10 +15,11 @@ export var Draggable =
     // browser overrides css cursor when dragging
     e.nativeEvent.dataTransfer.dropEffect = "move";
 
+
     this.offset =
     {
-      x: e.nativeEvent.layerX,
-      y: e.nativeEvent.layerY
+      x: e.nativeEvent.pageX - parseInt(this.DOMNode.style.left),
+      y: e.nativeEvent.pageY - parseInt(this.DOMNode.style.top)
     };
   },
   handleDrag: function(e)

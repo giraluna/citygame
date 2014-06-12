@@ -229,6 +229,13 @@ var DateSystem = (function (_super) {
         };
         return dateObj;
     };
+    DateSystem.prototype.setDate = function (newDate) {
+        this.year = newDate.year;
+        this.month = newDate.month;
+        this.day = newDate.day;
+
+        this.updateDate();
+    };
     DateSystem.prototype.toString = function () {
         return "" + this.day + "." + this.month + "." + this.year;
     };

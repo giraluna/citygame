@@ -292,6 +292,14 @@ class DateSystem extends System
     };
     return dateObj;
   }
+  setDate(newDate: IDateObj)
+  {
+    this.year = newDate.year;
+    this.month = newDate.month;
+    this.day = newDate.day;
+
+    this.updateDate();
+  }
   toString()
   {
     return "" + this.day + "." + this.month + "." + this.year;

@@ -82,6 +82,7 @@ declare class DateSystem extends System {
         (): any;
     }[], date: number): void;
     public getDate(): IDateObj;
+    public setDate(newDate: IDateObj): void;
     public toString(): string;
     public updateDate(): void;
 }

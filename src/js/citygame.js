@@ -129,7 +129,7 @@ var Cell = (function () {
 
         var relativeInverseDist = 1 - (meanDistance / maxDist);
 
-        var baseVal = 15;
+        var baseVal = board.population / 4;
 
         this.baseLandValue = this.landValue = Math.round(baseVal + baseVal * relativeInverseDist * 0.5);
 
@@ -709,8 +709,8 @@ var WorldRenderer = (function () {
             }
             case "underground": {
                 if (zoomLayer.underground.children <= 0) {
-                    for (var i = 0; i < zoomLayer.ground.children.length; i++) {
-                        var currSprite = zoomLayer.ground.children[i];
+                    for (var i = 0; i < zoomLayer.ground.children[0].children.length; i++) {
+                        var currSprite = zoomLayer.ground.children[0].children[i];
 
                         var _s = PIXI.Sprite.fromFrame("underground.png");
                         _s.position = currSprite.position.clone();
@@ -1078,7 +1078,8 @@ var Game = (function () {
         var toSave = {
             player: this.savePlayer(this.players["player0"]),
             boards: this.saveBoards(this.boards),
-            date: new Date()
+            date: new Date(),
+            gameDate: this.systemsManager.systems.date.getDate()
         };
         localStorage.setItem(name, JSON.stringify(toSave));
     };
@@ -1103,6 +1104,10 @@ var Game = (function () {
         var parsed = JSON.parse(localStorage.getItem(name));
         this.loadPlayer(parsed.player);
         this.loadBoards(parsed);
+
+        // legacy
+        if (parsed.gameDate)
+            this.systemsManager.systems.date.setDate(parsed.gameDate);
     };
     Game.prototype.saveBoards = function (boardsToSave) {
         var savedBoards = [];

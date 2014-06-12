@@ -30,7 +30,7 @@ var SCREEN_WIDTH = 720,
     WORLD_WIDTH = TILES * TILE_WIDTH,
     WORLD_HEIGHT = TILES * TILE_HEIGHT,
     ZOOM_LEVELS = [1],
-    AMT_OF_BOARDS = 3;
+    AMT_OF_BOARDS = 1;
 
 var idGenerator = idGenerator || {};
 idGenerator.content = 0;

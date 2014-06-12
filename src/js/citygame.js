@@ -775,6 +775,7 @@ var Game = (function () {
             this.boards.push(new Board({ width: TILES }));
         }
         this.changeActiveBoard(0);
+        this.updateBoardSelect();
 
         this.highlighter = new Highlighter();
 
@@ -1008,12 +1009,32 @@ var Game = (function () {
                 type: "updateWorld",
                 content: ""
             });
+            self.updateBoardSelect();
+        });
+
+        // board select
+        var boardSelect = document.getElementById("board-select");
+        boardSelect.addEventListener("change", function (event) {
+            self.changeActiveBoard(parseInt(boardSelect.value));
         });
     };
     Game.prototype.bindRenderer = function () {
         var _canvas = document.getElementById("pixi-container");
         _canvas.appendChild(this.renderer.view);
         this.renderer.view.setAttribute("id", "pixi-canvas");
+    };
+    Game.prototype.updateBoardSelect = function () {
+        var boardSelect = document.getElementById("board-select");
+        while (boardSelect.children.length > 0) {
+            boardSelect.remove(0);
+        }
+        for (var i = 0; i < this.boards.length; i++) {
+            var opt = document.createElement("option");
+            opt.value = "" + i;
+            opt.text = this.boards[i].name;
+
+            boardSelect.add(opt);
+        }
     };
     Game.prototype.updateWorld = function (clear) {
         eventManager.dispatchEvent({ type: "updateWorld", content: { clear: clear } });
@@ -1083,13 +1104,14 @@ var Game = (function () {
     };
     Game.prototype.saveBoards = function (boardsToSave) {
         var savedBoards = [];
-        for (var i = 0; i < boardsToSave.length; i++) {
+        for (var k = 0; k < boardsToSave.length; k++) {
             var data = {};
-            var board = boardsToSave[i];
+            var board = boardsToSave[k];
 
             data.width = board.width;
             data.height = board.height;
             data.population = board.population;
+            data.name = board.name;
             data.cells = [];
 
             for (var i = 0; i < board.cells.length; i++) {
@@ -1159,6 +1181,7 @@ var Game = (function () {
             });
 
             board.population = currToLoad.population;
+            board.name = currToLoad.name || board.name;
 
             newBoards.push(board);
         }
@@ -1167,6 +1190,7 @@ var Game = (function () {
         game.changeActiveBoard(cachedBoardIndex);
 
         eventManager.dispatchEvent({ type: "updateWorld", content: { clear: true } });
+        this.updateBoardSelect();
     };
 
     Game.prototype.savePlayer = function (player) {

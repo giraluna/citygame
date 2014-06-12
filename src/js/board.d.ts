@@ -6,6 +6,7 @@
 declare var idGenerator: any;
 declare class Board {
     public id: number;
+    public name: string;
     public width: number;
     public height: number;
     public totalSize: number;

@@ -12,6 +12,7 @@ var Board = (function () {
         this.mapGenInfo = {};
         this.layers = {};
         this.id = idGenerator.board++;
+        this.name = "City " + this.id;
 
         this.width = props.width;
         this.height = props.height || props.width;

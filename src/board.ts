@@ -11,6 +11,7 @@ idGenerator.board = 0;
 class Board
 {
   id: number;
+  name: string;
   width: number;
   height: number;
   totalSize: number;
@@ -26,6 +27,7 @@ class Board
   })
   {
     this.id = idGenerator.board++;
+    this.name = "City " + this.id;
 
     this.width = props.width;
     this.height = props.height || props.width;

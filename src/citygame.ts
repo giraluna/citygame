@@ -1015,6 +1015,7 @@ class Game
       this.boards.push(new Board({width: TILES}));
     }
     this.changeActiveBoard(0);
+    this.updateBoardSelect();
 
     this.highlighter = new Highlighter();
 
@@ -1293,13 +1294,37 @@ class Game
           type: "updateWorld",
           content: ""
         });
+        self.updateBoardSelect();
       });
+      // board select
+      var boardSelect = <HTMLInputElement> document.getElementById("board-select");
+      boardSelect.addEventListener("change", function(event)
+      {
+        self.changeActiveBoard( parseInt(boardSelect.value) );
+      });
+      
   }
   bindRenderer()
   {
     var _canvas = document.getElementById("pixi-container");
     _canvas.appendChild(this.renderer.view);
     this.renderer.view.setAttribute("id", "pixi-canvas");
+  }
+  updateBoardSelect()
+  {
+    var boardSelect = <HTMLSelectElement> document.getElementById("board-select");
+    while (boardSelect.children.length > 0)
+    {
+      boardSelect.remove(0);
+    }
+    for (var i = 0; i < this.boards.length; i++)
+    {
+      var opt = document.createElement("option");
+      opt.value = "" + i;
+      opt.text = this.boards[i].name;
+
+      boardSelect.add(opt);
+    }
   }
   updateWorld(clear?: boolean)
   {
@@ -1388,14 +1413,15 @@ class Game
   saveBoards(boardsToSave: Board[])
   {
     var savedBoards = [];
-    for (var i = 0; i < boardsToSave.length; i++)
+    for (var k = 0; k < boardsToSave.length; k++)
     {
       var data: any = {};
-      var board = boardsToSave[i];
+      var board = boardsToSave[k];
 
       data.width = board.width;
       data.height = board.height;
       data.population = board.population;
+      data.name = board.name;
       data.cells = [];
 
       for (var i = 0; i < board.cells.length; i++)
@@ -1432,7 +1458,6 @@ class Game
       savedBoards.push(data);
     }
 
-    
     return savedBoards;
   }
   loadBoards(data: any)
@@ -1486,6 +1511,7 @@ class Game
       });
 
       board.population = currToLoad.population;
+      board.name = currToLoad.name || board.name;
 
       newBoards.push(board);
     }
@@ -1494,6 +1520,7 @@ class Game
     game.changeActiveBoard(cachedBoardIndex);
 
     eventManager.dispatchEvent({type: "updateWorld", content:{clear: true}});
+    this.updateBoardSelect();
   }
 
   savePlayer(player: Player)

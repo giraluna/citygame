@@ -174,6 +174,7 @@ declare class Game {
     public initTools(): void;
     public bindElements(): void;
     public bindRenderer(): void;
+    public updateBoardSelect(): void;
     public updateWorld(clear?: boolean): void;
     public resize(): void;
     public changeTool(tool: any): void;

@@ -8,6 +8,7 @@
 /// <reference path="js/ui.d.ts" />
 /// <reference path="js/loader.d.ts" />
 /// 
+/// <reference path="js/sorteddisplaycontainer.d.ts" />
 /// <reference path="js/player.d.ts" />F
 /// <reference path="js/systems.d.ts" />
 /// <reference path="js/eventlistener.d.ts" />
@@ -30,7 +31,7 @@ var SCREEN_WIDTH = 720,
     WORLD_WIDTH = TILES * TILE_WIDTH,
     WORLD_HEIGHT = TILES * TILE_HEIGHT,
     ZOOM_LEVELS = [1],
-    AMT_OF_BOARDS = 1;
+    AMT_OF_BOARDS = 3;
 
 var idGenerator = idGenerator || {};
 idGenerator.content = 0;
@@ -130,7 +131,8 @@ class Content
     var cellSprite = this.cell.sprite;
     var gridPos = this.cell.gridPos;
     _s.position = this.cell.sprite.position.clone();
-    game.layers[layer]._addChildAt(_s, gridPos[0] + gridPos[1]);
+
+    this.cell.board.addSpriteToLayer(layer, _s, gridPos);
   }
   applyModifiers()
   {
@@ -208,7 +210,7 @@ class Cell
     _s.position = arrayToPoint( getIsoCoord(this.gridPos[0], this.gridPos[1],
       TILE_WIDTH, TILE_HEIGHT,
       [WORLD_WIDTH/2, TILE_HEIGHT]) );
-    game.layers["ground"].addChild(_s);
+    this.board.addSpriteToLayer("ground", _s);
 
     if (this.type.effects)
     {
@@ -292,8 +294,8 @@ class Cell
   {
     if (this.undergroundContent)
     {
-      game.layers["undergroundContent"]._removeChildAt(this.undergroundContent.sprite,
-        this.gridPos[0] + this.gridPos[1]);
+      this.board.removeSpriteFromLayer("undergroundContent", this.undergroundContent.sprite,
+        this.gridPos);
       this.undergroundContent = undefined;
     }
 
@@ -420,8 +422,8 @@ class Cell
     {
       this.removeAllPropagatedModifiers(this.content.type.translatedEffects);
     }
-    game.layers["content"]._removeChildAt(this.content.sprite,
-      this.gridPos[0] + this.gridPos[1]);
+    this.board.removeSpriteFromLayer("content", this.content.sprite,
+      this.gridPos);
 
     this.content = undefined;
   }
@@ -652,7 +654,7 @@ class Cell
   {
     if (this.overlay)
     {
-      game.layers["cellOverlay"]._removeChildAt(this.overlay, this.gridPos[0], this.gridPos[1]);
+      this.board.removeSpriteFromLayer("cellOverlay", this.overlay, this.gridPos);
     }
 
     var neighbors = this.getNeighbors();
@@ -703,9 +705,9 @@ class Cell
     }
 
     gfx.position = this.sprite.position.clone();
-    game.layers["cellOverlay"]._addChildAt(gfx, this.gridPos[0], this.gridPos[1]);
+    this.board.addSpriteToLayer("cellOverlay", gfx, this.gridPos);
 
-    this.overlay = gfx;;
+    this.overlay = gfx;
 
     var willUpdateNeighbors = false;
 
@@ -769,7 +771,7 @@ class WorldRenderer
       }
     }
   };
-  currentMapmode: string;
+  currentMapmode: string = "default";
   
   constructor(width, height)
   {
@@ -857,14 +859,13 @@ class WorldRenderer
       var main = zoomLayer["main"];
 
       zoomLayer["underground"] = new PIXI.DisplayObjectContainer();
-      zoomLayer["undergroundContent"] = new SortedDisplayObjectContainer(TILES * 2);
+      zoomLayer["undergroundContent"] = new PIXI.DisplayObjectContainer();
       zoomLayer["ground"]  = new PIXI.DisplayObjectContainer();
       zoomLayer["landValueOverlay"] = new PIXI.DisplayObjectContainer();
-      zoomLayer["cellOverlay"] = new SortedDisplayObjectContainer(TILES * 2);
-      zoomLayer["content"] = new SortedDisplayObjectContainer(TILES * 2);
+      zoomLayer["cellOverlay"] = new PIXI.DisplayObjectContainer();
+      zoomLayer["content"] = new PIXI.DisplayObjectContainer();
     }
 
-    this.setMapmode("default");
   }
   clearLayers()
   {
@@ -884,8 +885,21 @@ class WorldRenderer
       
       if(main.children.length > 0) main.removeChildren();
     }
+    //this.currentMapmode = undefined;
+  }
+  setBoard(board: Board)
+  {
+    this.clearLayers();
 
-    this.currentMapmode = undefined;
+    for (var zoomLevel in board.layers)
+    {
+      for (var layer in board.layers[zoomLevel])
+      {
+        this.layers[zoomLevel][layer].addChild(board.layers[zoomLevel][layer]);
+      }
+    }
+
+    this.setMapmode(this.currentMapmode);
   }
   changeZoomLevel(level)
   {
@@ -894,10 +908,6 @@ class WorldRenderer
   }
   setMapmode(newMapmode: string)
   {
-    if (this.currentMapmode === newMapmode)
-    {
-      return;
-    }
     var zoomLayer = this.layers["zoom" + this.zoomLevel];
     switch (newMapmode)
     {
@@ -1075,8 +1085,6 @@ class Game
       this.worldRenderer = new WorldRenderer(WORLD_WIDTH, WORLD_HEIGHT);
       _main.addChild(this.worldRenderer.worldSprite);
 
-      this.initLayers();
-
       var _game = this;
 
       _stage.mousedown = _stage.touchstart = function(event)
@@ -1096,14 +1104,6 @@ class Game
         game.mouseEventHandler.mouseUp(event, "stage");
       }
 
-    }
-    initLayers()
-    {
-      this.layers["ground"] = this.worldRenderer.layers["zoom1"]["ground"];
-      this.layers["cellOverlay"] = this.worldRenderer.layers["zoom1"]["cellOverlay"];
-      this.layers["content"] = this.worldRenderer.layers["zoom1"]["content"];
-      this.layers["undergroundContent"] =
-        this.worldRenderer.layers["zoom1"]["undergroundContent"];
     }
     initTools()
     {
@@ -1279,7 +1279,9 @@ class Game
         var oldMapmode = game.worldRenderer.currentMapmode;
         self.resetLayers();
         self.activeBoard.destroy();
-        game.boards[this.indexOfActiveBoard] = new Board({width: TILES});
+        self.boards[self.indexOfActiveBoard] = new Board({width: TILES});
+
+        self.changeActiveBoard(self.indexOfActiveBoard);
         
         eventManager.dispatchEvent(
         {
@@ -1335,6 +1337,8 @@ class Game
 
     this.activeBoard = this.boards[index];
     this.indexOfActiveBoard = index;
+
+    this.worldRenderer.setBoard(this.activeBoard);
   }
   destroyAllBoards()
   {
@@ -1391,6 +1395,7 @@ class Game
 
       data.width = board.width;
       data.height = board.height;
+      data.population = board.population;
       data.cells = [];
 
       for (var i = 0; i < board.cells.length; i++)
@@ -1480,6 +1485,8 @@ class Game
         savedCells: currToLoad.cells
       });
 
+      board.population = currToLoad.population;
+
       newBoards.push(board);
     }
     
@@ -1531,7 +1538,6 @@ class Game
   {
     this.worldRenderer.clearLayers();
     this.worldRenderer.initLayers();
-    this.initLayers();
     this.worldRenderer.render();
   }
   switchEditingMode(newMode: string)
@@ -1573,55 +1579,6 @@ class Game
     this.currentMode = newMode;
     var el = <HTMLInputElement> document.getElementById("editmode-select")
     el.value = newMode;
-  }
-}
-
-class SortedDisplayObjectContainer extends PIXI.DisplayObjectContainer
-{
-  container: PIXI.DisplayObjectContainer;
-  _sortingIndexes: number[];
-  // arr[1] = index 1
-  // when adding new displayobject increment following indexes
-  
-  constructor( layers:number)
-  {
-    this._sortingIndexes = new Array(layers);
-    super();
-    this.init();
-  }
-  
-  init()
-  {
-    for (var i = 0; i < this._sortingIndexes.length; i++)
-    {
-      this._sortingIndexes[i] = 0;
-    };
-  }
-  incrementIndexes(start:number)
-  {
-    for (var i = start + 1; i < this._sortingIndexes.length; i++)
-    {
-      this._sortingIndexes[i]++
-    }
-  }
-  decrementIndexes(start:number)
-  {
-    for (var i = start + 1; i < this._sortingIndexes.length; i++)
-    {
-      this._sortingIndexes[i]--
-    }
-  }
-
-  
-  _addChildAt(element:PIXI.DisplayObject, index:number)
-  {
-    super.addChildAt( element, this._sortingIndexes[index] );
-    this.incrementIndexes(index);
-  }
-  _removeChildAt(element:PIXI.DisplayObject, index:number)
-  {
-    super.removeChild(element);
-    this.decrementIndexes(index);
   }
 }
 

@@ -1,13 +1,22 @@
 /// <reference path="js/utility.d.ts" />
+/// <reference path="js/sorteddisplaycontainer.d.ts" />
 /// <reference path="js/mapgeneration.d.ts" />
 /// <reference path="js/citygeneration.d.ts" />
+/// 
+/// <reference path="../lib/pixi.d.ts" />
+
+var idGenerator = idGenerator || {};
+idGenerator.board = 0;
 
 class Board
 {
+  id: number;
   width: number;
   height: number;
+  totalSize: number;
   cells: any[][];
   mapGenInfo: any = {};
+  layers: any = {};
   population: number;
   constructor(props:
   {
@@ -16,12 +25,17 @@ class Board
     savedCells?: any[][];
   })
   {
+    this.id = idGenerator.board++;
+
     this.width = props.width;
     this.height = props.height || props.width;
 
-    var amtOfCells = this.width * this.height;
+    this.totalSize = this.width * this.height;
 
-    this.population = randInt(amtOfCells / 15, amtOfCells / 10);
+    this.initLayers();
+
+
+    this.population = randInt(this.totalSize / 15, this.totalSize / 10);
 
     this.cells = mapGeneration.makeBlankCells(
     {
@@ -134,6 +148,54 @@ class Board
       for (var j = 0; j < this.cells[i].length; j++)
       {
         this.cells[i][j] = null;
+      }
+    }
+  }
+  initLayers()
+  {
+    // TODO zoom levels
+    for (var i = 1; i <= 1; i++)
+    {
+      var zoomStr = "zoom" + i;
+
+      var zoomLayer = this.layers[zoomStr] = <any> {};
+
+      zoomLayer["undergroundContent"] = new SortedDisplayObjectContainer(this.totalSize * 2);
+      zoomLayer["ground"]  = new PIXI.DisplayObjectContainer();
+      zoomLayer["landValueOverlay"] = new PIXI.DisplayObjectContainer();
+      zoomLayer["cellOverlay"] = new SortedDisplayObjectContainer(this.totalSize * 2);
+      zoomLayer["content"] = new SortedDisplayObjectContainer(this.totalSize * 2);
+    }
+  }
+  addSpriteToLayer(layerToAddTo: string, spriteToAdd: any, gridPos?: number[])
+  {
+    for (var zoomLevel in this.layers)
+    {
+      var layer = this.layers[zoomLevel][layerToAddTo];
+
+      if (layer._addChildAt)
+      {
+        layer._addChildAt(spriteToAdd, gridPos[0] + gridPos[1]);
+      }
+      else
+      {
+        layer.addChild(spriteToAdd)
+      }
+    }
+  }
+  removeSpriteFromLayer(layerToRemoveFrom: string, spriteToRemove: any, gridPos?: number[])
+  {
+    for (var zoomLevel in this.layers)
+    {
+      var layer = this.layers[zoomLevel][layerToRemoveFrom];
+
+      if (layer._removeChildAt)
+      {
+        layer._removeChildAt(spriteToRemove, gridPos[0] + gridPos[1]);
+      }
+      else
+      {
+        layer.removeChild(spriteToRemove)
       }
     }
   }

@@ -8,6 +8,7 @@
 /// <reference path="js/ui.d.ts" />
 /// <reference path="js/loader.d.ts" />
 ///
+/// <reference path="js/sorteddisplaycontainer.d.ts" />
 /// <reference path="js/player.d.ts" />F
 /// <reference path="js/systems.d.ts" />
 /// <reference path="js/eventlistener.d.ts" />
@@ -26,7 +27,7 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-var SCREEN_WIDTH = 720, SCREEN_HEIGHT = 480, TILE_WIDTH = 64, TILE_HEIGHT = 32, TILES = 32, WORLD_WIDTH = TILES * TILE_WIDTH, WORLD_HEIGHT = TILES * TILE_HEIGHT, ZOOM_LEVELS = [1], AMT_OF_BOARDS = 1;
+var SCREEN_WIDTH = 720, SCREEN_HEIGHT = 480, TILE_WIDTH = 64, TILE_HEIGHT = 32, TILES = 32, WORLD_WIDTH = TILES * TILE_WIDTH, WORLD_HEIGHT = TILES * TILE_HEIGHT, ZOOM_LEVELS = [1], AMT_OF_BOARDS = 3;
 
 var idGenerator = idGenerator || {};
 idGenerator.content = 0;
@@ -94,7 +95,8 @@ var Content = (function () {
         var cellSprite = this.cell.sprite;
         var gridPos = this.cell.gridPos;
         _s.position = this.cell.sprite.position.clone();
-        game.layers[layer]._addChildAt(_s, gridPos[0] + gridPos[1]);
+
+        this.cell.board.addSpriteToLayer(layer, _s, gridPos);
     };
     Content.prototype.applyModifiers = function () {
         var totals = {
@@ -140,7 +142,7 @@ var Cell = (function () {
     Cell.prototype.init = function () {
         var _s = this.sprite = new GroundSprite(this.type, this);
         _s.position = arrayToPoint(getIsoCoord(this.gridPos[0], this.gridPos[1], TILE_WIDTH, TILE_HEIGHT, [WORLD_WIDTH / 2, TILE_HEIGHT]));
-        game.layers["ground"].addChild(_s);
+        this.board.addSpriteToLayer("ground", _s);
 
         if (this.type.effects) {
             this.propagateAllModifiers(this.type.translatedEffects);
@@ -201,7 +203,7 @@ var Cell = (function () {
     Cell.prototype.changeUndergroundContent = function (type, update) {
         if (typeof update === "undefined") { update = true; }
         if (this.undergroundContent) {
-            game.layers["undergroundContent"]._removeChildAt(this.undergroundContent.sprite, this.gridPos[0] + this.gridPos[1]);
+            this.board.removeSpriteFromLayer("undergroundContent", this.undergroundContent.sprite, this.gridPos);
             this.undergroundContent = undefined;
         }
 
@@ -305,7 +307,7 @@ var Cell = (function () {
         if (this.content.type.effects) {
             this.removeAllPropagatedModifiers(this.content.type.translatedEffects);
         }
-        game.layers["content"]._removeChildAt(this.content.sprite, this.gridPos[0] + this.gridPos[1]);
+        this.board.removeSpriteFromLayer("content", this.content.sprite, this.gridPos);
 
         this.content = undefined;
     };
@@ -486,7 +488,7 @@ var Cell = (function () {
     Cell.prototype.addOverlay = function (color, depth) {
         if (typeof depth === "undefined") { depth = 1; }
         if (this.overlay) {
-            game.layers["cellOverlay"]._removeChildAt(this.overlay, this.gridPos[0], this.gridPos[1]);
+            this.board.removeSpriteFromLayer("cellOverlay", this.overlay, this.gridPos);
         }
 
         var neighbors = this.getNeighbors();
@@ -530,10 +532,9 @@ var Cell = (function () {
         }
 
         gfx.position = this.sprite.position.clone();
-        game.layers["cellOverlay"]._addChildAt(gfx, this.gridPos[0], this.gridPos[1]);
+        this.board.addSpriteToLayer("cellOverlay", gfx, this.gridPos);
 
         this.overlay = gfx;
-        ;
 
         var willUpdateNeighbors = false;
 
@@ -584,6 +585,7 @@ var WorldRenderer = (function () {
                 }
             }
         };
+        this.currentMapmode = "default";
         this.initContainers(width, height);
         this.initLayers();
         this.addEventListeners();
@@ -653,14 +655,12 @@ var WorldRenderer = (function () {
             var main = zoomLayer["main"];
 
             zoomLayer["underground"] = new PIXI.DisplayObjectContainer();
-            zoomLayer["undergroundContent"] = new SortedDisplayObjectContainer(TILES * 2);
+            zoomLayer["undergroundContent"] = new PIXI.DisplayObjectContainer();
             zoomLayer["ground"] = new PIXI.DisplayObjectContainer();
             zoomLayer["landValueOverlay"] = new PIXI.DisplayObjectContainer();
-            zoomLayer["cellOverlay"] = new SortedDisplayObjectContainer(TILES * 2);
-            zoomLayer["content"] = new SortedDisplayObjectContainer(TILES * 2);
+            zoomLayer["cellOverlay"] = new PIXI.DisplayObjectContainer();
+            zoomLayer["content"] = new PIXI.DisplayObjectContainer();
         }
-
-        this.setMapmode("default");
     };
     WorldRenderer.prototype.clearLayers = function () {
         for (var i = 0; i < ZOOM_LEVELS.length; i++) {
@@ -677,17 +677,24 @@ var WorldRenderer = (function () {
             if (main.children.length > 0)
                 main.removeChildren();
         }
+        //this.currentMapmode = undefined;
+    };
+    WorldRenderer.prototype.setBoard = function (board) {
+        this.clearLayers();
 
-        this.currentMapmode = undefined;
+        for (var zoomLevel in board.layers) {
+            for (var layer in board.layers[zoomLevel]) {
+                this.layers[zoomLevel][layer].addChild(board.layers[zoomLevel][layer]);
+            }
+        }
+
+        this.setMapmode(this.currentMapmode);
     };
     WorldRenderer.prototype.changeZoomLevel = function (level) {
         this.zoomLevel = level;
         this.render();
     };
     WorldRenderer.prototype.setMapmode = function (newMapmode) {
-        if (this.currentMapmode === newMapmode) {
-            return;
-        }
         var zoomLayer = this.layers["zoom" + this.zoomLevel];
         switch (newMapmode) {
             case "default": {
@@ -825,8 +832,6 @@ var Game = (function () {
         this.worldRenderer = new WorldRenderer(WORLD_WIDTH, WORLD_HEIGHT);
         _main.addChild(this.worldRenderer.worldSprite);
 
-        this.initLayers();
-
         var _game = this;
 
         _stage.mousedown = _stage.touchstart = function (event) {
@@ -841,12 +846,6 @@ var Game = (function () {
         _stage.mouseupoutside = _stage.touchendoutside = function (event) {
             game.mouseEventHandler.mouseUp(event, "stage");
         };
-    };
-    Game.prototype.initLayers = function () {
-        this.layers["ground"] = this.worldRenderer.layers["zoom1"]["ground"];
-        this.layers["cellOverlay"] = this.worldRenderer.layers["zoom1"]["cellOverlay"];
-        this.layers["content"] = this.worldRenderer.layers["zoom1"]["content"];
-        this.layers["undergroundContent"] = this.worldRenderer.layers["zoom1"]["undergroundContent"];
     };
     Game.prototype.initTools = function () {
         this.tools.nothing = new NothingTool();
@@ -997,7 +996,9 @@ var Game = (function () {
             var oldMapmode = game.worldRenderer.currentMapmode;
             self.resetLayers();
             self.activeBoard.destroy();
-            game.boards[this.indexOfActiveBoard] = new Board({ width: TILES });
+            self.boards[self.indexOfActiveBoard] = new Board({ width: TILES });
+
+            self.changeActiveBoard(self.indexOfActiveBoard);
 
             eventManager.dispatchEvent({
                 type: "changeMapmode",
@@ -1042,6 +1043,8 @@ var Game = (function () {
 
         this.activeBoard = this.boards[index];
         this.indexOfActiveBoard = index;
+
+        this.worldRenderer.setBoard(this.activeBoard);
     };
     Game.prototype.destroyAllBoards = function () {
         for (var i = 0; i < this.boards.length; i++) {
@@ -1086,6 +1089,7 @@ var Game = (function () {
 
             data.width = board.width;
             data.height = board.height;
+            data.population = board.population;
             data.cells = [];
 
             for (var i = 0; i < board.cells.length; i++) {
@@ -1154,6 +1158,8 @@ var Game = (function () {
                 savedCells: currToLoad.cells
             });
 
+            board.population = currToLoad.population;
+
             newBoards.push(board);
         }
 
@@ -1198,7 +1204,6 @@ var Game = (function () {
     Game.prototype.resetLayers = function () {
         this.worldRenderer.clearLayers();
         this.worldRenderer.initLayers();
-        this.initLayers();
         this.worldRenderer.render();
     };
     Game.prototype.switchEditingMode = function (newMode) {
@@ -1233,43 +1238,6 @@ var Game = (function () {
     };
     return Game;
 })();
-
-var SortedDisplayObjectContainer = (function (_super) {
-    __extends(SortedDisplayObjectContainer, _super);
-    // arr[1] = index 1
-    // when adding new displayobject increment following indexes
-    function SortedDisplayObjectContainer(layers) {
-        this._sortingIndexes = new Array(layers);
-        _super.call(this);
-        this.init();
-    }
-    SortedDisplayObjectContainer.prototype.init = function () {
-        for (var i = 0; i < this._sortingIndexes.length; i++) {
-            this._sortingIndexes[i] = 0;
-        }
-        ;
-    };
-    SortedDisplayObjectContainer.prototype.incrementIndexes = function (start) {
-        for (var i = start + 1; i < this._sortingIndexes.length; i++) {
-            this._sortingIndexes[i]++;
-        }
-    };
-    SortedDisplayObjectContainer.prototype.decrementIndexes = function (start) {
-        for (var i = start + 1; i < this._sortingIndexes.length; i++) {
-            this._sortingIndexes[i]--;
-        }
-    };
-
-    SortedDisplayObjectContainer.prototype._addChildAt = function (element, index) {
-        _super.prototype.addChildAt.call(this, element, this._sortingIndexes[index]);
-        this.incrementIndexes(index);
-    };
-    SortedDisplayObjectContainer.prototype._removeChildAt = function (element, index) {
-        _super.prototype.removeChild.call(this, element);
-        this.decrementIndexes(index);
-    };
-    return SortedDisplayObjectContainer;
-})(PIXI.DisplayObjectContainer);
 
 var Scroller = (function () {
     function Scroller(container, bound) {

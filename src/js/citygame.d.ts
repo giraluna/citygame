@@ -5,6 +5,7 @@
 /// <reference path="../../data/js/names.d.ts" />
 /// <reference path="ui.d.ts" />
 /// <reference path="loader.d.ts" />
+/// <reference path="sorteddisplaycontainer.d.ts" />
 /// <reference path="player.d.ts" />
 /// <reference path="systems.d.ts" />
 /// <reference path="eventlistener.d.ts" />
@@ -136,6 +137,7 @@ declare class WorldRenderer {
     public initContainers(width: any, height: any): void;
     public initLayers(): void;
     public clearLayers(): void;
+    public setBoard(board: Board): void;
     public changeZoomLevel(level: any): void;
     public setMapmode(newMapmode: string): void;
     public changeMapmode(newMapmode: string): void;
@@ -169,7 +171,6 @@ declare class Game {
     constructor();
     public init(): void;
     public initContainers(): void;
-    public initLayers(): void;
     public initTools(): void;
     public bindElements(): void;
     public bindRenderer(): void;
@@ -188,16 +189,6 @@ declare class Game {
     public render(): void;
     public resetLayers(): void;
     public switchEditingMode(newMode: string): void;
-}
-declare class SortedDisplayObjectContainer extends PIXI.DisplayObjectContainer {
-    public container: PIXI.DisplayObjectContainer;
-    public _sortingIndexes: number[];
-    constructor(layers: number);
-    public init(): void;
-    public incrementIndexes(start: number): void;
-    public decrementIndexes(start: number): void;
-    public _addChildAt(element: PIXI.DisplayObject, index: number): void;
-    public _removeChildAt(element: PIXI.DisplayObject, index: number): void;
 }
 declare class Scroller {
     public container: PIXI.DisplayObjectContainer;

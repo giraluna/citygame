@@ -1313,6 +1313,7 @@ class Game
   updateBoardSelect()
   {
     var boardSelect = <HTMLSelectElement> document.getElementById("board-select");
+    var oldValue = boardSelect.value || "0";
     while (boardSelect.children.length > 0)
     {
       boardSelect.remove(0);
@@ -1325,6 +1326,7 @@ class Game
 
       boardSelect.add(opt);
     }
+    boardSelect.value = oldValue;
   }
   updateWorld(clear?: boolean)
   {

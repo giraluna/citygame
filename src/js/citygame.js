@@ -1025,6 +1025,7 @@ var Game = (function () {
     };
     Game.prototype.updateBoardSelect = function () {
         var boardSelect = document.getElementById("board-select");
+        var oldValue = boardSelect.value || "0";
         while (boardSelect.children.length > 0) {
             boardSelect.remove(0);
         }
@@ -1035,6 +1036,7 @@ var Game = (function () {
 
             boardSelect.add(opt);
         }
+        boardSelect.value = oldValue;
     };
     Game.prototype.updateWorld = function (clear) {
         eventManager.dispatchEvent({ type: "updateWorld", content: { clear: clear } });

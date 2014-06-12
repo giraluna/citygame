@@ -15,7 +15,7 @@
 /// <reference path="landvalueoverlay.d.ts" />
 /// <reference path="utility.d.ts" />
 /// <reference path="arraylogic.d.ts" />
-declare var SCREEN_WIDTH: number, SCREEN_HEIGHT: number, TILE_WIDTH: number, TILE_HEIGHT: number, TILES: number, WORLD_WIDTH: number, WORLD_HEIGHT: number, ZOOM_LEVELS: number[];
+declare var SCREEN_WIDTH: number, SCREEN_HEIGHT: number, TILE_WIDTH: number, TILE_HEIGHT: number, TILES: number, WORLD_WIDTH: number, WORLD_HEIGHT: number, ZOOM_LEVELS: number[], AMT_OF_BOARDS: number;
 declare var idGenerator: any;
 declare class Sprite extends PIXI.Sprite {
     public type: string;
@@ -142,7 +142,9 @@ declare class WorldRenderer {
     public render(clear?: boolean): void;
 }
 declare class Game {
-    public board: Board;
+    public boards: Board[];
+    public activeBoard: Board;
+    public indexOfActiveBoard: number;
     public tools: any;
     public activeTool: Tool;
     public mouseEventHandler: MouseEventHandler;
@@ -174,11 +176,13 @@ declare class Game {
     public updateWorld(clear?: boolean): void;
     public resize(): void;
     public changeTool(tool: any): void;
+    public changeActiveBoard(index: number): void;
+    public destroyAllBoards(): void;
     public save(name: string): void;
     public autosave(): void;
     public load(name: string): void;
-    public saveBoard(board: Board): any;
-    public loadBoard(data: any): void;
+    public saveBoards(boardsToSave: Board[]): any[];
+    public loadBoards(data: any): void;
     public savePlayer(player: Player): any;
     public loadPlayer(data: any): void;
     public render(): void;

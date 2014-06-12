@@ -26,7 +26,7 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-var SCREEN_WIDTH = 720, SCREEN_HEIGHT = 480, TILE_WIDTH = 64, TILE_HEIGHT = 32, TILES = 32, WORLD_WIDTH = TILES * TILE_WIDTH, WORLD_HEIGHT = TILES * TILE_HEIGHT, ZOOM_LEVELS = [1];
+var SCREEN_WIDTH = 720, SCREEN_HEIGHT = 480, TILE_WIDTH = 64, TILE_HEIGHT = 32, TILES = 32, WORLD_WIDTH = TILES * TILE_WIDTH, WORLD_HEIGHT = TILES * TILE_HEIGHT, ZOOM_LEVELS = [1], AMT_OF_BOARDS = 3;
 
 var idGenerator = idGenerator || {};
 idGenerator.content = 0;
@@ -611,7 +611,7 @@ var WorldRenderer = (function () {
                 return;
 
             var zoomLayer = self.layers["zoom" + self.zoomLevel];
-            zoomLayer.landValueOverlay = makeLandValueOverlay(game.board);
+            zoomLayer.landValueOverlay = makeLandValueOverlay(game.activeBoard);
             self.changeMapmode("landValue");
         });
     };
@@ -695,7 +695,7 @@ var WorldRenderer = (function () {
                 return;
             }
             case "landValue": {
-                zoomLayer.landValueOverlay = makeLandValueOverlay(game.board);
+                zoomLayer.landValueOverlay = makeLandValueOverlay(game.activeBoard);
 
                 this.changeMapmode("landValue");
                 return;
@@ -749,6 +749,7 @@ var WorldRenderer = (function () {
 
 var Game = (function () {
     function Game() {
+        this.boards = [];
         this.tools = {};
         this.layers = {};
         this.players = {};
@@ -763,7 +764,10 @@ var Game = (function () {
         this.bindElements();
         this.changeTool("grass");
 
-        this.board = new Board({ width: TILES });
+        for (var i = 0; i < AMT_OF_BOARDS; i++) {
+            this.boards.push(new Board({ width: TILES }));
+        }
+        this.changeActiveBoard(0);
 
         this.highlighter = new Highlighter();
 
@@ -992,8 +996,8 @@ var Game = (function () {
         addClickAndTouchEventListener(document.getElementById("regen-world"), function () {
             var oldMapmode = game.worldRenderer.currentMapmode;
             self.resetLayers();
-            self.board.destroy();
-            game.board = new Board({ width: TILES });
+            self.activeBoard.destroy();
+            game.boards[this.indexOfActiveBoard] = new Board({ width: TILES });
 
             eventManager.dispatchEvent({
                 type: "changeMapmode",
@@ -1033,10 +1037,21 @@ var Game = (function () {
             this.activeTool.button.classList.toggle("selected-tool");
         }
     };
+    Game.prototype.changeActiveBoard = function (index) {
+        var oldBoard = this.activeBoard;
+
+        this.activeBoard = this.boards[index];
+        this.indexOfActiveBoard = index;
+    };
+    Game.prototype.destroyAllBoards = function () {
+        for (var i = 0; i < this.boards.length; i++) {
+            this.boards[i].destroy();
+        }
+    };
     Game.prototype.save = function (name) {
         var toSave = {
             player: this.savePlayer(this.players["player0"]),
-            board: this.saveBoard(this.board),
+            boards: this.saveBoards(this.boards),
             date: new Date()
         };
         localStorage.setItem(name, JSON.stringify(toSave));
@@ -1061,60 +1076,90 @@ var Game = (function () {
     Game.prototype.load = function (name) {
         var parsed = JSON.parse(localStorage.getItem(name));
         this.loadPlayer(parsed.player);
-        this.loadBoard(parsed.board);
+        this.loadBoards(parsed);
     };
-    Game.prototype.saveBoard = function (board) {
-        var data = {};
-        data.width = board.width;
-        data.height = board.height;
-        data.cells = [];
+    Game.prototype.saveBoards = function (boardsToSave) {
+        var savedBoards = [];
+        for (var i = 0; i < boardsToSave.length; i++) {
+            var data = {};
+            var board = boardsToSave[i];
 
-        for (var i = 0; i < board.cells.length; i++) {
-            data.cells[i] = [];
-            for (var j = 0; j < board.cells[i].length; j++) {
-                var boardCell = board.cells[i][j];
-                var cell = data.cells[i][j] = {};
-                cell.type = boardCell.type.type;
-                if (boardCell.player) {
-                    cell.player = boardCell.player.id;
-                }
-                if (boardCell.content) {
-                    cell.content = {
-                        type: boardCell.content.type.type,
-                        player: boardCell.content.player ? boardCell.content.player.id : null
-                    };
-                    if (cell.content.type.baseType === "road") {
-                        cell.content.type = cg["content"]["roads"]["road_nesw"];
+            data.width = board.width;
+            data.height = board.height;
+            data.cells = [];
+
+            for (var i = 0; i < board.cells.length; i++) {
+                data.cells[i] = [];
+                for (var j = 0; j < board.cells[i].length; j++) {
+                    var boardCell = board.cells[i][j];
+                    var cell = data.cells[i][j] = {};
+                    cell.type = boardCell.type.type;
+                    if (boardCell.player) {
+                        cell.player = boardCell.player.id;
+                    }
+                    if (boardCell.content) {
+                        cell.content = {
+                            type: boardCell.content.type.type,
+                            player: boardCell.content.player ? boardCell.content.player.id : null
+                        };
+                        if (cell.content.type.baseType === "road") {
+                            cell.content.type = cg["content"]["roads"]["road_nesw"];
+                        }
+                    }
+                    if (boardCell.undergroundContent) {
+                        cell.undergroundContent = true;
                     }
                 }
-                if (boardCell.undergroundContent) {
-                    cell.undergroundContent = true;
-                }
             }
+            savedBoards.push(data);
         }
-        return data;
+
+        return savedBoards;
     };
-    Game.prototype.loadBoard = function (data) {
+    Game.prototype.loadBoards = function (data) {
         this.resetLayers();
-        this.board.destroy();
+        this.destroyAllBoards();
 
-        for (var i = 0; i < data.cells.length; i++) {
-            for (var j = 0; j < data.cells[i].length; j++) {
-                var cell = data.cells[i][j];
-                if (cell.player) {
-                    cell.player = this.players[cell.player];
-                    if (cell.content) {
-                        cell.content.player = this.players[cell.player];
+        var boardsToLoad = [];
+        var newBoards = [];
+        var cachedBoardIndex = data.cachedBoardIndex || 0;
+
+        // legacy
+        if (data.board) {
+            boardsToLoad.push(data.board);
+        } else {
+            boardsToLoad = data.boards;
+        }
+        if (boardsToLoad.length === 0)
+            throw new Error("No boards to load");
+
+        for (var k = 0; k < boardsToLoad.length; k++) {
+            var currToLoad = boardsToLoad[k];
+
+            for (var i = 0; i < currToLoad.cells.length; i++) {
+                for (var j = 0; j < currToLoad.cells[i].length; j++) {
+                    var cell = currToLoad.cells[i][j];
+                    if (cell.player) {
+                        cell.player = this.players[cell.player];
+                        if (cell.content) {
+                            cell.content.player = this.players[cell.player];
+                        }
                     }
                 }
             }
+
+            var board = new Board({
+                width: currToLoad.width,
+                height: currToLoad.height,
+                savedCells: currToLoad.cells
+            });
+
+            newBoards.push(board);
         }
 
-        var board = this.board = new Board({
-            width: data.width,
-            height: data.height,
-            savedCells: data.cells
-        });
+        game.boards = newBoards;
+        game.changeActiveBoard(cachedBoardIndex);
+
         eventManager.dispatchEvent({ type: "updateWorld", content: { clear: true } });
     };
 
@@ -1444,7 +1489,7 @@ var MouseEventHandler = (function () {
         this.startCell = gridPos;
 
         game.highlighter.clearSprites();
-        game.highlighter.tintCells([game.board.getCell(gridPos)], game.activeTool.tintColor);
+        game.highlighter.tintCells([game.activeBoard.getCell(gridPos)], game.activeTool.tintColor);
         game.updateWorld();
     };
     MouseEventHandler.prototype.worldMove = function (event) {
@@ -1453,7 +1498,7 @@ var MouseEventHandler = (function () {
 
         if (!this.currCell || gridPos[0] !== this.currCell[0] || gridPos[1] !== this.currCell[1]) {
             this.currCell = gridPos;
-            var selectedCells = game.board.getCells(game.activeTool.selectType(this.startCell, this.currCell));
+            var selectedCells = game.activeBoard.getCells(game.activeTool.selectType(this.startCell, this.currCell));
 
             game.highlighter.clearSprites();
             game.highlighter.tintCells(selectedCells, game.activeTool.tintColor);
@@ -1465,7 +1510,7 @@ var MouseEventHandler = (function () {
         var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
 
         this.currCell = gridPos;
-        var selectedCells = game.board.getCells(game.activeTool.selectType(this.startCell, this.currCell));
+        var selectedCells = game.activeBoard.getCells(game.activeTool.selectType(this.startCell, this.currCell));
 
         game.activeTool.activate(selectedCells);
 
@@ -1476,7 +1521,7 @@ var MouseEventHandler = (function () {
 
         game.updateWorld(true);
         /* TEMPORARY
-        var cell = game.board.getCell(this.currCell);
+        var cell = game.activeBoard.getCell(this.currCell);
         var neighs = cell.getNeighbors()
         game.uiDrawer.makeCellPopup(cell, event.target);
         for (var neigh in neighs)
@@ -1505,7 +1550,7 @@ var MouseEventHandler = (function () {
         if (gridPos[0] !== this.hoverCell[0] || gridPos[1] !== this.hoverCell[1]) {
             this.hoverCell = gridPos;
             game.uiDrawer.removeActive();
-            game.uiDrawer.makeCellTooltip(event, game.board.getCell(gridPos), event.target);
+            game.uiDrawer.makeCellTooltip(event, game.activeBoard.getCell(gridPos), event.target);
         }
     };
     return MouseEventHandler;

@@ -29,7 +29,8 @@ var SCREEN_WIDTH = 720,
     TILES = 32,
     WORLD_WIDTH = TILES * TILE_WIDTH,
     WORLD_HEIGHT = TILES * TILE_HEIGHT,
-    ZOOM_LEVELS = [1];
+    ZOOM_LEVELS = [1],
+    AMT_OF_BOARDS = 3;
 
 var idGenerator = idGenerator || {};
 idGenerator.content = 0;
@@ -805,7 +806,7 @@ class WorldRenderer
       if (self.currentMapmode !== "landValue") return;
 
       var zoomLayer = self.layers["zoom" + self.zoomLevel];
-      zoomLayer.landValueOverlay = makeLandValueOverlay(game.board);
+      zoomLayer.landValueOverlay = makeLandValueOverlay(game.activeBoard);
       self.changeMapmode("landValue");
     });
   }
@@ -907,7 +908,7 @@ class WorldRenderer
       }
       case "landValue":
       {
-        zoomLayer.landValueOverlay = makeLandValueOverlay(game.board);
+        zoomLayer.landValueOverlay = makeLandValueOverlay(game.activeBoard);
 
         this.changeMapmode("landValue");
         return;
@@ -966,7 +967,9 @@ class WorldRenderer
 
 class Game
 {
-  board: Board;
+  boards: Board[] = [];
+  activeBoard: Board;
+  indexOfActiveBoard: number;
   tools: any = {};
   activeTool: Tool;
   mouseEventHandler: MouseEventHandler;
@@ -997,7 +1000,11 @@ class Game
     this.bindElements();
     this.changeTool("grass");
 
-    this.board = new Board({width: TILES});
+    for (var i = 0; i < AMT_OF_BOARDS; i++)
+    {
+      this.boards.push(new Board({width: TILES}));
+    }
+    this.changeActiveBoard(0);
 
     this.highlighter = new Highlighter();
 
@@ -1271,8 +1278,8 @@ class Game
       {
         var oldMapmode = game.worldRenderer.currentMapmode;
         self.resetLayers();
-        self.board.destroy();
-        game.board = new Board({width: TILES});
+        self.activeBoard.destroy();
+        game.boards[this.indexOfActiveBoard] = new Board({width: TILES});
         
         eventManager.dispatchEvent(
         {
@@ -1322,12 +1329,26 @@ class Game
       this.activeTool.button.classList.toggle("selected-tool");
     }
   }
+  changeActiveBoard(index: number)
+  {
+    var oldBoard = this.activeBoard;
+
+    this.activeBoard = this.boards[index];
+    this.indexOfActiveBoard = index;
+  }
+  destroyAllBoards()
+  {
+    for (var i = 0; i < this.boards.length; i++)
+    {
+      this.boards[i].destroy();
+    }
+  }
   save(name: string)
   {
     var toSave =
     {
       player: this.savePlayer(this.players["player0"]),
-      board: this.saveBoard(this.board),
+      boards: this.saveBoards(this.boards),
       date: new Date()
     }
     localStorage.setItem(name, JSON.stringify(toSave));
@@ -1358,75 +1379,113 @@ class Game
   {
     var parsed = JSON.parse(localStorage.getItem(name));
     this.loadPlayer(parsed.player);
-    this.loadBoard(parsed.board);
+    this.loadBoards(parsed);
   }
-  saveBoard(board: Board)
+  saveBoards(boardsToSave: Board[])
   {
-    var data: any = {};
-    data.width = board.width;
-    data.height = board.height;
-    data.cells = [];
-
-    for (var i = 0; i < board.cells.length; i++)
+    var savedBoards = [];
+    for (var i = 0; i < boardsToSave.length; i++)
     {
-      data.cells[i] = [];
-      for (var j = 0; j < board.cells[i].length; j++)
+      var data: any = {};
+      var board = boardsToSave[i];
+
+      data.width = board.width;
+      data.height = board.height;
+      data.cells = [];
+
+      for (var i = 0; i < board.cells.length; i++)
       {
-        var boardCell = board.cells[i][j];
-        var cell: any = data.cells[i][j] = {};
-        cell.type = boardCell.type.type;
-        if (boardCell.player)
+        data.cells[i] = [];
+        for (var j = 0; j < board.cells[i].length; j++)
         {
-          cell.player = boardCell.player.id;
-        }
-        if (boardCell.content)
-        {
-          cell.content =
+          var boardCell = board.cells[i][j];
+          var cell: any = data.cells[i][j] = {};
+          cell.type = boardCell.type.type;
+          if (boardCell.player)
           {
-            type: boardCell.content.type.type,
-            player: boardCell.content.player ?
-              boardCell.content.player.id : null
+            cell.player = boardCell.player.id;
           }
-          if (cell.content.type.baseType === "road")
+          if (boardCell.content)
           {
-            cell.content.type = cg["content"]["roads"]["road_nesw"];
+            cell.content =
+            {
+              type: boardCell.content.type.type,
+              player: boardCell.content.player ?
+                boardCell.content.player.id : null
+            }
+            if (cell.content.type.baseType === "road")
+            {
+              cell.content.type = cg["content"]["roads"]["road_nesw"];
+            }
           }
-        }
-        if (boardCell.undergroundContent)
-        {
-          cell.undergroundContent = true;
+          if (boardCell.undergroundContent)
+          {
+            cell.undergroundContent = true;
+          }
         }
       }
+      savedBoards.push(data);
     }
-    return data;
+
+    
+    return savedBoards;
   }
-  loadBoard(data: any)
+  loadBoards(data: any)
   {
     this.resetLayers();
-    this.board.destroy();
+    this.destroyAllBoards();
 
-    for (var i = 0; i < data.cells.length; i++)
+    var boardsToLoad = [];
+    var newBoards = [];
+    var cachedBoardIndex = data.cachedBoardIndex || 0;
+
+    // legacy
+    if (data.board)
     {
-      for (var j = 0; j < data.cells[i].length; j++)
-      {
-        var cell = data.cells[i][j];
-        if (cell.player)
+      boardsToLoad.push(data.board);
+    }
+
+    else
+    {
+      boardsToLoad = data.boards;
+    }
+    if (boardsToLoad.length === 0) throw new Error("No boards to load");
+
+
+
+    for (var k = 0; k < boardsToLoad.length; k++)
+    {
+      var currToLoad = boardsToLoad[k];
+
+      for (var i = 0; i < currToLoad.cells.length; i++)
+      { 
+        for (var j = 0; j < currToLoad.cells[i].length; j++)
         {
-          cell.player = this.players[cell.player];
-          if (cell.content)
+          var cell = currToLoad.cells[i][j];
+          if (cell.player)
           {
-            cell.content.player = this.players[cell.player];
+            cell.player = this.players[cell.player];
+            if (cell.content)
+            {
+              cell.content.player = this.players[cell.player];
+            }
           }
         }
       }
-    }
 
-    var board = this.board = new Board(
-    {
-      width: data.width,
-      height: data.height,
-      savedCells: data.cells
-    });
+      var board = new Board(
+      {
+        width: currToLoad.width,
+        height: currToLoad.height,
+        savedCells: currToLoad.cells
+      });
+
+      newBoards.push(board);
+    }
+    
+    game.boards = newBoards;
+    game.changeActiveBoard(cachedBoardIndex);
+
     eventManager.dispatchEvent({type: "updateWorld", content:{clear: true}});
   }
 
@@ -1865,7 +1924,7 @@ class MouseEventHandler
     this.startCell = gridPos;
 
     game.highlighter.clearSprites();
-    game.highlighter.tintCells([game.board.getCell(gridPos)], game.activeTool.tintColor);
+    game.highlighter.tintCells([game.activeBoard.getCell(gridPos)], game.activeTool.tintColor);
     game.updateWorld();
   }
   worldMove(event)
@@ -1876,7 +1935,7 @@ class MouseEventHandler
     if ( !this.currCell || gridPos[0] !== this.currCell[0] || gridPos[1] !== this.currCell[1] )
     {
       this.currCell = gridPos;
-      var selectedCells = game.board.getCells(
+      var selectedCells = game.activeBoard.getCells(
           game.activeTool.selectType(this.startCell, this.currCell));
 
       game.highlighter.clearSprites();
@@ -1890,7 +1949,7 @@ class MouseEventHandler
     var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
 
     this.currCell = gridPos;
-    var selectedCells = game.board.getCells(
+    var selectedCells = game.activeBoard.getCells(
         game.activeTool.selectType(this.startCell, this.currCell));
 
     game.activeTool.activate(selectedCells);
@@ -1902,7 +1961,7 @@ class MouseEventHandler
 
     game.updateWorld(true);
     /* TEMPORARY
-    var cell = game.board.getCell(this.currCell);
+    var cell = game.activeBoard.getCell(this.currCell);
     var neighs = cell.getNeighbors()
     game.uiDrawer.makeCellPopup(cell, event.target);
     for (var neigh in neighs)
@@ -1928,7 +1987,7 @@ class MouseEventHandler
     {
       this.hoverCell = gridPos;
       game.uiDrawer.removeActive();
-      game.uiDrawer.makeCellTooltip(event, game.board.getCell(gridPos), event.target);
+      game.uiDrawer.makeCellTooltip(event, game.activeBoard.getCell(gridPos), event.target);
     }
   }
 

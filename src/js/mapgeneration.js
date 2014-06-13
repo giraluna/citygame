@@ -316,7 +316,12 @@ var mapGeneration;
             for (var j = 0; j < cells[i].length; j++) {
                 var cell = cells[i][j];
 
-                var neighbors = getArea(cells, [i, j], radius, "center", true);
+                var neighbors = getArea({
+                    targetArray: cells,
+                    start: [i, j],
+                    size: radius,
+                    excludeStart: false
+                });
                 var totalNeighborCount = 0;
 
                 var neighborTypes = {};

@@ -288,12 +288,16 @@ function getDistanceFromCell(cells, center, maxDistance, diagonal) {
     return indexedDistances;
 }
 
-function getArea(targetArray, gridPos, size, anchor, excludeStart) {
-    if (typeof anchor === "undefined") { anchor = "center"; }
-    if (typeof excludeStart === "undefined") { excludeStart = false; }
-    var start = [gridPos[0], gridPos[1]];
-    var curr = start.slice(0);
-    var end = [gridPos[0], gridPos[1]];
+function getArea(props) {
+    var targetArray = props.targetArray;
+    var start = props.start;
+    var end = props.end || props.start;
+    var size = props.size;
+    var anchor = props.anchor || "center";
+    var excludeStart = props.excludeStart || false;
+
+    var newStart = start.slice(0);
+    var newEnd = end.slice(0);
 
     var adjust = [[0, 0], [0, 0]];
 
@@ -319,25 +323,19 @@ function getArea(targetArray, gridPos, size, anchor, excludeStart) {
     ;
 
     for (var i = 0; i < size; i++) {
-        curr[0] += adjust[0][0];
-        curr[1] += adjust[0][1];
-        end[0] += adjust[1][0];
-        end[1] += adjust[1][1];
+        newStart[0] += adjust[0][0];
+        newStart[1] += adjust[0][1];
+        newEnd[0] += adjust[1][0];
+        newEnd[1] += adjust[1][1];
     }
-    var rect = rectSelect(curr, end);
+    var rect = rectSelect(newStart, newEnd);
 
     if (excludeStart) {
-        var indexOfStart = -1;
-        for (var i = 0; i < rect.length; i++) {
-            if (rect[i][0] === start[0] && rect[i][1] === start[1]) {
-                indexOfStart = i;
-                break;
+        rect = rect.filter(function (pos) {
+            if (!(pos[0] >= start[0] && pos[0] <= end[0] && pos[1] >= start[1] && pos[1] <= end[1])) {
+                return pos;
             }
-        }
-        if (indexOfStart === -1)
-            throw new Error();
-
-        rect[indexOfStart] = undefined;
+        });
     }
 
     return getFrom2dArray(targetArray, rect);

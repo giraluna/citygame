@@ -37,14 +37,15 @@ declare class Content {
     public categoryType: string;
     public id: number;
     public sprite: Sprite;
-    public cell: Cell;
+    public cells: Cell[];
+    public baseCell: Cell;
     public flags: string[];
     public baseProfit: number;
     public modifiers: any;
     public modifiedProfit: number;
     public player: Player;
     constructor(props: {
-        cell: Cell;
+        cells: Cell[];
         type: any;
         player?: Player;
         id?: number;
@@ -52,6 +53,7 @@ declare class Content {
     });
     public init(type: any, layer?: string): void;
     public applyModifiers(): void;
+    public remove(): void;
 }
 interface neighborCells {
     n: Cell;

@@ -27,7 +27,7 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-var SCREEN_WIDTH = 720, SCREEN_HEIGHT = 480, TILE_WIDTH = 64, TILE_HEIGHT = 32, TILES = 32, WORLD_WIDTH = TILES * TILE_WIDTH, WORLD_HEIGHT = TILES * TILE_HEIGHT, ZOOM_LEVELS = [1], AMT_OF_BOARDS = 3;
+var SCREEN_WIDTH = 720, SCREEN_HEIGHT = 480, TILE_WIDTH = 64, TILE_HEIGHT = 32, TILES = 32, WORLD_WIDTH = TILES * TILE_WIDTH, WORLD_HEIGHT = TILES * TILE_HEIGHT, ZOOM_LEVELS = [1], AMT_OF_BOARDS = 1;
 
 var idGenerator = idGenerator || {};
 idGenerator.content = 0;
@@ -73,7 +73,23 @@ var Content = (function () {
         this.baseProfit = 0;
         this.modifiers = {};
         this.modifiedProfit = 0;
-        this.cell = props.cell;
+        this.cells = props.cells;
+
+        var minX, minY;
+        for (var i = 0; i < this.cells.length; i++) {
+            var pos = this.cells[i].gridPos;
+
+            if (minY === undefined || pos[1] <= minY) {
+                minY = pos[1];
+
+                if (minX === undefined || pos[0] < minX) {
+                    minX = pos[0];
+                }
+            }
+        }
+
+        this.baseCell = this.cells[0].board.getCell([minX, minY]);
+
         var type = this.type = props.type;
         this.id = props.id || idGenerator.content++;
 
@@ -92,11 +108,12 @@ var Content = (function () {
     Content.prototype.init = function (type, layer) {
         if (typeof layer === "undefined") { layer = "content"; }
         var _s = this.sprite = new ContentSprite(type, this);
-        var cellSprite = this.cell.sprite;
-        var gridPos = this.cell.gridPos;
-        _s.position = this.cell.sprite.position.clone();
+        var cellSprite = this.baseCell.sprite;
+        var gridPos = this.baseCell.gridPos;
 
-        this.cell.board.addSpriteToLayer(layer, _s, gridPos);
+        _s.position = this.baseCell.sprite.position.clone();
+
+        this.baseCell.board.addSpriteToLayer(layer, _s, gridPos);
     };
     Content.prototype.applyModifiers = function () {
         var totals = {
@@ -110,6 +127,20 @@ var Content = (function () {
             }
         }
         this.modifiedProfit = totals.addedProfit * totals.multiplier;
+    };
+    Content.prototype.remove = function () {
+        if (this.player) {
+            this.player.removeContent(this);
+        }
+        if (this.type.effects) {
+            this.baseCell.removeAllPropagatedModifiers(this.type.translatedEffects);
+        }
+
+        this.baseCell.board.removeSpriteFromLayer("content", this.sprite, this.baseCell.gridPos);
+
+        for (var i = 0; i < this.cells.length; i++) {
+            this.cells[i].content = undefined;
+        }
     };
     return Content;
 })();
@@ -172,7 +203,13 @@ var Cell = (function () {
     Cell.prototype.getArea = function (size, anchor, excludeStart) {
         if (typeof anchor === "undefined") { anchor = "center"; }
         if (typeof excludeStart === "undefined") { excludeStart = false; }
-        return getArea(this.board.cells, this.gridPos, size, anchor, excludeStart);
+        return getArea({
+            targetArray: this.board.cells,
+            start: this.gridPos,
+            size: size,
+            anchor: anchor,
+            excludeStart: excludeStart
+        });
     };
     Cell.prototype.getDistances = function (radius) {
         return getDistanceFromCell(this.board.cells, this, radius, true);
@@ -209,7 +246,7 @@ var Cell = (function () {
 
         if (type) {
             this.undergroundContent = new Content({
-                cell: this,
+                cells: [this],
                 type: type,
                 layer: "undergroundContent"
             });
@@ -280,7 +317,7 @@ var Cell = (function () {
     };
     Cell.prototype.addContent = function (type, player) {
         this.content = new Content({
-            cell: this,
+            cells: [this],
             type: type,
             player: player
         });
@@ -300,16 +337,8 @@ var Cell = (function () {
     Cell.prototype.removeContent = function () {
         if (this.content === undefined) {
             return;
-        }
-        if (this.content.player) {
-            this.content.player.removeContent(this.content);
-        }
-        if (this.content.type.effects) {
-            this.removeAllPropagatedModifiers(this.content.type.translatedEffects);
-        }
-        this.board.removeSpriteFromLayer("content", this.content.sprite, this.gridPos);
-
-        this.content = undefined;
+        } else
+            this.content.remove();
     };
     Cell.prototype.addModifier = function (modifier) {
         if (!this.modifiers[modifier.type]) {
@@ -384,7 +413,17 @@ var Cell = (function () {
         if (!this.content)
             return;
 
-        this.content.modifiers = this.getValidModifiers();
+        var modifiersToApply = this.getValidModifiers();
+
+        this.content.modifiers = this.content.modifiers || {};
+        for (var _mod in modifiersToApply) {
+            var modifier = modifiersToApply[_mod];
+
+            if (this.content.modifiers[_mod] && this.content.modifiers[_mod].strength < modifier.strength) {
+                this.content.modifiers[_mod] = modifier;
+            }
+        }
+
         this.content.applyModifiers();
     };
     Cell.prototype.propagateLandValueModifier = function (modifier) {
@@ -1499,6 +1538,7 @@ var MouseEventHandler = (function () {
             this.currCell = gridPos;
             var selectedCells = game.activeBoard.getCells(game.activeTool.selectType(this.startCell, this.currCell));
 
+            //var selectedCells = game.activeBoard.getCell(this.currCell).getArea(3, "center", true);
             game.highlighter.clearSprites();
             game.highlighter.tintCells(selectedCells, game.activeTool.tintColor);
             game.updateWorld();

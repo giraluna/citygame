@@ -31,7 +31,7 @@ var SCREEN_WIDTH = 720,
     WORLD_WIDTH = TILES * TILE_WIDTH,
     WORLD_HEIGHT = TILES * TILE_HEIGHT,
     ZOOM_LEVELS = [1],
-    AMT_OF_BOARDS = 3;
+    AMT_OF_BOARDS = 1;
 
 var idGenerator = idGenerator || {};
 idGenerator.content = 0;
@@ -89,7 +89,8 @@ class Content
   categoryType: string;
   id: number;
   sprite: Sprite;
-  cell: Cell;
+  cells: Cell[];
+  baseCell: Cell;
   flags: string[];
 
   baseProfit: number = 0;
@@ -99,7 +100,7 @@ class Content
 
   constructor(props:
   {
-    cell: Cell;
+    cells: Cell[];
     type: any;
 
     player?: Player;
@@ -108,7 +109,27 @@ class Content
     layer?: string;
   })
   {
-    this.cell = props.cell;
+    this.cells = props.cells;
+
+    var minX, minY;
+    for (var i = 0; i < this.cells.length; i++)
+    {
+      var pos = this.cells[i].gridPos;
+
+      if (minY === undefined || pos[1] <= minY)
+      {
+        minY = pos[1];
+
+        if (minX === undefined || pos[0] < minX)
+        {
+          minX = pos[0];
+        }
+      }
+    }
+
+    this.baseCell = this.cells[0].board.getCell([minX, minY]);
+
+
     var type = this.type = props.type;
     this.id = props.id || idGenerator.content++;
 
@@ -128,11 +149,12 @@ class Content
   init( type, layer: string = "content" )
   {
     var _s = this.sprite = new ContentSprite( type, this );
-    var cellSprite = this.cell.sprite;
-    var gridPos = this.cell.gridPos;
-    _s.position = this.cell.sprite.position.clone();
+    var cellSprite = this.baseCell.sprite;
+    var gridPos = this.baseCell.gridPos;
 
-    this.cell.board.addSpriteToLayer(layer, _s, gridPos);
+    _s.position = this.baseCell.sprite.position.clone();
+
+    this.baseCell.board.addSpriteToLayer(layer, _s, gridPos);
   }
   applyModifiers()
   {
@@ -150,6 +172,24 @@ class Content
       }
     }
     this.modifiedProfit = totals.addedProfit * totals.multiplier;
+  }
+  remove()
+  {
+    if (this.player)
+    {
+      this.player.removeContent(this);
+    }
+    if (this.type.effects)
+    {
+      this.baseCell.removeAllPropagatedModifiers(this.type.translatedEffects);
+    }
+
+    this.baseCell.board.removeSpriteFromLayer("content", this.sprite, this.baseCell.gridPos);
+
+    for (var i = 0; i < this.cells.length; i++)
+    {
+      this.cells[i].content = undefined;
+    }
   }
 }
 
@@ -247,12 +287,13 @@ class Cell
   getArea(size: number, anchor:string="center", excludeStart:boolean=false)
   {
     return getArea(
-      this.board.cells,
-      this.gridPos,
-      size,
-      anchor,
-      excludeStart
-    );
+    {
+      targetArray: this.board.cells,
+      start: this.gridPos,
+      size: size,
+      anchor: anchor,
+      excludeStart: excludeStart
+    });
   }
   getDistances(radius: number)
   {
@@ -303,7 +344,7 @@ class Cell
     {
       this.undergroundContent = new Content(
       {
-        cell: this,
+        cells: [this],
         type: type,
         layer: "undergroundContent"
       });
@@ -390,7 +431,7 @@ class Cell
   {
     this.content = new Content(
     {
-      cell: this,
+      cells: [this],
       type: type,
       player: player
     });
@@ -414,18 +455,7 @@ class Cell
     {
       return;
     }
-    if (this.content.player)
-    {
-      this.content.player.removeContent(this.content);
-    }
-    if (this.content.type.effects)
-    {
-      this.removeAllPropagatedModifiers(this.content.type.translatedEffects);
-    }
-    this.board.removeSpriteFromLayer("content", this.content.sprite,
-      this.gridPos);
-
-    this.content = undefined;
+    else this.content.remove();
   }
   addModifier(modifier)
   {
@@ -525,7 +555,21 @@ class Cell
   {
     if (!this.content) return;
 
-    this.content.modifiers = this.getValidModifiers();
+    
+    var modifiersToApply = this.getValidModifiers();
+    
+    this.content.modifiers = this.content.modifiers || {};
+    for (var _mod in modifiersToApply)
+    {
+      var modifier = modifiersToApply[_mod];
+
+      if (this.content.modifiers[_mod] &&
+       this.content.modifiers[_mod].strength < modifier.strength)
+      {
+        this.content.modifiers[_mod] = modifier;
+      }
+    }
+
     this.content.applyModifiers();
   }
   propagateLandValueModifier(modifier)
@@ -1927,6 +1971,8 @@ class MouseEventHandler
       this.currCell = gridPos;
       var selectedCells = game.activeBoard.getCells(
           game.activeTool.selectType(this.startCell, this.currCell));
+      
+      //var selectedCells = game.activeBoard.getCell(this.currCell).getArea(3, "center", true);
 
       game.highlighter.clearSprites();
       game.highlighter.tintCells(selectedCells, game.activeTool.tintColor);

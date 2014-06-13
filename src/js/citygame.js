@@ -1579,32 +1579,19 @@ var MouseEventHandler = (function () {
 
             //var selectedCells = game.activeBoard.getCells(
             //    game.activeTool.selectType(this.startCell, this.currCell));
-            var selectedCells = game.activeBoard.getCell(this.currCell).getArea({
-                size: 2,
-                centerSize: [2, 5],
+            this.selectedCells = game.activeBoard.getCell(this.currCell).getArea({
+                size: 1,
+                centerSize: [5, 5],
                 excludeStart: true
             });
 
             game.highlighter.clearSprites();
-            game.highlighter.tintCells(selectedCells, game.activeTool.tintColor);
+            game.highlighter.tintCells(this.selectedCells, game.activeTool.tintColor);
             game.updateWorld();
         }
     };
     MouseEventHandler.prototype.worldEnd = function (event) {
-        var pos = event.getLocalPosition(event.target);
-        var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
-
-        this.currCell = gridPos;
-
-        //var selectedCells = game.activeBoard.getCells(
-        //    game.activeTool.selectType(this.startCell, this.currCell));
-        var selectedCells = game.activeBoard.getCell(this.currCell).getArea({
-            size: 2,
-            centerSize: [2, 5],
-            excludeStart: true
-        });
-
-        game.activeTool.activate(selectedCells);
+        game.activeTool.activate(this.selectedCells);
 
         game.highlighter.clearSprites();
         this.currAction = undefined;
@@ -1612,18 +1599,7 @@ var MouseEventHandler = (function () {
         eventManager.dispatchEvent({ type: "updateLandValueMapmode", content: "" });
 
         game.updateWorld(true);
-        /* TEMPORARY
-        var cell = game.activeBoard.getCell(this.currCell);
-        var neighs = cell.getNeighbors()
-        game.uiDrawer.makeCellPopup(cell, event.target);
-        for (var neigh in neighs)
-        {
-        if (neighs[neigh])
-        {
-        game.uiDrawer.makeCellPopup(neighs[neigh], event.target);
-        }
-        }
-        */
+        this.selectedCells = undefined;
     };
     MouseEventHandler.prototype.hover = function (event) {
         var pos = event.getLocalPosition(event.target);

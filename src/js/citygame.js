@@ -401,9 +401,10 @@ var Cell = (function () {
     Cell.prototype.propagateModifier = function (modifier) {
         var effectedCells = this.getArea({
             size: modifier.range,
-            centerSize: modifier.size,
+            centerSize: modifier.center,
             excludeStart: true
         });
+
         for (var cell in effectedCells) {
             if (effectedCells[cell] !== this) {
                 effectedCells[cell].addModifier(modifier);
@@ -420,7 +421,7 @@ var Cell = (function () {
     Cell.prototype.removePropagatedModifier = function (modifier) {
         var effectedCells = this.getArea({
             size: modifier.range,
-            centerSize: modifier.size,
+            centerSize: modifier.center,
             excludeStart: true
         });
         for (var cell in effectedCells) {
@@ -1565,9 +1566,12 @@ var MouseEventHandler = (function () {
 
         this.currAction = "cellAction";
         this.startCell = gridPos;
+        this.currCell = gridPos;
+
+        this.selectedCells = [game.activeBoard.getCell(gridPos)];
 
         game.highlighter.clearSprites();
-        game.highlighter.tintCells([game.activeBoard.getCell(gridPos)], game.activeTool.tintColor);
+        game.highlighter.tintCells(this.selectedCells, game.activeTool.tintColor);
         game.updateWorld();
     };
     MouseEventHandler.prototype.worldMove = function (event) {
@@ -1576,15 +1580,15 @@ var MouseEventHandler = (function () {
 
         if (!this.currCell || gridPos[0] !== this.currCell[0] || gridPos[1] !== this.currCell[1]) {
             this.currCell = gridPos;
+            this.selectedCells = game.activeBoard.getCells(game.activeTool.selectType(this.startCell, this.currCell));
 
-            //var selectedCells = game.activeBoard.getCells(
-            //    game.activeTool.selectType(this.startCell, this.currCell));
-            this.selectedCells = game.activeBoard.getCell(this.currCell).getArea({
-                size: 1,
-                centerSize: [5, 5],
-                excludeStart: true
-            });
-
+            /*
+            this.selectedCells = game.activeBoard.getCell(this.currCell).getArea(
+            {
+            size: 1,
+            centerSize: [5, 5],
+            excludeStart: true
+            });*/
             game.highlighter.clearSprites();
             game.highlighter.tintCells(this.selectedCells, game.activeTool.tintColor);
             game.updateWorld();
@@ -1595,11 +1599,13 @@ var MouseEventHandler = (function () {
 
         game.highlighter.clearSprites();
         this.currAction = undefined;
+        this.startCell = undefined;
+        this.currCell = undefined;
+        this.selectedCells = undefined;
 
         eventManager.dispatchEvent({ type: "updateLandValueMapmode", content: "" });
 
         game.updateWorld(true);
-        this.selectedCells = undefined;
     };
     MouseEventHandler.prototype.hover = function (event) {
         var pos = event.getLocalPosition(event.target);

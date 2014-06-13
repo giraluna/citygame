@@ -88,7 +88,9 @@ var Content = (function () {
             }
         }
 
+        // highest point arbitrarily assigned as root
         this.baseCell = this.cells[0].board.getCell([minX, minY]);
+        this.size = props.type.size || [1, 1];
 
         var type = this.type = props.type;
         this.id = props.id || idGenerator.content++;
@@ -107,13 +109,16 @@ var Content = (function () {
     }
     Content.prototype.init = function (type, layer) {
         if (typeof layer === "undefined") { layer = "content"; }
+        // todo needs to be split into multiple sprites for
+        // large content z depth to be right
         var _s = this.sprite = new ContentSprite(type, this);
-        var cellSprite = this.baseCell.sprite;
-        var gridPos = this.baseCell.gridPos;
 
-        _s.position = this.baseCell.sprite.position.clone();
+        // sprites aligned at the lowest point
+        var spriteOrigin = [this.baseCell.gridPos[0] + this.size[0] - 1, this.baseCell.gridPos[1] + this.size[1] - 1];
 
-        this.baseCell.board.addSpriteToLayer(layer, _s, gridPos);
+        _s.position = this.baseCell.board.getCell(spriteOrigin).sprite.position.clone();
+
+        this.baseCell.board.addSpriteToLayer(layer, _s, this.baseCell.gridPos);
     };
     Content.prototype.applyModifiers = function () {
         var totals = {
@@ -162,8 +167,9 @@ var Cell = (function () {
 
         var baseVal = board.population / 4;
 
-        this.baseLandValue = this.landValue = Math.round(baseVal + baseVal * relativeInverseDist * 0.5);
+        this.baseLandValue = this.landValue = 20;
 
+        //Math.round(baseVal + baseVal * relativeInverseDist * 0.5);
         this.board = board;
         this.flags = this.type["flags"].slice(0);
 
@@ -200,19 +206,16 @@ var Cell = (function () {
             return this.neighbors;
         }
     };
-    Cell.prototype.getArea = function (size, anchor, excludeStart) {
-        if (typeof anchor === "undefined") { anchor = "center"; }
-        if (typeof excludeStart === "undefined") { excludeStart = false; }
-        return getArea({
-            targetArray: this.board.cells,
-            start: this.gridPos,
-            size: size,
-            anchor: anchor,
-            excludeStart: excludeStart
-        });
+    Cell.prototype.getArea = function (_props) {
+        var props = Object.create(_props);
+
+        props.targetArray = this.board.cells;
+        props.start = this.gridPos;
+
+        return getArea(props);
     };
     Cell.prototype.getDistances = function (radius) {
-        return getDistanceFromCell(this.board.cells, this, radius, true);
+        return getDistanceFromCell(this.board.cells, [this], radius, true);
     };
     Cell.prototype.replace = function (type) {
         var _oldType = this.type;
@@ -258,19 +261,44 @@ var Cell = (function () {
     };
     Cell.prototype.changeContent = function (type, update, player) {
         if (typeof update === "undefined") { update = true; }
-        var buildable = this.checkBuildable(type);
+        var coversMultipleTiles = (type.size && (type.size[0] > 1 || type.size[1] > 1));
+
+        var buildArea;
+        if (coversMultipleTiles) {
+            var endX = this.gridPos[0] + type.size[0] - 1;
+            var endY = this.gridPos[1] + type.size[1] - 1;
+
+            buildArea = this.board.getCells(rectSelect(this.gridPos, [endX, endY]));
+        } else {
+            buildArea = [this];
+        }
+
+        var buildable = true;
+        for (var i = 0; i < buildArea.length; i++) {
+            if (!buildArea[i].checkBuildable(type)) {
+                buildable = false;
+                break;
+            }
+        }
+        if (coversMultipleTiles && buildArea.length !== type.size[0] * type.size[1])
+            buildable = false;
+
         var toAdd = (type !== "none" && buildable !== false);
         var toRemove = (type === "none" || toAdd);
 
         if (toRemove) {
-            this.removeContent();
+            for (var i = 0; i < buildArea.length; i++) {
+                buildArea[i].removeContent();
+            }
         }
 
         if (toAdd) {
-            this.addContent(type, player);
+            this.addContent(type, buildArea, player);
         }
         if (update) {
-            this.updateCell();
+            for (var i = 0; i < buildArea.length; i++) {
+                buildArea[i].updateCell();
+            }
         }
     };
     Cell.prototype.checkBuildable = function (type, checkContent) {
@@ -315,13 +343,16 @@ var Cell = (function () {
     Cell.prototype.updateCell = function () {
         getRoadConnections(this, 1);
     };
-    Cell.prototype.addContent = function (type, player) {
-        this.content = new Content({
-            cells: [this],
+    Cell.prototype.addContent = function (type, cells, player) {
+        var _c = new Content({
+            cells: cells,
             type: type,
             player: player
         });
-        this.applyModifiersToContent();
+        for (var i = 0; i < cells.length; i++) {
+            cells[i].content = _c;
+            cells[i].applyModifiersToContent();
+        }
 
         if (type.effects) {
             this.propagateAllModifiers(type.translatedEffects);
@@ -329,7 +360,9 @@ var Cell = (function () {
 
         // todo
         if (type.underground) {
-            this.changeUndergroundContent(cg.content.tubes[type.underground]);
+            for (var i = 0; i < cells.length; i++) {
+                cells[i].changeUndergroundContent(cg.content.tubes[type.underground]);
+            }
         }
 
         return this.content;
@@ -366,7 +399,11 @@ var Cell = (function () {
         }
     };
     Cell.prototype.propagateModifier = function (modifier) {
-        var effectedCells = this.getArea(modifier.range);
+        var effectedCells = this.getArea({
+            size: modifier.range,
+            centerSize: modifier.size,
+            excludeStart: true
+        });
         for (var cell in effectedCells) {
             if (effectedCells[cell] !== this) {
                 effectedCells[cell].addModifier(modifier);
@@ -381,7 +418,11 @@ var Cell = (function () {
         }
     };
     Cell.prototype.removePropagatedModifier = function (modifier) {
-        var effectedCells = this.getArea(modifier.range);
+        var effectedCells = this.getArea({
+            size: modifier.range,
+            centerSize: modifier.size,
+            excludeStart: true
+        });
         for (var cell in effectedCells) {
             effectedCells[cell].removeModifier(modifier);
         }
@@ -832,7 +873,7 @@ var Game = (function () {
         this.players[player.id] = player;
 
         // TODO have content types register themselves
-        var dailyProfitSystem = new ProfitSystem(1, this.systemsManager, this.players, ["fastfood", "shopping"]);
+        var dailyProfitSystem = new ProfitSystem(1, this.systemsManager, this.players, ["fastfood", "shopping", "parking"]);
         var monthlyProfitSystem = new ProfitSystem(30, this.systemsManager, this.players, ["apartment"]);
         var quarterlyProfitSystem = new ProfitSystem(90, this.systemsManager, this.players, ["office"]);
         this.systemsManager.addSystem("dailyProfitSystem", dailyProfitSystem);
@@ -1362,16 +1403,15 @@ var Scroller = (function () {
         /*
         if (oldZoom <= 0.5 && zoomAmount > 0.5)
         {
-        console.log("32>64");
+        
         }
         else if ( oldZoom <= 1.5 && oldZoom >= 0.5)
         {
-        if (zoomAmount < 0.5) console.log("64>32")
-        else if (zoomAmount > 1.5) console.log("64>128");
+        if (zoomAmount < 0.5)
+        else if (zoomAmount > 1.5)
         }
         else if (oldZoom >= 1.5 && zoomAmount < 1.5)
         {
-        console.log("128>64");
         }*/
         var zoomDelta = oldZoom - zoomAmount;
         var rect = container.getLocalBounds();
@@ -1536,9 +1576,15 @@ var MouseEventHandler = (function () {
 
         if (!this.currCell || gridPos[0] !== this.currCell[0] || gridPos[1] !== this.currCell[1]) {
             this.currCell = gridPos;
-            var selectedCells = game.activeBoard.getCells(game.activeTool.selectType(this.startCell, this.currCell));
 
-            //var selectedCells = game.activeBoard.getCell(this.currCell).getArea(3, "center", true);
+            //var selectedCells = game.activeBoard.getCells(
+            //    game.activeTool.selectType(this.startCell, this.currCell));
+            var selectedCells = game.activeBoard.getCell(this.currCell).getArea({
+                size: 2,
+                centerSize: [2, 5],
+                excludeStart: true
+            });
+
             game.highlighter.clearSprites();
             game.highlighter.tintCells(selectedCells, game.activeTool.tintColor);
             game.updateWorld();
@@ -1549,7 +1595,14 @@ var MouseEventHandler = (function () {
         var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
 
         this.currCell = gridPos;
-        var selectedCells = game.activeBoard.getCells(game.activeTool.selectType(this.startCell, this.currCell));
+
+        //var selectedCells = game.activeBoard.getCells(
+        //    game.activeTool.selectType(this.startCell, this.currCell));
+        var selectedCells = game.activeBoard.getCell(this.currCell).getArea({
+            size: 2,
+            centerSize: [2, 5],
+            excludeStart: true
+        });
 
         game.activeTool.activate(selectedCells);
 
@@ -1655,20 +1708,33 @@ var UIDrawer = (function () {
                     text += "Adj strength: " + _mod.scalingFN(_mod.strength).toFixed(3) + "\n";
                 }
             }
-        } else if (cell.content && cell.content.baseProfit) {
-            text += "\n--------------\n";
-            text += "Base profit: " + cell.content.baseProfit.toFixed(2) + "/d" + "\n";
-            text += "-------\n";
-            for (var modifier in cell.content.modifiers) {
-                var _mod = cell.content.modifiers[modifier];
+        } else {
+            for (var modifier in cell.modifiers) {
+                var _mod = cell.modifiers[modifier];
+                text += "\n--------------\n";
                 text += "Modifier: " + _mod.translate + "\n";
                 text += "Strength: " + _mod.strength + "\n";
-                text += "Adj strength: " + _mod.scaling(_mod.strength).toFixed(3) + "\n";
-                text += "--------------\n";
+                text += "Adj strength: " + _mod.scaling(_mod.strength).toFixed(3);
             }
-            text += "Final profit: " + cell.content.modifiedProfit.toFixed(2) + "/d";
         }
 
+        /*
+        else if (cell.content && cell.content.baseProfit)
+        {
+        text += "\n--------------\n";
+        text += "Base profit: " + cell.content.baseProfit.toFixed(2) + "/d" + "\n";
+        text += "-------\n";
+        for (var modifier in cell.content.modifiers)
+        {
+        var _mod = cell.content.modifiers[modifier];
+        text += "Modifier: " + _mod.translate + "\n";
+        text += "Strength: " + _mod.strength + "\n";
+        text += "Adj strength: " + _mod.scaling(_mod.strength).toFixed(3) + "\n";
+        text += "--------------\n";
+        }
+        text += "Final profit: " + cell.content.modifiedProfit.toFixed(2) + "/d";
+        }
+        */
         var font = this.fonts["base"];
 
         var textObject = new PIXI.Text(text, font);
@@ -1889,7 +1955,8 @@ var HouseTool = (function (_super) {
         // TODO
         var toChange;
         while (true) {
-            toChange = getRandomProperty(cg["content"]["buildings"]);
+            //toChange = getRandomProperty(cg["content"]["buildings"]);
+            toChange = cg.content.buildings.bigoffice;
             if (toChange.categoryType && toChange.categoryType === "apartment") {
                 break;
             }

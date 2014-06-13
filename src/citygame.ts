@@ -91,6 +91,7 @@ class Content
   sprite: Sprite;
   cells: Cell[];
   baseCell: Cell;
+  size: number[];
   flags: string[];
 
   baseProfit: number = 0;
@@ -127,7 +128,9 @@ class Content
       }
     }
 
+    // highest point arbitrarily assigned as root
     this.baseCell = this.cells[0].board.getCell([minX, minY]);
+    this.size = props.type.size || [1,1];
 
 
     var type = this.type = props.type;
@@ -148,13 +151,17 @@ class Content
   }
   init( type, layer: string = "content" )
   {
+    // todo needs to be split into multiple sprites for
+    // large content z depth to be right
     var _s = this.sprite = new ContentSprite( type, this );
-    var cellSprite = this.baseCell.sprite;
-    var gridPos = this.baseCell.gridPos;
 
-    _s.position = this.baseCell.sprite.position.clone();
+    // sprites aligned at the lowest point
+    var spriteOrigin =
+      [this.baseCell.gridPos[0] + this.size[0]-1, this.baseCell.gridPos[1] + this.size[1]-1]
 
-    this.baseCell.board.addSpriteToLayer(layer, _s, gridPos);
+    _s.position = this.baseCell.board.getCell(spriteOrigin).sprite.position.clone();
+
+    this.baseCell.board.addSpriteToLayer(layer, _s, this.baseCell.gridPos);
   }
   applyModifiers()
   {
@@ -236,8 +243,8 @@ class Cell
 
     var baseVal = board.population / 4;
 
-    this.baseLandValue = this.landValue =
-      Math.round(baseVal + baseVal * relativeInverseDist * 0.5);
+    this.baseLandValue = this.landValue = 20;
+      //Math.round(baseVal + baseVal * relativeInverseDist * 0.5);
       
     this.board = board;
     this.flags = this.type["flags"].slice(0);
@@ -284,20 +291,24 @@ class Cell
       return this.neighbors;
     }
   }
-  getArea(size: number, anchor:string="center", excludeStart:boolean=false)
+  getArea(_props:
   {
-    return getArea(
-    {
-      targetArray: this.board.cells,
-      start: this.gridPos,
-      size: size,
-      anchor: anchor,
-      excludeStart: excludeStart
-    });
+    size:number;
+    centerSize?:number[];
+    anchor?:string;
+    excludeStart?: boolean;
+  })
+  {
+    var props = Object.create(_props);
+
+    props.targetArray = this.board.cells;
+    props.start = this.gridPos;
+
+    return getArea(props);
   }
   getDistances(radius: number)
   {
-    return getDistanceFromCell(this.board.cells, this, radius, true);
+    return getDistanceFromCell(this.board.cells, [this], radius, true);
   }
   replace( type ) //change base type of tile
   {
@@ -355,24 +366,56 @@ class Cell
       getTubeConnections(this, 1);
     }
   }
-  changeContent( type:string, update:boolean=true, player?: Player)
+  changeContent( type, update:boolean=true, player?: Player)
   {
-    var buildable = this.checkBuildable(type);
+    var coversMultipleTiles = (type.size && (type.size[0] > 1 || type.size[1] > 1) );
+
+    var buildArea;
+    if (coversMultipleTiles)
+    {
+      var endX = this.gridPos[0] + type.size[0]-1;
+      var endY = this.gridPos[1] + type.size[1]-1;
+
+      buildArea = this.board.getCells( rectSelect(this.gridPos, [endX, endY]) );
+    }
+    else
+    {
+      buildArea = [this];
+    }
+
+    var buildable = true; //this.checkBuildable(type);
+    for (var i = 0; i < buildArea.length; i++)
+    {
+      if ( !buildArea[i].checkBuildable(type) )
+      {
+        buildable = false;
+        break;
+      }
+    }
+    if (coversMultipleTiles &&
+      buildArea.length !== type.size[0] * type.size[1]) buildable = false;
+
     var toAdd: boolean = ( type !== "none" && buildable !== false );
     var toRemove: boolean = ( type === "none" || toAdd );
 
     if ( toRemove )
     {
-      this.removeContent();
+      for (var i = 0; i < buildArea.length; i++)
+      {
+        buildArea[i].removeContent();
+      }
     }
 
     if ( toAdd )
     {
-      this.addContent( type, player);
+      this.addContent( type, buildArea, player);
     }
     if (update)
     {
-      this.updateCell();
+      for (var i = 0; i < buildArea.length; i++)
+      {
+        buildArea[i].updateCell();
+      }
     }
   }
   checkBuildable( type: any, checkContent: boolean = true )
@@ -427,15 +470,19 @@ class Cell
   {
     getRoadConnections(this, 1);
   }
-  addContent( type: any, player?: Player )
+  addContent( type: any, cells: Cell[], player?: Player )
   {
-    this.content = new Content(
+    var _c = new Content(
     {
-      cells: [this],
+      cells: cells,
       type: type,
       player: player
     });
-    this.applyModifiersToContent();
+    for (var i = 0; i < cells.length; i++)
+    {
+      cells[i].content = _c;
+      cells[i].applyModifiersToContent();
+    }
 
     if (type.effects)
     {
@@ -444,7 +491,10 @@ class Cell
     // todo
     if (type.underground)
     {
-      this.changeUndergroundContent(cg.content.tubes[type.underground])
+      for (var i = 0; i < cells.length; i++)
+      {
+        cells[i].changeUndergroundContent(cg.content.tubes[type.underground]);
+      }
     }
     
     return this.content;
@@ -500,7 +550,12 @@ class Cell
   }
   propagateModifier(modifier)
   {
-    var effectedCells = this.getArea(modifier.range);
+    var effectedCells = this.getArea(
+    {
+      size: modifier.range,
+      centerSize: modifier.size,
+      excludeStart: true
+    });
     for (var cell in effectedCells)
     {
       if (effectedCells[cell] !== this)
@@ -519,7 +574,12 @@ class Cell
   }
   removePropagatedModifier(modifier)
   {
-    var effectedCells = this.getArea(modifier.range);
+    var effectedCells = this.getArea(
+    {
+      size: modifier.range,
+      centerSize: modifier.size,
+      excludeStart: true
+    });
     for (var cell in effectedCells)
     {
       effectedCells[cell].removeModifier(modifier);
@@ -1077,7 +1137,7 @@ class Game
     this.players[player.id] = player;
     // TODO have content types register themselves
     var dailyProfitSystem = new ProfitSystem(1, this.systemsManager, this.players,
-      ["fastfood", "shopping"]);
+      ["fastfood", "shopping", "parking"]);
     var monthlyProfitSystem = new ProfitSystem(30, this.systemsManager, this.players,
       ["apartment"]);
     var quarterlyProfitSystem = new ProfitSystem(90, this.systemsManager, this.players,
@@ -1728,16 +1788,15 @@ class Scroller
     /*
     if (oldZoom <= 0.5 && zoomAmount > 0.5)
     {
-      console.log("32>64");
+
     }
     else if ( oldZoom <= 1.5 && oldZoom >= 0.5)
     {
-      if (zoomAmount < 0.5) console.log("64>32")
-      else if (zoomAmount > 1.5) console.log("64>128");
+      if (zoomAmount < 0.5) 
+      else if (zoomAmount > 1.5)
     }
     else if (oldZoom >= 1.5 && zoomAmount < 1.5)
     {
-      console.log("128>64");
     }*/
     
 
@@ -1969,10 +2028,15 @@ class MouseEventHandler
     if ( !this.currCell || gridPos[0] !== this.currCell[0] || gridPos[1] !== this.currCell[1] )
     {
       this.currCell = gridPos;
-      var selectedCells = game.activeBoard.getCells(
-          game.activeTool.selectType(this.startCell, this.currCell));
+      //var selectedCells = game.activeBoard.getCells(
+      //    game.activeTool.selectType(this.startCell, this.currCell));
       
-      //var selectedCells = game.activeBoard.getCell(this.currCell).getArea(3, "center", true);
+      var selectedCells = game.activeBoard.getCell(this.currCell).getArea(
+      {
+        size: 2,
+        centerSize: [2, 5],
+        excludeStart: true
+      });
 
       game.highlighter.clearSprites();
       game.highlighter.tintCells(selectedCells, game.activeTool.tintColor);
@@ -1985,8 +2049,16 @@ class MouseEventHandler
     var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
 
     this.currCell = gridPos;
-    var selectedCells = game.activeBoard.getCells(
-        game.activeTool.selectType(this.startCell, this.currCell));
+    //var selectedCells = game.activeBoard.getCells(
+    //    game.activeTool.selectType(this.startCell, this.currCell));
+    
+    var selectedCells = game.activeBoard.getCell(this.currCell).getArea(
+    {
+      size: 2,
+      centerSize: [2, 5],
+      excludeStart: true
+    });
+
 
     game.activeTool.activate(selectedCells);
 
@@ -2109,7 +2181,19 @@ class UIDrawer
         }
       }
     }
+    else
+    {
+      for (var modifier in cell.modifiers)
+      {
+        var _mod = cell.modifiers[modifier];
+        text += "\n--------------\n";
+        text += "Modifier: " + _mod.translate + "\n";
+        text += "Strength: " + _mod.strength + "\n";
+        text += "Adj strength: " + _mod.scaling(_mod.strength).toFixed(3);
+      }
+    }
 
+    /*
     else if (cell.content && cell.content.baseProfit)
     {
       text += "\n--------------\n";
@@ -2125,6 +2209,7 @@ class UIDrawer
       }
       text += "Final profit: " + cell.content.modifiedProfit.toFixed(2) + "/d";
     }
+    */
 
     var font = this.fonts["base"];
 
@@ -2388,7 +2473,8 @@ class HouseTool extends Tool
     var toChange;
     while (true)
     {
-      toChange = getRandomProperty(cg["content"]["buildings"])
+      //toChange = getRandomProperty(cg["content"]["buildings"]);
+      toChange = cg.content.buildings.bigoffice;
       if (toChange.categoryType && toChange.categoryType === "apartment")
       {
         break;

@@ -275,9 +275,21 @@ class ReactUI
       this.makeInfoPopup({text: "Recruit some employees first"});
       return;
     }
+
+    if (props.player.ownedCells[props.cell.gridPos]) return;
+
+    var buyCost = props.cell.landValue;
+    if (props.cell.content)
+    {
+      buyCost += 10;
+      if (props.cell.content.type.cost)
+      {
+        buyCost += props.cell.content.type.cost * 1.15;
+      }
+    }
     var buySelected = function(selected)
     {
-      actions.buyCell( props.player, props.cell, selected.employee);
+      actions.buyCell( props.player, props.cell, selected.employee, buyCost);
     }
     this.makeEmployeeActionPopup(
     {
@@ -301,7 +313,7 @@ class ReactUI
           cost:
           {
             approximate: true,
-            amount: props.cell.landValue
+            amount: buyCost
           }
         }
       }

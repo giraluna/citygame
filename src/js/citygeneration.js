@@ -19,7 +19,7 @@ var cityGeneration;
             for (var i = 0; i < exclusions.length; i++) {
                 var excludedFlags = exclusions[i].flags;
 
-                var neighs = cell.getArea(exclusions[i].radius);
+                var neighs = cell.getArea({ size: exclusions[i].radius });
 
                 for (var j = 0; j < neighs.length; j++) {
                     if (arrayLogic.or(excludedFlags, neighs[j].flags)) {

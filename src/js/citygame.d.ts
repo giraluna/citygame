@@ -39,6 +39,7 @@ declare class Content {
     public sprite: Sprite;
     public cells: Cell[];
     public baseCell: Cell;
+    public size: number[];
     public flags: string[];
     public baseProfit: number;
     public modifiers: any;
@@ -85,15 +86,20 @@ declare class Cell {
     public init(): void;
     public getScreenPos(container: any): number[];
     public getNeighbors(diagonal?: boolean): neighborCells;
-    public getArea(size: number, anchor?: string, excludeStart?: boolean): any;
+    public getArea(_props: {
+        size: number;
+        centerSize?: number[];
+        anchor?: string;
+        excludeStart?: boolean;
+    }): any;
     public getDistances(radius: number): any;
     public replace(type: any): void;
     public changeUndergroundContent(type?: string, update?: boolean): void;
-    public changeContent(type: string, update?: boolean, player?: Player): void;
+    public changeContent(type: any, update?: boolean, player?: Player): void;
     public checkBuildable(type: any, checkContent?: boolean): boolean;
     public addPlant(): void;
     public updateCell(): void;
-    public addContent(type: any, player?: Player): Content;
+    public addContent(type: any, cells: Cell[], player?: Player): Content;
     public removeContent(): void;
     public addModifier(modifier: any): void;
     public removeModifier(modifier: any): void;

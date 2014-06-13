@@ -303,22 +303,27 @@ function getNeighbors(targetArray: any[][], gridPos: number[],
 // TODO really stupid and inefficient
 function getDistanceFromCell(
   cells: any[][],
-  center: any,
+  center: any[],
   maxDistance: number,
   diagonal: boolean = false
   )
 {
   maxDistance++;
   
-  var toAnalyze = [center];
+  var toAnalyze = [];
   var indexedDistances: any = {};
-  indexedDistances[center.gridPos] =
+  for (var i = 0; i < center.length; i++)
   {
-    item: center,
-    distance: 1,
-    invertedDistance: maxDistance,
-    invertedDistanceRatio: 1
+    indexedDistances[center[i].gridPos] =
+    {
+      item: center[i],
+      distance: 1,
+      invertedDistance: maxDistance,
+      invertedDistanceRatio: 1
+    }
+    toAnalyze.push(center[i]);
   }
+  
   while (toAnalyze.length > 0)
   {
     var current = toAnalyze.shift();
@@ -367,15 +372,21 @@ function getArea(props:
 {
   targetArray: any[][];
   start: number[];
-  end?: number[]
+  centerSize?: number[]
   size: number;
   anchor?:string;
   excludeStart?: boolean;
 })
 {
   var targetArray = props.targetArray;
+
+  var centerSize = props.centerSize || [1,1];
+
   var start = props.start;
-  var end = props.end || props.start;
+  var end = [start[0] + centerSize[0] - 1, start[1] + centerSize[1] - 1];
+
+
+
   var size = props.size;
   var anchor = props.anchor || "center";
   var excludeStart = props.excludeStart || false;

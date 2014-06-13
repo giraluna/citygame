@@ -245,14 +245,18 @@ function getDistanceFromCell(cells, center, maxDistance, diagonal) {
     if (typeof diagonal === "undefined") { diagonal = false; }
     maxDistance++;
 
-    var toAnalyze = [center];
+    var toAnalyze = [];
     var indexedDistances = {};
-    indexedDistances[center.gridPos] = {
-        item: center,
-        distance: 1,
-        invertedDistance: maxDistance,
-        invertedDistanceRatio: 1
-    };
+    for (var i = 0; i < center.length; i++) {
+        indexedDistances[center[i].gridPos] = {
+            item: center[i],
+            distance: 1,
+            invertedDistance: maxDistance,
+            invertedDistanceRatio: 1
+        };
+        toAnalyze.push(center[i]);
+    }
+
     while (toAnalyze.length > 0) {
         var current = toAnalyze.shift();
         var neighbors;
@@ -290,8 +294,12 @@ function getDistanceFromCell(cells, center, maxDistance, diagonal) {
 
 function getArea(props) {
     var targetArray = props.targetArray;
+
+    var centerSize = props.centerSize || [1, 1];
+
     var start = props.start;
-    var end = props.end || props.start;
+    var end = [start[0] + centerSize[0] - 1, start[1] + centerSize[1] - 1];
+
     var size = props.size;
     var anchor = props.anchor || "center";
     var excludeStart = props.excludeStart || false;

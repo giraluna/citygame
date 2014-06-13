@@ -563,6 +563,27 @@ var cg = {
                         "strength": 1
                     }
                 ]
+            },
+            "bigoffice": {
+                "type": "bigoffice",
+                "baseType": "building",
+                "categoryType": "apartment",
+                "translate": "Big office",
+                "size": [2, 2],
+                "baseProfit": 3,
+                "daysForProfitTick": 90,
+                "cost": 50,
+                "buildTime": 21,
+                "anchor": [0.6666, 1],
+                "frame": "bigoffice.png",
+                "canNotBuildOn": ["water", "building", "road"],
+                "effects": [
+                    {
+                        "type": "nearbyStation",
+                        "range": 3,
+                        "strength": 10
+                    }
+                ]
             }
         }
     }
@@ -592,6 +613,8 @@ function findType(typeName, target) {
                     console.error("Invalid effect defined on ", target);
 
                 var translated = cellModifiers[e.type].call(null, e.range, e.strength);
+
+                translated.center = target.size || [1, 1];
 
                 translated.scaling = translated.scaling || function (strength) {
                     return 1 + Math.log(strength);

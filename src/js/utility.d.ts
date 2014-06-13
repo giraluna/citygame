@@ -54,11 +54,11 @@ declare function getNeighbors(targetArray: any[][], gridPos: number[], diagonal?
     se: any;
     sw: any;
 };
-declare function getDistanceFromCell(cells: any[][], center: any, maxDistance: number, diagonal?: boolean): any;
+declare function getDistanceFromCell(cells: any[][], center: any[], maxDistance: number, diagonal?: boolean): any;
 declare function getArea(props: {
     targetArray: any[][];
     start: number[];
-    end?: number[];
+    centerSize?: number[];
     size: number;
     anchor?: string;
     excludeStart?: boolean;

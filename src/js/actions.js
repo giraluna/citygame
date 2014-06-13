@@ -7,13 +7,14 @@ var actions;
 (function (actions) {
     var blinkerTODO = new Blinker(600, 0x880055, -1, false);
 
-    function buyCell(player, cell, employee) {
+    function buyCell(player, cell, employee, buyCost) {
         employee.active = false;
         employee.currentAction = "buyCell";
         var blinkerIdTODO = blinkerTODO.idGenerator++;
 
         var actionTime = getActionTime([employee.skills["negotiation"]], 14);
-        var price = getActionCost([employee.skills["negotiation"]], cell.landValue).actual;
+
+        var price = getActionCost([employee.skills["negotiation"]], buyCost).actual;
 
         var buyCellConfirmFN = function () {
             blinkerTODO.removeCells(blinkerIdTODO);

@@ -32,7 +32,7 @@ module cityGeneration
       {
         var excludedFlags = exclusions[i].flags;
 
-        var neighs = cell.getArea(exclusions[i].radius);
+        var neighs = cell.getArea({size: exclusions[i].radius});
 
         for (var j = 0; j < neighs.length; j++)
         {

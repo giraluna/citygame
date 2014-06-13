@@ -3,7 +3,7 @@
 /// <reference path="eventlistener.d.ts" />
 /// <reference path="spriteblinker.d.ts" />
 declare module actions {
-    function buyCell(player: Player, cell: any, employee: Employee): void;
+    function buyCell(player: Player, cell: any, employee: Employee, buyCost: number): void;
     function recruitEmployee(player: Player, employee: Employee): void;
     function constructBuilding(props: {
         player: Player;

@@ -188,6 +188,10 @@ body {
 .popup .popup-buttons button {
   margin: 0 20px;
 }
+.scrollable-wrapper {
+  overflow-y: scroll;
+  max-height: 400px;
+}
 .building-list tr {
   height: 30px;
 }

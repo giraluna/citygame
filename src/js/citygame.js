@@ -278,13 +278,18 @@ var Cell = (function () {
             buildArea = [this];
         }
 
-        var buildable = true;
-        for (var i = 0; i < buildArea.length; i++) {
-            if (!buildArea[i].checkBuildable(type)) {
-                buildable = false;
-                break;
-            }
+        /*
+        var buildable = true; //this.checkBuildable(type);
+        for (var i = 0; i < buildArea.length; i++)
+        {
+        if ( !buildArea[i].checkBuildable(type) )
+        {
+        buildable = false;
+        break;
         }
+        }*/
+        var buildable = this.checkBuildable(type);
+
         if (coversMultipleTiles && buildArea.length !== type.size[0] * type.size[1])
             buildable = false;
 
@@ -311,32 +316,55 @@ var Cell = (function () {
         if (type === "none")
             return true;
 
-        // implicitly true
-        var canBuild = true;
+        var buildArea;
 
-        // check invalid
-        if (type.canNotBuildOn) {
-            // check if any flags in cell conflict with type.canNotBuildOn
-            canBuild = arrayLogic.not(this.flags, type.canNotBuildOn);
+        if (type.size && (type.size[0] > 1 || type.size[1] > 1)) {
+            var endX = this.gridPos[0] + type.size[0] - 1;
+            var endY = this.gridPos[1] + type.size[1] - 1;
 
-            // same with content
-            if (checkContent && canBuild !== false && this.content) {
-                canBuild = arrayLogic.not(this.content.flags, type.canNotBuildOn);
-            }
+            buildArea = this.board.getCells(rectSelect(this.gridPos, [endX, endY]));
+        } else {
+            buildArea = [this];
         }
 
-        if (canBuild === false) {
-            return false;
-        } else {
-            var valid = true;
+        var buildAreaIsValid = true;
+        for (var i = 0; i < buildArea.length; i++) {
+            var a = checkCell(buildArea[i], type);
+            if (!a) {
+                buildAreaIsValid = false;
+                break;
+            }
+        }
+        return buildAreaIsValid;
 
-            if (type.canBuildOn) {
-                valid = arrayLogic.or(this.flags, type.canBuildOn);
-                if (checkContent && !valid && this.content) {
-                    valid = arrayLogic.or(this.content.flags, type.canBuildOn);
+        function checkCell(cell, type) {
+            // implicitly true
+            var canBuild = true;
+
+            // check invalid
+            if (type.canNotBuildOn) {
+                // check if any flags in cell conflict with type.canNotBuildOn
+                canBuild = arrayLogic.not(cell.flags, type.canNotBuildOn);
+
+                // same with content
+                if (checkContent && canBuild !== false && cell.content) {
+                    canBuild = arrayLogic.not(cell.content.flags, type.canNotBuildOn);
                 }
             }
-            return valid;
+
+            if (canBuild === false) {
+                return false;
+            } else {
+                var valid = true;
+
+                if (type.canBuildOn) {
+                    valid = arrayLogic.or(cell.flags, type.canBuildOn);
+                    if (checkContent && !valid && cell.content) {
+                        valid = arrayLogic.or(cell.content.flags, type.canBuildOn);
+                    }
+                }
+                return valid;
+            }
         }
     };
     Cell.prototype.addPlant = function () {

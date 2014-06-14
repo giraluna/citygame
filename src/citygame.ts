@@ -386,7 +386,7 @@ class Cell
     {
       buildArea = [this];
     }
-
+    /*
     var buildable = true; //this.checkBuildable(type);
     for (var i = 0; i < buildArea.length; i++)
     {
@@ -395,7 +395,11 @@ class Cell
         buildable = false;
         break;
       }
-    }
+    }*/
+
+    var buildable = this.checkBuildable(type);
+
+
     if (coversMultipleTiles &&
       buildArea.length !== type.size[0] * type.size[1]) buildable = false;
 
@@ -426,41 +430,70 @@ class Cell
   {
     if (type === "none") return true;
 
+    var buildArea;
 
-    // implicitly true
-    var canBuild = true;
-
-    // check invalid
-    if (type.canNotBuildOn)
+    if (type.size && (type.size[0] > 1 || type.size[1] > 1) )
     {
-      // check if any flags in cell conflict with type.canNotBuildOn
-      canBuild = arrayLogic.not(this.flags, type.canNotBuildOn);
-      // same with content
-      if (checkContent && canBuild !== false && this.content)
-      {
-        canBuild = arrayLogic.not(this.content.flags, type.canNotBuildOn);
-      }
-    }
+      var endX = this.gridPos[0] + type.size[0]-1;
+      var endY = this.gridPos[1] + type.size[1]-1;
 
-    if (canBuild === false)
-    {
-      return false
+      buildArea = this.board.getCells( rectSelect(this.gridPos, [endX, endY]) );
     }
-    // if there are no conflicts, finally check if it's valid
     else
     {
-      var valid = true;
+      buildArea = [this];
+    }
 
-      if (type.canBuildOn)
+    var buildAreaIsValid = true;
+    for (var i = 0; i < buildArea.length; i++)
+    {
+      var a = checkCell(buildArea[i], type);
+      if (!a)
       {
-        valid = arrayLogic.or(this.flags, type.canBuildOn);
-        if (checkContent && !valid && this.content)
+        buildAreaIsValid = false;
+        break;
+      }
+    }
+    return buildAreaIsValid;
+
+    function checkCell(cell: Cell, type)
+    {
+      // implicitly true
+      var canBuild = true;
+
+      // check invalid
+      if (type.canNotBuildOn)
+      {
+        // check if any flags in cell conflict with type.canNotBuildOn
+        canBuild = arrayLogic.not(cell.flags, type.canNotBuildOn);
+        // same with content
+        if (checkContent && canBuild !== false && cell.content)
         {
-          valid = arrayLogic.or(this.content.flags, type.canBuildOn);
+          canBuild = arrayLogic.not(cell.content.flags, type.canNotBuildOn);
         }
       }
-      return valid;
+
+      if (canBuild === false)
+      {
+        return false
+      }
+      // if there are no conflicts, finally check if it's valid
+      else
+      {
+        var valid = true;
+
+        if (type.canBuildOn)
+        {
+          valid = arrayLogic.or(cell.flags, type.canBuildOn);
+          if (checkContent && !valid && cell.content)
+          {
+            valid = arrayLogic.or(cell.content.flags, type.canBuildOn);
+          }
+        }
+        return valid;
+      }
     }
+    
 
   }
   addPlant()

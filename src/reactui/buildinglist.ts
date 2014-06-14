@@ -1,4 +1,5 @@
 /// <reference path="../../lib/react.d.ts" />
+/// <reference path="../js/utility.d.ts" />
 
 module UIComponents
 {
@@ -56,12 +57,35 @@ module UIComponents
           rowProps.className = "inactive";
           costProps.className = "insufficient";
         }
+
         if (this.props.cell && !this.props.cell.checkBuildable(buildingTemplate))
         {
           playerCanBuildBuilding = false;
           rowProps.className = "inactive";
           nameProps.className = "insufficient";
-        };
+        }
+        else if (buildingTemplate.size &&
+          (buildingTemplate.size[0] > 1 || buildingTemplate.size[1] > 1) )
+        {
+          var cell = this.props.cell;
+
+          var endX = cell.gridPos[0] + buildingTemplate.size[0]-1;
+          var endY = cell.gridPos[1] + buildingTemplate.size[1]-1;
+
+          var buildArea = cell.board.getCells( rectSelect(cell.gridPos, [endX, endY]) );
+
+          for (var i = 0; i < buildArea.length; i++)
+          {
+            if ( !buildArea[i].player || buildArea[i].player.id !== this.props.player.id)
+            {
+              playerCanBuildBuilding = false;
+              rowProps.className = "inactive";
+              nameProps.className = "insufficient";
+              break;
+            }
+          }
+        }
+        
 
         if (playerCanBuildBuilding)
         {
@@ -95,19 +119,22 @@ module UIComponents
       };
 
       return(
-        React.DOM.table({className: "building-list"},
-          React.DOM.thead(null, 
-            React.DOM.tr(null, 
-              React.DOM.th(null),
-              React.DOM.th(null, "Type"),
-              React.DOM.th(null, "Cost")
+        React.DOM.div({className: "scrollable-wrapper"},
+            React.DOM.table({className: "building-list"},
+              React.DOM.thead(null, 
+                React.DOM.tr(null, 
+                  React.DOM.th(null),
+                  React.DOM.th(null, "Type"),
+                  React.DOM.th(null, "Cost")
+                )
+              ),
+              React.DOM.tbody(null, 
+                rows
+              )
             )
-          ),
-          React.DOM.tbody(null, 
-            rows
           )
-        )
-      );
+        );
+        
     }
 
   });

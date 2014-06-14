@@ -92,7 +92,7 @@ declare class Cell {
         anchor?: string;
         excludeStart?: boolean;
     }): any;
-    public getDistances(radius: number): any;
+    public getDistances(radius: number, centerSize?: number[]): any;
     public replace(type: any): void;
     public changeUndergroundContent(type?: string, update?: boolean): void;
     public changeContent(type: any, update?: boolean, player?: Player): void;

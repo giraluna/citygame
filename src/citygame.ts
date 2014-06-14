@@ -306,9 +306,13 @@ class Cell
 
     return getArea(props);
   }
-  getDistances(radius: number)
+  getDistances(radius: number, centerSize: number[] = [1,1])
   {
-    return getDistanceFromCell(this.board.cells, [this], radius, true);
+    var centerEnd = [this.gridPos[0] + centerSize[0]-1,
+      this.gridPos[1] + centerSize[1]-1]
+    var center = this.board.getCells(rectSelect(this.gridPos, centerEnd));
+
+    return getDistanceFromCell(this.board.cells, center, radius, true);
   }
   replace( type ) //change base type of tile
   {
@@ -636,7 +640,7 @@ class Cell
   }
   propagateLandValueModifier(modifier)
   {
-    var effectedCells = this.getDistances(modifier.landValue.radius);
+    var effectedCells = this.getDistances(modifier.landValue.radius, modifier.center);
 
     var strengthIndexes: any = {};
 
@@ -688,7 +692,7 @@ class Cell
   }
   removePropagatedLandValueModifier(modifier)
   {
-    var effectedCells = this.getDistances(modifier.landValue.radius);
+    var effectedCells = this.getDistances(modifier.landValue.radius, modifier.center);
 
     var strengthIndexes: any = {};
 
@@ -2034,17 +2038,17 @@ class MouseEventHandler
     if ( !this.currCell || gridPos[0] !== this.currCell[0] || gridPos[1] !== this.currCell[1] )
     {
       this.currCell = gridPos;
-      /*
+      
       this.selectedCells = game.activeBoard.getCells(
           game.activeTool.selectType(this.startCell, this.currCell));
-      */
       
+      /*
       this.selectedCells = game.activeBoard.getCell(this.currCell).getArea(
       {
         size: 1,
         centerSize: [4, 5],
         excludeStart: true
-      });
+      });*/
 
       game.highlighter.clearSprites();
       game.highlighter.tintCells(this.selectedCells, game.activeTool.tintColor);

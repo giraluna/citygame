@@ -27,7 +27,7 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-var SCREEN_WIDTH = 720, SCREEN_HEIGHT = 480, TILE_WIDTH = 64, TILE_HEIGHT = 32, TILES = 32, WORLD_WIDTH = TILES * TILE_WIDTH, WORLD_HEIGHT = TILES * TILE_HEIGHT, ZOOM_LEVELS = [1], AMT_OF_BOARDS = 1;
+var SCREEN_WIDTH = 720, SCREEN_HEIGHT = 480, TILE_WIDTH = 64, TILE_HEIGHT = 32, TILES = 32, WORLD_WIDTH = TILES * TILE_WIDTH, WORLD_HEIGHT = TILES * TILE_HEIGHT, ZOOM_LEVELS = [1], AMT_OF_BOARDS = 2;
 
 var idGenerator = idGenerator || {};
 idGenerator.content = 0;
@@ -167,9 +167,8 @@ var Cell = (function () {
 
         var baseVal = board.population / 4;
 
-        this.baseLandValue = this.landValue = 20;
+        this.baseLandValue = this.landValue = Math.round(baseVal + baseVal * relativeInverseDist * 0.5);
 
-        //Math.round(baseVal + baseVal * relativeInverseDist * 0.5);
         this.board = board;
         this.flags = this.type["flags"].slice(0);
 
@@ -424,6 +423,7 @@ var Cell = (function () {
             centerSize: modifier.center,
             excludeStart: true
         });
+
         for (var cell in effectedCells) {
             effectedCells[cell].removeModifier(modifier);
         }
@@ -1580,15 +1580,17 @@ var MouseEventHandler = (function () {
 
         if (!this.currCell || gridPos[0] !== this.currCell[0] || gridPos[1] !== this.currCell[1]) {
             this.currCell = gridPos;
-            this.selectedCells = game.activeBoard.getCells(game.activeTool.selectType(this.startCell, this.currCell));
 
             /*
-            this.selectedCells = game.activeBoard.getCell(this.currCell).getArea(
-            {
-            size: 1,
-            centerSize: [5, 5],
-            excludeStart: true
-            });*/
+            this.selectedCells = game.activeBoard.getCells(
+            game.activeTool.selectType(this.startCell, this.currCell));
+            */
+            this.selectedCells = game.activeBoard.getCell(this.currCell).getArea({
+                size: 1,
+                centerSize: [4, 5],
+                excludeStart: true
+            });
+
             game.highlighter.clearSprites();
             game.highlighter.tintCells(this.selectedCells, game.activeTool.tintColor);
             game.updateWorld();

@@ -31,7 +31,7 @@ var SCREEN_WIDTH = 720,
     WORLD_WIDTH = TILES * TILE_WIDTH,
     WORLD_HEIGHT = TILES * TILE_HEIGHT,
     ZOOM_LEVELS = [1],
-    AMT_OF_BOARDS = 1;
+    AMT_OF_BOARDS = 2;
 
 var idGenerator = idGenerator || {};
 idGenerator.content = 0;
@@ -243,8 +243,8 @@ class Cell
 
     var baseVal = board.population / 4;
 
-    this.baseLandValue = this.landValue = 20;
-      //Math.round(baseVal + baseVal * relativeInverseDist * 0.5);
+    this.baseLandValue = this.landValue =
+      Math.round(baseVal + baseVal * relativeInverseDist * 0.5);
       
     this.board = board;
     this.flags = this.type["flags"].slice(0);
@@ -2034,16 +2034,17 @@ class MouseEventHandler
     if ( !this.currCell || gridPos[0] !== this.currCell[0] || gridPos[1] !== this.currCell[1] )
     {
       this.currCell = gridPos;
+      /*
       this.selectedCells = game.activeBoard.getCells(
           game.activeTool.selectType(this.startCell, this.currCell));
+      */
       
-      /*
       this.selectedCells = game.activeBoard.getCell(this.currCell).getArea(
       {
         size: 1,
-        centerSize: [5, 5],
+        centerSize: [4, 5],
         excludeStart: true
-      });*/
+      });
 
       game.highlighter.clearSprites();
       game.highlighter.tintCells(this.selectedCells, game.activeTool.tintColor);

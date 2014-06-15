@@ -78,6 +78,7 @@ declare class ReactUI {
         player: Player;
         buildingTemplate: any;
         cell: any;
+        onOk?: any;
         text?: any;
     }): void;
     public makeInputPopup(props: {

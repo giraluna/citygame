@@ -1,5 +1,6 @@
 /// <reference path="js/employee.d.ts" />
 /// <reference path="js/player.d.ts" />
+/// <reference path="js/utility.d.ts" />
 /// <reference path="js/eventlistener.d.ts" />
 /// <reference path="js/spriteblinker.d.ts" />
 ///
@@ -125,7 +126,13 @@ var actions;
             eventManager.dispatchEvent({ type: "updateWorld", content: "" });
         };
         var constructBuildingCompleteFN = function () {
-            blinkerTODO.addCells([cell], blinkerId);
+            var size = building.size || [1, 1];
+            var endX = cell.gridPos[0] + size[0] - 1;
+            var endY = cell.gridPos[1] + size[1] - 1;
+
+            var buildArea = cell.board.getCells(rectSelect(cell.gridPos, [endX, endY]));
+
+            blinkerTODO.addCells(buildArea, blinkerId);
             blinkerTODO.start();
 
             employee.active = true;

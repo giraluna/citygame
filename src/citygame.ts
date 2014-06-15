@@ -327,7 +327,7 @@ class Cell
     }
     else if(this.content)
     {
-      if ( !this.checkBuildable(this.content.type, false) )
+      if ( !this.checkBuildable(this.content.type, null, false) )
       {
         this.changeContent("none");
       }
@@ -397,7 +397,7 @@ class Cell
       }
     }*/
 
-    var buildable = this.checkBuildable(type);
+    var buildable = this.checkBuildable(type, player);
 
 
     if (coversMultipleTiles &&
@@ -426,7 +426,7 @@ class Cell
       }
     }
   }
-  checkBuildable( type: any, checkContent: boolean = true )
+  checkBuildable( type: any, player?: Player, checkContent: boolean = true )
   {
     if (type === "none") return true;
 
@@ -449,7 +449,7 @@ class Cell
     var buildAreaIsValid = true;
     for (var i = 0; i < buildArea.length; i++)
     {
-      var a = checkCell(buildArea[i], type);
+      var a = checkCell(buildArea[i], type, player);
       if (!a)
       {
         buildAreaIsValid = false;
@@ -458,10 +458,16 @@ class Cell
     }
     return buildAreaIsValid;
 
-    function checkCell(cell: Cell, type)
+    function checkCell(cell: Cell, type, player?: Player)
     {
       // implicitly true
       var canBuild = true;
+
+      // check ownership if needed
+      if (player)
+      {
+        if (!cell.player || cell.player.id !== player.id) return false;
+      }
 
       // check invalid
       if (type.canNotBuildOn)
@@ -1968,6 +1974,7 @@ class MouseEventHandler
     var _canvas = document.getElementById("pixi-container");
     _canvas.addEventListener("DOMMouseScroll", function(e: any)
     {
+      console.log(e.target);
       self.scroller.deltaZoom(-e.detail, 0.05);
     });
     _canvas.addEventListener("mousewheel", function(e: any)
@@ -2124,7 +2131,6 @@ class MouseEventHandler
       
       this.selectedCells = game.activeBoard.getCells(
           game.activeTool.selectType(this.startCell, this.currCell));
-      
       /*
       this.selectedCells = game.activeBoard.getCell(this.currCell).getArea(
       {
@@ -2628,6 +2634,7 @@ class BuildTool extends Tool
     this.tintColor = 0xFFFFFF;
     this.canBuild = false;
     this.mainCell = undefined;
+    game.changeTool("nothing");
   }
   changeBuilding(buildingType)
   {
@@ -2644,7 +2651,8 @@ class BuildTool extends Tool
         this.mainCell = start;
       }
 
-      var buildable = start.checkBuildable(this.selectedBuildingType);
+      var buildable = start.checkBuildable(
+        this.selectedBuildingType, game.players.player0);
 
       if (buildable)
       {
@@ -2664,17 +2672,17 @@ class BuildTool extends Tool
   {
     if (this.canBuild === true)
     {
-      var player = game.players["player0"];
-      if (player.money >= this.selectedBuildingType.cost)
+      if (game.players.player0.money >= this.selectedBuildingType.cost)
       {
         eventManager.dispatchEvent(
         {
           type: "makeBuildingConstructPopup",
           content:
           {
-            player: game.players["player0"],
+            player: game.players.player0,
             buildingTemplate: this.selectedBuildingType,
-            cell: this.mainCell
+            cell: this.mainCell,
+            onOk: this.setDefaults.bind(this)
           }
         });
       }
@@ -2689,8 +2697,6 @@ class BuildTool extends Tool
           }
         })
       };
-
-      this.setDefaults();
     }
 
   }

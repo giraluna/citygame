@@ -1,5 +1,6 @@
 /// <reference path="employee.d.ts" />
 /// <reference path="player.d.ts" />
+/// <reference path="utility.d.ts" />
 /// <reference path="eventlistener.d.ts" />
 /// <reference path="spriteblinker.d.ts" />
 declare module actions {

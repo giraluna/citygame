@@ -359,6 +359,7 @@ class ReactUI
     player: Player;
     buildingTemplate: any;
     cell: any;
+    onOk?: any;
     text?: any;
   })
   {
@@ -375,6 +376,7 @@ class ReactUI
           building: props.buildingTemplate,
           employee: selected.employee
         });
+        props.onOk.call();
       }
     }
     this.makeEmployeeActionPopup(

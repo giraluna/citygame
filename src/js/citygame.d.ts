@@ -96,7 +96,7 @@ declare class Cell {
     public replace(type: any): void;
     public changeUndergroundContent(type?: string, update?: boolean): void;
     public changeContent(type: any, update?: boolean, player?: Player): void;
-    public checkBuildable(type: any, checkContent?: boolean): boolean;
+    public checkBuildable(type: any, player?: Player, checkContent?: boolean): boolean;
     public addPlant(): void;
     public updateCell(): void;
     public addContent(type: any, cells: Cell[], player?: Player): Content;

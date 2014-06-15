@@ -231,7 +231,7 @@ var Cell = (function () {
         if (this.content && this.content.baseType === "plant") {
             this.addPlant();
         } else if (this.content) {
-            if (!this.checkBuildable(this.content.type, false)) {
+            if (!this.checkBuildable(this.content.type, null, false)) {
                 this.changeContent("none");
             } else {
                 this.changeContent(this.content.type, false, this.content.player);
@@ -288,7 +288,7 @@ var Cell = (function () {
         break;
         }
         }*/
-        var buildable = this.checkBuildable(type);
+        var buildable = this.checkBuildable(type, player);
 
         if (coversMultipleTiles && buildArea.length !== type.size[0] * type.size[1])
             buildable = false;
@@ -311,7 +311,7 @@ var Cell = (function () {
             }
         }
     };
-    Cell.prototype.checkBuildable = function (type, checkContent) {
+    Cell.prototype.checkBuildable = function (type, player, checkContent) {
         if (typeof checkContent === "undefined") { checkContent = true; }
         if (type === "none")
             return true;
@@ -332,7 +332,7 @@ var Cell = (function () {
 
         var buildAreaIsValid = true;
         for (var i = 0; i < buildArea.length; i++) {
-            var a = checkCell(buildArea[i], type);
+            var a = checkCell(buildArea[i], type, player);
             if (!a) {
                 buildAreaIsValid = false;
                 break;
@@ -340,9 +340,15 @@ var Cell = (function () {
         }
         return buildAreaIsValid;
 
-        function checkCell(cell, type) {
+        function checkCell(cell, type, player) {
             // implicitly true
             var canBuild = true;
+
+            // check ownership if needed
+            if (player) {
+                if (!cell.player || cell.player.id !== player.id)
+                    return false;
+            }
 
             // check invalid
             if (type.canNotBuildOn) {
@@ -1544,6 +1550,7 @@ var MouseEventHandler = (function () {
 
         var _canvas = document.getElementById("pixi-container");
         _canvas.addEventListener("DOMMouseScroll", function (e) {
+            console.log(e.target);
             self.scroller.deltaZoom(-e.detail, 0.05);
         });
         _canvas.addEventListener("mousewheel", function (e) {
@@ -2090,6 +2097,7 @@ var BuildTool = (function (_super) {
         this.tintColor = 0xFFFFFF;
         this.canBuild = false;
         this.mainCell = undefined;
+        game.changeTool("nothing");
     };
     BuildTool.prototype.changeBuilding = function (buildingType) {
         this.selectedBuildingType = buildingType;
@@ -2104,7 +2112,7 @@ var BuildTool = (function (_super) {
                 this.mainCell = start;
             }
 
-            var buildable = start.checkBuildable(this.selectedBuildingType);
+            var buildable = start.checkBuildable(this.selectedBuildingType, game.players.player0);
 
             if (buildable) {
                 this.tintColor = 0x338833;
@@ -2119,14 +2127,14 @@ var BuildTool = (function (_super) {
 
     BuildTool.prototype.activate = function (selectedCells) {
         if (this.canBuild === true) {
-            var player = game.players["player0"];
-            if (player.money >= this.selectedBuildingType.cost) {
+            if (game.players.player0.money >= this.selectedBuildingType.cost) {
                 eventManager.dispatchEvent({
                     type: "makeBuildingConstructPopup",
                     content: {
-                        player: game.players["player0"],
+                        player: game.players.player0,
                         buildingTemplate: this.selectedBuildingType,
-                        cell: this.mainCell
+                        cell: this.mainCell,
+                        onOk: this.setDefaults.bind(this)
                     }
                 });
             } else {
@@ -2138,8 +2146,6 @@ var BuildTool = (function (_super) {
                 });
             }
             ;
-
-            this.setDefaults();
         }
     };
     return BuildTool;

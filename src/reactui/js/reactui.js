@@ -252,6 +252,7 @@ var ReactUI = (function () {
                     building: props.buildingTemplate,
                     employee: selected.employee
                 });
+                props.onOk.call();
             }
         };
         this.makeEmployeeActionPopup({

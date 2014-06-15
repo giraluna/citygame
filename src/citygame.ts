@@ -674,7 +674,7 @@ class Cell
     {
       var modifier = modifiersToApply[_mod];
 
-      if (this.content.modifiers[_mod] &&
+      if (!this.content.modifiers[_mod] ||
        this.content.modifiers[_mod].strength < modifier.strength)
       {
         this.content.modifiers[_mod] = modifier;
@@ -2554,8 +2554,8 @@ class HouseTool extends Tool
     var toChange;
     while (true)
     {
-      //toChange = getRandomProperty(cg["content"]["buildings"]);
-      toChange = cg.content.buildings.bigoffice;
+      toChange = getRandomProperty(cg["content"]["buildings"]);
+      //toChange = cg.content.buildings.bigoffice;
       if (toChange.categoryType && toChange.categoryType === "apartment")
       {
         break;

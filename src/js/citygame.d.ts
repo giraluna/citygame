@@ -225,9 +225,12 @@ declare class MouseEventHandler {
     public currCell: number[];
     public hoverCell: number[];
     public currAction: string;
+    public stashedAction: string;
     public selectedCells: Cell[];
+    public preventingGhost: boolean;
     public scroller: Scroller;
     constructor();
+    public preventGhost(delay: number): void;
     public mouseDown(event: any, targetType: string): void;
     public mouseMove(event: any, targetType: string): void;
     public mouseUp(event: any, targetType: string): void;

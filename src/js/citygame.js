@@ -1506,6 +1506,7 @@ var Scroller = (function () {
 
 var MouseEventHandler = (function () {
     function MouseEventHandler() {
+        this.preventingGhost = false;
         var self = this;
 
         this.currAction = undefined;
@@ -1525,10 +1526,19 @@ var MouseEventHandler = (function () {
             self.scroller.deltaZoom(e.wheelDelta / 40, 0.05);
         });
     }
+    MouseEventHandler.prototype.preventGhost = function (delay) {
+        this.preventingGhost = true;
+        var self = this;
+        var timeout = window.setTimeout(function () {
+            self.preventingGhost = false;
+            window.clearTimeout(timeout);
+        }, delay);
+    };
     MouseEventHandler.prototype.mouseDown = function (event, targetType) {
         game.uiDrawer.removeActive();
         if (event.originalEvent.button === 2 && this.currAction !== undefined && targetType === "stage") {
             this.currAction = undefined;
+            this.stashedAction = undefined;
             this.startPoint = undefined;
             this.scroller.end();
             game.highlighter.clearSprites();
@@ -1556,17 +1566,23 @@ var MouseEventHandler = (function () {
             return;
         else if (targetType === "stage" && (this.currAction === "zoom" || this.currAction === "scroll")) {
             this.stageEnd(event);
-        } else if (targetType === "world" && this.currAction === "cellAction") {
-            this.worldEnd(event);
+            this.preventGhost(15);
+        } else if (targetType === "world" && this.currAction === "cellAction" && event.originalEvent.button !== 2 && event.originalEvent.button !== 3) {
+            if (!this.preventingGhost)
+                this.worldEnd(event);
         }
     };
 
     MouseEventHandler.prototype.startScroll = function (event) {
+        if (this.currAction === "cellAction")
+            this.stashedAction = "cellAction";
         this.currAction = "scroll";
         this.startPoint = [event.global.x, event.global.y];
         this.scroller.startScroll(this.startPoint);
     };
     MouseEventHandler.prototype.startZoom = function (event) {
+        if (this.currAction === "cellAction")
+            this.stashedAction = "cellAction";
         this.currAction = "zoom";
         this.startPoint = this.currPoint = [event.global.x, event.global.y];
     };
@@ -1583,11 +1599,13 @@ var MouseEventHandler = (function () {
         if (this.currAction === "scroll") {
             this.scroller.end();
             this.startPoint = undefined;
-            this.currAction = undefined;
+            this.currAction = this.stashedAction;
+            this.stashedAction = undefined;
         }
         if (this.currAction === "zoom") {
             this.startPoint = undefined;
-            this.currAction = undefined;
+            this.currAction = this.stashedAction;
+            this.stashedAction = undefined;
         }
     };
 

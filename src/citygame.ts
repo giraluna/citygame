@@ -1919,7 +1919,10 @@ class MouseEventHandler
   hoverCell: number[];
 
   currAction: string;
+  stashedAction: string;
   selectedCells: Cell[];
+
+  preventingGhost: boolean = false;
 
   scroller: Scroller
   constructor()
@@ -1945,6 +1948,16 @@ class MouseEventHandler
       self.scroller.deltaZoom(e.wheelDelta / 40, 0.05);
     });
   }
+  preventGhost(delay: number)
+  {
+    this.preventingGhost = true;
+    var self = this;
+    var timeout = window.setTimeout(function()
+    {
+      self.preventingGhost = false;
+      window.clearTimeout(timeout);
+    }, delay);
+  }
   mouseDown(event, targetType: string)
   {
     game.uiDrawer.removeActive();
@@ -1953,6 +1966,7 @@ class MouseEventHandler
       targetType === "stage")
     {
       this.currAction = undefined;
+      this.stashedAction = undefined;
       this.startPoint = undefined;
       this.scroller.end();
       game.highlighter.clearSprites();
@@ -1993,27 +2007,32 @@ class MouseEventHandler
   }
   mouseUp(event, targetType: string)
   {
+
     if (this.currAction === undefined) return;
     else if (targetType === "stage" &&
       (this.currAction === "zoom" || this.currAction === "scroll"))
     {
       this.stageEnd(event);
+      this.preventGhost(15);
     }
-    else if (targetType === "world" && this.currAction === "cellAction")
+    else if (targetType === "world" && this.currAction === "cellAction"
+      && event.originalEvent.button !== 2  && event.originalEvent.button !== 3)
     {
-      this.worldEnd(event);
+      if (!this.preventingGhost) this.worldEnd(event);
     }
 
   }
 
   startScroll(event)
   {
+    if (this.currAction === "cellAction") this.stashedAction = "cellAction";
     this.currAction = "scroll";
     this.startPoint = [event.global.x, event.global.y];
     this.scroller.startScroll(this.startPoint);
   }
   startZoom(event)
   {
+    if (this.currAction === "cellAction") this.stashedAction = "cellAction";
     this.currAction = "zoom";
     this.startPoint = this.currPoint = [event.global.x, event.global.y];
   }
@@ -2037,12 +2056,14 @@ class MouseEventHandler
     {
       this.scroller.end();
       this.startPoint = undefined;
-      this.currAction = undefined;
+      this.currAction = this.stashedAction;
+      this.stashedAction = undefined;
     }
     if (this.currAction === "zoom")
     {
       this.startPoint = undefined;
-      this.currAction = undefined;
+      this.currAction = this.stashedAction;
+      this.stashedAction = undefined;
     }
   }
   // need to switch to the click event being transferred to

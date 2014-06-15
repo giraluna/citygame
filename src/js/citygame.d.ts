@@ -95,7 +95,7 @@ declare class Cell {
     public getDistances(radius: number, centerSize?: number[]): any;
     public replace(type: any): void;
     public changeUndergroundContent(type?: string, update?: boolean): void;
-    public changeContent(type: any, update?: boolean, player?: Player): void;
+    public changeContent(type: any, update?: boolean, player?: Player, checkPlayer?: boolean): void;
     public checkBuildable(type: any, player?: Player, checkContent?: boolean): boolean;
     public addPlant(): void;
     public updateCell(): void;

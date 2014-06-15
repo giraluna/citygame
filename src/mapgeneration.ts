@@ -85,18 +85,18 @@ module mapGeneration
 
         cell.replace(getIndexedType(savedCell.type));
 
+        if (savedCell.player)
+        {
+          savedCell.player.addCell(cell);
+        }
         if (savedCell.content)
         {
           cell.changeContent(getIndexedType(savedCell.content.type), true,
-            savedCell.player);
+            savedCell.content.player, false);
         }
         if (savedCell.undergroundContent)
         {
           cell.changeUndergroundContent( cg["content"]["tubes"]["tube_nesw"] );
-        }
-        if (savedCell.player)
-        {
-          savedCell.player.addCell(cell);
         }
       }
     }

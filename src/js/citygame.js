@@ -264,8 +264,9 @@ var Cell = (function () {
             getTubeConnections(this, 1);
         }
     };
-    Cell.prototype.changeContent = function (type, update, player) {
+    Cell.prototype.changeContent = function (type, update, player, checkPlayer) {
         if (typeof update === "undefined") { update = true; }
+        if (typeof checkPlayer === "undefined") { checkPlayer = true; }
         var coversMultipleTiles = (type.size && (type.size[0] > 1 || type.size[1] > 1));
 
         var buildArea;
@@ -288,7 +289,8 @@ var Cell = (function () {
         break;
         }
         }*/
-        var buildable = this.checkBuildable(type, player);
+        var _checkPlayer = checkPlayer ? player : null;
+        var buildable = this.checkBuildable(type, _checkPlayer);
 
         if (coversMultipleTiles && buildArea.length !== type.size[0] * type.size[1])
             buildable = false;
@@ -346,8 +348,9 @@ var Cell = (function () {
 
             // check ownership if needed
             if (player) {
-                if (!cell.player || cell.player.id !== player.id)
+                if (!cell.player || cell.player.id !== player.id) {
                     return false;
+                }
             }
 
             // check invalid
@@ -1275,7 +1278,7 @@ var Game = (function () {
                     if (boardCell.player) {
                         cell.player = boardCell.player.id;
                     }
-                    if (boardCell.content) {
+                    if (boardCell.content && boardCell.content.baseCell === boardCell) {
                         cell.content = {
                             type: boardCell.content.type.type,
                             player: boardCell.content.player ? boardCell.content.player.id : null
@@ -1320,7 +1323,7 @@ var Game = (function () {
                     if (cell.player) {
                         cell.player = this.players[cell.player];
                         if (cell.content) {
-                            cell.content.player = this.players[cell.player];
+                            cell.content.player = this.players[cell.content.player];
                         }
                     }
                 }
@@ -1550,10 +1553,13 @@ var MouseEventHandler = (function () {
 
         var _canvas = document.getElementById("pixi-container");
         _canvas.addEventListener("DOMMouseScroll", function (e) {
-            console.log(e.target);
+            if (e.target.localName !== "canvas")
+                return;
             self.scroller.deltaZoom(-e.detail, 0.05);
         });
         _canvas.addEventListener("mousewheel", function (e) {
+            if (e.target.localName !== "canvas")
+                return;
             self.scroller.deltaZoom(e.wheelDelta / 40, 0.05);
         });
     }

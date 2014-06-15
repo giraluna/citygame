@@ -370,7 +370,7 @@ class Cell
       getTubeConnections(this, 1);
     }
   }
-  changeContent( type, update:boolean=true, player?: Player)
+  changeContent( type, update:boolean=true, player?: Player, checkPlayer:boolean = true)
   {
     var coversMultipleTiles = (type.size && (type.size[0] > 1 || type.size[1] > 1) );
 
@@ -397,7 +397,8 @@ class Cell
       }
     }*/
 
-    var buildable = this.checkBuildable(type, player);
+    var _checkPlayer = checkPlayer ? player : null;
+    var buildable = this.checkBuildable(type, _checkPlayer);
 
 
     if (coversMultipleTiles &&
@@ -466,7 +467,10 @@ class Cell
       // check ownership if needed
       if (player)
       {
-        if (!cell.player || cell.player.id !== player.id) return false;
+        if (!cell.player || cell.player.id !== player.id)
+        {
+          return false;
+        }
       }
 
       // check invalid
@@ -1618,7 +1622,7 @@ class Game
           {
             cell.player = boardCell.player.id;
           }
-          if (boardCell.content)
+          if (boardCell.content && boardCell.content.baseCell === boardCell)
           {
             cell.content =
             {
@@ -1679,7 +1683,7 @@ class Game
             cell.player = this.players[cell.player];
             if (cell.content)
             {
-              cell.content.player = this.players[cell.player];
+              cell.content.player = this.players[cell.content.player];
             }
           }
         }
@@ -1974,11 +1978,12 @@ class MouseEventHandler
     var _canvas = document.getElementById("pixi-container");
     _canvas.addEventListener("DOMMouseScroll", function(e: any)
     {
-      console.log(e.target);
+      if (e.target.localName !== "canvas") return;
       self.scroller.deltaZoom(-e.detail, 0.05);
     });
     _canvas.addEventListener("mousewheel", function(e: any)
     {
+      if (e.target.localName !== "canvas") return;
       self.scroller.deltaZoom(e.wheelDelta / 40, 0.05);
     });
   }

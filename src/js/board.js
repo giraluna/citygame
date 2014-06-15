@@ -73,7 +73,7 @@ var Board = (function () {
             landThreshhold: 0.2
         }, [this.width / 2 - this.width / 8, 0]);
 
-        this.cells = mapGeneration.smoothCells(this.cells, 0.5, 1, 3);
+        this.cells = mapGeneration.smoothCells(this.cells, 0.6, 1, 4);
         this.cells = mapGeneration.smoothCells(this.cells, 0.6, 2, 2);
         this.cells = mapGeneration.smoothCells(this.cells, 0.7, 3, 1);
 
@@ -86,7 +86,7 @@ var Board = (function () {
             });
         }
 
-        this.cells = mapGeneration.smoothCells(this.cells, 0.6, 1, 1);
+        this.cells = mapGeneration.smoothCells(this.cells, 0.5, 1, 2);
 
         mapGeneration.convertCells(this.cells, this, false);
 

@@ -1207,6 +1207,9 @@ class Game
     this.editModes = ["play", "edit-world"];
     this.switchEditingMode("play");
 
+    eventManager.dispatchEvent({type:"changeMapmode",
+      content:"landValue"});
+
     this.resize();
     this.render();
     this.updateWorld();

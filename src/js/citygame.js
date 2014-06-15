@@ -322,6 +322,9 @@ var Cell = (function () {
             var endX = this.gridPos[0] + type.size[0] - 1;
             var endY = this.gridPos[1] + type.size[1] - 1;
 
+            if (endX >= this.board.width || endY >= this.board.height)
+                return false;
+
             buildArea = this.board.getCells(rectSelect(this.gridPos, [endX, endY]));
         } else {
             buildArea = [this];
@@ -995,9 +998,13 @@ var Game = (function () {
             (function addBtnFn(btn, toolName) {
                 var tool = self.tools[toolName];
                 var type = tool.type;
-                if (tool.button === null)
+
+                if (tool.button === null) {
+                    // added for toggling button, but can't be used to select tool
+                    if (btn)
+                        tool.button = btn;
                     return;
-                else
+                } else
                     tool.button = btn;
 
                 addClickAndTouchEventListener(btn, function () {
@@ -1083,6 +1090,23 @@ var Game = (function () {
                     }
                 });
             }
+        });
+
+        //build
+        var buildBtn = document.getElementById("buildBtn");
+
+        var onBuildingSelect = function (selected) {
+            self.tools.build.changeBuilding(selected);
+            self.changeTool("build");
+        };
+
+        addClickAndTouchEventListener(buildBtn, function () {
+            eventManager.dispatchEvent({
+                type: "makeBuildingSelectPopup", content: {
+                    player: self.players["player0"],
+                    onOk: onBuildingSelect
+                }
+            });
         });
 
         //info
@@ -2056,6 +2080,7 @@ var BuildTool = (function (_super) {
         _super.call(this);
         this.type = "build";
         this.mapmode = undefined;
+        this.button = null;
 
         this.setDefaults();
     }
@@ -2064,13 +2089,21 @@ var BuildTool = (function (_super) {
         this.selectType = singleSelect;
         this.tintColor = 0xFFFFFF;
         this.canBuild = false;
+        this.mainCell = undefined;
     };
     BuildTool.prototype.changeBuilding = function (buildingType) {
         this.selectedBuildingType = buildingType;
         var size = buildingType.size || [1, 1];
 
         this.selectType = function (a, b) {
-            var start = this.mainCell = game.activeBoard.getCell(b);
+            var start = game.activeBoard.getCell(b);
+
+            if (!start)
+                return b;
+            else {
+                this.mainCell = start;
+            }
+
             var buildable = start.checkBuildable(this.selectedBuildingType);
 
             if (buildable) {
@@ -2086,10 +2119,28 @@ var BuildTool = (function (_super) {
 
     BuildTool.prototype.activate = function (selectedCells) {
         if (this.canBuild === true) {
-            this.mainCell.changeContent(this.selectedBuildingType);
-        }
+            var player = game.players["player0"];
+            if (player.money >= this.selectedBuildingType.cost) {
+                eventManager.dispatchEvent({
+                    type: "makeBuildingConstructPopup",
+                    content: {
+                        player: game.players["player0"],
+                        buildingTemplate: this.selectedBuildingType,
+                        cell: this.mainCell
+                    }
+                });
+            } else {
+                eventManager.dispatchEvent({
+                    type: "makeInfoPopup",
+                    content: {
+                        text: "Not enough funds"
+                    }
+                });
+            }
+            ;
 
-        this.setDefaults();
+            this.setDefaults();
+        }
     };
     return BuildTool;
 })(Tool);

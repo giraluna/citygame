@@ -16,7 +16,7 @@ var UIComponents;
             var templates = this.props.buildingTemplates;
             for (var _type in templates) {
                 var building = templates[_type];
-                if (this.props.player.money >= building.cost && this.props.cell.checkBuildable(building)) {
+                if (this.props.player.money >= building.cost) {
                     return { selected: building };
                 }
             }
@@ -41,28 +41,6 @@ var UIComponents;
                     playerCanBuildBuilding = false;
                     rowProps.className = "inactive";
                     costProps.className = "insufficient";
-                }
-
-                if (this.props.cell && !this.props.cell.checkBuildable(buildingTemplate)) {
-                    playerCanBuildBuilding = false;
-                    rowProps.className = "inactive";
-                    nameProps.className = "insufficient";
-                } else if (buildingTemplate.size && (buildingTemplate.size[0] > 1 || buildingTemplate.size[1] > 1)) {
-                    var cell = this.props.cell;
-
-                    var endX = cell.gridPos[0] + buildingTemplate.size[0] - 1;
-                    var endY = cell.gridPos[1] + buildingTemplate.size[1] - 1;
-
-                    var buildArea = cell.board.getCells(rectSelect(cell.gridPos, [endX, endY]));
-
-                    for (var i = 0; i < buildArea.length; i++) {
-                        if (!buildArea[i].player || buildArea[i].player.id !== this.props.player.id) {
-                            playerCanBuildBuilding = false;
-                            rowProps.className = "inactive";
-                            nameProps.className = "insufficient";
-                            break;
-                        }
-                    }
                 }
 
                 if (playerCanBuildBuilding) {

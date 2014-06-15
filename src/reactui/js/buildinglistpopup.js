@@ -55,7 +55,6 @@ var UIComponents;
                 buildingTemplates: this.props.buildingTemplates,
                 buildingImages: this.props.buildingImages,
                 player: this.state.player,
-                cell: this.props.cell,
                 selected: null
             };
             var stopBubble = function (e) {

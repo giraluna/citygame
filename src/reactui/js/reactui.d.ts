@@ -72,7 +72,7 @@ declare class ReactUI {
     }): void;
     public makeBuildingSelectPopup(props: {
         player: Player;
-        cell: any;
+        onOk: any;
     }): void;
     public makeBuildingConstructPopup(props: {
         player: Player;

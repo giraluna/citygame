@@ -18,9 +18,9 @@ var actions;
 
         var buyCellConfirmFN = function () {
             blinkerTODO.removeCells(blinkerIdTODO);
-            employee.active = true;
-            employee.currentAction = undefined;
+
             employee.trainSkill("negotiation");
+
             if (player.money < price) {
                 eventManager.dispatchEvent({
                     type: "makeInfoPopup",
@@ -40,8 +40,6 @@ var actions;
 
         var buyCellCancelFN = function () {
             blinkerTODO.removeCells(blinkerIdTODO);
-            employee.active = true;
-            employee.currentAction = undefined;
         }.bind(this);
 
         var onCompleteText = "Buy plot for " + price + "$?";
@@ -49,6 +47,10 @@ var actions;
         var buyCellCompleteFN = function () {
             blinkerTODO.addCells([cell], blinkerIdTODO);
             blinkerTODO.start();
+
+            employee.active = true;
+            employee.currentAction = undefined;
+
             eventManager.dispatchEvent({
                 type: "makeConfirmPopup",
                 content: {
@@ -116,8 +118,7 @@ var actions;
 
         var constructBuildingConfirmFN = function () {
             blinkerTODO.removeCells(blinkerId);
-            employee.active = true;
-            employee.currentAction = undefined;
+            employee.trainSkill("construction");
 
             cell.changeContent(building, true, player);
             eventManager.dispatchEvent({ type: "updateLandValueMapmode", content: "" });
@@ -126,6 +127,10 @@ var actions;
         var constructBuildingCompleteFN = function () {
             blinkerTODO.addCells([cell], blinkerId);
             blinkerTODO.start();
+
+            employee.active = true;
+            employee.currentAction = undefined;
+
             eventManager.dispatchEvent({
                 type: "makeInfoPopup",
                 content: {

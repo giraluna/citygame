@@ -101,7 +101,10 @@ var Board = (function () {
     };
 
     Board.prototype.getCell = function (arr) {
-        return this.cells[arr[0]][arr[1]];
+        if (this.cells[arr[0]] && this.cells[arr[1]]) {
+            return this.cells[arr[0]][arr[1]];
+        } else
+            return false;
     };
     Board.prototype.getCells = function (arr) {
         return getFrom2dArray(this.cells, arr);

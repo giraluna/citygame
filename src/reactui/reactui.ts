@@ -81,6 +81,10 @@ class ReactUI
     {
       self.makeBuildingSelectPopup(event.content)
     });
+    eventManager.addEventListener("makeBuildingConstructPopup", function(event)
+    {
+      self.makeBuildingConstructPopup(event.content)
+    });
     eventManager.addEventListener("makeInputPopup", function(event)
     {
       self.makeInputPopup(event.content)
@@ -333,7 +337,7 @@ class ReactUI
   makeBuildingSelectPopup(props:
   {
     player: Player;
-    cell: any;
+    onOk: any;
   })
   {
     if (Object.keys(props.player.employees).length < 1)
@@ -341,32 +345,13 @@ class ReactUI
       this.makeInfoPopup({text: "Recruit some employees first"});
       return;
     }
-    if (!props.player.ownedCells["" + props.cell.gridPos[0] + "," + props.cell.gridPos[1]])
-    {
-      this.makeInfoPopup({text: "You need to purchase that plot first"});
-      return;
-    }
 
-    var self = this;
-    var buildSelected = function(selected)
-    {
-      if (selected && props.player.money >= selected.cost)
-      {
-        self.makeBuildingConstructPopup(
-        {
-          player: props.player,
-          buildingTemplate: selected,
-          cell: props.cell
-        });
-      }
-    }
     this.makePopup("BuildingListPopup",
     {
       player: props.player,
       buildingTemplates: cg.content.buildings,
       buildingImages: this.frameImages,
-      onOk: buildSelected,
-      cell: props.cell
+      onOk: props.onOk
     });
   }
   makeBuildingConstructPopup(props:

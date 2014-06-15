@@ -313,7 +313,7 @@ declare class BuildTool extends Tool {
     constructor();
     public setDefaults(): void;
     public changeBuilding(buildingType: any): void;
-    public activate(selectedCells: any): void;
+    public activate(selectedCells: any[]): void;
 }
 declare class NothingTool extends Tool {
     constructor();

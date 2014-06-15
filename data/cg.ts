@@ -644,7 +644,7 @@ var cg: any =
         "type": "bigoffice",
         "baseType": "building",
         "categoryType": "apartment",
-        "translate": "Big office",
+        "translate": "Big office (test)",
         "size": [2,2],
         "baseProfit": 3,
         "daysForProfitTick": 90,
@@ -662,6 +662,34 @@ var cg: any =
           }
         ]
       },
+      "stretchystore":
+      {
+        "type": "stretchystore",
+        "baseType": "building",
+        "categoryType": "shopping",
+        "translate": "Stretchy store (test)",
+        "size": [2,1],
+        "baseProfit": 1,
+        "daysForProfitTick": 1,
+        "cost": 25,
+        "buildTime": 14,
+        "anchor": [0.6666, 1],
+        "frame": "stretchystore.png",
+        "canNotBuildOn": ["water", "building", "road"],
+        "effects":
+        [
+          {
+            "type": "shoppingCompetition",
+            "range": 2,
+            "strength": 1
+          },
+          {
+            "type": "nearbyShopping",
+            "range": 2,
+            "strength": 1
+          }
+        ]
+      }
     }
   }
 };

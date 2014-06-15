@@ -2258,6 +2258,7 @@ class UIDrawer
         }
       }
     }
+    /*
     else
     {
       for (var modifier in cell.modifiers)
@@ -2268,9 +2269,8 @@ class UIDrawer
         text += "Strength: " + _mod.strength + "\n";
         text += "Adj strength: " + _mod.scaling(_mod.strength).toFixed(3);
       }
-    }
+    }*/
 
-    /*
     else if (cell.content && cell.content.baseProfit)
     {
       text += "\n--------------\n";
@@ -2286,7 +2286,6 @@ class UIDrawer
       }
       text += "Final profit: " + cell.content.modifiedProfit.toFixed(2) + "/d";
     }
-    */
 
     var font = this.fonts["base"];
 
@@ -2698,7 +2697,6 @@ class BuildTool extends Tool
         })
       };
     }
-
   }
 }
 

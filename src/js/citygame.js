@@ -1602,7 +1602,8 @@ var MouseEventHandler = (function () {
         this.startCell = gridPos;
         this.currCell = gridPos;
 
-        this.selectedCells = [game.activeBoard.getCell(gridPos)];
+        //this.selectedCells = [game.activeBoard.getCell(gridPos)];
+        this.selectedCells = game.activeBoard.getCells(game.activeTool.selectType(this.startCell, this.currCell));
 
         game.highlighter.clearSprites();
         game.highlighter.tintCells(this.selectedCells, game.activeTool.tintColor);
@@ -2036,17 +2037,41 @@ var BuildTool = (function (_super) {
     function BuildTool() {
         _super.call(this);
         this.type = "build";
-        this.selectType = singleSelect;
-        this.tintColor = 0x696969;
         this.mapmode = undefined;
+
+        this.setDefaults();
     }
-    BuildTool.prototype.onActivate = function (target) {
-        eventManager.dispatchEvent({
-            type: "makeBuildingSelectPopup", content: {
-                player: game.players["player0"],
-                cell: target
+    BuildTool.prototype.setDefaults = function () {
+        this.selectedBuildingType = undefined;
+        this.selectType = singleSelect;
+        this.tintColor = 0xFFFFFF;
+        this.canBuild = false;
+    };
+    BuildTool.prototype.changeBuilding = function (buildingType) {
+        this.selectedBuildingType = buildingType;
+        var size = buildingType.size || [1, 1];
+
+        this.selectType = function (a, b) {
+            var start = this.mainCell = game.activeBoard.getCell(b);
+            var buildable = start.checkBuildable(this.selectedBuildingType);
+
+            if (buildable) {
+                this.tintColor = 0x338833;
+                this.canBuild = true;
+            } else {
+                this.tintColor = 0xFF5555;
+                this.canBuild = false;
             }
-        });
+            return rectSelect(b, [b[0] + size[0] - 1, b[1] + size[1] - 1]);
+        }.bind(this);
+    };
+
+    BuildTool.prototype.activate = function (selectedCells) {
+        if (this.canBuild === true) {
+            this.mainCell.changeContent(this.selectedBuildingType);
+        }
+
+        this.setDefaults();
     };
     return BuildTool;
 })(Tool);

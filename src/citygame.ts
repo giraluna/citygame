@@ -2057,7 +2057,9 @@ class MouseEventHandler
     this.startCell = gridPos;
     this.currCell = gridPos;
 
-    this.selectedCells = [game.activeBoard.getCell(gridPos)];
+    //this.selectedCells = [game.activeBoard.getCell(gridPos)];
+    this.selectedCells = game.activeBoard.getCells(
+        game.activeTool.selectType(this.startCell, this.currCell));
 
     game.highlighter.clearSprites();
     game.highlighter.tintCells(this.selectedCells, game.activeTool.tintColor);
@@ -2558,22 +2560,57 @@ class BuyTool extends Tool
 
 class BuildTool extends Tool
 {
+  selectedBuildingType: any;
+  canBuild: boolean;
+  mainCell: Cell;
+
   constructor()
   {
     super();
     this.type = "build";
-    this.selectType = singleSelect;
-    this.tintColor = 0x696969;
     this.mapmode = undefined;
+
+    this.setDefaults();
   }
-  onActivate(target: Cell)
+  setDefaults()
   {
-    eventManager.dispatchEvent({type: "makeBuildingSelectPopup", content:
+    this.selectedBuildingType = undefined;
+    this.selectType = singleSelect;
+    this.tintColor = 0xFFFFFF;
+    this.canBuild = false;
+  }
+  changeBuilding(buildingType)
+  {
+    this.selectedBuildingType = buildingType;
+    var size = buildingType.size || [1,1];
+
+    this.selectType = function(a, b)
+    {
+      var start = this.mainCell = game.activeBoard.getCell(b);
+      var buildable = start.checkBuildable(this.selectedBuildingType);
+
+      if (buildable)
       {
-        player: game.players["player0"],
-        cell: target
+        this.tintColor = 0x338833;
+        this.canBuild = true;
       }
-    });
+      else
+      {
+        this.tintColor = 0xFF5555;
+        this.canBuild = false;
+      }
+      return rectSelect(b, [b[0]+size[0]-1,b[1]+size[1]-1]);
+    }.bind(this);
+  }
+
+  activate(selectedCells: any)
+  {
+    if (this.canBuild === true)
+    {
+      this.mainCell.changeContent(this.selectedBuildingType);
+    }
+
+    this.setDefaults();
   }
 }
 

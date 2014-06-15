@@ -304,8 +304,13 @@ declare class BuyTool extends Tool {
     public onActivate(target: Cell): void;
 }
 declare class BuildTool extends Tool {
+    public selectedBuildingType: any;
+    public canBuild: boolean;
+    public mainCell: Cell;
     constructor();
-    public onActivate(target: Cell): void;
+    public setDefaults(): void;
+    public changeBuilding(buildingType: any): void;
+    public activate(selectedCells: any): void;
 }
 declare class NothingTool extends Tool {
     constructor();

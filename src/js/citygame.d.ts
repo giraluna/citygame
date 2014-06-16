@@ -3,6 +3,7 @@
 /// <reference path="../reactui/js/reactui.d.ts" />
 /// <reference path="../../data/js/cg.d.ts" />
 /// <reference path="../../data/js/names.d.ts" />
+/// <reference path="../../data/js/playermodifiers.d.ts" />
 /// <reference path="ui.d.ts" />
 /// <reference path="loader.d.ts" />
 /// <reference path="sorteddisplaycontainer.d.ts" />

@@ -77,7 +77,6 @@ export var EmployeeList = React.createClass({
           React.DOM.tr(null, 
             React.DOM.th(null, "Name"),
             React.DOM.th({title: "Negotiation"}, "neg"),
-            React.DOM.th({title: "Management"}, "mgt"),
             React.DOM.th({title: "Recruitment"}, "rec"),
             React.DOM.th({title: "Construction"}, "con")
           )

@@ -10,7 +10,10 @@ declare class Player {
     public ownedCells: any;
     public employees: any;
     public usedInitialRecruit: boolean;
+    public incomePerDate: any;
+    public incomePerType: any;
     public modifiers: any;
+    public modifierEffects: any;
     public moneySpan: HTMLElement;
     public incomeSpan: HTMLElement;
     constructor(id: number, color?: number);
@@ -25,5 +28,9 @@ declare class Player {
     public removeCell(cell: any): void;
     public addContent(content: any): void;
     public removeContent(content: any): void;
-    public addMoney(amount: any): void;
+    public addMoney(initialAmount: any, incomeType?: string, date?: any): void;
+    public addModifier(modifier: any): void;
+    public applyModifier(modifier: any): void;
+    public applyAllModifiers(): void;
+    public removeModifier(modifier: any): void;
 }

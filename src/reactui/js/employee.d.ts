@@ -5,7 +5,6 @@ declare module UIComponents {
             name: string;
             skills: {
                 "neg": number;
-                "man": number;
                 "rec": number;
                 "con": number;
             };
@@ -15,7 +14,6 @@ declare module UIComponents {
             name: string;
             skills: {
                 "neg": number;
-                "man": number;
                 "rec": number;
                 "con": number;
             };

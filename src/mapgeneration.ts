@@ -87,6 +87,7 @@ module mapGeneration
 
         if (savedCell.player)
         {
+          console.log(savedCell.player, cell.gridPos);
           savedCell.player.addCell(cell);
         }
         if (savedCell.content)

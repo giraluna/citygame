@@ -8,7 +8,6 @@ var UIComponents;
                     name: "UNDEFINED",
                     skills: {
                         "neg": 0,
-                        "man": 0,
                         "rec": 0,
                         "con": 0
                     }

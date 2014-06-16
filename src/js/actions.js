@@ -81,7 +81,7 @@ var actions;
             return 1 / (1.5 / Math.log(avgSkill + 1));
         }, 0.33);
 
-        var newEmployees = makeNewEmployees(employeeCount.actual, employee.skills["recruitment"]);
+        var newEmployees = makeNewEmployees(employeeCount.actual, employee.skills["recruitment"] * employee.player.recruitQualityMultiplier);
 
         var recruitCompleteFN = function () {
             eventManager.dispatchEvent({

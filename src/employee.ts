@@ -7,7 +7,6 @@ idGenerator.employee = 0;
 interface ISkillsObj
 {
   negotiation: number; // buy & sell price
-  management: number;  // rolling profits
   recruitment: number; // recruiting new employees
   construction: number; // constructing buildings
 }
@@ -16,6 +15,7 @@ class Employee
 {
   id: string;
   name: string;
+  player: any;
   gender: string;
   ethnicity: string;
   skills: ISkillsObj;
@@ -55,10 +55,14 @@ class Employee
     this.name = _params.name || this.getName( names, this.gender, this.ethnicity );
 
     var skillVariance = Math.round(_params.skillVariance) || 1;
+
+    // legacy
+    if (_params.skills && _params.skills["management"]) delete _params.skills["management"];
+
     this.skills = _params.skills || this.setSkillsByLevel(_params.skillLevel, skillVariance);
     this.growth = _params.growth || this.setGrowthByLevel(_params.growthLevel);
-    this.potential = _params.potential || 80;
-      //50 * _params.skillLevel + 30 * Math.random();
+    this.potential = _params.potential || 60;
+      //40 * _params.skillLevel + 20 * Math.random();
 
     
     this.setSkillTotal();
@@ -86,7 +90,6 @@ class Employee
     var skills: ISkillsObj =
     {
       negotiation: 1,
-      management: 1,
       recruitment: 1,
       construction: 1
     }
@@ -96,6 +99,7 @@ class Employee
     for (var skill in skills)
     {
       skills[skill] = randInt(min, max);
+      if (skills[skill] > 20) skills[skill] = 20;
     }
     return skills;
   }
@@ -104,7 +108,6 @@ class Employee
     var skills: ISkillsObj =
     {
       negotiation: 1,
-      management: 1,
       recruitment: 1,
       construction: 1
     }

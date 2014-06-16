@@ -9,7 +9,14 @@ var Player = (function () {
         this.ownedCells = {};
         this.employees = {};
         this.usedInitialRecruit = false;
+        this.incomePerDate = {};
+        this.incomePerType = {};
         this.modifiers = {};
+        this.modifierEffects = {
+            profit: {},
+            buildCost: {},
+            recruitQuality: 1
+        };
         this.id = "player" + id;
         this.color = color;
         this.bindElements();
@@ -30,13 +37,34 @@ var Player = (function () {
             if (!this.ownedContent[type]) {
                 this.ownedContent[type] = [];
             }
+            if (this.incomePerType[type] === undefined) {
+                this.incomePerType[type] = 0;
+            }
+
+            this.modifierEffects.profit[type] = {
+                addedProfit: 0,
+                multiplier: 1
+            };
+            this.modifierEffects.buildCost[type] = {
+                addedProfit: 0,
+                multiplier: 1
+            };
         }
+        this.modifierEffects.profit["global"] = {
+            addedProfit: 0,
+            multiplier: 1
+        };
+        this.modifierEffects.buildCost["global"] = {
+            addedProfit: 0,
+            multiplier: 1
+        };
     };
     Player.prototype.addEventListeners = function () {
     };
 
     Player.prototype.addEmployee = function (employee) {
         this.employees[employee.id] = employee;
+        employee.player = this;
     };
     Player.prototype.getEmployees = function () {
         var employees = [];
@@ -73,6 +101,8 @@ var Player = (function () {
     };
     Player.prototype.addContent = function (content) {
         var type = content.categoryType;
+
+        // for trees etc.
         if (!this.ownedContent[type])
             return;
 
@@ -85,9 +115,91 @@ var Player = (function () {
             return building.id !== content.id;
         });
     };
-    Player.prototype.addMoney = function (amount) {
+    Player.prototype.addMoney = function (initialAmount, incomeType, date) {
+        var amount = initialAmount;
+        amount += this.modifierEffects.profit["global"].addedProfit;
+
+        if (incomeType) {
+            if (this.modifierEffects.profit[incomeType]) {
+                amount += this.modifierEffects.profit[incomeType].addedProfit;
+                amount *= this.modifierEffects.profit[incomeType].multiplier;
+            }
+        }
+        amount *= this.modifierEffects.profit["global"].multiplier;
+
+        if (incomeType) {
+            this.incomePerType[incomeType] += amount;
+        }
+        if (date) {
+            this.incomePerDate[date.year] = this.incomePerDate[date.year] || { total: 0 };
+            var _y = this.incomePerDate[date.year];
+            _y.total += amount;
+
+            _y[date.month] = _y[date.month] || { total: 0 };
+            var _m = _y[date.month];
+            _m.total += amount;
+
+            _m[date.day] ? _m[date.day] += amount : _m[date.day] = amount;
+        }
+
         this.money += amount;
         this.updateElements();
+    };
+    Player.prototype.addModifier = function (modifier) {
+        if (this.modifiers[modifier.type])
+            return;
+        else {
+            this.modifiers[modifier.type] = Object.create(modifier);
+
+            this.applyModifier(modifier);
+        }
+    };
+    Player.prototype.applyModifier = function (modifier) {
+        console.log(modifier.type, modifier);
+        for (var ii = 0; ii < modifier.effects.length; ii++) {
+            var effect = modifier.effects[ii];
+
+            for (var jj = 0; jj < effect.targets.length; jj++) {
+                var type = effect.targets[jj];
+
+                if (effect.addedProfit) {
+                    this.modifierEffects.profit[type].addedProfit += effect.addedProfit;
+                }
+                if (effect.multiplier) {
+                    this.modifierEffects.profit[type].multiplier *= effect.multiplier;
+                }
+            }
+        }
+    };
+    Player.prototype.applyAllModifiers = function () {
+        for (var _modifier in this.modifiers) {
+            this.applyModifier(this.modifiers[_modifier]);
+        }
+        ;
+    };
+    Player.prototype.removeModifier = function (modifier) {
+        if (!this.modifiers[modifier.type]) {
+            console.warn("Modifier ", modifier, " does not exist on player ", this);
+            return;
+        }
+
+        for (var ii = 0; ii < modifier.effects.length; ii++) {
+            var effect = modifier.effects[ii];
+
+            for (var jj = 0; jj < effect.targets.length; jj++) {
+                var type = effect.targets[jj];
+
+                if (effect.addedProfit) {
+                    this.modifierEffects.profit[type].addedProfit -= effect.addedProfit;
+                }
+                if (effect.multiplier) {
+                    this.modifierEffects.profit[type].multiplier *= (1 / effect.multiplier);
+                }
+            }
+        }
+
+        this.modifiers[modifier.type] = null;
+        delete this.modifiers[modifier.type];
     };
     return Player;
 })();

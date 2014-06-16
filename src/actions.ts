@@ -96,7 +96,8 @@ module actions
       function employeeCountAdjustFN(avgSkill){return 1 / (1.5 / Math.log(avgSkill + 1))},
       0.33);
 
-    var newEmployees = makeNewEmployees(employeeCount.actual, employee.skills["recruitment"]);
+    var newEmployees = makeNewEmployees(employeeCount.actual,
+      employee.skills["recruitment"] * employee.player.modifierEffects.recruitQuality);
 
 
     var recruitCompleteFN = function()

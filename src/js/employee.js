@@ -17,11 +17,16 @@ var Employee = (function () {
         this.name = _params.name || this.getName(names, this.gender, this.ethnicity);
 
         var skillVariance = Math.round(_params.skillVariance) || 1;
+
+        // legacy
+        if (_params.skills && _params.skills["management"])
+            delete _params.skills["management"];
+
         this.skills = _params.skills || this.setSkillsByLevel(_params.skillLevel, skillVariance);
         this.growth = _params.growth || this.setGrowthByLevel(_params.growthLevel);
-        this.potential = _params.potential || 80;
+        this.potential = _params.potential || 60;
 
-        //50 * _params.skillLevel + 30 * Math.random();
+        //40 * _params.skillLevel + 20 * Math.random();
         this.setSkillTotal();
     }
     Employee.prototype.getName = function (names, gender, ethnicity) {
@@ -40,7 +45,6 @@ var Employee = (function () {
     Employee.prototype.setSkillsByLevel = function (skillLevel, variance) {
         var skills = {
             negotiation: 1,
-            management: 1,
             recruitment: 1,
             construction: 1
         };
@@ -49,13 +53,14 @@ var Employee = (function () {
 
         for (var skill in skills) {
             skills[skill] = randInt(min, max);
+            if (skills[skill] > 20)
+                skills[skill] = 20;
         }
         return skills;
     };
     Employee.prototype.setGrowthByLevel = function (growthLevel) {
         var skills = {
             negotiation: 1,
-            management: 1,
             recruitment: 1,
             construction: 1
         };

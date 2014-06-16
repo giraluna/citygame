@@ -186,17 +186,23 @@ class ProfitSystem extends System
 
   activate()
   {
+    var currentDate = this.systemsManager.systems.date.getDate();
     for (var _player in this.players)
     {
       var player = this.players[_player];
 
       for (var ii = 0; ii < this.targetTypes.length; ii++)
       {
+        var profitPerThisType = 0;
         var targets = player.ownedContent[this.targetTypes[ii]];
+        
+        if (targets.length < 1) continue;
+
         for (var jj = 0; jj < targets.length; jj++)
         {
-          player.addMoney(targets[jj].modifiedProfit * targets[jj].type.daysForProfitTick);
+          profitPerThisType += targets[jj].modifiedProfit * targets[jj].type.daysForProfitTick;
         }
+        player.addMoney(profitPerThisType, this.targetTypes[ii], currentDate);
       }
     }
     

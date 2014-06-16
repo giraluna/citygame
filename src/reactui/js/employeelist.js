@@ -9,7 +9,6 @@ var UIComponents;
             var rows = [];
             var skillColumns = [];
 
-            Object.keys(this.props.employees);
             for (var skill in this.props.employees[Object.keys(this.props.employees)[0]]) {
                 var colProps = {};
 
@@ -52,7 +51,7 @@ var UIComponents;
             }
             ;
 
-            return (React.DOM.table({ className: "employee-list" }, React.DOM.colgroup(null, React.DOM.col(null), skillColumns), React.DOM.thead(null, React.DOM.tr(null, React.DOM.th(null, "Name"), React.DOM.th({ title: "Negotiation" }, "neg"), React.DOM.th({ title: "Management" }, "mgt"), React.DOM.th({ title: "Recruitment" }, "rec"), React.DOM.th({ title: "Construction" }, "con"))), React.DOM.tbody(null, rows)));
+            return (React.DOM.table({ className: "employee-list" }, React.DOM.colgroup(null, React.DOM.col(null), skillColumns), React.DOM.thead(null, React.DOM.tr(null, React.DOM.th(null, "Name"), React.DOM.th({ title: "Negotiation" }, "neg"), React.DOM.th({ title: "Recruitment" }, "rec"), React.DOM.th({ title: "Construction" }, "con"))), React.DOM.tbody(null, rows)));
         }
     });
 })(UIComponents || (UIComponents = {}));

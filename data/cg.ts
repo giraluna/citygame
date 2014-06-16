@@ -643,7 +643,7 @@ var cg: any =
       {
         "type": "bigoffice",
         "baseType": "building",
-        "categoryType": "apartment",
+        "categoryType": "office",
         "translate": "Big office (test)",
         "size": [2,2],
         "baseProfit": 3,

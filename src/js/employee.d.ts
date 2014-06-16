@@ -3,13 +3,13 @@
 declare var idGenerator: any;
 interface ISkillsObj {
     negotiation: number;
-    management: number;
     recruitment: number;
     construction: number;
 }
 declare class Employee {
     public id: string;
     public name: string;
+    public player: any;
     public gender: string;
     public ethnicity: string;
     public skills: ISkillsObj;

@@ -4,6 +4,7 @@
 /// <reference path="reactui/js/reactui.d.ts" />
 /// <reference path="../data/js/cg.d.ts" />
 /// <reference path="../data/js/names.d.ts" />
+/// <reference path="../data/js/playermodifiers.d.ts" />
 /// 
 /// <reference path="js/ui.d.ts" />
 /// <reference path="js/loader.d.ts" />
@@ -1718,28 +1719,52 @@ class Game
     data.id = player.id;
     data.money = player.money;
 
+    for (var _e in player.employees)
+    {
+      delete player.employees[_e].player;
+    }
+
     data.employees = player.employees;
-    data.modifiers = player.modifiers;
+    data.modifiers = [];
+    for (var _mod in player.modifiers)
+    {
+      data.modifiers.push(player.modifiers[_mod].type);
+    }
+    data.stats =
+    {
+      incomePerType: player.incomePerType,
+      incomePerDate: player.incomePerDate
+    }
 
     return data;
   }
   loadPlayer(data: any)
   {
+    var player = new Player(data.id);
+    
+    player.money = data.money;
+
+    if (data.stats)
+    {
+      player.incomePerDate = data.stats.incomePerDate;
+      player.incomePerType = data.stats.incomePerType;
+    }
+
+    for (var _mod in data.modifiers)
+    {
+      player.addModifier(playerModifiers[data.modifiers[_mod]]);
+    }
+
     for (var employee in data.employees)
     {
       data.employees[employee] = new Employee(names, data.employees[employee]);
-    }
-    var newPlayer = new Player(data.id);
-    for (var prop in data)
-    {
-      if (data[prop] !== undefined)
-      {
-        newPlayer[prop] = data[prop];
-      }
+
+      player.addEmployee(data.employees[employee]);
     }
 
-    this.players["player0"] = newPlayer;
-    newPlayer.updateElements();
+
+    this.players["player0"] = player;
+    player.updateElements();
   }
   render()
   {

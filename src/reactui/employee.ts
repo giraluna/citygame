@@ -14,7 +14,6 @@ export var Employee = React.createClass({
         skills:
         {
           "neg": 0,
-          "man": 0,
           "rec": 0,
           "con": 0
         }

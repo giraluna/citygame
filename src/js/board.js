@@ -21,7 +21,7 @@ var Board = (function () {
 
         this.initLayers();
 
-        this.population = randInt(this.totalSize / 15, this.totalSize / 10);
+        this.population = props.population || randInt(this.totalSize / 15, this.totalSize / 10);
 
         this.cells = mapGeneration.makeBlankCells({
             width: this.width,

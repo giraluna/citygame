@@ -136,6 +136,14 @@ module actions
     var building = props.building;
     var employee = props.employee;
 
+    var baseCost = player.getBuildCost(building);
+    var adjustedCost = getActionCost([employee.skills["construction"], baseCost).actual;
+
+    if (player.money < adjustedCost) return;
+
+
+    player.addMoney(-adjustedCost);
+
     employee.active = false;
     employee.currentAction = "constructBuilding";
     var blinkerId = blinkerTODO.idGenerator++;

@@ -18,6 +18,7 @@ declare class Board {
         width: number;
         height?: number;
         savedCells?: any[][];
+        population?: number;
     });
     public generateMap(): void;
     public generateCity(): void;

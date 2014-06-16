@@ -915,7 +915,8 @@ var Game = (function () {
         this.uiDrawer = new UIDrawer();
 
         this.systemsManager = new SystemsManager(1000);
-        var player = new Player(idGenerator.player++);
+        var id = "player" + (idGenerator.player++);
+        var player = new Player(id);
         player.addMoney(100);
         this.reactUI = new ReactUI(player, this.frameImages);
         this.players[player.id] = player;
@@ -1337,10 +1338,10 @@ var Game = (function () {
             var board = new Board({
                 width: currToLoad.width,
                 height: currToLoad.height,
-                savedCells: currToLoad.cells
+                savedCells: currToLoad.cells,
+                population: currToLoad.population
             });
 
-            board.population = currToLoad.population;
             board.name = currToLoad.name || board.name;
 
             newBoards.push(board);

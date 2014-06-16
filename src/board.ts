@@ -24,6 +24,7 @@ class Board
     width: number;
     height?: number;
     savedCells?: any[][];
+    population?: number;
   })
   {
     this.id = idGenerator.board++;
@@ -37,7 +38,8 @@ class Board
     this.initLayers();
 
 
-    this.population = randInt(this.totalSize / 15, this.totalSize / 10);
+    this.population = props.population ||
+      randInt(this.totalSize / 15, this.totalSize / 10);
 
     this.cells = mapGeneration.makeBlankCells(
     {

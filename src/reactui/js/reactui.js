@@ -243,9 +243,7 @@ var ReactUI = (function () {
     };
     ReactUI.prototype.makeBuildingConstructPopup = function (props) {
         var buildBuilding = function (selected) {
-            if (selected && props.player.money >= props.buildingTemplate.cost) {
-                props.player.addMoney(-props.buildingTemplate.cost);
-
+            if (selected) {
                 actions.constructBuilding({
                     player: props.player,
                     cell: props.cell,

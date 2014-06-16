@@ -7,6 +7,7 @@ declare class Player {
     public money: number;
     public eventListener: any;
     public ownedContent: any;
+    public weightedContentAmounts: any;
     public ownedCells: any;
     public employees: any;
     public usedInitialRecruit: boolean;
@@ -16,7 +17,7 @@ declare class Player {
     public modifierEffects: any;
     public moneySpan: HTMLElement;
     public incomeSpan: HTMLElement;
-    constructor(id: number, color?: number);
+    constructor(id: string, color?: number);
     public bindElements(): void;
     public updateElements(): void;
     public init(): void;
@@ -33,4 +34,5 @@ declare class Player {
     public applyModifier(modifier: any): void;
     public applyAllModifiers(): void;
     public removeModifier(modifier: any): void;
+    public getBuildCost(type: any): any;
 }

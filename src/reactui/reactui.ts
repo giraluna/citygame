@@ -365,10 +365,8 @@ class ReactUI
   {
     var buildBuilding = function(selected)
     {
-      if (selected && props.player.money >= props.buildingTemplate.cost)
+      if (selected)
       {
-        props.player.addMoney(-props.buildingTemplate.cost);
-
         actions.constructBuilding(
         {
           player: props.player,

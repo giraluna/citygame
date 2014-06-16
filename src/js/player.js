@@ -6,6 +6,7 @@ var Player = (function () {
         if (typeof color === "undefined") { color = 0xFF0000; }
         this.money = 0;
         this.ownedContent = {};
+        this.weightedContentAmounts = {};
         this.ownedCells = {};
         this.employees = {};
         this.usedInitialRecruit = false;
@@ -17,7 +18,7 @@ var Player = (function () {
             buildCost: {},
             recruitQuality: 1
         };
-        this.id = "player" + id;
+        this.id = id;
         this.color = color;
         this.bindElements();
         this.init();
@@ -37,6 +38,9 @@ var Player = (function () {
             if (!this.ownedContent[type]) {
                 this.ownedContent[type] = [];
             }
+            if (this.weightedContentAmounts[type] === undefined) {
+                this.weightedContentAmounts[type] = 0;
+            }
             if (this.incomePerType[type] === undefined) {
                 this.incomePerType[type] = 0;
             }
@@ -46,7 +50,7 @@ var Player = (function () {
                 multiplier: 1
             };
             this.modifierEffects.buildCost[type] = {
-                addedProfit: 0,
+                addedCost: 0,
                 multiplier: 1
             };
         }
@@ -55,7 +59,7 @@ var Player = (function () {
             multiplier: 1
         };
         this.modifierEffects.buildCost["global"] = {
-            addedProfit: 0,
+            addedCost: 0,
             multiplier: 1
         };
     };
@@ -107,6 +111,8 @@ var Player = (function () {
             return;
 
         this.ownedContent[type].push(content);
+        var weight = content.type.amountWeights || 1;
+        this.weightedContentAmounts[type] += weight;
         content.player = this;
     };
     Player.prototype.removeContent = function (content) {
@@ -114,6 +120,9 @@ var Player = (function () {
         this.ownedContent[type] = this.ownedContent[type].filter(function (building) {
             return building.id !== content.id;
         });
+
+        var weight = content.type.amountWeights || 1;
+        this.weightedContentAmounts[type] -= weight;
     };
     Player.prototype.addMoney = function (initialAmount, incomeType, date) {
         var amount = initialAmount;
@@ -128,6 +137,10 @@ var Player = (function () {
         amount *= this.modifierEffects.profit["global"].multiplier;
 
         if (incomeType) {
+            if (!this.incomePerType[incomeType]) {
+                this.incomePerType[incomeType] = 0;
+            }
+
             this.incomePerType[incomeType] += amount;
         }
         if (date) {
@@ -155,7 +168,6 @@ var Player = (function () {
         }
     };
     Player.prototype.applyModifier = function (modifier) {
-        console.log(modifier.type, modifier);
         for (var ii = 0; ii < modifier.effects.length; ii++) {
             var effect = modifier.effects[ii];
 
@@ -200,6 +212,20 @@ var Player = (function () {
 
         this.modifiers[modifier.type] = null;
         delete this.modifiers[modifier.type];
+    };
+    Player.prototype.getBuildCost = function (type) {
+        var cost = type.cost;
+        var alreadyBuilt = this.weightedContentAmounts[type.categoryType];
+
+        cost *= Math.pow(1.1, alreadyBuilt);
+
+        cost += this.modifierEffects.buildCost[type.categoryType].addedCost;
+        cost += this.modifierEffects.buildCost["global"].addedCost;
+
+        cost *= this.modifierEffects.buildCost[type.categoryType].multiplier;
+        cost *= this.modifierEffects.buildCost["global"].multiplier;
+
+        return cost;
     };
     return Player;
 })();

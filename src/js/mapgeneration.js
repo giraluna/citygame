@@ -58,7 +58,6 @@ var mapGeneration;
                 cell.replace(getIndexedType(savedCell.type));
 
                 if (savedCell.player) {
-                    console.log(savedCell.player, cell.gridPos);
                     savedCell.player.addCell(cell);
                 }
                 if (savedCell.content) {

@@ -26,7 +26,10 @@ var UIComponents;
                 onDragLeave: function (e) {
                     e.preventDefault();
                 }
-            }, popups), UIComponents.SideMenu(null)));
+            }, popups), UIComponents.SideMenu({
+                player: this.props.player,
+                frameImages: this.props.frameImages
+            })));
         }
     });
 })(UIComponents || (UIComponents = {}));

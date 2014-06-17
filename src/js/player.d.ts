@@ -7,7 +7,7 @@ declare class Player {
     public money: number;
     public eventListener: any;
     public ownedContent: any;
-    public weightedContentAmounts: any;
+    public amountBuiltPerType: any;
     public ownedCells: any;
     public employees: any;
     public usedInitialRecruit: boolean;

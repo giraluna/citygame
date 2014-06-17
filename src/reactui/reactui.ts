@@ -466,7 +466,7 @@ class ReactUI
   updateReact()
   {
     React.renderComponent(
-      UIComponents.Stage( {popups: this.popups}),
+      UIComponents.Stage( {popups: this.popups, player: this.player, frameImages: this.frameImages}),
       document.getElementById("react-container")
     );
   }

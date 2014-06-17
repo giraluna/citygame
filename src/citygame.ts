@@ -2650,6 +2650,7 @@ class BuildTool extends Tool
   selectedBuildingType: any;
   canBuild: boolean;
   mainCell: Cell;
+  continuous: boolean;
 
   constructor()
   {
@@ -2667,10 +2668,14 @@ class BuildTool extends Tool
     this.tintColor = 0xFFFFFF;
     this.canBuild = false;
     this.mainCell = undefined;
+    this.continuous = false;
     game.changeTool("nothing");
   }
-  changeBuilding(buildingType)
+  changeBuilding(buildingType, continuous:boolean = false)
   {
+    this.continuous = continuous;
+    if (this.selectedBuildingType === buildingType) return;
+
     this.selectedBuildingType = buildingType;
     var size = buildingType.size || [1,1];
 
@@ -2715,7 +2720,7 @@ class BuildTool extends Tool
             player: game.players.player0,
             buildingTemplate: this.selectedBuildingType,
             cell: this.mainCell,
-            onOk: this.setDefaults.bind(this)
+            onOk: ( this.continuous ? function(){return;} : this.setDefaults.bind(this) )
           }
         });
       }

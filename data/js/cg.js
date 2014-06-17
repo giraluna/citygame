@@ -289,7 +289,6 @@ var cg = {
                 "daysForProfitTick": 30,
                 "cost": 25,
                 "buildTime": 14,
-                "amountOwnedWeight": 1,
                 "anchor": [0.5, 1],
                 "frame": "house1.png",
                 "canNotBuildOn": ["water", "building", "road"],
@@ -316,7 +315,6 @@ var cg = {
                 "daysForProfitTick": 30,
                 "cost": 50,
                 "buildTime": 21,
-                "amountOwnedWeight": 2,
                 "anchor": [0.5, 1],
                 "frame": "house2.png",
                 "canNotBuildOn": ["water", "building", "road"],
@@ -343,7 +341,6 @@ var cg = {
                 "daysForProfitTick": 30,
                 "cost": 25,
                 "buildTime": 14,
-                "amountOwnedWeight": 1,
                 "anchor": [0.5, 1],
                 "frame": "house3.png",
                 "canNotBuildOn": ["water", "building", "road"],
@@ -369,7 +366,6 @@ var cg = {
                 "baseProfit": 2.5,
                 "daysForProfitTick": 30,
                 "cost": 50,
-                "amountOwnedWeight": 2,
                 "buildTime": 21,
                 "anchor": [0.5, 1],
                 "frame": "house4.png",
@@ -396,7 +392,6 @@ var cg = {
                 "baseProfit": 2.5,
                 "daysForProfitTick": 30,
                 "cost": 50,
-                "amountOwnedWeight": 2,
                 "buildTime": 21,
                 "anchor": [0.5, 1],
                 "frame": "house5.png",
@@ -423,7 +418,6 @@ var cg = {
                 "baseProfit": 2.5,
                 "daysForProfitTick": 30,
                 "cost": 50,
-                "amountOwnedWeight": 2,
                 "buildTime": 21,
                 "anchor": [0.5, 1],
                 "frame": "house6.png",
@@ -451,7 +445,6 @@ var cg = {
                 "daysForProfitTick": 30,
                 "cost": 25,
                 "buildTime": 14,
-                "amountOwnedWeight": 1,
                 "anchor": [0.425, 1],
                 "frame": "house7.png",
                 "canNotBuildOn": ["water", "building", "road"],
@@ -478,7 +471,6 @@ var cg = {
                 "daysForProfitTick": 1,
                 "cost": 25,
                 "buildTime": 14,
-                "amountOwnedWeight": 1,
                 "anchor": [0.5, 1],
                 "frame": "fastfood.png",
                 "canNotBuildOn": ["water", "building", "road"],
@@ -499,7 +491,6 @@ var cg = {
                 "daysForProfitTick": 1,
                 "cost": 25,
                 "buildTime": 14,
-                "amountOwnedWeight": 1,
                 "anchor": [0.5, 1],
                 "frame": "conveniencestore.png",
                 "canNotBuildOn": ["water", "building", "road"],
@@ -525,7 +516,6 @@ var cg = {
                 "daysForProfitTick": 90,
                 "cost": 50,
                 "buildTime": 21,
-                "amountOwnedWeight": 1,
                 "anchor": [0.5, 1],
                 "frame": "smalloffice.png",
                 "canNotBuildOn": ["water", "building", "road"]
@@ -558,7 +548,6 @@ var cg = {
                 "daysForProfitTick": 1,
                 "cost": 25,
                 "buildTime": 14,
-                "amountOwnedWeight": 1,
                 "anchor": [0.5, 1],
                 "frame": "parkinglot.png",
                 "canNotBuildOn": ["water", "building", "road"],
@@ -584,7 +573,6 @@ var cg = {
                 "baseProfit": 3,
                 "daysForProfitTick": 90,
                 "cost": 100,
-                "amountOwnedWeight": 2,
                 "buildTime": 21,
                 "anchor": [0.6666, 1],
                 "frame": "bigoffice.png",
@@ -607,7 +595,6 @@ var cg = {
                 "daysForProfitTick": 1,
                 "cost": 50,
                 "buildTime": 14,
-                "amountOwnedWeight": 2,
                 "anchor": [0.6666, 1],
                 "frame": "stretchystore.png",
                 "canNotBuildOn": ["water", "building", "road"],
@@ -667,4 +654,11 @@ function findType(typeName, target) {
         }
     }
 }(cg));
+
+var playerBuildableBuildings = [];
+[
+    "house1", "house2", "parkinglot", "fastfood", "conveniencestore", "smalloffice"
+].forEach(function (type) {
+    playerBuildableBuildings.push(findType(type));
+});
 //# sourceMappingURL=cg.js.map

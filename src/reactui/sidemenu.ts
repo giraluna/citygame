@@ -1,5 +1,6 @@
 /// <reference path="../../lib/react.d.ts" />
 
+/// <reference path="js/sidemenubuildings.d.ts" />
 module UIComponents
 {
 
@@ -7,15 +8,7 @@ export var SideMenu = React.createClass(
 {
   render: function()
   {
-    var buildings = [];
 
-    for (var i = 0; i <= 20; i++)
-    {
-      var div = React.DOM.div( {key: ""+i, className:"grid-cell"},
-        "building" + i
-      );
-      buildings.push(div);
-    }
     return(
       React.DOM.div( {id:"react-side-menu"},
         React.DOM.div( {id:"side-menu-main-buttons", className:"grid-column"},
@@ -36,9 +29,13 @@ export var SideMenu = React.createClass(
             )
           )
         ),
-        React.DOM.div( {id:"side-menu-buildings", className:"grid-column"}, 
-          buildings
+        UIComponents.SideMenuBuildings(
+          {
+            player: this.props.player,
+            frameImages: this.props.frameImages
+          }
         ),
+
         React.DOM.div( {id:"side-menu-other-buttons", className:"grid-column"}, 
           React.DOM.div( {id:"save-buttons", className:"grid-row"},
             React.DOM.div( {className:"grid-cell"},
@@ -49,7 +46,7 @@ export var SideMenu = React.createClass(
             )
           ),
           React.DOM.form( {id:"size-menu-zoom", className:"grid-row"},
-            React.DOM.input( {type:"number", className:"grid-row", id:"zoom-amount", value:"1", step:0.1}),
+            React.DOM.input( {type:"number", className:"grid-row", id:"zoom-amount", defaultValue:"1", step:0.1}),
             React.DOM.button( {id:"zoomBtn", className:"grid-row"}, "zoom")
           )
 

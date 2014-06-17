@@ -6,7 +6,7 @@ var Player = (function () {
         if (typeof color === "undefined") { color = 0xFF0000; }
         this.money = 0;
         this.ownedContent = {};
-        this.weightedContentAmounts = {};
+        this.amountBuiltPerType = {};
         this.ownedCells = {};
         this.employees = {};
         this.usedInitialRecruit = false;
@@ -38,8 +38,8 @@ var Player = (function () {
             if (!this.ownedContent[type]) {
                 this.ownedContent[type] = [];
             }
-            if (this.weightedContentAmounts[type] === undefined) {
-                this.weightedContentAmounts[type] = 0;
+            if (this.amountBuiltPerType[type] === undefined) {
+                this.amountBuiltPerType[type] = 0;
             }
             if (this.incomePerType[type] === undefined) {
                 this.incomePerType[type] = 0;
@@ -111,8 +111,7 @@ var Player = (function () {
             return;
 
         this.ownedContent[type].push(content);
-        var weight = content.type.amountWeights || 1;
-        this.weightedContentAmounts[type] += weight;
+        this.amountBuiltPerType[type]++;
         content.player = this;
     };
     Player.prototype.removeContent = function (content) {
@@ -121,8 +120,7 @@ var Player = (function () {
             return building.id !== content.id;
         });
 
-        var weight = content.type.amountWeights || 1;
-        this.weightedContentAmounts[type] -= weight;
+        this.amountBuiltPerType[type]--;
     };
     Player.prototype.addMoney = function (initialAmount, incomeType, date) {
         var amount = initialAmount;
@@ -215,7 +213,7 @@ var Player = (function () {
     };
     Player.prototype.getBuildCost = function (type) {
         var cost = type.cost;
-        var alreadyBuilt = this.weightedContentAmounts[type.categoryType];
+        var alreadyBuilt = this.amountBuiltPerType[type.categoryType];
 
         cost *= Math.pow(1.1, alreadyBuilt);
 

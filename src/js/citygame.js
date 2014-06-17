@@ -2117,9 +2117,15 @@ var BuildTool = (function (_super) {
         this.tintColor = 0xFFFFFF;
         this.canBuild = false;
         this.mainCell = undefined;
+        this.continuous = false;
         game.changeTool("nothing");
     };
-    BuildTool.prototype.changeBuilding = function (buildingType) {
+    BuildTool.prototype.changeBuilding = function (buildingType, continuous) {
+        if (typeof continuous === "undefined") { continuous = false; }
+        this.continuous = continuous;
+        if (this.selectedBuildingType === buildingType)
+            return;
+
         this.selectedBuildingType = buildingType;
         var size = buildingType.size || [1, 1];
 
@@ -2154,7 +2160,9 @@ var BuildTool = (function (_super) {
                         player: game.players.player0,
                         buildingTemplate: this.selectedBuildingType,
                         cell: this.mainCell,
-                        onOk: this.setDefaults.bind(this)
+                        onOk: (this.continuous ? function () {
+                            return;
+                        } : this.setDefaults.bind(this))
                     }
                 });
             } else {

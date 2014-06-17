@@ -11,7 +11,7 @@ class Player
   eventListener: any;
 
   ownedContent: any = {};
-  weightedContentAmounts: any = {};
+  amountBuiltPerType: any = {};
   ownedCells: any = {};
 
   employees: any = {};
@@ -59,9 +59,9 @@ class Player
       {
         this.ownedContent[type] = [];
       }
-      if (this.weightedContentAmounts[type] === undefined)
+      if (this.amountBuiltPerType[type] === undefined)
       {
-        this.weightedContentAmounts[type] = 0;
+        this.amountBuiltPerType[type] = 0;
       }
       if (this.incomePerType[type] === undefined)
       {
@@ -145,8 +145,7 @@ class Player
     if (!this.ownedContent[type]) return;
     
     this.ownedContent[type].push(content);
-    var weight = content.type.amountWeights || 1;
-    this.weightedContentAmounts[type] += weight;
+    this.amountBuiltPerType[type]++;
     content.player = this;
   }
   removeContent( content )
@@ -157,8 +156,7 @@ class Player
       return building.id !== content.id;
     });
 
-    var weight = content.type.amountWeights || 1;
-    this.weightedContentAmounts[type] -= weight;
+    this.amountBuiltPerType[type]--;
   }
   addMoney(initialAmount, incomeType?: string, date?)
   {
@@ -276,7 +274,7 @@ class Player
   getBuildCost(type)
   {
     var cost = type.cost;
-    var alreadyBuilt = this.weightedContentAmounts[type.categoryType];
+    var alreadyBuilt = this.amountBuiltPerType[type.categoryType];
 
     cost *= Math.pow(1.1, alreadyBuilt);
 

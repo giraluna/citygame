@@ -28,7 +28,12 @@ export var Stage = React.createClass(
           }, 
           popups
         ),
-        UIComponents.SideMenu(null)
+        UIComponents.SideMenu(
+          {
+            player: this.props.player,
+            frameImages: this.props.frameImages
+          }
+        )
       )
     );
   }

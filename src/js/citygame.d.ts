@@ -311,9 +311,10 @@ declare class BuildTool extends Tool {
     public selectedBuildingType: any;
     public canBuild: boolean;
     public mainCell: Cell;
+    public continuous: boolean;
     constructor();
     public setDefaults(): void;
-    public changeBuilding(buildingType: any): void;
+    public changeBuilding(buildingType: any, continuous?: boolean): void;
     public activate(selectedCells: any[]): void;
 }
 declare class NothingTool extends Tool {

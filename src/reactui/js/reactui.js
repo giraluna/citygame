@@ -319,7 +319,7 @@ var ReactUI = (function () {
     };
 
     ReactUI.prototype.updateReact = function () {
-        React.renderComponent(UIComponents.Stage({ popups: this.popups }), document.getElementById("react-container"));
+        React.renderComponent(UIComponents.Stage({ popups: this.popups, player: this.player, frameImages: this.frameImages }), document.getElementById("react-container"));
     };
     return ReactUI;
 })();

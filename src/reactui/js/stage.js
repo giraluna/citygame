@@ -10,8 +10,8 @@ var UIComponents;
                 popups.push(UIComponents[popup.type].call(null, popup.props));
             }
             ;
-            return (React.DOM.div({
-                id: "react-stage",
+            return (React.DOM.div({ id: "react-wrapper" }, React.DOM.div({
+                id: "react-popups",
                 onDragEnter: function (e) {
                     e.preventDefault();
                 },
@@ -24,7 +24,7 @@ var UIComponents;
                 onDragLeave: function (e) {
                     e.preventDefault();
                 }
-            }, popups));
+            }, popups), React.DOM.div({ id: "react-side-menu" })));
         }
     });
 })(UIComponents || (UIComponents = {}));

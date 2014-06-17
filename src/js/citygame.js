@@ -1171,6 +1171,11 @@ var Game = (function () {
         boardSelect.addEventListener("change", function (event) {
             self.changeActiveBoard(parseInt(boardSelect.value));
         });
+
+        // react side menu stuff
+        eventManager.addEventListener("changeZoom", function (event) {
+            self.mouseEventHandler.scroller.zoom(event.content);
+        });
     };
     Game.prototype.bindRenderer = function () {
         var _canvas = document.getElementById("pixi-container");

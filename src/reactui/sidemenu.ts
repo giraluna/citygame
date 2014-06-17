@@ -1,11 +1,22 @@
 /// <reference path="../../lib/react.d.ts" />
 
 /// <reference path="js/sidemenubuildings.d.ts" />
+/// 
+/// <reference path="../js/eventlistener.d.ts" />
 module UIComponents
 {
 
 export var SideMenu = React.createClass(
 {
+  componentDidMount: function()
+  {
+    var money = this.refs.money.getDOMNode();
+
+    eventManager.addEventListener("updatePlayerMoney", function(event)
+    {
+      money.innerHTML = event.content;
+    });
+  },
   render: function()
   {
 
@@ -45,8 +56,30 @@ export var SideMenu = React.createClass(
               "load"
             )
           ),
-          React.DOM.form( {id:"size-menu-zoom", className:"grid-row"},
-            React.DOM.input( {type:"number", className:"grid-row", id:"zoom-amount", defaultValue:"1", step:0.1}),
+          React.DOM.form( {
+              id:"size-menu-zoom",
+              className:"grid-row",
+              onSubmit: function(e)
+                {
+                  e.preventDefault();
+                  eventManager.dispatchEvent({type: "changeZoom", content:this.state.zoom});
+                  return false;
+                }
+            },
+            React.DOM.input(
+              {
+                type:"number",
+                className:"grid-row",
+                id:"zoom-amount",
+                defaultValue:"1",
+                step:0.1,
+                onChange: function(event)
+                {
+                  var target = <HTMLInputElement> event.target;
+                  this.setState({zoom: parseInt(target.value)});
+                  console.log(this);
+                }
+              }),
             React.DOM.button( {id:"zoomBtn", className:"grid-row"}, "zoom")
           )
 
@@ -55,7 +88,8 @@ export var SideMenu = React.createClass(
           React.DOM.div( {id:"player-level-wrapper"},
             React.DOM.progress( {id:"player-level", value:69, max:100} ),
             React.DOM.span(null, "Level 69     4,200,000 / 6,900,000 [ 69% ]")
-          )
+          ),
+          React.DOM.div({ref: "money"}, 0)
         )
 
       )

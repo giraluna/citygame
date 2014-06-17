@@ -172,8 +172,6 @@ var ProfitSystem = (function (_super) {
                 player.addMoney(profitPerThisType, this.targetTypes[ii], currentDate);
             }
         }
-
-        eventManager.dispatchEvent({ type: "updateReact", content: "" });
     };
     return ProfitSystem;
 })(System);

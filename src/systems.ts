@@ -205,8 +205,6 @@ class ProfitSystem extends System
         player.addMoney(profitPerThisType, this.targetTypes[ii], currentDate);
       }
     }
-    
-    eventManager.dispatchEvent({type:"updateReact", content:""});
   }
 }
 

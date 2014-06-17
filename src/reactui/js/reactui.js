@@ -26,7 +26,11 @@ var ReactUI = (function () {
     ReactUI.prototype.init = function () {
         React.initializeTouchEvents(true);
         this.addEventListeners();
+
         this.updateReact();
+
+        // chrome doesnt work when called via reuqestAnimationFrame
+        this.updateInterval = window.setInterval(this.updateReact.bind(this), 1000);
     };
     ReactUI.prototype.addEventListeners = function () {
         var self = this;
@@ -319,6 +323,11 @@ var ReactUI = (function () {
     };
 
     ReactUI.prototype.updateReact = function () {
+        if (document.hidden) {
+            console.log("hidden");
+            return;
+        }
+
         React.renderComponent(UIComponents.Stage({ popups: this.popups, player: this.player, frameImages: this.frameImages }), document.getElementById("react-container"));
     };
     return ReactUI;

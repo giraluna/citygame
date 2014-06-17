@@ -1487,6 +1487,13 @@ class Game
       {
         self.changeActiveBoard( parseInt(boardSelect.value) );
       });
+
+
+      // react side menu stuff
+      eventManager.addEventListener("changeZoom", function(event)
+      {
+        self.mouseEventHandler.scroller.zoom( event.content );
+      });
       
   }
   bindRenderer()

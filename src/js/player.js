@@ -1,10 +1,13 @@
 /// <reference path="../lib/pixi.d.ts" />
 /// <reference path="js/employee.d.ts" />
 /// <reference path="../data/js/cg.d.ts" />
+/// <reference path="js/eventlistener.d.ts" />
+/// <reference path="js/utility.d.ts" />
 var Player = (function () {
     function Player(id, color) {
         if (typeof color === "undefined") { color = 0xFF0000; }
         this.money = 0;
+        this.experience = 0;
         this.ownedContent = {};
         this.amountBuiltPerType = {};
         this.ownedCells = {};
@@ -29,7 +32,9 @@ var Player = (function () {
         this.updateElements();
     };
     Player.prototype.updateElements = function () {
-        this.moneySpan.innerHTML = Math.round(this.money) + "$";
+        var beautified = beautify(this.money);
+        this.moneySpan.innerHTML = beautified;
+        eventManager.dispatchEvent({ type: "updatePlayerMoney", content: beautified });
         //this.incomeSpan.innerHTML = "+" + this.income + "/s";
     };
     Player.prototype.init = function () {
@@ -154,6 +159,7 @@ var Player = (function () {
         }
 
         this.money += amount;
+        this.experience += amount;
         this.updateElements();
     };
     Player.prototype.addModifier = function (modifier) {

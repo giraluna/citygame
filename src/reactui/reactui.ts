@@ -33,6 +33,8 @@ class ReactUI
 
   player: Player;
 
+  updateInterval: any;
+
   constructor(player: Player, frameImages: {[id: string]: HTMLImageElement;})
   {
     this.player = player;
@@ -43,7 +45,11 @@ class ReactUI
   {
     React.initializeTouchEvents(true);
     this.addEventListeners();
+
     this.updateReact();
+
+    // chrome doesnt work when called via reuqestAnimationFrame
+    this.updateInterval = window.setInterval(this.updateReact.bind(this), 1000);
   }
   addEventListeners()
   {
@@ -465,6 +471,12 @@ class ReactUI
 
   updateReact()
   {
+    if (document.hidden) 
+    {
+      console.log("hidden")
+      return;
+    }
+
     React.renderComponent(
       UIComponents.Stage( {popups: this.popups, player: this.player, frameImages: this.frameImages}),
       document.getElementById("react-container")

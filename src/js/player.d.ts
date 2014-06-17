@@ -1,10 +1,13 @@
 /// <reference path="../../lib/pixi.d.ts" />
 /// <reference path="employee.d.ts" />
 /// <reference path="../../data/js/cg.d.ts" />
+/// <reference path="eventlistener.d.ts" />
+/// <reference path="utility.d.ts" />
 declare class Player {
     public id: string;
     public color: number;
     public money: number;
+    public experience: number;
     public eventListener: any;
     public ownedContent: any;
     public amountBuiltPerType: any;

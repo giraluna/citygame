@@ -2,12 +2,15 @@
 
 /// <reference path="js/employee.d.ts" />
 /// <reference path="../data/js/cg.d.ts" />
+/// <reference path="js/eventlistener.d.ts" />
+/// <reference path="js/utility.d.ts" />
 
 class Player
 {
   id: string;
   color: number;
   money: number = 0;
+  experience: number = 0;
   eventListener: any;
 
   ownedContent: any = {};
@@ -47,7 +50,9 @@ class Player
   }
   updateElements()
   {
-    this.moneySpan.innerHTML = Math.round(this.money) + "$";
+    var beautified = beautify(this.money);
+    this.moneySpan.innerHTML = beautified;
+    eventManager.dispatchEvent({type: "updatePlayerMoney", content: beautified});
     //this.incomeSpan.innerHTML = "+" + this.income + "/s";
   }
   init()
@@ -197,6 +202,7 @@ class Player
     }
 
     this.money += amount;
+    this.experience += amount;
     this.updateElements();
   }
   addModifier(modifier)

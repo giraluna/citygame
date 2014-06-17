@@ -558,3 +558,71 @@ function getReverseDir(dir: string)
     }
   }
 }
+
+// https://github.com/Icehawk78/FrozenCookies/blob/master/fc_main.js#L132
+// license?: https://github.com/Icehawk78/FrozenCookies/issues/45
+
+function formatEveryThirdPower(notations): any
+{
+  return function (value) {
+    var base = 0,
+      notationValue = '';
+    if (value >= 1000000 && isFinite(value)) {
+      value /= 1000;
+      while(Math.round(value) >= 1000){
+        value /= 1000;
+        base++;
+      }
+      if (base > notations.length) {
+        return 'Infinity';
+      } else {
+        notationValue = notations[base];
+      }
+    }
+    return ( Math.round(value * 1000) / 1000 ) + notationValue;
+  };
+}
+
+function rawFormatter(value) {
+  return Math.round(value * 1000) / 1000;
+}
+
+var numberFormatters = [
+  rawFormatter,
+  formatEveryThirdPower([
+    '',
+    '',
+    ' billion',
+    ' trillion',
+    ' quadrillion',
+    ' quintillion',
+    ' sextillion',
+    ' septillion',
+    ' octillion',
+    ' nonillion',
+    ' decillion'
+  ]),
+
+  formatEveryThirdPower([
+    '',
+    ' M',
+    ' B',
+    ' T',
+    ' Qa',
+    ' Qi',
+    ' Sx',
+    ' Sp',
+    ' Oc',
+    ' No',
+    ' De'
+  ])
+];
+
+function beautify (value)
+{
+  var negative = (value < 0);
+  value = Math.abs(value);
+  var formatter = numberFormatters[0];
+  var output = formatter(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return negative ? '-' + output : output;
+}

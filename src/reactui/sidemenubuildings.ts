@@ -17,10 +17,11 @@ export var SideMenuBuildings = React.createClass(
   {
 
     var divs = [];
+    var player = this.props.player;
+    
     for (var i = 0; i < playerBuildableBuildings.length; i++)
     {
       var building = playerBuildableBuildings[i];
-      var player = this.props.player;
 
       var buildCost = player.getBuildCost(building);
       var canAfford = player.money >= buildCost;
@@ -40,7 +41,7 @@ export var SideMenuBuildings = React.createClass(
       }
       else
       {
-        divProps.onClick = function(){console.log(building.type)};
+        divProps.onClick = function(type){console.log(type)}.bind(null, building.type);
       }
 
       var image = this.props.frameImages[building.frame];

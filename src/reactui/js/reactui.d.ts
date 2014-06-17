@@ -26,6 +26,7 @@ declare class ReactUI {
         [id: string]: HTMLImageElement;
     };
     public player: Player;
+    public updateInterval: any;
     constructor(player: Player, frameImages: {
         [id: string]: HTMLImageElement;
     });

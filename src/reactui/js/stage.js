@@ -1,4 +1,6 @@
 /// <reference path="../../lib/react.d.ts" />
+///
+/// <reference path="js/sidemenu.d.ts" />
 var UIComponents;
 (function (UIComponents) {
     UIComponents.Stage = React.createClass({
@@ -24,7 +26,7 @@ var UIComponents;
                 onDragLeave: function (e) {
                     e.preventDefault();
                 }
-            }, popups), React.DOM.div({ id: "react-side-menu" })));
+            }, popups), UIComponents.SideMenu(null)));
         }
     });
 })(UIComponents || (UIComponents = {}));

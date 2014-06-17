@@ -1,4 +1,6 @@
 /// <reference path="../../lib/react.d.ts" />
+/// 
+/// <reference path="js/sidemenu.d.ts" />
 
 module UIComponents
 {
@@ -26,7 +28,7 @@ export var Stage = React.createClass(
           }, 
           popups
         ),
-        React.DOM.div( {id:"react-side-menu"} )
+        UIComponents.SideMenu(null)
       )
     );
   }

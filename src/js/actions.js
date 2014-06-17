@@ -77,11 +77,13 @@ var actions;
 
         var actionTime = getActionTime([employee.skills["recruitment"]], 14);
 
-        var employeeCount = getSkillAdjust([employee.skills["recruitment"]], 2, function employeeCountAdjustFN(avgSkill) {
+        var employeeCount = getSkillAdjust([employee.skills["recruitment"]], 4, function employeeCountAdjustFN(avgSkill) {
             return 1 / (1.5 / Math.log(avgSkill + 1));
         }, 0.33);
 
-        var newEmployees = makeNewEmployees(employeeCount.actual, employee.skills["recruitment"] * employee.player.recruitQualityMultiplier);
+        var adjustedSkill = employee.skills["recruitment"] * employee.player.modifierEffects.recruitQuality;
+
+        var newEmployees = makeNewEmployees(employeeCount.actual, adjustedSkill);
 
         var recruitCompleteFN = function () {
             eventManager.dispatchEvent({
@@ -110,6 +112,14 @@ var actions;
         var cell = props.cell;
         var building = props.building;
         var employee = props.employee;
+
+        var baseCost = player.getBuildCost(building);
+        var adjustedCost = getActionCost([employee.skills["construction"]], baseCost).actual;
+
+        if (player.money < adjustedCost)
+            return;
+
+        player.addMoney(-adjustedCost, "buildingCost");
 
         employee.active = false;
         employee.currentAction = "constructBuilding";

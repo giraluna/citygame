@@ -286,7 +286,11 @@ class Player
     cost *= this.modifierEffects.buildCost[type.categoryType].multiplier;
     cost *= this.modifierEffects.buildCost["global"].multiplier;
 
-    return cost;
+    return Math.round(cost);
+  }
+  getCellBuyCost(baseCost)
+  {
+    return baseCost * Math.pow(1.1, this.ownedCells.length);
   }
 }
 

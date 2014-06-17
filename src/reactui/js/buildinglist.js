@@ -37,7 +37,9 @@ var UIComponents;
                 var costProps = { className: "money" };
                 var nameProps = { className: "building-title" };
 
-                if (player.money < buildingTemplate.cost) {
+                var cost = player.getBuildCost(buildingTemplate);
+
+                if (player.money < cost) {
                     playerCanBuildBuilding = false;
                     rowProps.className = "inactive";
                     costProps.className = "insufficient";
@@ -60,7 +62,7 @@ var UIComponents;
                     src: image.src,
                     width: image.width / 2,
                     height: image.height / 2
-                })), React.DOM.td(nameProps, buildingTemplate.translate), React.DOM.td(costProps, buildingTemplate.cost + "$"));
+                })), React.DOM.td(nameProps, buildingTemplate.translate), React.DOM.td(costProps, cost + "$"));
 
                 rows.push(row);
             }

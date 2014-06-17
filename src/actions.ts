@@ -92,12 +92,13 @@ module actions
 
     var employeeCount = getSkillAdjust(
       [employee.skills["recruitment"]],
-      2,
+      4,
       function employeeCountAdjustFN(avgSkill){return 1 / (1.5 / Math.log(avgSkill + 1))},
       0.33);
 
-    var newEmployees = makeNewEmployees(employeeCount.actual,
-      employee.skills["recruitment"] * employee.player.modifierEffects.recruitQuality);
+    var adjustedSkill = employee.skills["recruitment"] * employee.player.modifierEffects.recruitQuality;
+
+    var newEmployees = makeNewEmployees(employeeCount.actual, adjustedSkill);
 
 
     var recruitCompleteFN = function()
@@ -137,12 +138,12 @@ module actions
     var employee = props.employee;
 
     var baseCost = player.getBuildCost(building);
-    var adjustedCost = getActionCost([employee.skills["construction"], baseCost).actual;
+    var adjustedCost = getActionCost([employee.skills["construction"]], baseCost).actual;
 
     if (player.money < adjustedCost) return;
 
 
-    player.addMoney(-adjustedCost);
+    player.addMoney(-adjustedCost, "buildingCost");
 
     employee.active = false;
     employee.currentAction = "constructBuilding";

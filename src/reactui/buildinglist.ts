@@ -50,7 +50,9 @@ module UIComponents
         var costProps = {className: "money"};
         var nameProps = {className: "building-title"};
 
-        if (player.money < buildingTemplate.cost)
+        var cost = player.getBuildCost(buildingTemplate);
+
+        if (player.money < cost)
         {
           playerCanBuildBuilding = false;
           rowProps.className = "inactive";
@@ -82,7 +84,7 @@ module UIComponents
             )
           ),
           React.DOM.td(nameProps, buildingTemplate.translate),
-          React.DOM.td(costProps, buildingTemplate.cost + "$")
+          React.DOM.td(costProps, cost + "$")
         )
 
         rows.push(row);

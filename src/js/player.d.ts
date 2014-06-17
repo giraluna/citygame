@@ -34,5 +34,6 @@ declare class Player {
     public applyModifier(modifier: any): void;
     public applyAllModifiers(): void;
     public removeModifier(modifier: any): void;
-    public getBuildCost(type: any): any;
+    public getBuildCost(type: any): number;
+    public getCellBuyCost(baseCost: any): number;
 }

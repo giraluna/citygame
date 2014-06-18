@@ -14,8 +14,10 @@ module UIComponents
 
 export var SideMenuBuildings = React.createClass(
 {
-  handleBuildingSelect: function(building, continuous)
+  handleBuildingSelect: function(building, e)
   {
+    var continuous = e.shiftKey;
+
     eventManager.dispatchEvent(
       {
         type:"changeBuildingType",
@@ -36,14 +38,11 @@ export var SideMenuBuildings = React.createClass(
     {
       var building = playerBuildableBuildings[i];
 
-      var boundSelect = this.handleBuildingSelect.bind(null, building, false);
-      var boundContinuous = this.handleBuildingSelect.bind(null, building, true);
-
       var buildCost = player.getBuildCost(building);
       var canAfford = player.money >= buildCost;
       var amountBuilt = player.amountBuiltPerType[building.categoryType];
 
-      var divProps: any = {className: "side-building", key: building.type};
+      var divProps: any = {className: "side-building interactive", key: building.type};
 
       var imageProps: any = {className: "building-image"};
       var titleProps: any = {className: "building-title"};
@@ -57,12 +56,7 @@ export var SideMenuBuildings = React.createClass(
       }
       else
       {
-        divProps.onClick = function(e)
-        {
-          console.log(e.shiftKey);
-          if (e.shiftKey) boundContinuous();
-          else boundSelect();
-        }
+        divProps.onClick = this.handleBuildingSelect.bind(null, building);
       }
 
       var image = this.props.frameImages[building.frame];

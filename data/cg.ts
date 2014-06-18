@@ -689,6 +689,28 @@ var cg: any =
             "strength": 1
           }
         ]
+      },
+      "factory":
+      {
+        "type": "factory",
+        "baseType": "building",
+        "categoryType": "factory",
+        "translate": "Factory",
+        "baseProfit": 1.5,
+        "daysForProfitTick": 1,
+        "cost": 50,
+        "buildTime": 14,
+        "anchor": [0.5, 1],
+        "frame": "factory.png",
+        "canNotBuildOn": ["water", "building", "road"],
+        "effects":
+        [
+          {
+            "type": "nearbyFactory",
+            "range": 4,
+            "strength": 1
+          }
+        ]
       }
     }
   }

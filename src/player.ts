@@ -10,7 +10,9 @@ class Player
   id: string;
   color: number;
   money: number = 0;
+  level: number = 1;
   experience: number = 0;
+  experienceToNextLevel: number = 0;
   eventListener: any;
 
   ownedContent: any = {};
@@ -53,6 +55,18 @@ class Player
     var beautified = beautify(this.money) + "$";
     this.moneySpan.innerHTML = beautified;
     eventManager.dispatchEvent({type: "updatePlayerMoney", content: beautified});
+    eventManager.dispatchEvent(
+      {
+        type: "updatePlayerExp",
+        content:
+        {
+          experience: beautify(this.experience),
+          nextLevel: beautify(this.experienceToNextLevel),
+          level: this.level,
+          percentage: this.getExperiencePercentage()
+        }
+      }
+    );
     //this.incomeSpan.innerHTML = "+" + this.income + "/s";
   }
   init()
@@ -94,6 +108,8 @@ class Player
       addedCost: 0,
       multiplier: 1
     };
+
+    this.setExperienceToNextLevel();
   }
   addEventListeners()
   {
@@ -166,17 +182,24 @@ class Player
   addMoney(initialAmount, incomeType?: string, date?)
   {
     var amount = initialAmount;
-    amount += this.modifierEffects.profit["global"].addedProfit;
-
-    if (incomeType)
+    if (amount > 0)
     {
-      if (this.modifierEffects.profit[incomeType])
+      amount += this.modifierEffects.profit["global"].addedProfit;
+
+      if (incomeType)
       {
-        amount += this.modifierEffects.profit[incomeType].addedProfit;
-        amount *= this.modifierEffects.profit[incomeType].multiplier;
+        if (this.modifierEffects.profit[incomeType])
+        {
+          amount += this.modifierEffects.profit[incomeType].addedProfit;
+          amount *= this.modifierEffects.profit[incomeType].multiplier;
+        }
       }
+      amount *= this.modifierEffects.profit["global"].multiplier;
+
+      if (amount < 0) amount = 0;
+
+      this.addExperience(amount);
     }
-    amount *= this.modifierEffects.profit["global"].multiplier;
 
 
     if (incomeType)
@@ -202,7 +225,6 @@ class Player
     }
 
     this.money += amount;
-    this.experience += amount;
     this.updateElements();
   }
   addModifier(modifier)
@@ -295,6 +317,41 @@ class Player
   getCellBuyCost(baseCost)
   {
     return baseCost * Math.pow(1.1, this.ownedCells.length);
+  }
+  addExperience(amount)
+  {
+    this.experience += amount;
+
+    if (this.experience >= this.experienceToNextLevel)
+    {
+      this.levelUp();
+    }
+  }
+  levelUp()
+  {
+    this.level++;
+    this.setExperienceToNextLevel();
+
+    if (this.experience >= this.experienceToNextLevel)
+    {
+      this.levelUp();
+    }
+  }
+  getExperienceForLevel(level)
+  {
+    if (level <= 0) return 0;
+    else
+    {
+      return Math.round( 100 * Math.pow(1.1, level-1) );
+    }
+  }
+  setExperienceToNextLevel()
+  {
+    this.experienceToNextLevel += this.getExperienceForLevel(this.level);
+  }
+  getExperiencePercentage()
+  {
+    return Math.floor( 100 * ( this.experience / this.experienceToNextLevel ) )
   }
 }
 

@@ -72,4 +72,4 @@ declare function getReverseDir(dir: string): string;
 declare function formatEveryThirdPower(notations: any): any;
 declare function rawFormatter(value: any): number;
 declare var numberFormatters: any[];
-declare function beautify(value: any): any;
+declare function beautify(value: number, formatterIndex?: number): any;

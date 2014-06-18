@@ -1185,7 +1185,7 @@ class Game
     this.systemsManager = new SystemsManager(1000);
     var id = "player" + (idGenerator.player++);
     var player = new Player(id);
-    player.addMoney(100);
+    //player.addMoney(100);
     this.reactUI = new ReactUI(player, this.frameImages);
     this.players[player.id] = player;
     // TODO have content types register themselves
@@ -1331,36 +1331,23 @@ class Game
       //save & load
       var saveBtn = document.getElementById("saveBtn");
       var loadBtn = document.getElementById("loadBtn");
-      addClickAndTouchEventListener(saveBtn, function()
+
+      var saveFN = function()
       {
         eventManager.dispatchEvent(
         {
           type: "makeSavePopup", content: ""
         });
-      });
-      addClickAndTouchEventListener(loadBtn, function()
+      };
+      var loadFN = function()
       {
         eventManager.dispatchEvent(
         {
           type: "makeLoadPopup", content: ""
         });
-        /*
-        eventManager.dispatchEvent(
-        {
-          type: "makeInputPopup",
-          content:
-          {
-            text: "Load",
-            onOk: function(name: string)
-            {
-              self.load(name);
-            },
-            okBtnText: "Load",
-            closeBtnText: "Cancel"
-          }
-        });
-        */
-      });
+      };
+      addClickAndTouchEventListener(saveBtn, saveFN);
+      addClickAndTouchEventListener(loadBtn, loadFN);
 
       eventManager.addEventListener("saveGame", function(event)
       {
@@ -1731,6 +1718,7 @@ class Game
     var data: any = {};
     data.id = player.id;
     data.money = player.money;
+    data.experience = player.experience;
 
     for (var _e in player.employees)
     {
@@ -1756,6 +1744,7 @@ class Game
     var player = new Player(data.id);
     
     player.money = data.money;
+    player.addExperience(data.experience);
 
     if (data.stats)
     {
@@ -2753,7 +2742,7 @@ class BuildTool extends Tool
       selectedCells[0].player.id !== game.players.player0.id)
     {
       this.timesTriedToBuiltOnNonOwnedPlot++;
-      if (this.timesTriedToBuiltOnNonOwnedPlot % 3 === 0)
+      if (this.timesTriedToBuiltOnNonOwnedPlot <= 3 )
       {
         eventManager.dispatchEvent(
         {

@@ -110,4 +110,21 @@ declare module cellModifiers {
             addedProfit: number;
         };
     };
+    function nearbyFactory(range: number, strength?: number): {
+        type: string;
+        translate: string;
+        range: number;
+        strength: number;
+        targets: string[];
+        effect: {
+            addedProfit: number;
+            multiplier: number;
+        };
+        scaling: (strength: any) => any;
+        landValue: {
+            radius: number;
+            multiplier: number;
+            falloffFN: (distance: any, invertedDistance: any, invertedDistanceRatio: any) => number;
+        };
+    };
 }

@@ -175,4 +175,34 @@ module cellModifiers
       }
     });
   }
+
+  export function nearbyFactory(range: number, strength: number = 1)
+  {
+    return(
+    {
+      type: "nearbyFactory",
+      translate: "Nearby Factory",
+      range: range,
+      strength: strength,
+      targets: ["fastfood", "shopping", "apartment", "office"],
+      effect:
+      {
+        addedProfit: -0.2,
+        multiplier: -0.2
+      },
+      scaling: function(strength)
+      {
+        return strength;
+      },
+      landValue:
+      {
+        radius: 5,
+        multiplier: -0.1,
+        falloffFN: function(distance, invertedDistance, invertedDistanceRatio)
+        {
+          return invertedDistance * invertedDistanceRatio / 2;
+        }
+      }
+    });
+  }
 }

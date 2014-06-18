@@ -494,10 +494,11 @@ var numberFormatters = [
     ])
 ];
 
-function beautify(value) {
+function beautify(value, formatterIndex) {
+    if (typeof formatterIndex === "undefined") { formatterIndex = 0; }
     var negative = (value < 0);
     value = Math.abs(value);
-    var formatter = numberFormatters[0];
+    var formatter = numberFormatters[formatterIndex];
     var output = formatter(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     return negative ? '-' + output : output;
 }

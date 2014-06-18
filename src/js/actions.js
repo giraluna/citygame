@@ -81,6 +81,7 @@ var actions;
             return 1 / (1.5 / Math.log(avgSkill + 1));
         }, 0.33);
 
+        console.log(employee.player);
         var adjustedSkill = employee.skills["recruitment"] * employee.player.modifierEffects.recruitQuality;
 
         var newEmployees = makeNewEmployees(employeeCount.actual, adjustedSkill);

@@ -7,7 +7,9 @@ var Player = (function () {
     function Player(id, color) {
         if (typeof color === "undefined") { color = 0xFF0000; }
         this.money = 0;
+        this.level = 1;
         this.experience = 0;
+        this.experienceToNextLevel = 0;
         this.ownedContent = {};
         this.amountBuiltPerType = {};
         this.ownedCells = {};
@@ -35,6 +37,15 @@ var Player = (function () {
         var beautified = beautify(this.money) + "$";
         this.moneySpan.innerHTML = beautified;
         eventManager.dispatchEvent({ type: "updatePlayerMoney", content: beautified });
+        eventManager.dispatchEvent({
+            type: "updatePlayerExp",
+            content: {
+                experience: beautify(this.experience),
+                nextLevel: beautify(this.experienceToNextLevel),
+                level: this.level,
+                percentage: this.getExperiencePercentage()
+            }
+        });
         //this.incomeSpan.innerHTML = "+" + this.income + "/s";
     };
     Player.prototype.init = function () {
@@ -67,6 +78,8 @@ var Player = (function () {
             addedCost: 0,
             multiplier: 1
         };
+
+        this.setExperienceToNextLevel();
     };
     Player.prototype.addEventListeners = function () {
     };
@@ -129,15 +142,22 @@ var Player = (function () {
     };
     Player.prototype.addMoney = function (initialAmount, incomeType, date) {
         var amount = initialAmount;
-        amount += this.modifierEffects.profit["global"].addedProfit;
+        if (amount > 0) {
+            amount += this.modifierEffects.profit["global"].addedProfit;
 
-        if (incomeType) {
-            if (this.modifierEffects.profit[incomeType]) {
-                amount += this.modifierEffects.profit[incomeType].addedProfit;
-                amount *= this.modifierEffects.profit[incomeType].multiplier;
+            if (incomeType) {
+                if (this.modifierEffects.profit[incomeType]) {
+                    amount += this.modifierEffects.profit[incomeType].addedProfit;
+                    amount *= this.modifierEffects.profit[incomeType].multiplier;
+                }
             }
+            amount *= this.modifierEffects.profit["global"].multiplier;
+
+            if (amount < 0)
+                amount = 0;
+
+            this.addExperience(amount);
         }
-        amount *= this.modifierEffects.profit["global"].multiplier;
 
         if (incomeType) {
             if (!this.incomePerType[incomeType]) {
@@ -159,7 +179,6 @@ var Player = (function () {
         }
 
         this.money += amount;
-        this.experience += amount;
         this.updateElements();
     };
     Player.prototype.addModifier = function (modifier) {
@@ -233,6 +252,34 @@ var Player = (function () {
     };
     Player.prototype.getCellBuyCost = function (baseCost) {
         return baseCost * Math.pow(1.1, this.ownedCells.length);
+    };
+    Player.prototype.addExperience = function (amount) {
+        this.experience += amount;
+
+        if (this.experience >= this.experienceToNextLevel) {
+            this.levelUp();
+        }
+    };
+    Player.prototype.levelUp = function () {
+        this.level++;
+        this.setExperienceToNextLevel();
+
+        if (this.experience >= this.experienceToNextLevel) {
+            this.levelUp();
+        }
+    };
+    Player.prototype.getExperienceForLevel = function (level) {
+        if (level <= 0)
+            return 0;
+        else {
+            return Math.round(100 * Math.pow(1.1, level - 1));
+        }
+    };
+    Player.prototype.setExperienceToNextLevel = function () {
+        this.experienceToNextLevel += this.getExperienceForLevel(this.level);
+    };
+    Player.prototype.getExperiencePercentage = function () {
+        return Math.floor(100 * (this.experience / this.experienceToNextLevel));
     };
     return Player;
 })();

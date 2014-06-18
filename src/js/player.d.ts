@@ -7,7 +7,9 @@ declare class Player {
     public id: string;
     public color: number;
     public money: number;
+    public level: number;
     public experience: number;
+    public experienceToNextLevel: number;
     public eventListener: any;
     public ownedContent: any;
     public amountBuiltPerType: any;
@@ -39,4 +41,9 @@ declare class Player {
     public removeModifier(modifier: any): void;
     public getBuildCost(type: any): number;
     public getCellBuyCost(baseCost: any): number;
+    public addExperience(amount: any): void;
+    public levelUp(): void;
+    public getExperienceForLevel(level: any): number;
+    public setExperienceToNextLevel(): void;
+    public getExperiencePercentage(): number;
 }

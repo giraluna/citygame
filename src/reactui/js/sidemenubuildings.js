@@ -24,6 +24,7 @@ var UIComponents;
         render: function () {
             var divs = [];
             var player = this.props.player;
+            console.log(player.money);
 
             for (var i = 0; i < playerBuildableBuildings.length; i++) {
                 var building = playerBuildableBuildings[i];

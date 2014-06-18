@@ -29,10 +29,10 @@ var UIComponents;
                 className: "grid-cell interactive",
                 onClick: this.handleToolChange.bind(null, "buy")
             }, "buy plot"), React.DOM.div({
-                ref: "remove",
+                ref: "sell",
                 className: "grid-cell interactive",
-                onClick: this.handleToolChange.bind(null, "remove")
-            }, "remove"))));
+                onClick: this.handleToolChange.bind(null, "sell")
+            }, "sell"))));
         }
     });
 })(UIComponents || (UIComponents = {}));

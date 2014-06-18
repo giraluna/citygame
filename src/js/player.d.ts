@@ -22,7 +22,7 @@ declare class Player {
     public modifierEffects: any;
     public moneySpan: HTMLElement;
     public incomeSpan: HTMLElement;
-    constructor(id: string, color?: number);
+    constructor(id: string, experience?: number, color?: number);
     public bindElements(): void;
     public updateElements(): void;
     public init(): void;
@@ -32,8 +32,10 @@ declare class Player {
     public getActiveEmployees(): any[];
     public addCell(cell: any): void;
     public removeCell(cell: any): void;
+    public sellCell(cell: any): void;
     public addContent(content: any): void;
     public removeContent(content: any): void;
+    public sellContent(content: any): void;
     public addMoney(initialAmount: any, incomeType?: string, date?: any): void;
     public addModifier(modifier: any): void;
     public applyModifier(modifier: any): void;

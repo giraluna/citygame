@@ -82,20 +82,26 @@
 {
   z-index: 1000;
   
-  background-color: #fff;
-  border-style: inset;
-  border-color: #ddd
+  background-color: lighten(@dark-blue, 25%);
+  //border-style: inset;
+  //border-color: #ddd
+}
+
+.interactive:active
+{
+  background-color: @dark-blue;
+  color: #ddd;
 }
 
 .selected-tool
 {
-  background-color: #666;
+  background-color: @dark-blue;
   color: #ddd;
 }
 
 .selected-tool:hover
 {
-  background-color: #666;
+  background-color: @dark-blue;
 }
 
 html, body

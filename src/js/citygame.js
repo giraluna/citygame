@@ -28,7 +28,7 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-var SCREEN_WIDTH = 720, SCREEN_HEIGHT = 480, TILE_WIDTH = 64, TILE_HEIGHT = 32, TILES = 32, WORLD_WIDTH = TILES * TILE_WIDTH, WORLD_HEIGHT = TILES * TILE_HEIGHT, ZOOM_LEVELS = [1], AMT_OF_BOARDS = 2;
+var SCREEN_WIDTH = 720, SCREEN_HEIGHT = 480, TILE_WIDTH = 64, TILE_HEIGHT = 32, TILES = 32, WORLD_WIDTH = TILES * TILE_WIDTH, WORLD_HEIGHT = TILES * TILE_HEIGHT, ZOOM_LEVELS = [1], AMT_OF_BOARDS = 1;
 
 var idGenerator = idGenerator || {};
 idGenerator.content = 0;
@@ -630,7 +630,7 @@ var Cell = (function () {
         for (var _dir in neighbors) {
             var neighborCell = neighbors[_dir];
             if (neighborCell !== undefined) {
-                if (neighborCell.player && neighborCell.player.id === this.player.id) {
+                if (neighborCell.overlay && neighborCell.overlayColor === color) {
                     linesToDraw[_dir] = false;
                 }
             }
@@ -663,6 +663,7 @@ var Cell = (function () {
         this.board.addSpriteToLayer("cellOverlay", gfx, this.gridPos);
 
         this.overlay = gfx;
+        this.overlayColor = color;
 
         var willUpdateNeighbors = false;
 
@@ -677,6 +678,18 @@ var Cell = (function () {
 
         if (willUpdateNeighbors === false) {
             game.updateWorld();
+        }
+    };
+    Cell.prototype.removeOverlay = function () {
+        this.board.removeSpriteFromLayer("cellOverlay", this.overlay, this.gridPos);
+        this.overlay = null;
+        this.overlayColor = null;
+
+        var neighs = this.getNeighbors();
+        for (var neigh in neighs) {
+            if (neighs[neigh] && neighs[neigh].overlay) {
+                neighs[neigh].addOverlay(neighs[neigh].overlayColor);
+            }
         }
     };
     return Cell;
@@ -997,6 +1010,7 @@ var Game = (function () {
 
         this.tools.buy = new BuyTool();
         this.tools.build = new BuildTool();
+        this.tools.sell = new SellTool();
     };
 
     Game.prototype.bindElements = function () {
@@ -1382,10 +1396,9 @@ var Game = (function () {
         return data;
     };
     Game.prototype.loadPlayer = function (data) {
-        var player = new Player(data.id);
+        var player = new Player(data.id, data.experience);
 
         player.money = data.money;
-        player.addExperience(data.experience);
 
         if (data.stats) {
             player.incomePerDate = data.stats.incomePerDate;
@@ -1403,6 +1416,7 @@ var Game = (function () {
         }
 
         this.players["player0"] = player;
+        this.reactUI.player = player;
         player.updateElements();
     };
     Game.prototype.render = function () {
@@ -2020,6 +2034,29 @@ var RemoveTool = (function (_super) {
         }
     };
     return RemoveTool;
+})(Tool);
+
+var SellTool = (function (_super) {
+    __extends(SellTool, _super);
+    function SellTool() {
+        _super.call(this);
+        this.type = "remove";
+        this.selectType = rectSelect;
+        this.tintColor = 0xFF5555;
+        this.mapmode = undefined;
+        this.button = null;
+    }
+    SellTool.prototype.onActivate = function (target) {
+        if (target.content) {
+            if (target.content.player) {
+                game.players.player0.sellContent(target.content);
+                target.changeContent("none");
+            }
+        } else if (target.player && target.player.id === game.players.player0.id) {
+            game.players.player0.sellCell(target);
+        }
+    };
+    return SellTool;
 })(Tool);
 
 var PlantTool = (function (_super) {

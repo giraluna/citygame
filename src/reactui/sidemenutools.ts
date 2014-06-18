@@ -56,11 +56,11 @@ export var SideMenuTools = React.createClass(
           ),
           React.DOM.div(
             {
-              ref: "remove",
+              ref: "sell",
               className:"grid-cell interactive",
-              onClick: this.handleToolChange.bind(null, "remove")
+              onClick: this.handleToolChange.bind(null, "sell")
             },
-            "remove"
+            "sell"
           )
         )
       )

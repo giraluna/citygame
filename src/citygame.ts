@@ -32,7 +32,7 @@ var SCREEN_WIDTH = 720,
     WORLD_WIDTH = TILES * TILE_WIDTH,
     WORLD_HEIGHT = TILES * TILE_HEIGHT,
     ZOOM_LEVELS = [1],
-    AMT_OF_BOARDS = 2;
+    AMT_OF_BOARDS = 1;
 
 var idGenerator = idGenerator || {};
 idGenerator.content = 0;
@@ -227,6 +227,7 @@ class Cell
   modifiers: any = {};
   landValueModifiers: any = {};
   overlay: PIXI.Graphics = undefined;
+  overlayColor: number;
   player: Player;
   neighbors: neighborCells;
   neighborsWithDiagonals: neighborCells;
@@ -827,7 +828,7 @@ class Cell
       var neighborCell = neighbors[_dir];
       if (neighborCell !== undefined)
       {
-        if ( neighborCell.player && neighborCell.player.id === this.player.id)
+        if ( neighborCell.overlay && neighborCell.overlayColor === color)
         {
           linesToDraw[_dir] = false;
         }
@@ -864,6 +865,7 @@ class Cell
     this.board.addSpriteToLayer("cellOverlay", gfx, this.gridPos);
 
     this.overlay = gfx;
+    this.overlayColor = color;
 
     var willUpdateNeighbors = false;
 
@@ -882,6 +884,21 @@ class Cell
     if (willUpdateNeighbors === false)
     {
       game.updateWorld();
+    }
+  }
+  removeOverlay()
+  {
+    this.board.removeSpriteFromLayer("cellOverlay", this.overlay, this.gridPos);
+    this.overlay = null;
+    this.overlayColor = null;
+
+    var neighs = this.getNeighbors();
+    for (var neigh in neighs)
+    {
+      if (neighs[neigh] && neighs[neigh].overlay)
+      {
+        neighs[neigh].addOverlay(neighs[neigh].overlayColor);
+      }
     }
   }
 }
@@ -1281,7 +1298,8 @@ class Game
       this.tools.subway = new SubwayTool();
 
       this.tools.buy = new BuyTool();
-      this.tools.build = new BuildTool(); 
+      this.tools.build = new BuildTool();
+      this.tools.sell = new SellTool();
     }
 
     bindElements()
@@ -1751,10 +1769,9 @@ class Game
   }
   loadPlayer(data: any)
   {
-    var player = new Player(data.id);
+    var player = new Player(data.id, data.experience);
     
     player.money = data.money;
-    player.addExperience(data.experience);
 
     if (data.stats)
     {
@@ -1776,6 +1793,7 @@ class Game
 
 
     this.players["player0"] = player;
+    this.reactUI.player = player;
     player.updateElements();
   }
   render()
@@ -2560,6 +2578,34 @@ class RemoveTool extends Tool
     else
     {
       target.changeUndergroundContent();
+    }
+  }
+}
+
+class SellTool extends Tool
+{
+  constructor()
+  {
+    super();
+    this.type = "remove";
+    this.selectType = rectSelect;
+    this.tintColor = 0xFF5555;
+    this.mapmode = undefined;
+    this.button = null;
+  } 
+  onActivate(target: Cell)
+  {
+    if (target.content)
+    {
+      if (target.content.player)
+      {
+        game.players.player0.sellContent(target.content);
+        target.changeContent("none");
+      }
+    }
+    else if (target.player && target.player.id === game.players.player0.id)
+    {
+      game.players.player0.sellCell(target);
     }
   }
 }

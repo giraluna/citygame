@@ -80,6 +80,7 @@ declare class Cell {
     public modifiers: any;
     public landValueModifiers: any;
     public overlay: PIXI.Graphics;
+    public overlayColor: number;
     public player: Player;
     public neighbors: neighborCells;
     public neighborsWithDiagonals: neighborCells;
@@ -114,6 +115,7 @@ declare class Cell {
     public removePropagatedLandValueModifier(modifier: any): void;
     public updateLandValue(): void;
     public addOverlay(color: any, depth?: number): void;
+    public removeOverlay(): void;
 }
 declare class WorldRenderer {
     public layers: any;
@@ -284,6 +286,10 @@ declare class SnowTool extends Tool {
     public onActivate(target: Cell): void;
 }
 declare class RemoveTool extends Tool {
+    constructor();
+    public onActivate(target: Cell): void;
+}
+declare class SellTool extends Tool {
     constructor();
     public onActivate(target: Cell): void;
 }

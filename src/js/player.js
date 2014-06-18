@@ -4,7 +4,7 @@
 /// <reference path="js/eventlistener.d.ts" />
 /// <reference path="js/utility.d.ts" />
 var Player = (function () {
-    function Player(id, color) {
+    function Player(id, experience, color) {
         if (typeof color === "undefined") { color = 0xFF0000; }
         this.money = 0;
         this.level = 1;
@@ -25,8 +25,10 @@ var Player = (function () {
         };
         this.id = id;
         this.color = color;
-        this.bindElements();
         this.init();
+        if (experience)
+            this.addExperience(experience);
+        this.bindElements();
     }
     Player.prototype.bindElements = function () {
         this.moneySpan = document.getElementById("money");
@@ -118,8 +120,18 @@ var Player = (function () {
     };
     Player.prototype.removeCell = function (cell) {
         if (this.ownedCells[cell.gridPos]) {
+            if (cell.overlay)
+                cell.removeOverlay();
+
             delete this.ownedCells[cell.gridPos];
+            cell.player = null;
         }
+    };
+    Player.prototype.sellCell = function (cell) {
+        var value = this.getCellBuyCost(cell.landValue) * 0.66;
+
+        this.addMoney(value, "soldCell");
+        this.removeCell(cell);
     };
     Player.prototype.addContent = function (content) {
         var type = content.categoryType;
@@ -139,6 +151,13 @@ var Player = (function () {
         });
 
         this.amountBuiltPerType[type]--;
+    };
+    Player.prototype.sellContent = function (content) {
+        var type = content.type;
+        var value = this.getBuildCost(type) * 0.66;
+
+        this.addMoney(value, "soldContent");
+        this.removeContent(content);
     };
     Player.prototype.addMoney = function (initialAmount, incomeType, date) {
         var amount = initialAmount;
@@ -251,7 +270,7 @@ var Player = (function () {
         return Math.round(cost);
     };
     Player.prototype.getCellBuyCost = function (baseCost) {
-        return baseCost * Math.pow(1.1, this.ownedCells.length);
+        return baseCost * Math.pow(1.1, Object.keys(this.ownedCells).length);
     };
     Player.prototype.addExperience = function (amount) {
         this.experience += amount;

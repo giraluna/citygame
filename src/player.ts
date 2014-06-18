@@ -37,12 +37,13 @@ class Player
   moneySpan: HTMLElement;
   incomeSpan: HTMLElement;
 
-  constructor(id: string, color: number=0xFF0000)
+  constructor(id: string, experience?: number, color: number=0xFF0000)
   {
     this.id = id;
     this.color = color;
-    this.bindElements();
     this.init();
+    if (experience) this.addExperience(experience);
+    this.bindElements();
   }
   bindElements()
   {
@@ -156,8 +157,18 @@ class Player
   {
     if (this.ownedCells[cell.gridPos])
     {
+      if (cell.overlay) cell.removeOverlay();
+
       delete this.ownedCells[cell.gridPos];
+      cell.player = null;
     }
+  }
+  sellCell( cell )
+  {
+    var value = this.getCellBuyCost(cell.landValue) * 0.66;
+
+    this.addMoney(value, "soldCell");
+    this.removeCell(cell);
   }
   addContent( content )
   {
@@ -178,6 +189,14 @@ class Player
     });
 
     this.amountBuiltPerType[type]--;
+  }
+  sellContent( content )
+  {
+    var type = content.type;
+    var value = this.getBuildCost(type) * 0.66;
+
+    this.addMoney(value, "soldContent");
+    this.removeContent(content);
   }
   addMoney(initialAmount, incomeType?: string, date?)
   {
@@ -316,7 +335,7 @@ class Player
   }
   getCellBuyCost(baseCost)
   {
-    return baseCost * Math.pow(1.1, this.ownedCells.length);
+    return baseCost * Math.pow(1.1, Object.keys(this.ownedCells).length);
   }
   addExperience(amount)
   {

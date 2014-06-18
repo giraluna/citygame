@@ -7,10 +7,6 @@ module UIComponents
 
 export var SideMenuZoom = React.createClass(
 {
-  getInitialState: function()
-  {
-    return {zoom: 1};
-  },
   handleZoomChange: function(event)
   {
     var target = <HTMLInputElement> event.target;
@@ -23,6 +19,18 @@ export var SideMenuZoom = React.createClass(
     eventManager.dispatchEvent({type: "changeZoom", content:this.state.zoom});
     return false;
   },
+  componentDidMount: function()
+  {
+    var self = this;
+    var el = this.refs.zoomValue.getDOMNode();
+
+    eventManager.addEventListener("updateZoomValue", function(e)
+    {
+      el.value = e.content.toFixed(3);
+      self.setState({zoom: e.content});
+    });
+  },
+
   render: function()
   {
     return(
@@ -33,9 +41,10 @@ export var SideMenuZoom = React.createClass(
         },
         React.DOM.input(
           {
-            type:"number",
-            className:"grid-row",
             id:"zoom-amount",
+            ref:"zoomValue",
+            className:"grid-row",
+            type:"number",
             defaultValue:"1",
             step:0.1,
             onChange: this.handleZoomChange

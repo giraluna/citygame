@@ -1316,15 +1316,6 @@ class Game
           addClickAndTouchEventListener(btn, function()
           {
             self.changeTool([type]);
-
-            if (tool.mapmode)
-            {
-              eventManager.dispatchEvent(
-              {
-                type: "changeMapmode",
-                content: tool.mapmode
-              });
-            }
           });
         })(btn, toolName);
       }
@@ -1360,8 +1351,8 @@ class Game
 
       //recruit
       var recruitBtn = document.getElementById("recruitBtn");
-
-      addClickAndTouchEventListener(recruitBtn, function()
+      
+      var recruitFN = function()
       {
         if ( Object.keys(self.players["player0"].employees).length < 1 )
         {
@@ -1398,7 +1389,12 @@ class Game
             }
           });
         }
-      });
+      }
+
+      addClickAndTouchEventListener(recruitBtn, recruitFN);
+
+      eventManager.addEventListener("recruit", recruitFN);
+
       //build
       var buildBtn = document.getElementById("buildBtn");
 
@@ -1421,6 +1417,11 @@ class Game
       eventManager.addEventListener("changeBuildingType", function(e)
       {
         onBuildingSelect(e.content.building, e.content.continuous);
+      });
+
+      eventManager.addEventListener("changeTool", function(e)
+      {
+        self.changeTool(e.content);
       });
 
       //info
@@ -1540,6 +1541,15 @@ class Game
     if (this.activeTool.button)
     {
       this.activeTool.button.classList.toggle("selected-tool");
+    }
+
+    if (tool.mapmode)
+    {
+      eventManager.dispatchEvent(
+      {
+        type: "changeMapmode",
+        content: tool.mapmode
+      });
     }
   }
   changeActiveBoard(index: number)
@@ -1922,6 +1932,8 @@ class Scroller
     container.position.y += yDelta;
     container.scale.set(zoomAmount, zoomAmount);
     this.zoomField.value = this.currZoom = zoomAmount;
+
+    eventManager.dispatchEvent({type:"updateZoomValue", content: this.currZoom});
   }
   deltaZoom( delta, scale )
   {

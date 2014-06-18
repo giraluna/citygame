@@ -42,7 +42,7 @@ export var SideMenuBuildings = React.createClass(
       var canAfford = player.money >= buildCost;
       var amountBuilt = player.amountBuiltPerType[building.categoryType];
 
-      var divProps: any = {className: "side-building interactive", key: building.type};
+      var divProps: any = {className: "side-building", key: building.type};
 
       var imageProps: any = {className: "building-image"};
       var titleProps: any = {className: "building-title"};
@@ -51,11 +51,12 @@ export var SideMenuBuildings = React.createClass(
 
       if (!canAfford)
       {
-        divProps.className += " inactive";
+        divProps.className += " disabled";
         costProps.className += " insufficient";
       }
       else
       {
+        divProps.className += " interactive";
         divProps.onClick = this.handleBuildingSelect.bind(null, building);
       }
 

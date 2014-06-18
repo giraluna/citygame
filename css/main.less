@@ -5,7 +5,7 @@
 @light-button-top: hsv(0, 0, 100%);
 @light-button-bot: hsv(0, 0, 91%);
 
-@side-menu-width: 300px;
+@side-menu-width: 250px;
 
 .single-gradient(@dir, @col1, @col2)
 {
@@ -75,12 +75,27 @@
 {
   .unselectable;
   cursor: pointer;
+  background-color: #fff;
 }
 
 .interactive:hover
 {
-  box-shadow: 0px 0px 10px #bbb inset,0px 0px 4px #000;
   z-index: 1000;
+  
+  background-color: #fff;
+  border-style: inset;
+  border-color: #ddd
+}
+
+.selected-tool
+{
+  background-color: #666;
+  color: #ddd;
+}
+
+.selected-tool:hover
+{
+  background-color: #666;
 }
 
 html, body
@@ -148,14 +163,6 @@ progress
   select
   {
     width: 70px;
-  }
-
-  .selected-tool
-  {
-    .single-gradient(
-      to top, @light-button-top, @light-button-bot);
-    border-style: inset;
-    border-color: @light-button-top;
   }
 
 
@@ -409,7 +416,7 @@ progress
 }
 
 
-#side-menu-main-buttons
+#side-menu-tools
 {
   flex: 0 0 100px;
   order: 1;
@@ -420,6 +427,17 @@ progress
   flex: 1 0;
   order: 2;
   overflow-y: scroll;
+  .unselectable;
+
+  .disabled
+  {
+    background-color: #ccc;
+    color: #888;
+  }
+  .insufficient
+  {
+    color: red;
+  }
 
   .side-building
   {
@@ -434,6 +452,7 @@ progress
     overflow-x: hidden;
     align-items: center;
     border: 1px solid black;
+
 
     .building-image
     {

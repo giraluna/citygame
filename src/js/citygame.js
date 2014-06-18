@@ -1025,13 +1025,6 @@ var Game = (function () {
 
                 addClickAndTouchEventListener(btn, function () {
                     self.changeTool([type]);
-
-                    if (tool.mapmode) {
-                        eventManager.dispatchEvent({
-                            type: "changeMapmode",
-                            content: tool.mapmode
-                        });
-                    }
                 });
             })(btn, toolName);
         }
@@ -1063,7 +1056,7 @@ var Game = (function () {
         //recruit
         var recruitBtn = document.getElementById("recruitBtn");
 
-        addClickAndTouchEventListener(recruitBtn, function () {
+        var recruitFN = function () {
             if (Object.keys(self.players["player0"].employees).length < 1) {
                 // TODO
                 if (false) {
@@ -1093,7 +1086,11 @@ var Game = (function () {
                     }
                 });
             }
-        });
+        };
+
+        addClickAndTouchEventListener(recruitBtn, recruitFN);
+
+        eventManager.addEventListener("recruit", recruitFN);
 
         //build
         var buildBtn = document.getElementById("buildBtn");
@@ -1114,6 +1111,10 @@ var Game = (function () {
 
         eventManager.addEventListener("changeBuildingType", function (e) {
             onBuildingSelect(e.content.building, e.content.continuous);
+        });
+
+        eventManager.addEventListener("changeTool", function (e) {
+            self.changeTool(e.content);
         });
 
         //info
@@ -1210,6 +1211,13 @@ var Game = (function () {
         }
         if (this.activeTool.button) {
             this.activeTool.button.classList.toggle("selected-tool");
+        }
+
+        if (tool.mapmode) {
+            eventManager.dispatchEvent({
+                type: "changeMapmode",
+                content: tool.mapmode
+            });
         }
     };
     Game.prototype.changeActiveBoard = function (index) {
@@ -1522,6 +1530,8 @@ var Scroller = (function () {
         container.position.y += yDelta;
         container.scale.set(zoomAmount, zoomAmount);
         this.zoomField.value = this.currZoom = zoomAmount;
+
+        eventManager.dispatchEvent({ type: "updateZoomValue", content: this.currZoom });
     };
     Scroller.prototype.deltaZoom = function (delta, scale) {
         if (delta === 0) {

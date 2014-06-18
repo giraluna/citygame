@@ -36,10 +36,20 @@
   -ms-user-select: none;
   user-select: none;
   cursor: pointer;
+  background-color: #fff;
 }
 .interactive:hover {
-  box-shadow: 0px 0px 10px #bbb inset,0px 0px 4px #000;
   z-index: 1000;
+  background-color: #fff;
+  border-style: inset;
+  border-color: #dddddd;
+}
+.selected-tool {
+  background-color: #666;
+  color: #ddd;
+}
+.selected-tool:hover {
+  background-color: #666;
 }
 html,
 body {
@@ -50,6 +60,10 @@ body {
   padding: 0;
   margin: 0;
   border: 0;
+}
+progress {
+  color: #0063a6;
+  background: #fff;
 }
 #main {
   position: relative;
@@ -74,7 +88,7 @@ body {
   order: 2;
   display: flex;
   flex-flow: column;
-  flex: 0 0 300px;
+  flex: 0 0 250px;
   position: relative;
   margin: 10px 0;
 }
@@ -86,11 +100,6 @@ body {
 }
 #side-menu select {
   width: 70px;
-}
-#side-menu .selected-tool {
-  background: linear-gradient(to top, #ffffff, #e8e8e8);
-  border-style: inset;
-  border-color: #ffffff;
 }
 #side-menu #action-buttons {
   margin-top: 25px;
@@ -257,14 +266,14 @@ body {
 #react-side-menu {
   display: flex;
   flex-flow: column;
-  flex: 0 0 300px;
+  flex: 0 0 250px;
   order: 2;
   background-color: white;
 }
 #react-side-menu > * {
   pointer-events: auto;
 }
-#side-menu-main-buttons {
+#side-menu-tools {
   flex: 0 0 100px;
   order: 1;
 }
@@ -272,6 +281,20 @@ body {
   flex: 1 0;
   order: 2;
   overflow-y: scroll;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: -moz-none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+#side-menu-buildings .disabled {
+  background-color: #ccc;
+  color: #888;
+}
+#side-menu-buildings .insufficient {
+  color: red;
 }
 #side-menu-buildings .side-building {
   position: relative;

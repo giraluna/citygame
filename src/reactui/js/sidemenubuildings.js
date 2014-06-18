@@ -32,7 +32,7 @@ var UIComponents;
                 var canAfford = player.money >= buildCost;
                 var amountBuilt = player.amountBuiltPerType[building.categoryType];
 
-                var divProps = { className: "side-building interactive", key: building.type };
+                var divProps = { className: "side-building", key: building.type };
 
                 var imageProps = { className: "building-image" };
                 var titleProps = { className: "building-title" };
@@ -40,9 +40,10 @@ var UIComponents;
                 var amountProps = { className: "building-amount" };
 
                 if (!canAfford) {
-                    divProps.className += " inactive";
+                    divProps.className += " disabled";
                     costProps.className += " insufficient";
                 } else {
+                    divProps.className += " interactive";
                     divProps.onClick = this.handleBuildingSelect.bind(null, building);
                 }
 

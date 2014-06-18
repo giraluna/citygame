@@ -473,7 +473,6 @@ class ReactUI
   {
     if (document.hidden) 
     {
-      console.log("hidden")
       return;
     }
 

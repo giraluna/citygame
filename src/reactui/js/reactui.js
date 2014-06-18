@@ -324,7 +324,6 @@ var ReactUI = (function () {
 
     ReactUI.prototype.updateReact = function () {
         if (document.hidden) {
-            console.log("hidden");
             return;
         }
 

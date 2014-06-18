@@ -1,8 +1,8 @@
 /// <reference path="../../lib/react.d.ts" />
 
 /// <reference path="js/sidemenubuildings.d.ts" />
-/// 
-/// <reference path="../js/eventlistener.d.ts" />
+/// <reference path="js/sidemenuzoom.d.ts" />
+
 module UIComponents
 {
 
@@ -56,32 +56,7 @@ export var SideMenu = React.createClass(
               "load"
             )
           ),
-          React.DOM.form( {
-              id:"size-menu-zoom",
-              className:"grid-row",
-              onSubmit: function(e)
-                {
-                  e.preventDefault();
-                  eventManager.dispatchEvent({type: "changeZoom", content:this.state.zoom});
-                  return false;
-                }
-            },
-            React.DOM.input(
-              {
-                type:"number",
-                className:"grid-row",
-                id:"zoom-amount",
-                defaultValue:"1",
-                step:0.1,
-                onChange: function(event)
-                {
-                  var target = <HTMLInputElement> event.target;
-                  this.setState({zoom: parseInt(target.value)});
-                  console.log(this);
-                }
-              }),
-            React.DOM.button( {id:"zoomBtn", className:"grid-row"}, "zoom")
-          )
+          UIComponents.SideMenuZoom()
 
         ),
         React.DOM.div( {id:"side-menu-stats"},

@@ -1415,9 +1415,9 @@ class Game
       //build
       var buildBtn = document.getElementById("buildBtn");
 
-      var onBuildingSelect = function(selected)
+      var onBuildingSelect = function(selected, continuous: boolean)
       {
-        self.tools.build.changeBuilding(selected);
+        self.tools.build.changeBuilding(selected, continuous);
         self.changeTool("build");
       }
 
@@ -1429,6 +1429,11 @@ class Game
             onOk: onBuildingSelect
           }
         });
+      });
+
+      eventManager.addEventListener("changeBuildingType", function(e)
+      {
+        onBuildingSelect(e.content.building, e.content.continuous);
       });
 
       //info
@@ -2658,6 +2663,7 @@ class BuildTool extends Tool
   canBuild: boolean;
   mainCell: Cell;
   continuous: boolean;
+  timesTriedToBuiltOnNonOwnedPlot: number = 0;
 
   constructor()
   {
@@ -2742,6 +2748,22 @@ class BuildTool extends Tool
           }
         })
       };
+    }
+    else if ( !selectedCells[0].player ||
+      selectedCells[0].player.id !== game.players.player0.id)
+    {
+      this.timesTriedToBuiltOnNonOwnedPlot++;
+      if (this.timesTriedToBuiltOnNonOwnedPlot % 3 === 0)
+      {
+        eventManager.dispatchEvent(
+        {
+          type: "makeInfoPopup",
+          content:
+          {
+            text: "You need to purchase that plot first"
+          }
+        })
+      }
     }
   }
 }

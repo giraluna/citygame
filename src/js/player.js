@@ -32,7 +32,7 @@ var Player = (function () {
         this.updateElements();
     };
     Player.prototype.updateElements = function () {
-        var beautified = beautify(this.money);
+        var beautified = beautify(this.money) + "$";
         this.moneySpan.innerHTML = beautified;
         eventManager.dispatchEvent({ type: "updatePlayerMoney", content: beautified });
         //this.incomeSpan.innerHTML = "+" + this.income + "/s";

@@ -50,7 +50,7 @@ class Player
   }
   updateElements()
   {
-    var beautified = beautify(this.money);
+    var beautified = beautify(this.money) + "$";
     this.moneySpan.innerHTML = beautified;
     eventManager.dispatchEvent({type: "updatePlayerMoney", content: beautified});
     //this.incomeSpan.innerHTML = "+" + this.income + "/s";

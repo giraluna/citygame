@@ -1,6 +1,7 @@
 /// <reference path="../../lib/react.d.ts" />
 ///
 /// <reference path="../../data/js/cg.d.ts" />
+/// <reference path="../js/eventlistener.d.ts" />
 var UIComponents;
 (function (UIComponents) {
     /**
@@ -9,12 +10,24 @@ var UIComponents;
     *   buildableTypes
     */
     UIComponents.SideMenuBuildings = React.createClass({
+        handleBuildingSelect: function (building, continuous) {
+            eventManager.dispatchEvent({
+                type: "changeBuildingType",
+                content: {
+                    building: building,
+                    continuous: continuous
+                }
+            });
+        },
         render: function () {
             var divs = [];
             var player = this.props.player;
 
             for (var i = 0; i < playerBuildableBuildings.length; i++) {
                 var building = playerBuildableBuildings[i];
+
+                var boundSelect = this.handleBuildingSelect.bind(null, building, false);
+                var boundContinuous = this.handleBuildingSelect.bind(null, building, true);
 
                 var buildCost = player.getBuildCost(building);
                 var canAfford = player.money >= buildCost;
@@ -31,9 +44,13 @@ var UIComponents;
                     divProps.className += " inactive";
                     costProps.className += " insufficient";
                 } else {
-                    divProps.onClick = function (type) {
-                        console.log(type);
-                    }.bind(null, building.type);
+                    divProps.onClick = function (e) {
+                        console.log(e.shiftKey);
+                        if (e.shiftKey)
+                            boundContinuous();
+                        else
+                            boundSelect();
+                    };
                 }
 
                 var image = this.props.frameImages[building.frame];

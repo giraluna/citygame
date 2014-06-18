@@ -312,6 +312,7 @@ declare class BuildTool extends Tool {
     public canBuild: boolean;
     public mainCell: Cell;
     public continuous: boolean;
+    public timesTriedToBuiltOnNonOwnedPlot: number;
     constructor();
     public setDefaults(): void;
     public changeBuilding(buildingType: any, continuous?: boolean): void;

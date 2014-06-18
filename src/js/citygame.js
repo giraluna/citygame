@@ -1110,8 +1110,8 @@ var Game = (function () {
         //build
         var buildBtn = document.getElementById("buildBtn");
 
-        var onBuildingSelect = function (selected) {
-            self.tools.build.changeBuilding(selected);
+        var onBuildingSelect = function (selected, continuous) {
+            self.tools.build.changeBuilding(selected, continuous);
             self.changeTool("build");
         };
 
@@ -1122,6 +1122,10 @@ var Game = (function () {
                     onOk: onBuildingSelect
                 }
             });
+        });
+
+        eventManager.addEventListener("changeBuildingType", function (e) {
+            onBuildingSelect(e.content.building, e.content.continuous);
         });
 
         //info
@@ -2110,6 +2114,7 @@ var BuildTool = (function (_super) {
     __extends(BuildTool, _super);
     function BuildTool() {
         _super.call(this);
+        this.timesTriedToBuiltOnNonOwnedPlot = 0;
         this.type = "build";
         this.mapmode = undefined;
         this.button = null;
@@ -2179,6 +2184,16 @@ var BuildTool = (function (_super) {
                 });
             }
             ;
+        } else if (!selectedCells[0].player || selectedCells[0].player.id !== game.players.player0.id) {
+            this.timesTriedToBuiltOnNonOwnedPlot++;
+            if (this.timesTriedToBuiltOnNonOwnedPlot % 3 === 0) {
+                eventManager.dispatchEvent({
+                    type: "makeInfoPopup",
+                    content: {
+                        text: "You need to purchase that plot first"
+                    }
+                });
+            }
         }
     };
     return BuildTool;

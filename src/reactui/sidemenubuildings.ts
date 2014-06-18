@@ -1,6 +1,7 @@
 /// <reference path="../../lib/react.d.ts" />
 /// 
 /// <reference path="../../data/js/cg.d.ts" />
+/// <reference path="../js/eventlistener.d.ts" />
 
 module UIComponents
 {
@@ -13,6 +14,18 @@ module UIComponents
 
 export var SideMenuBuildings = React.createClass(
 {
+  handleBuildingSelect: function(building, continuous)
+  {
+    eventManager.dispatchEvent(
+      {
+        type:"changeBuildingType",
+        content:
+        {
+          building: building,
+          continuous: continuous
+        }
+      })
+  },
   render: function()
   {
 
@@ -22,6 +35,9 @@ export var SideMenuBuildings = React.createClass(
     for (var i = 0; i < playerBuildableBuildings.length; i++)
     {
       var building = playerBuildableBuildings[i];
+
+      var boundSelect = this.handleBuildingSelect.bind(null, building, false);
+      var boundContinuous = this.handleBuildingSelect.bind(null, building, true);
 
       var buildCost = player.getBuildCost(building);
       var canAfford = player.money >= buildCost;
@@ -41,7 +57,12 @@ export var SideMenuBuildings = React.createClass(
       }
       else
       {
-        divProps.onClick = function(type){console.log(type)}.bind(null, building.type);
+        divProps.onClick = function(e)
+        {
+          console.log(e.shiftKey);
+          if (e.shiftKey) boundContinuous();
+          else boundSelect();
+        }
       }
 
       var image = this.props.frameImages[building.frame];

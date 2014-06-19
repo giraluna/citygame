@@ -5,5 +5,9 @@
 /// <reference path="sidemenustats.d.ts" />
 /// <reference path="sidemenutools.d.ts" />
 declare module UIComponents {
-    var SideMenu: React.ReactComponentFactory<{}, React.ReactComponent<{}, {}>>;
+    var SideMenu: React.ReactComponentFactory<{
+        selectedTool: any;
+    }, React.ReactComponent<{
+        selectedTool: any;
+    }, {}>>;
 }

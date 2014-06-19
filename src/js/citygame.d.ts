@@ -324,6 +324,11 @@ declare class BuildTool extends Tool {
     public changeBuilding(buildingType: any, continuous?: boolean): void;
     public activate(selectedCells: any[]): void;
 }
+declare var clickCount: number;
+declare class ClickTool extends Tool {
+    constructor();
+    public onActivate(target: Cell): void;
+}
 declare class NothingTool extends Tool {
     constructor();
     public onActivate(target: Cell): void;

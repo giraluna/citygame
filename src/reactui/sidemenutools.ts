@@ -17,7 +17,8 @@ export var SideMenuTools = React.createClass(
   },
   handleToolChange: function(type)
   {
-    this.refs[type].getDOMNode().classList.add("selected-tool");
+    this.props.setSelectedTool(type);
+
     eventManager.dispatchEvent(
     {
       type: "changeTool",
@@ -27,15 +28,42 @@ export var SideMenuTools = React.createClass(
 
   render: function()
   {
+
+    var props =
+    {
+      click:
+      {
+        ref: "click",
+        className:"grid-cell interactive",
+        onClick: this.handleToolChange.bind(null, "click")
+      },
+      buy:
+      {
+        ref: "buy",
+        className:"grid-cell interactive",
+        onClick: this.handleToolChange.bind(null, "buy")
+      },
+      sell:
+      {
+        ref: "sell",
+        className:"grid-cell interactive",
+        onClick: this.handleToolChange.bind(null, "sell")
+      }
+    }
+
+
+
+    var selectedTool = this.props.selectedTool;
+    if (selectedTool && props[selectedTool])
+    {
+      props[selectedTool].className += " selected-tool";
+    }
+
+
     return(
       React.DOM.div( {id:"side-menu-tools", className:"grid-column"},
         React.DOM.div( {className:"grid-row"},
-          React.DOM.div(
-            {
-              className:"grid-cell interactive"
-            },
-            "click"
-          ),
+          React.DOM.div(props.click, "click"),
           React.DOM.div(
             {
               ref: "recruit",
@@ -46,22 +74,8 @@ export var SideMenuTools = React.createClass(
           )
         ),
         React.DOM.div( {className:"grid-row"},
-          React.DOM.div(
-            {
-              ref: "buy",
-              className:"grid-cell interactive",
-              onClick: this.handleToolChange.bind(null, "buy")
-            },
-            "buy plot"
-          ),
-          React.DOM.div(
-            {
-              ref: "sell",
-              className:"grid-cell interactive",
-              onClick: this.handleToolChange.bind(null, "sell")
-            },
-            "sell"
-          )
+          React.DOM.div(props.buy, "buy plot"),
+          React.DOM.div(props.sell, "sell")
         )
       )
     );

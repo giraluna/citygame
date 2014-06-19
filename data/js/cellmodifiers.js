@@ -5,7 +5,7 @@ var cellModifiers;
         if (typeof strength === "undefined") { strength = 1; }
         return ({
             type: "niceEnviroment",
-            translate: "Nice enviroment",
+            title: "Nice enviroment",
             range: range,
             strength: strength,
             targets: ["apartment"],
@@ -27,7 +27,7 @@ var cellModifiers;
         if (typeof strength === "undefined") { strength = 1; }
         return ({
             type: "crowded",
-            translate: "Crowded",
+            title: "Crowded",
             range: range,
             strength: strength,
             targets: ["apartment"],
@@ -43,7 +43,7 @@ var cellModifiers;
         if (typeof strength === "undefined") { strength = 1; }
         return ({
             type: "population",
-            translate: "Nearby customers",
+            title: "Nearby customers",
             range: range,
             strength: strength,
             targets: ["fastfood", "shopping"],
@@ -65,7 +65,7 @@ var cellModifiers;
         if (typeof strength === "undefined") { strength = 1; }
         return ({
             type: "fastfoodCompetition",
-            translate: "Competing restaurants",
+            title: "Competing restaurants",
             range: range,
             strength: strength,
             targets: ["fastfood"],
@@ -81,7 +81,7 @@ var cellModifiers;
         if (typeof strength === "undefined") { strength = 1; }
         return ({
             type: "shoppingCompetition",
-            translate: "Competing stores",
+            title: "Competing stores",
             range: range,
             strength: strength,
             targets: ["shopping"],
@@ -97,7 +97,7 @@ var cellModifiers;
         if (typeof strength === "undefined") { strength = 1; }
         return ({
             type: "nearbyShopping",
-            translate: "Nearby stores",
+            title: "Nearby stores",
             range: range,
             strength: strength,
             targets: ["fastfood"],
@@ -112,7 +112,7 @@ var cellModifiers;
         if (typeof strength === "undefined") { strength = 1; }
         return ({
             type: "nearbyStation",
-            translate: "Nearby station",
+            title: "Nearby station",
             range: range,
             strength: strength,
             targets: ["fastfood", "shopping", "office", "apartment"],
@@ -135,7 +135,7 @@ var cellModifiers;
         if (typeof strength === "undefined") { strength = 1; }
         return ({
             type: "parkingCompetition",
-            translate: "Competing stores",
+            title: "Competing stores",
             range: range,
             strength: strength,
             targets: ["parking"],
@@ -151,7 +151,7 @@ var cellModifiers;
         if (typeof strength === "undefined") { strength = 1; }
         return ({
             type: "nearbyParking",
-            translate: "Nearby parking",
+            title: "Nearby parking",
             range: range,
             strength: strength,
             targets: ["fastfood", "shopping"],
@@ -166,7 +166,7 @@ var cellModifiers;
         if (typeof strength === "undefined") { strength = 1; }
         return ({
             type: "nearbyFactory",
-            translate: "Nearby Factory",
+            title: "Nearby Factory",
             range: range,
             strength: strength,
             targets: ["fastfood", "shopping", "apartment", "office"],

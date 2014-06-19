@@ -11,16 +11,31 @@ module UIComponents
 
 export var SideMenu = React.createClass(
 {
+  getInitialState: function()
+  {
+    return {selectedTool: null};
+  },
+  setSelectedTool: function(type)
+  {
+    this.setState({selectedTool: type});
+  },
   render: function()
   {
 
     return(
       React.DOM.div( {id:"react-side-menu"},
-        UIComponents.SideMenuTools(),
+        UIComponents.SideMenuTools(
+          {
+            setSelectedTool: this.setSelectedTool,
+            selectedTool: this.state.selectedTool
+          }
+        ),
         UIComponents.SideMenuBuildings(
           {
             player: this.props.player,
-            frameImages: this.props.frameImages
+            frameImages: this.props.frameImages,
+            setSelectedTool: this.setSelectedTool,
+            selectedTool: this.state.selectedTool
           }
         ),
 

@@ -1008,6 +1008,7 @@ var Game = (function () {
         this.tools.road = new RoadTool();
         this.tools.subway = new SubwayTool();
 
+        this.tools.click = new ClickTool();
         this.tools.buy = new BuyTool();
         this.tools.build = new BuildTool();
         this.tools.sell = new SellTool();
@@ -1710,7 +1711,9 @@ var MouseEventHandler = (function () {
         this.selectedCells = game.activeBoard.getCells(game.activeTool.selectType(this.startCell, this.currCell));
 
         game.highlighter.clearSprites();
-        game.highlighter.tintCells(this.selectedCells, game.activeTool.tintColor);
+        if (game.activeTool.tintColor !== null) {
+            game.highlighter.tintCells(this.selectedCells, game.activeTool.tintColor);
+        }
         game.updateWorld();
     };
     MouseEventHandler.prototype.worldMove = function (event) {
@@ -1730,7 +1733,9 @@ var MouseEventHandler = (function () {
             excludeStart: true
             });*/
             game.highlighter.clearSprites();
-            game.highlighter.tintCells(this.selectedCells, game.activeTool.tintColor);
+            if (game.activeTool.tintColor !== null) {
+                game.highlighter.tintCells(this.selectedCells, game.activeTool.tintColor);
+            }
             game.updateWorld();
         }
     };
@@ -1817,7 +1822,7 @@ var UIDrawer = (function () {
         var screenX = event.global.x;
         var screenY = event.global.y;
 
-        var text = cell.content ? cell.content.type["translate"] || cell.content.type.type : cell.type["type"];
+        var text = cell.content ? cell.content.type.title || cell.content.type.type : cell.type["type"];
 
         if (game.worldRenderer.currentMapmode === "landValue") {
             text += "\nLand value: " + cell.landValue;
@@ -1836,7 +1841,7 @@ var UIDrawer = (function () {
             text += "-------\n";
             for (var modifier in cell.content.modifiers) {
                 var _mod = cell.content.modifiers[modifier];
-                text += "Modifier: " + _mod.translate + "\n";
+                text += "Modifier: " + _mod.title + "\n";
                 text += "Strength: " + _mod.strength + "\n";
                 text += "Adj strength: " + _mod.scaling(_mod.strength).toFixed(3) + "\n";
                 text += "--------------\n";
@@ -2235,6 +2240,24 @@ var BuildTool = (function (_super) {
     };
     return BuildTool;
 })(Tool);
+var clickCount = 0;
+
+var ClickTool = (function (_super) {
+    __extends(ClickTool, _super);
+    function ClickTool() {
+        _super.call(this);
+        this.type = "click";
+        this.selectType = singleSelect;
+        this.tintColor = null;
+        this.mapmode = undefined;
+        this.button = null;
+    }
+    ClickTool.prototype.onActivate = function (target) {
+        // TODO direct reference
+        game.uiDrawer.makeCellPopup(target, "" + clickCount++, game.worldRenderer.worldSprite);
+    };
+    return ClickTool;
+})(Tool);
 
 var NothingTool = (function (_super) {
     __extends(NothingTool, _super);
@@ -2242,7 +2265,7 @@ var NothingTool = (function (_super) {
         _super.call(this);
         this.type = "nothing";
         this.selectType = singleSelect;
-        this.tintColor = 0xFFFFFF;
+        this.tintColor = null;
         this.mapmode = undefined;
         this.button = null;
     }

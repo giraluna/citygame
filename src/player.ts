@@ -12,6 +12,7 @@ class Player
   money: number = 0;
   level: number = 1;
   experience: number = 0;
+  experienceForCurrentLevel: number = 0;
   experienceToNextLevel: number = 0;
   eventListener: any;
 
@@ -366,11 +367,14 @@ class Player
   }
   setExperienceToNextLevel()
   {
+    this.experienceForCurrentLevel = this.experienceToNextLevel;
     this.experienceToNextLevel += this.getExperienceForLevel(this.level);
   }
   getExperiencePercentage()
   {
-    return Math.floor( 100 * ( this.experience / this.experienceToNextLevel ) )
+    var current = this.experience - this.experienceForCurrentLevel;
+
+    return Math.floor( 100 * ( current / this.getExperienceForLevel(this.level) ) );
   }
 }
 

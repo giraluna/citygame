@@ -8,7 +8,7 @@ module cellModifiers
     return(
     {
       type: "niceEnviroment",
-      translate: "Nice enviroment",
+      title: "Nice enviroment",
       range: range,
       strength: strength,
       targets: ["apartment"],
@@ -30,7 +30,7 @@ module cellModifiers
     return(
     {
       type: "crowded",
-      translate: "Crowded",
+      title: "Crowded",
       range: range,
       strength: strength,
       targets: ["apartment"],
@@ -47,7 +47,7 @@ module cellModifiers
     return(
     {
       type: "population",
-      translate: "Nearby customers",
+      title: "Nearby customers",
       range: range,
       strength: strength,
       targets: ["fastfood", "shopping"],
@@ -72,7 +72,7 @@ module cellModifiers
     return(
     {
       type: "fastfoodCompetition",
-      translate: "Competing restaurants",
+      title: "Competing restaurants",
       range: range,
       strength: strength,
       targets: ["fastfood"],
@@ -89,7 +89,7 @@ module cellModifiers
     return(
     {
       type: "shoppingCompetition",
-      translate: "Competing stores",
+      title: "Competing stores",
       range: range,
       strength: strength,
       targets: ["shopping"],
@@ -106,7 +106,7 @@ module cellModifiers
     return(
     {
       type: "nearbyShopping",
-      translate: "Nearby stores",
+      title: "Nearby stores",
       range: range,
       strength: strength,
       targets: ["fastfood"],
@@ -122,7 +122,7 @@ module cellModifiers
     return(
     {
       type: "nearbyStation",
-      translate: "Nearby station",
+      title: "Nearby station",
       range: range,
       strength: strength,
       targets: ["fastfood", "shopping", "office", "apartment"],
@@ -148,7 +148,7 @@ module cellModifiers
     return(
     {
       type: "parkingCompetition",
-      translate: "Competing stores",
+      title: "Competing stores",
       range: range,
       strength: strength,
       targets: ["parking"],
@@ -165,7 +165,7 @@ module cellModifiers
     return(
     {
       type: "nearbyParking",
-      translate: "Nearby parking",
+      title: "Nearby parking",
       range: range,
       strength: strength,
       targets: ["fastfood", "shopping"],
@@ -181,7 +181,7 @@ module cellModifiers
     return(
     {
       type: "nearbyFactory",
-      translate: "Nearby Factory",
+      title: "Nearby Factory",
       range: range,
       strength: strength,
       targets: ["fastfood", "shopping", "apartment", "office"],

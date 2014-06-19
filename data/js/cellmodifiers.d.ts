@@ -2,7 +2,7 @@
 declare module cellModifiers {
     function niceEnviroment(range: number, strength?: number): {
         type: string;
-        translate: string;
+        title: string;
         range: number;
         strength: number;
         targets: string[];
@@ -17,7 +17,7 @@ declare module cellModifiers {
     };
     function crowded(range: number, strength?: number): {
         type: string;
-        translate: string;
+        title: string;
         range: number;
         strength: number;
         targets: string[];
@@ -28,7 +28,7 @@ declare module cellModifiers {
     };
     function population(range: number, strength?: number): {
         type: string;
-        translate: string;
+        title: string;
         range: number;
         strength: number;
         targets: string[];
@@ -43,7 +43,7 @@ declare module cellModifiers {
     };
     function fastfoodCompetition(range: number, strength?: number): {
         type: string;
-        translate: string;
+        title: string;
         range: number;
         strength: number;
         targets: string[];
@@ -54,7 +54,7 @@ declare module cellModifiers {
     };
     function shoppingCompetition(range: number, strength?: number): {
         type: string;
-        translate: string;
+        title: string;
         range: number;
         strength: number;
         targets: string[];
@@ -65,7 +65,7 @@ declare module cellModifiers {
     };
     function nearbyShopping(range: number, strength?: number): {
         type: string;
-        translate: string;
+        title: string;
         range: number;
         strength: number;
         targets: string[];
@@ -75,7 +75,7 @@ declare module cellModifiers {
     };
     function nearbyStation(range: number, strength?: number): {
         type: string;
-        translate: string;
+        title: string;
         range: number;
         strength: number;
         targets: string[];
@@ -91,7 +91,7 @@ declare module cellModifiers {
     };
     function parkingCompetition(range: number, strength?: number): {
         type: string;
-        translate: string;
+        title: string;
         range: number;
         strength: number;
         targets: string[];
@@ -102,7 +102,7 @@ declare module cellModifiers {
     };
     function nearbyParking(range: number, strength?: number): {
         type: string;
-        translate: string;
+        title: string;
         range: number;
         strength: number;
         targets: string[];
@@ -112,7 +112,7 @@ declare module cellModifiers {
     };
     function nearbyFactory(range: number, strength?: number): {
         type: string;
-        translate: string;
+        title: string;
         range: number;
         strength: number;
         targets: string[];

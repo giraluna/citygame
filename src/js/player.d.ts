@@ -9,6 +9,7 @@ declare class Player {
     public money: number;
     public level: number;
     public experience: number;
+    public experienceForCurrentLevel: number;
     public experienceToNextLevel: number;
     public eventListener: any;
     public ownedContent: any;

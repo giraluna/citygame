@@ -16,6 +16,9 @@ export var SideMenuBuildings = React.createClass(
 {
   handleBuildingSelect: function(building, e)
   {
+    this.props.setSelectedTool(building.type);
+
+
     var continuous = e.shiftKey;
 
     eventManager.dispatchEvent(
@@ -33,7 +36,6 @@ export var SideMenuBuildings = React.createClass(
 
     var divs = [];
     var player = this.props.player;
-    console.log(player.money);
     
     for (var i = 0; i < playerBuildableBuildings.length; i++)
     {
@@ -61,6 +63,14 @@ export var SideMenuBuildings = React.createClass(
         divProps.onClick = this.handleBuildingSelect.bind(null, building);
       }
 
+
+      if (this.props.selectedTool &&
+        this.props.selectedTool === building.type)
+      {
+        divProps.className += " selected-tool";
+      }
+
+
       var image = this.props.frameImages[building.frame];
       imageProps.src = image.src;
 
@@ -69,7 +79,7 @@ export var SideMenuBuildings = React.createClass(
 
         React.DOM.div({className: "building-content"},
           React.DOM.div({className: "building-content-wrapper"},
-            React.DOM.div(titleProps, building.translate),
+            React.DOM.div(titleProps, building.title),
             React.DOM.div(costProps, "" + buildCost + "$")
           ),
           React.DOM.div(amountProps, amountBuilt)

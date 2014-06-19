@@ -11,6 +11,8 @@ var UIComponents;
     */
     UIComponents.SideMenuBuildings = React.createClass({
         handleBuildingSelect: function (building, e) {
+            this.props.setSelectedTool(building.type);
+
             var continuous = e.shiftKey;
 
             eventManager.dispatchEvent({
@@ -24,7 +26,6 @@ var UIComponents;
         render: function () {
             var divs = [];
             var player = this.props.player;
-            console.log(player.money);
 
             for (var i = 0; i < playerBuildableBuildings.length; i++) {
                 var building = playerBuildableBuildings[i];
@@ -48,10 +49,14 @@ var UIComponents;
                     divProps.onClick = this.handleBuildingSelect.bind(null, building);
                 }
 
+                if (this.props.selectedTool && this.props.selectedTool === building.type) {
+                    divProps.className += " selected-tool";
+                }
+
                 var image = this.props.frameImages[building.frame];
                 imageProps.src = image.src;
 
-                var div = React.DOM.div(divProps, React.DOM.img(imageProps, null), React.DOM.div({ className: "building-content" }, React.DOM.div({ className: "building-content-wrapper" }, React.DOM.div(titleProps, building.translate), React.DOM.div(costProps, "" + buildCost + "$")), React.DOM.div(amountProps, amountBuilt)));
+                var div = React.DOM.div(divProps, React.DOM.img(imageProps, null), React.DOM.div({ className: "building-content" }, React.DOM.div({ className: "building-content-wrapper" }, React.DOM.div(titleProps, building.title), React.DOM.div(costProps, "" + buildCost + "$")), React.DOM.div(amountProps, amountBuilt)));
 
                 divs.push(div);
             }

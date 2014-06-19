@@ -9,6 +9,7 @@ var Player = (function () {
         this.money = 0;
         this.level = 1;
         this.experience = 0;
+        this.experienceForCurrentLevel = 0;
         this.experienceToNextLevel = 0;
         this.ownedContent = {};
         this.amountBuiltPerType = {};
@@ -295,10 +296,13 @@ var Player = (function () {
         }
     };
     Player.prototype.setExperienceToNextLevel = function () {
+        this.experienceForCurrentLevel = this.experienceToNextLevel;
         this.experienceToNextLevel += this.getExperienceForLevel(this.level);
     };
     Player.prototype.getExperiencePercentage = function () {
-        return Math.floor(100 * (this.experience / this.experienceToNextLevel));
+        var current = this.experience - this.experienceForCurrentLevel;
+
+        return Math.floor(100 * (current / this.getExperienceForLevel(this.level)));
     };
     return Player;
 })();

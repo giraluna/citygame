@@ -56,7 +56,7 @@ var UIComponents;
                 var image = this.props.frameImages[building.frame];
                 imageProps.src = image.src;
 
-                var div = React.DOM.div(divProps, React.DOM.img(imageProps, null), React.DOM.div({ className: "building-content" }, React.DOM.div({ className: "building-content-wrapper" }, React.DOM.div(titleProps, building.title), React.DOM.div(costProps, "" + buildCost + "$")), React.DOM.div(amountProps, amountBuilt)));
+                var div = React.DOM.div(divProps, React.DOM.div({ className: "building-image-container" }, React.DOM.img(imageProps, null)), React.DOM.div({ className: "building-content" }, React.DOM.div({ className: "building-content-wrapper" }, React.DOM.div(titleProps, building.title), React.DOM.div(costProps, "" + buildCost + "$")), React.DOM.div(amountProps, amountBuilt)));
 
                 divs.push(div);
             }

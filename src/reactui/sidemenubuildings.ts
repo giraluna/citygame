@@ -75,7 +75,9 @@ export var SideMenuBuildings = React.createClass(
       imageProps.src = image.src;
 
       var div = React.DOM.div(divProps,
-        React.DOM.img(imageProps, null),
+        React.DOM.div({className: "building-image-container"},
+          React.DOM.img(imageProps, null)
+        ),
 
         React.DOM.div({className: "building-content"},
           React.DOM.div({className: "building-content-wrapper"},

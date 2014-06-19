@@ -931,6 +931,7 @@ var Game = (function () {
         this.systemsManager = new SystemsManager(1000);
         var id = "player" + (idGenerator.player++);
         var player = new Player(id);
+        player.money += 10;
 
         //player.addMoney(100);
         this.reactUI = new ReactUI(player, this.frameImages);
@@ -2255,7 +2256,7 @@ var ClickTool = (function (_super) {
     }
     ClickTool.prototype.onActivate = function (target) {
         // TODO direct reference
-        game.uiDrawer.makeCellPopup(target, "" + clickCount, game.worldRenderer.worldSprite);
+        game.uiDrawer.makeCellPopup(target, "" + clickCount++, game.worldRenderer.worldSprite);
     };
     return ClickTool;
 })(Tool);

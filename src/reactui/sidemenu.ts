@@ -2,6 +2,7 @@
 
 /// <reference path="js/sidemenubuildings.d.ts" />
 /// <reference path="js/sidemenuzoom.d.ts" />
+/// <reference path="js/sidemenumapmode.d.ts" />
 /// <reference path="js/sidemenusave.d.ts" />
 /// <reference path="js/sidemenustats.d.ts" />
 /// <reference path="js/sidemenutools.d.ts" />
@@ -41,6 +42,7 @@ export var SideMenu = React.createClass(
 
         React.DOM.div( {id:"side-menu-other-buttons", className:"grid-column"}, 
           UIComponents.SideMenuSave(),
+          UIComponents.SideMenuMapmode(),
           UIComponents.SideMenuZoom()
 
         ),

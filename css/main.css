@@ -65,8 +65,17 @@ body {
   border: 0;
 }
 progress {
-  color: #0063a6;
-  background: #fff;
+  color: #080;
+  background: #888;
+}
+progress::-moz-progress-bar {
+  background: #080;
+}
+progress::-webkit-progress-bar {
+  background: #888;
+}
+progress::-webkit-progress-value {
+  background: #080;
 }
 #main {
   position: relative;
@@ -334,7 +343,7 @@ progress {
   flex: 0 0 30px;
 }
 #side-menu-other-buttons {
-  flex: 0 0 50px;
+  flex: 0 0 75px;
   order: 3;
 }
 #side-menu-stats {

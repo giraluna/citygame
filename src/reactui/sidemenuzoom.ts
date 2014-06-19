@@ -7,6 +7,10 @@ module UIComponents
 
 export var SideMenuZoom = React.createClass(
 {
+  getInitialState: function()
+  {
+    return {zoom: 1};
+  },
   handleZoomChange: function(event)
   {
     var target = <HTMLInputElement> event.target;
@@ -18,6 +22,12 @@ export var SideMenuZoom = React.createClass(
     event.preventDefault();
     eventManager.dispatchEvent({type: "changeZoom", content:this.state.zoom});
     return false;
+  },
+  handleMapmodeChange: function(event)
+  {
+    var target = <HTMLInputElement> event.target;
+
+    eventManager.dispatchEvent({type: "changeMapmode", content:target.value});
   },
   componentDidMount: function()
   {
@@ -33,9 +43,28 @@ export var SideMenuZoom = React.createClass(
 
   render: function()
   {
+    var options = [];
+
+    ["terrain", "landValue", "underground"].forEach(function(type)
+    {
+      var props =
+      {
+        key: type,
+        value: type
+      }
+      var option = React.DOM.option(props, type);
+    });
+
     return(
+      React.DOM.select(
+        {
+          id: "side-menu-mapmode-select",
+          value: "landValue",
+        },
+        options
+      ),
       React.DOM.form( {
-          id:"size-menu-zoom",
+          id:"side-menu-zoom",
           className:"grid-row",
           onSubmit: this.handleZoomSubmit
         },

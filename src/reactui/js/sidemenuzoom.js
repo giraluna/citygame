@@ -4,6 +4,9 @@
 var UIComponents;
 (function (UIComponents) {
     UIComponents.SideMenuZoom = React.createClass({
+        getInitialState: function () {
+            return { zoom: 1 };
+        },
         handleZoomChange: function (event) {
             var target = event.target;
 
@@ -13,6 +16,11 @@ var UIComponents;
             event.preventDefault();
             eventManager.dispatchEvent({ type: "changeZoom", content: this.state.zoom });
             return false;
+        },
+        handleMapmodeChange: function (event) {
+            var target = event.target;
+
+            eventManager.dispatchEvent({ type: "changeMapmode", content: target.value });
         },
         componentDidMount: function () {
             var self = this;
@@ -24,8 +32,21 @@ var UIComponents;
             });
         },
         render: function () {
-            return (React.DOM.form({
-                id: "size-menu-zoom",
+            var options = [];
+
+            ["terrain", "landValue", "underground"].forEach(function (type) {
+                var props = {
+                    key: type,
+                    value: type
+                };
+                var option = React.DOM.option(props, type);
+            });
+
+            return (React.DOM.select({
+                id: "side-menu-mapmode-select",
+                value: "landValue"
+            }, options), React.DOM.form({
+                id: "side-menu-zoom",
                 className: "grid-row",
                 onSubmit: this.handleZoomSubmit
             }, React.DOM.input({

@@ -1085,6 +1085,7 @@ class WorldRenderer
     switch (newMapmode)
     {
       case "default":
+      case "terrain":
       {
         this.changeMapmode("default");
         return;
@@ -2837,7 +2838,7 @@ class ClickTool extends Tool
   onActivate(target: Cell)
   {
     // TODO direct reference
-    game.uiDrawer.makeCellPopup(target, "" +, game.worldRenderer.worldSprite);
+    game.uiDrawer.makeCellPopup(target, "" + clickCount, game.worldRenderer.worldSprite);
   }
 }
 

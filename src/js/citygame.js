@@ -838,7 +838,8 @@ var WorldRenderer = (function () {
     WorldRenderer.prototype.setMapmode = function (newMapmode) {
         var zoomLayer = this.layers["zoom" + this.zoomLevel];
         switch (newMapmode) {
-            case "default": {
+            case "default":
+            case "terrain": {
                 this.changeMapmode("default");
                 return;
             }
@@ -2254,7 +2255,7 @@ var ClickTool = (function (_super) {
     }
     ClickTool.prototype.onActivate = function (target) {
         // TODO direct reference
-        game.uiDrawer.makeCellPopup(target, "" + clickCount++, game.worldRenderer.worldSprite);
+        game.uiDrawer.makeCellPopup(target, "" + clickCount, game.worldRenderer.worldSprite);
     };
     return ClickTool;
 })(Tool);

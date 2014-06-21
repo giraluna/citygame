@@ -185,32 +185,36 @@ module cityGeneration
     var horDirs = [];
     var verDirs = [];
 
-    ["n", "s"].forEach(function(dir)
+    [["n", "s"], ["e", "w"]].forEach(function(dirSet)
     {
-      if (landDirs.indexOf(dir) !== -1) verDirs.push(dir);
-    });
-    ["e", "w"].forEach(function(dir)
-    {
-      if (landDirs.indexOf(dir) !== -1) horDirs.push(dir);
-    });
-
-    [horDirs, verDirs].forEach(function(dirSet)
-    {
-      if (dirSet.length === 1)
+      var roads = [];
+      dirSet.forEach(function(dir)
       {
-        var side = landDirs.length > 1 ? 1 : -1;
-        adjust[0] += adjustMappings[dirSet[0]][1] * side;
-        adjust[1] += adjustMappings[dirSet[0]][0] * side;
-      }
-      else if (dirSet.length > 1)
+        if (landDirs.indexOf(dir) > -1) roads.push(dir);
+      });
+      if (roads.length > 0)
       {
-        var dirToModify = adjust[0] === 0 ? 0 : 1;
-        adjust[dirToModify] += Math.round(Math.random()) * 2 - 1; //-1 or 1
+        if (landDirs.length <= 1)
+        {
+          adjust[0] += adjustMappings[roads[0]][1];
+          adjust[1] += adjustMappings[roads[0]][0];
+        }
+        else if (roads.length === 1)
+        {
+          adjust[0] += adjustMappings[roads[0]][0];
+          adjust[1] += adjustMappings[roads[0]][1];
+        }
+        else
+        {
+          var dirToUse = getRandomArrayItem(dirSet);
+          adjust[0] += adjustMappings[dirToUse][0];
+          adjust[1] += adjustMappings[dirToUse][1];
+        }
       }
     });
+    
     start[0] += adjust[0];
     start[1] += adjust[1];
-    
 
     for (var dir in connectedToLand)
     {

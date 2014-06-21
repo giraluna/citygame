@@ -716,12 +716,20 @@ var cg: any =
   }
 };
 
+var buildingTypeIndexes: any = {};
+
 function findType(typeName: string, target: any = cg)
 {
+  if (buildingTypeIndexes[typeName])
+  {
+    return buildingTypeIndexes[typeName];
+  }
+
   for (var prop in target)
   {
     if (target[prop].type === typeName)
     {
+      buildingTypeIndexes[typeName] = target[prop];
       return target[prop]
     }
     else if (typeof target[prop] === "object" && !target[prop].type)
@@ -769,5 +777,11 @@ function findType(typeName: string, target: any = cg)
 
 var playerBuildableBuildings = [];
 [
-  "house1", "house2", "parkinglot", "fastfood", "conveniencestore", "smalloffice"
+  "parkinglot",
+  "fastfood",
+  "conveniencestore",
+  "house1",
+  "smalloffice",
+  "factory",
+  "house2"
 ].forEach(function(type){playerBuildableBuildings.push(findType(type))});

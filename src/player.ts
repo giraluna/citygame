@@ -34,6 +34,7 @@ class Player
     recruitQuality: 1
   };
 
+  indexedProfits: any = {};
 
   moneySpan: HTMLElement;
   incomeSpan: HTMLElement;
@@ -44,18 +45,12 @@ class Player
     this.color = color;
     this.init();
     if (experience) this.addExperience(experience);
-    this.bindElements();
-  }
-  bindElements()
-  {
-    this.moneySpan = document.getElementById("money");
-    this.incomeSpan = document.getElementById("income");
     this.updateElements();
   }
   updateElements()
   {
     var beautified = beautify(this.money) + "$";
-    this.moneySpan.innerHTML = beautified;
+
     eventManager.dispatchEvent({type: "updatePlayerMoney", content: beautified});
     eventManager.dispatchEvent(
       {
@@ -69,7 +64,6 @@ class Player
         }
       }
     );
-    //this.incomeSpan.innerHTML = "+" + this.income + "/s";
   }
   init()
   {
@@ -199,25 +193,13 @@ class Player
     this.addMoney(value, "soldContent");
     this.removeContent(content);
   }
-  addMoney(initialAmount, incomeType?: string, date?)
+  addMoney(initialAmount, incomeType?: string, daysPerTick?: number, date?)
   {
-    var amount = initialAmount;
+    var amount = this.getIndexedProfit(incomeType, initialAmount);
+
     if (amount > 0)
     {
-      amount += this.modifierEffects.profit["global"].addedProfit;
-
-      if (incomeType)
-      {
-        if (this.modifierEffects.profit[incomeType])
-        {
-          amount += this.modifierEffects.profit[incomeType].addedProfit;
-          amount *= this.modifierEffects.profit[incomeType].multiplier;
-        }
-      }
-      amount *= this.modifierEffects.profit["global"].multiplier;
-
-      if (amount < 0) amount = 0;
-
+      if (daysPerTick) amount *= daysPerTick;
       this.addExperience(amount);
     }
 
@@ -277,6 +259,7 @@ class Player
           this.modifierEffects.profit[type].multiplier *=
             effect.multiplier;
         }
+        this.clearIndexedProfits();
       }
     }
   }
@@ -313,6 +296,7 @@ class Player
           this.modifierEffects.profit[type].multiplier *=
             (1 / effect.multiplier);
         }
+        this.clearIndexedProfits();
       }
     }
 
@@ -375,6 +359,42 @@ class Player
     var current = this.experience - this.experienceForCurrentLevel;
 
     return Math.floor( 100 * ( current / this.getExperienceForLevel(this.level) ) );
+  }
+  getModifiedProfit(initialAmount: number, type?: string)
+  {
+    var amount = initialAmount;
+    if (amount > 0)
+    {
+      amount += this.modifierEffects.profit["global"].addedProfit;
+
+      if (type)
+      {
+        if (this.modifierEffects.profit[type])
+        {
+          amount += this.modifierEffects.profit[type].addedProfit;
+          amount *= this.modifierEffects.profit[type].multiplier;
+        }
+      }
+      amount *= this.modifierEffects.profit["global"].multiplier;
+
+      if (amount < 0) amount = 0;
+    }
+    return amount;
+  }
+  getIndexedProfit(type, amount)
+  {
+    if (!this.indexedProfits[type]) this.indexedProfits[type] = {};
+
+    if (!this.indexedProfits[type][amount])
+    {
+      this.indexedProfits[type][amount] = this.getModifiedProfit(amount, type);
+    }
+
+    return this.indexedProfits[type][amount];
+  }
+  clearIndexedProfits()
+  {
+    this.indexedProfits = {};
   }
 }
 

@@ -24,21 +24,17 @@ var Player = (function () {
             buildCost: {},
             recruitQuality: 1
         };
+        this.indexedProfits = {};
         this.id = id;
         this.color = color;
         this.init();
         if (experience)
             this.addExperience(experience);
-        this.bindElements();
-    }
-    Player.prototype.bindElements = function () {
-        this.moneySpan = document.getElementById("money");
-        this.incomeSpan = document.getElementById("income");
         this.updateElements();
-    };
+    }
     Player.prototype.updateElements = function () {
         var beautified = beautify(this.money) + "$";
-        this.moneySpan.innerHTML = beautified;
+
         eventManager.dispatchEvent({ type: "updatePlayerMoney", content: beautified });
         eventManager.dispatchEvent({
             type: "updatePlayerExp",
@@ -49,7 +45,6 @@ var Player = (function () {
                 percentage: this.getExperiencePercentage()
             }
         });
-        //this.incomeSpan.innerHTML = "+" + this.income + "/s";
     };
     Player.prototype.init = function () {
         for (var building in cg.content.buildings) {
@@ -160,22 +155,12 @@ var Player = (function () {
         this.addMoney(value, "soldContent");
         this.removeContent(content);
     };
-    Player.prototype.addMoney = function (initialAmount, incomeType, date) {
-        var amount = initialAmount;
+    Player.prototype.addMoney = function (initialAmount, incomeType, daysPerTick, date) {
+        var amount = this.getIndexedProfit(incomeType, initialAmount);
+
         if (amount > 0) {
-            amount += this.modifierEffects.profit["global"].addedProfit;
-
-            if (incomeType) {
-                if (this.modifierEffects.profit[incomeType]) {
-                    amount += this.modifierEffects.profit[incomeType].addedProfit;
-                    amount *= this.modifierEffects.profit[incomeType].multiplier;
-                }
-            }
-            amount *= this.modifierEffects.profit["global"].multiplier;
-
-            if (amount < 0)
-                amount = 0;
-
+            if (daysPerTick)
+                amount *= daysPerTick;
             this.addExperience(amount);
         }
 
@@ -223,6 +208,7 @@ var Player = (function () {
                 if (effect.multiplier) {
                     this.modifierEffects.profit[type].multiplier *= effect.multiplier;
                 }
+                this.clearIndexedProfits();
             }
         }
     };
@@ -250,6 +236,7 @@ var Player = (function () {
                 if (effect.multiplier) {
                     this.modifierEffects.profit[type].multiplier *= (1 / effect.multiplier);
                 }
+                this.clearIndexedProfits();
             }
         }
 
@@ -303,6 +290,37 @@ var Player = (function () {
         var current = this.experience - this.experienceForCurrentLevel;
 
         return Math.floor(100 * (current / this.getExperienceForLevel(this.level)));
+    };
+    Player.prototype.getModifiedProfit = function (initialAmount, type) {
+        var amount = initialAmount;
+        if (amount > 0) {
+            amount += this.modifierEffects.profit["global"].addedProfit;
+
+            if (type) {
+                if (this.modifierEffects.profit[type]) {
+                    amount += this.modifierEffects.profit[type].addedProfit;
+                    amount *= this.modifierEffects.profit[type].multiplier;
+                }
+            }
+            amount *= this.modifierEffects.profit["global"].multiplier;
+
+            if (amount < 0)
+                amount = 0;
+        }
+        return amount;
+    };
+    Player.prototype.getIndexedProfit = function (type, amount) {
+        if (!this.indexedProfits[type])
+            this.indexedProfits[type] = {};
+
+        if (!this.indexedProfits[type][amount]) {
+            this.indexedProfits[type][amount] = this.getModifiedProfit(amount, type);
+        }
+
+        return this.indexedProfits[type][amount];
+    };
+    Player.prototype.clearIndexedProfits = function () {
+        this.indexedProfits = {};
     };
     return Player;
 })();

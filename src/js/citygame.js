@@ -938,7 +938,7 @@ var Game = (function () {
         this.players[player.id] = player;
 
         // TODO have content types register themselves
-        var dailyProfitSystem = new ProfitSystem(1, this.systemsManager, this.players, ["fastfood", "shopping", "parking"]);
+        var dailyProfitSystem = new ProfitSystem(1, this.systemsManager, this.players, ["fastfood", "shopping", "parking", "factory"]);
         var monthlyProfitSystem = new ProfitSystem(30, this.systemsManager, this.players, ["apartment"]);
         var quarterlyProfitSystem = new ProfitSystem(90, this.systemsManager, this.players, ["office"]);
         this.systemsManager.addSystem("dailyProfitSystem", dailyProfitSystem);
@@ -1759,12 +1759,10 @@ var MouseEventHandler = (function () {
         var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
 
         // TEMPORARY
-        if (!gridPos)
+        if ((!gridPos) || (gridPos[0] >= TILES || gridPos[1] >= TILES) || (gridPos[0] < 0 || gridPos[1] < 0)) {
+            game.uiDrawer.removeActive();
             return;
-        if (gridPos[0] >= TILES || gridPos[1] >= TILES)
-            return;
-        else if (gridPos[0] < 0 || gridPos[1] < 0)
-            return;
+        }
 
         if (!this.hoverCell)
             this.hoverCell = gridPos;
@@ -1828,16 +1826,9 @@ var UIDrawer = (function () {
 
         if (game.worldRenderer.currentMapmode === "landValue") {
             text += "\nLand value: " + cell.landValue;
-            for (var modifier in cell.landValueModifiers) {
-                text += "\n-------\n";
-                var _mod = cell.landValueModifiers[modifier];
-                text += "Modifier: " + modifier + "\n";
-                text += "Strength: " + _mod.strength + "\n";
-                if (_mod.scalingFN) {
-                    text += "Adj strength: " + _mod.scalingFN(_mod.strength).toFixed(3) + "\n";
-                }
-            }
+            text += "\nApproximate cost: " + parseInt(game.players.player0.getCellBuyCost(cell.landValue));
         } else if (cell.content && cell.content.baseProfit) {
+            var finalAmount = game.players.player0.getIndexedProfit(cell.content.type.categoryType, cell.content.modifiedProfit).toFixed(2);
             text += "\n--------------\n";
             text += "Base profit: " + cell.content.baseProfit.toFixed(2) + "/d" + "\n";
             text += "-------\n";
@@ -1848,7 +1839,7 @@ var UIDrawer = (function () {
                 text += "Adj strength: " + _mod.scaling(_mod.strength).toFixed(3) + "\n";
                 text += "--------------\n";
             }
-            text += "Final profit: " + cell.content.modifiedProfit.toFixed(2) + "/d";
+            text += "Final profit: " + finalAmount + "/d";
         }
 
         var font = this.fonts["base"];

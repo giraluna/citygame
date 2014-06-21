@@ -1430,6 +1430,7 @@ var Game = (function () {
 
         this.players["player0"] = player;
         this.reactUI.player = player;
+        player.addExperience(0); // refresh
         player.updateElements();
     };
     Game.prototype.render = function () {
@@ -1842,7 +1843,21 @@ var UIDrawer = (function () {
         if (game.worldRenderer.currentMapmode === "landValue") {
             text += "\nLand value: " + cell.landValue;
             text += "\nApproximate cost: " + parseInt(game.players.player0.getCellBuyCost(cell.landValue));
-        } else if (cell.content && cell.content.baseProfit) {
+        }
+
+        /*
+        else
+        {
+        for (var modifier in cell.modifiers)
+        {
+        var _mod = cell.modifiers[modifier];
+        text += "\n--------------\n";
+        text += "Modifier: " + _mod.title + "\n";
+        text += "Strength: " + _mod.strength + "\n";
+        text += "Adj strength: " + _mod.scaling(_mod.strength).toFixed(3);
+        }
+        }*/
+        if (cell.content && cell.content.baseProfit) {
             var finalAmount = game.players.player0.getIndexedProfit(cell.content.type.categoryType, cell.content.modifiedProfit).toFixed(2);
             text += "\n--------------\n";
             text += "Base profit: " + cell.content.baseProfit.toFixed(2) + "/d" + "\n";

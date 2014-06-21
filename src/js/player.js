@@ -205,10 +205,21 @@ var Player = (function () {
     Player.prototype.addModifier = function (modifier) {
         if (this.modifiers[modifier.type])
             return;
+        if (modifier.cost && modifier.cost > this.money)
+            return;
         else {
+            var index = this.unlockedModifiers.indexOf(modifier);
+             {
+                if (index > -1) {
+                    this.unlockedModifiers.splice(index, 1);
+                }
+            }
             this.modifiers[modifier.type] = Object.create(modifier);
 
             this.applyModifier(modifier);
+        }
+        if (modifier.cost) {
+            this.addMoney(-modifier.cost);
         }
     };
     Player.prototype.applyModifier = function (modifier) {
@@ -389,6 +400,9 @@ var Player = (function () {
         }
 
         var unlocks = playerModifiers.modifiersByUnlock[conditionType];
+        if (!unlocks)
+            return;
+
         var unlockValues = Object.keys(unlocks);
 
         for (var i = 0; i < unlockValues.length; i++) {

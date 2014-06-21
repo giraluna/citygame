@@ -1815,6 +1815,7 @@ class Game
 
     this.players["player0"] = player;
     this.reactUI.player = player;
+    player.addExperience(0); // refresh
     player.updateElements();
   }
   render()
@@ -2362,7 +2363,7 @@ class UIDrawer
       }
     }*/
 
-    else if (cell.content && cell.content.baseProfit)
+    if (cell.content && cell.content.baseProfit)
     {
       var finalAmount = game.players.player0.getIndexedProfit(
         cell.content.type.categoryType, cell.content.modifiedProfit).toFixed(2);

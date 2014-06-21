@@ -181,7 +181,8 @@ export var List = React.createClass({
           {
             className: !column.notSortable ? "sortable-column" : null,
             title: column.title,
-            onClick: self.handleSelectColumn.bind(null, column),
+            onMouseDown: self.handleSelectColumn.bind(null, column),
+            onTouchStart: self.handleSelectColumn.bind(null, column),
             key: column.key
           }, column.label)
       );
@@ -211,10 +212,12 @@ export var List = React.createClass({
       var rowProps: any = {};
       rowProps.key = item.key;
       rowProps.onClick = self.handleSelectRow.bind(null, item);
+      rowProps.onTouchStart = self.handleSelectRow.bind(null, item);
       if (self.state.selected.key === item.key)
       {
         rowProps.className = "selected";
       }
+      if (self.props.rowStylingFN) rowProps = self.props.rowStylingFN(item, rowProps);
       rows.push(
         React.DOM.tr(rowProps, cells)
       );

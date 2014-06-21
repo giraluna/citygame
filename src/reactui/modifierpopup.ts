@@ -19,9 +19,39 @@ module UIComponents
       this.props.onClose.call();
     },
 
+    handleOk: function()
+    {
+      var selected = this.refs.modifierList.state.selected;
+
+      if (!selected) return false;
+
+      this.props.player.addModifier(selected.data.modifier);
+      eventManager.dispatchEvent({type: "updateReact", content: ""});
+    },
+
+    applyRowStyle: function(item, rowProps)
+    {
+      if (item.data.modifier.cost > this.props.player.money)
+      {
+        rowProps.className = "inactive";
+        rowProps.onClick = rowProps.onTouchStart = null;
+      }
+      return rowProps;
+    },
+
     render: function()
     {
       var stopBubble = function(e){e.stopPropagation();};
+
+      var okBtn = React.DOM.button(
+      {
+        ref: "okBtn",
+        onClick: this.handleOk,
+        onTouchStart: this.handleOk,
+        draggable: true,
+        onDrag: stopBubble
+      }, this.props.okBtnText || "Buy");
+
       var closeBtn = React.DOM.button(
       {
         onClick: this.handleClose,
@@ -41,7 +71,9 @@ module UIComponents
           {
             title: modifier.title,
             cost: beautify(modifier.cost) + "$",
-            description: modifier.description
+            description: modifier.description,
+
+            modifier: modifier
           }
         });
       }
@@ -53,7 +85,8 @@ module UIComponents
         },
         {
           label: "Cost",
-          key: "cost"
+          key: "cost",
+          defaultOrder: "asc"
         },
         {
           label: "Description",
@@ -83,13 +116,15 @@ module UIComponents
               columns: null,
               sortBy: null,
               initialColumn: columns[1],
-              ref: "availableModifiers",
+              ref: "modifierList",
+              rowStylingFN: this.applyRowStyle,
 
               listItems: rows,
               initialColumns: columns
             })
           ),
           React.DOM.div( {className:"popup-buttons"},
+            okBtn,
             closeBtn
           )
           

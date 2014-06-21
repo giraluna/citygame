@@ -315,7 +315,7 @@ class ReactUI
           },
           cost:
           {
-            approximate: true,
+            approximate: false,
             amount: buyCost
           }
         }

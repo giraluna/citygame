@@ -1384,9 +1384,14 @@ var Game = (function () {
         data.money = player.money;
         data.experience = player.experience;
 
-        data.employees = player.employees;
-        for (var _e in data.employees) {
-            delete data.employees[_e].player;
+        data.employees = {};
+        for (var _e in player.employees) {
+            data.employees[_e] = {};
+            for (var prop in player.employees[_e]) {
+                if (prop !== "player") {
+                    data.employees[_e][prop] = player.employees[_e][prop];
+                }
+            }
         }
         data.modifiers = [];
         for (var _mod in player.modifiers) {

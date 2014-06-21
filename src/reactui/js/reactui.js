@@ -217,7 +217,7 @@ var ReactUI = (function () {
                         amount: 14
                     },
                     cost: {
-                        approximate: true,
+                        approximate: false,
                         amount: buyCost
                     }
                 }

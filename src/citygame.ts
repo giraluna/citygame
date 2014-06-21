@@ -1759,12 +1759,12 @@ class Game
     data.money = player.money;
     data.experience = player.experience;
 
-    for (var _e in player.employees)
+
+    data.employees = player.employees;
+    for (var _e in data.employees)
     {
       delete player.employees[_e].player;
     }
-
-    data.employees = player.employees;
     data.modifiers = [];
     for (var _mod in player.modifiers)
     {
@@ -2056,6 +2056,11 @@ class MouseEventHandler
     {
       if (e.target.localName !== "canvas") return;
       self.scroller.deltaZoom(e.wheelDelta / 40, 0.05);
+    });
+    _canvas.addEventListener("mouseout", function(e: any)
+    {
+      if (e.target.localName !== "canvas") return;
+      game.uiDrawer.removeActive();
     });
   }
   preventGhost(delay: number)

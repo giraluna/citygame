@@ -1387,11 +1387,10 @@ var Game = (function () {
         data.money = player.money;
         data.experience = player.experience;
 
-        for (var _e in player.employees) {
+        data.employees = player.employees;
+        for (var _e in data.employees) {
             delete player.employees[_e].player;
         }
-
-        data.employees = player.employees;
         data.modifiers = [];
         for (var _mod in player.modifiers) {
             data.modifiers.push(player.modifiers[_mod].type);
@@ -1618,6 +1617,11 @@ var MouseEventHandler = (function () {
             if (e.target.localName !== "canvas")
                 return;
             self.scroller.deltaZoom(e.wheelDelta / 40, 0.05);
+        });
+        _canvas.addEventListener("mouseout", function (e) {
+            if (e.target.localName !== "canvas")
+                return;
+            game.uiDrawer.removeActive();
         });
     }
     MouseEventHandler.prototype.preventGhost = function (delay) {

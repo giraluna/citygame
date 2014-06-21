@@ -151,6 +151,8 @@ var Player = (function () {
     };
     Player.prototype.sellContent = function (content) {
         var type = content.type;
+        if (!type.cost)
+            return;
         var value = this.getBuildCost(type) * 0.66;
 
         this.addMoney(value, "soldContent");

@@ -160,10 +160,10 @@ var cityGeneration;
 
         [horDirs, verDirs].forEach(function (dirSet) {
             if (dirSet.length === 1) {
-                var side = landDirs.length > 1 ? 1 : 0;
-                adjust[0] += adjustMappings[dirSet[0]][0] * side;
-                adjust[1] += adjustMappings[dirSet[0]][1] * side;
-            } else {
+                var side = landDirs.length > 1 ? 1 : -1;
+                adjust[0] += adjustMappings[dirSet[0]][1] * side;
+                adjust[1] += adjustMappings[dirSet[0]][0] * side;
+            } else if (dirSet.length > 1) {
                 var dirToModify = adjust[0] === 0 ? 0 : 1;
                 adjust[dirToModify] += Math.round(Math.random()) * 2 - 1; //-1 or 1
             }

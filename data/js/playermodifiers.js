@@ -18,8 +18,8 @@ var playerModifiers;
 
     playerModifiers.clickModifier1 = {
         type: "clickModifier1",
-        title: "clickModifier1",
-        description: "0.1 / click",
+        title: "Click Modifier 1",
+        description: "0.1$ / click",
         cost: 50,
         unlockConditions: ["default"],
         effects: [
@@ -31,8 +31,8 @@ var playerModifiers;
     };
     playerModifiers.clickModifier2 = {
         type: "clickModifier2",
-        title: "clickModifier2",
-        description: "0.5 / click",
+        title: "Click Modifier 2",
+        description: "0.5$ / click",
         cost: 200,
         unlockConditions: [
             {
@@ -49,7 +49,7 @@ var playerModifiers;
     };
     playerModifiers.clickModifier3 = {
         type: "clickModifier3",
-        title: "clickModifier3",
+        title: "Click Modifier 3",
         description: "clicks * 1.2",
         cost: 1000,
         unlockConditions: [
@@ -71,7 +71,7 @@ var playerModifiers;
     };
     playerModifiers.clickModifier4 = {
         type: "clickModifier4",
-        title: "clickModifier4",
+        title: "Click Modifier 4",
         description: "clicks * 1.2",
         cost: 5000,
         unlockConditions: [

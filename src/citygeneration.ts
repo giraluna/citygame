@@ -198,11 +198,11 @@ module cityGeneration
     {
       if (dirSet.length === 1)
       {
-        var side = landDirs.length > 1 ? 1 : 0;
-        adjust[0] += adjustMappings[dirSet[0]][0] * side;
-        adjust[1] += adjustMappings[dirSet[0]][1] * side;
+        var side = landDirs.length > 1 ? 1 : -1;
+        adjust[0] += adjustMappings[dirSet[0]][1] * side;
+        adjust[1] += adjustMappings[dirSet[0]][0] * side;
       }
-      else
+      else if (dirSet.length > 1)
       {
         var dirToModify = adjust[0] === 0 ? 0 : 1;
         adjust[dirToModify] += Math.round(Math.random()) * 2 - 1; //-1 or 1
@@ -210,6 +210,7 @@ module cityGeneration
     });
     start[0] += adjust[0];
     start[1] += adjust[1];
+    
 
     for (var dir in connectedToLand)
     {

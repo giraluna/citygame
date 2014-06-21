@@ -10,6 +10,7 @@
 /// <reference path="js/employeelist.d.ts" />
 /// <reference path="js/employee.d.ts" />
 /// <reference path="js/employeeaction.d.ts" />
+/// <reference path="js/modifierpopup.d.ts" />
 /// <reference path="js/employeeactionpopup.d.ts" />
 /// <reference path="js/inputpopup.d.ts" />
 /// <reference path="js/actioninfo.d.ts" />
@@ -105,7 +106,7 @@ class ReactUI
     });
     eventManager.addEventListener("makeModifierPopup", function(event)
     {
-      self.makeModifierPopup(event.content);
+      self.makeModifierPopup({player:event.content});
     });
     eventManager.addEventListener("closeTopPopup", function(event)
     {

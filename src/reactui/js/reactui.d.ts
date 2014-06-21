@@ -7,6 +7,7 @@
 /// <reference path="employeelist.d.ts" />
 /// <reference path="employee.d.ts" />
 /// <reference path="employeeaction.d.ts" />
+/// <reference path="modifierpopup.d.ts" />
 /// <reference path="employeeactionpopup.d.ts" />
 /// <reference path="inputpopup.d.ts" />
 /// <reference path="actioninfo.d.ts" />

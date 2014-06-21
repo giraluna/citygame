@@ -1,6 +1,7 @@
 /// <reference path="../../lib/react.d.ts" />
 ///
 /// <reference path="../js/eventlistener.d.ts" />
+/// <reference path="../js/utility.d.ts" />
 ///
 /// <reference path="js/draggable.d.ts" />
 /// <reference path="js/splitmultilinetext.d.ts" />
@@ -24,6 +25,34 @@ var UIComponents;
                 onDrag: stopBubble
             }, this.props.closeBtnText || "Cancel");
 
+            var rows = [];
+            for (var i = 0; i < this.props.player.unlockedModifiers.length; i++) {
+                var modifier = this.props.player.unlockedModifiers[i];
+                rows.push({
+                    key: modifier.type,
+                    data: {
+                        title: modifier.title,
+                        cost: beautify(modifier.cost) + "$",
+                        description: modifier.description
+                    }
+                });
+            }
+            var columns = [
+                {
+                    label: "Title",
+                    key: "title"
+                },
+                {
+                    label: "Cost",
+                    key: "cost"
+                },
+                {
+                    label: "Description",
+                    key: "description",
+                    notSortable: true
+                }
+            ];
+
             return (React.DOM.div({
                 className: "popup",
                 style: this.props.initialStyle,
@@ -38,10 +67,10 @@ var UIComponents;
                 selected: null,
                 columns: null,
                 sortBy: null,
-                initialColumn: columns[2],
+                initialColumn: columns[1],
                 ref: "availableModifiers",
-                listItems: availableModifiers,
-                initialColumns: availableColumns
+                listItems: rows,
+                initialColumns: columns
             })), React.DOM.div({ className: "popup-buttons" }, closeBtn)));
         }
     });

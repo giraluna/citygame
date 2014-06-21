@@ -1,12 +1,14 @@
 /// <reference path="../../lib/pixi.d.ts" />
 /// <reference path="employee.d.ts" />
 /// <reference path="../../data/js/cg.d.ts" />
+/// <reference path="../../data/js/playermodifiers.d.ts" />
 /// <reference path="eventlistener.d.ts" />
 /// <reference path="utility.d.ts" />
 declare class Player {
     public id: string;
     public color: number;
     public money: number;
+    public clicks: number;
     public level: number;
     public experience: number;
     public experienceForCurrentLevel: number;
@@ -21,6 +23,10 @@ declare class Player {
     public incomePerType: any;
     public modifiers: any;
     public modifierEffects: any;
+    public unlockedModifiers: any[];
+    public lockedModifiers: any[];
+    public recentlyCheckedUnlockConditions: any;
+    public maxCheckFrequency: number;
     public indexedProfits: any;
     public moneySpan: HTMLElement;
     public incomeSpan: HTMLElement;
@@ -52,4 +58,10 @@ declare class Player {
     public getModifiedProfit(initialAmount: number, type?: string): number;
     public getIndexedProfit(type: any, amount: any): any;
     public clearIndexedProfits(): void;
+    public getUnlockConditionVariable(conditionType: string): any;
+    public checkIfUnlocked(modifier: playerModifiers.IPlayerModifier): boolean;
+    public setInitialAvailableModifiers(allModifiers: playerModifiers.IPlayerModifier[]): void;
+    public checkLockedModifiers(conditionType: string): void;
+    public unlockModifier(modifier: playerModifiers.IPlayerModifier): void;
+    public addClicks(amount: number): void;
 }

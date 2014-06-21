@@ -1382,6 +1382,7 @@ var Game = (function () {
         var data = {};
         data.id = player.id;
         data.money = player.money;
+        data.clicks = player.clicks;
         data.experience = player.experience;
 
         data.employees = {};
@@ -1409,9 +1410,8 @@ var Game = (function () {
 
         player.money = data.money;
 
-        if (data.experience) {
-            player.addExperience(data.experience);
-        }
+        player.experience = data.experience || 0;
+        player.clicks = data.clicks || 0;
 
         if (data.stats) {
             player.incomePerDate = data.stats.incomePerDate;
@@ -2268,6 +2268,7 @@ var ClickTool = (function (_super) {
         }
 
         var finalAmount = player.addMoney(baseAmount, "click");
+        player.addClicks(1);
 
         if (DRAW_CLICK_POPUPS) {
             game.uiDrawer.makeCellPopup(target, "" + finalAmount.toFixed(3), game.worldRenderer.worldSprite);

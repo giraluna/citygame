@@ -103,6 +103,10 @@ class ReactUI
     {
       self.makeSavePopup()
     });
+    eventManager.addEventListener("makeModifierPopup", function(event)
+    {
+      self.makeModifierPopup(event.content);
+    });
     eventManager.addEventListener("closeTopPopup", function(event)
     {
       self.closeTopPopup()
@@ -202,6 +206,17 @@ class ReactUI
           content: name
         });
       }
+    });
+  }
+
+  makeModifierPopup(props:
+  {
+    player: Player;
+  })
+  {
+    this.makePopup("ModifierPopup",
+    {
+      player: props.player
     });
   }
 

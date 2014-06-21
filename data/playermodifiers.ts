@@ -3,19 +3,25 @@ module playerModifiers
   export interface IPlayerModifier
   {
     type: string;
-    effects?:
+    title: string;
+    description: string;
+    effects:
     {
       targets: string[];
       addedProfit?: number;
       multiplier?: number;
       buildCost?: number;
     }[];
+    unlockConditions?: any;
+
   }
 
 
   export var testModifier: IPlayerModifier =
   {
     type: "testModifier",
+    title: "testing",
+    description: "test",
     effects:
     [
       {
@@ -36,6 +42,7 @@ module playerModifiers
     title: "clickModifier1",
     description: "0.1 / click",
     cost: 50,
+    unlockConditions:["default"],
     effects:
     [
       {
@@ -50,6 +57,13 @@ module playerModifiers
     title: "clickModifier2",
     description: "0.5 / click",
     cost: 200,
+    unlockConditions:
+    [
+      {
+        type: "clicks",
+        value: 50
+      }
+    ],
     effects:
     [
       {
@@ -64,6 +78,17 @@ module playerModifiers
     title: "clickModifier3",
     description: "clicks * 1.2",
     cost: 1000,
+    unlockConditions:
+    [
+      {
+        type: "clicks",
+        value: 200
+      },
+      {
+        type: "money",
+        value: 250
+      }
+    ],
     effects:
     [
       {
@@ -78,6 +103,17 @@ module playerModifiers
     title: "clickModifier4",
     description: "clicks * 1.2",
     cost: 5000,
+    unlockConditions:
+    [
+      {
+        type: "clicks",
+        value: 500
+      },
+      {
+        type: "money",
+        value: 2000
+      }
+    ],
     effects:
     [
       {
@@ -86,4 +122,66 @@ module playerModifiers
       }
     ]
   }
+
+  /**
+   * unlockConditions:
+   * [
+   *   {
+   *     type: "buildings", "level", "money"
+   *     value: 69
+   *   }
+   * ]
+   * */
+   /**
+    * modifiersbyUnlock =
+    * {
+    *   money:
+    *   {
+    *     69: [playerModifiers.äbäbäbä]
+    *   }
+    * }
+    */
+
+  export var modifiersByUnlock = (function()
+  {
+    var base: any = {};
+
+    for (var _mod in playerModifiers)
+    {
+      var modifier = playerModifiers[_mod]
+      if (modifier.unlockConditions)
+      {
+        for (var i = 0; i < modifier.unlockConditions.length; i++)
+        {
+          var condition = modifier.unlockConditions[i];
+
+          if (condition === "default")
+          {
+            if (!base.default) base.default = [];
+            base.default.push(modifier);
+            continue;
+          }
+
+          if (!base[condition.type]) base[condition.type] = {};
+
+          var arr = base[condition.type][condition.value] = [];
+          arr.push(modifier);
+        }
+      }
+    }
+    return base;
+  })();
+
+  export var allModifiers = (function()
+  {
+    var all = [];
+    for (var _mod in playerModifiers)
+    {
+      if (playerModifiers[_mod].type)
+      {
+        all.push(playerModifiers[_mod]);
+      }
+    }
+    return all;
+  })();
 }

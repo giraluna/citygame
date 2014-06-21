@@ -1,12 +1,14 @@
 /// <reference path="../lib/pixi.d.ts" />
 /// <reference path="js/employee.d.ts" />
 /// <reference path="../data/js/cg.d.ts" />
+/// <reference path="../data/js/playermodifiers.d.ts" />
 /// <reference path="js/eventlistener.d.ts" />
 /// <reference path="js/utility.d.ts" />
 var Player = (function () {
     function Player(id, color) {
         if (typeof color === "undefined") { color = 0xFF0000; }
         this.money = 0;
+        this.clicks = 0;
         this.level = 1;
         this.experience = 0;
         this.experienceForCurrentLevel = 0;
@@ -24,6 +26,10 @@ var Player = (function () {
             buildCost: {},
             recruitQuality: 1
         };
+        this.unlockedModifiers = [];
+        this.lockedModifiers = [];
+        this.recentlyCheckedUnlockConditions = {};
+        this.maxCheckFrequency = 1000;
         this.indexedProfits = {};
         this.id = id;
         this.color = color;
@@ -82,6 +88,7 @@ var Player = (function () {
         };
 
         this.setExperienceToNextLevel();
+        this.setInitialAvailableModifiers(playerModifiers.allModifiers);
     };
     Player.prototype.addEventListeners = function () {
     };
@@ -140,6 +147,7 @@ var Player = (function () {
 
         this.ownedContent[content.categoryType].push(content);
         this.amountBuiltPerType[content.type.type]++;
+        this.checkLockedModifiers(content.type.type);
         content.player = this;
     };
     Player.prototype.removeContent = function (content) {
@@ -189,6 +197,7 @@ var Player = (function () {
         if (!isFinite(amount))
             debugger;
         this.money += amount;
+        this.checkLockedModifiers("money");
         this.updateElements();
 
         return amount;
@@ -333,6 +342,86 @@ var Player = (function () {
     };
     Player.prototype.clearIndexedProfits = function () {
         this.indexedProfits = {};
+    };
+    Player.prototype.getUnlockConditionVariable = function (conditionType) {
+        if (["clicks", "money", "level"].indexOf(conditionType) !== -1) {
+            return this[conditionType];
+        } else if (this.amountBuiltPerType[conditionType]) {
+            return this.amountBuiltPerType[conditionType];
+        }
+    };
+    Player.prototype.checkIfUnlocked = function (modifier) {
+        if (!modifier.unlockConditions)
+            return false;
+        if (modifier.unlockConditions === ["default"])
+            return true;
+
+        for (var i = 0; i < modifier.unlockConditions.length; i++) {
+            var condition = modifier.unlockConditions[i];
+
+            var toCheckAgainst = this.getUnlockConditionVariable(condition.type);
+
+            if (toCheckAgainst < condition.value)
+                return false;
+        }
+
+        return true;
+    };
+    Player.prototype.setInitialAvailableModifiers = function (allModifiers) {
+        for (var i = 0; i < allModifiers.length; i++) {
+            var mod = allModifiers[i];
+
+            if (this.checkIfUnlocked(mod)) {
+                this.unlockedModifiers.push(mod);
+            } else {
+                this.lockedModifiers.push(mod);
+            }
+        }
+    };
+    Player.prototype.checkLockedModifiers = function (conditionType) {
+        if (this.recentlyCheckedUnlockConditions[conditionType]) {
+            return;
+        } else {
+            this.recentlyCheckedUnlockConditions[conditionType] = true;
+            window.setTimeout(function () {
+                this.recentlyCheckedUnlockConditions[conditionType] = false;
+            }.bind(this), this.maxCheckFrequency);
+        }
+
+        var unlocks = playerModifiers.modifiersByUnlock[conditionType];
+        var unlockValues = Object.keys(unlocks);
+
+        for (var i = 0; i < unlockValues.length; i++) {
+            var toCheckAgainst = this.getUnlockConditionVariable(conditionType);
+
+            if (toCheckAgainst >= parseInt(unlockValues[i])) {
+                var modifiers = unlocks[unlockValues[i]];
+                for (var j = 0; j < modifiers.length; j++) {
+                    if (this.modifiers[modifiers[j].type])
+                        continue;
+
+                    var unlocked = this.checkIfUnlocked(modifiers[j]);
+
+                    if (unlocked) {
+                        this.unlockModifier(modifiers[j]);
+                    }
+                }
+            }
+        }
+    };
+    Player.prototype.unlockModifier = function (modifier) {
+        if (this.modifiers[modifier.type] || this.unlockedModifiers.indexOf(modifier) > -1) {
+            return;
+        }
+
+        this.unlockedModifiers.push(modifier);
+        var index = this.lockedModifiers.indexOf(modifier);
+        if (index > -1)
+            this.lockedModifiers.splice(index, 1);
+    };
+    Player.prototype.addClicks = function (amount) {
+        this.clicks += amount;
+        this.checkLockedModifiers("clicks");
     };
     return Player;
 })();

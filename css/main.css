@@ -400,6 +400,10 @@ progress::-webkit-progress-value {
   align-items: center;
   color: white;
 }
+#side-menu-modifiers {
+  flex: 0 0 auto;
+  order: 5;
+}
 #info-container {
   height: 100%;
   width: 100%;

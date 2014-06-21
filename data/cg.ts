@@ -894,8 +894,9 @@ var playerBuildableBuildings = [];
 ].forEach(function(type){playerBuildableBuildings.push(findType(type))});
 
 // easier balancing
+// cost, base profit
 
-var balanceValues =
+var basevalues =
 [
   [25, 0.3],
   [300, 1],
@@ -910,6 +911,6 @@ for (var i = 0; i < playerBuildableBuildings.length; i++)
 {
   var type = playerBuildableBuildings[i];
 
-  type.cost = balanceValues[i][0];
-  type.baseProfit = balanceValues[i][1];
+  type.cost = basevalues[i][0];
+  type.baseProfit = basevalues[i][1];
 }

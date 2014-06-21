@@ -2,6 +2,7 @@
 
 /// <reference path="js/employee.d.ts" />
 /// <reference path="../data/js/cg.d.ts" />
+/// <reference path="../data/js/playermodifiers.d.ts" />
 /// <reference path="js/eventlistener.d.ts" />
 /// <reference path="js/utility.d.ts" />
 
@@ -10,6 +11,7 @@ class Player
   id: string;
   color: number;
   money: number = 0;
+  clicks: number = 0;
   level: number = 1;
   experience: number = 0;
   experienceForCurrentLevel: number = 0;
@@ -33,6 +35,12 @@ class Player
     buildCost: {},
     recruitQuality: 1
   };
+
+  unlockedModifiers = [];
+  lockedModifiers = [];
+
+  recentlyCheckedUnlockConditions: any = {};
+  maxCheckFrequency: number = 1000;
 
   indexedProfits: any = {};
 
@@ -112,6 +120,7 @@ class Player
     };
 
     this.setExperienceToNextLevel();
+    this.setInitialAvailableModifiers(playerModifiers.allModifiers);
   }
   addEventListeners()
   {
@@ -178,6 +187,7 @@ class Player
     
     this.ownedContent[content.categoryType].push(content);
     this.amountBuiltPerType[content.type.type]++;
+    this.checkLockedModifiers(content.type.type);
     content.player = this;
   }
   removeContent( content )
@@ -234,6 +244,7 @@ class Player
 
     if (!isFinite(amount)) debugger;
     this.money += amount;
+    this.checkLockedModifiers("money");
     this.updateElements();
 
     return amount;
@@ -243,6 +254,13 @@ class Player
     if (this.modifiers[modifier.type]) return;
     else
     {
+      var index = this.unlockedModifiers.indexOf(modifier);
+      {
+        if (index > -1)
+        {
+          this.unlockedModifiers = this.unlockedModifiers.splice(index, 1);
+        }
+      }
       this.modifiers[modifier.type] = Object.create(modifier);
 
       this.applyModifier(modifier);
@@ -408,6 +426,105 @@ class Player
   clearIndexedProfits()
   {
     this.indexedProfits = {};
+  }
+  getUnlockConditionVariable(conditionType: string)
+  {
+    if (["clicks", "money", "level"].indexOf(conditionType) !== -1)
+    {
+      return this[conditionType];
+    }
+    else if (this.amountBuiltPerType[conditionType])
+    {
+      return this.amountBuiltPerType[conditionType];
+    }
+  }
+  checkIfUnlocked(modifier: playerModifiers.IPlayerModifier)
+  {
+    if (!modifier.unlockConditions) return false;
+    if (modifier.unlockConditions === ["default"]) return true;
+
+    for (var i = 0; i < modifier.unlockConditions.length; i++)
+    {
+      var condition = modifier.unlockConditions[i];
+
+      var toCheckAgainst = this.getUnlockConditionVariable(condition.type);
+
+      if (toCheckAgainst < condition.value) return false;
+    }
+
+    return true;
+  }
+  setInitialAvailableModifiers(allModifiers: playerModifiers.IPlayerModifier[])
+  {
+    for (var i = 0; i < allModifiers.length; i++)
+    {
+      var mod = allModifiers[i];
+
+      if (this.checkIfUnlocked(mod))
+      {
+        this.unlockedModifiers.push(mod);
+      }
+      else
+      {
+        this.lockedModifiers.push(mod);
+      }
+    }
+  }
+  checkLockedModifiers(conditionType: string)
+  {
+    if (this.recentlyCheckedUnlockConditions[conditionType])
+    {
+      return;
+    }
+    else
+    {
+      this.recentlyCheckedUnlockConditions[conditionType] = true;
+      window.setTimeout(function()
+      {
+        this.recentlyCheckedUnlockConditions[conditionType] = false;
+      }.bind(this), this.maxCheckFrequency);
+    }
+
+    var unlocks = playerModifiers.modifiersByUnlock[conditionType];
+    var unlockValues = Object.keys(unlocks);
+
+
+    for (var i = 0; i < unlockValues.length; i++)
+    {
+      var toCheckAgainst = this.getUnlockConditionVariable(conditionType);
+
+      if (toCheckAgainst >= parseInt(unlockValues[i]))
+      {
+        var modifiers = unlocks[unlockValues[i]];
+        for (var j = 0; j < modifiers.length; j++)
+        {
+          if (this.modifiers[modifiers[j].type]) continue;
+
+          var unlocked = this.checkIfUnlocked(modifiers[j]);
+
+          if (unlocked)
+          {
+            this.unlockModifier(modifiers[j]);
+          }
+        }
+      }
+    }
+  }
+  unlockModifier(modifier: playerModifiers.IPlayerModifier)
+  {
+    if (this.modifiers[modifier.type] || this.unlockedModifiers.indexOf(modifier) > -1)
+    {
+      return;
+    }
+
+    this.unlockedModifiers.push(modifier);
+    var index = this.lockedModifiers.indexOf(modifier);
+    if (index > -1) this.lockedModifiers.splice(index, 1);
+  }
+  addClicks(amount: number)
+  {
+    this.clicks += amount;
+    this.checkLockedModifiers("clicks");
   }
 }
 

@@ -6,6 +6,7 @@
 /// <reference path="js/sidemenusave.d.ts" />
 /// <reference path="js/sidemenustats.d.ts" />
 /// <reference path="js/sidemenutools.d.ts" />
+/// <reference path="js/sidemenumodifierbutton.d.ts" />
 
 module UIComponents
 {
@@ -36,7 +37,10 @@ export var SideMenu = React.createClass(
             player: this.props.player,
             frameImages: this.props.frameImages,
             setSelectedTool: this.setSelectedTool,
-            selectedTool: this.state.selectedTool
+            selectedTool: this.state.selectedTool,
+            // Todo react definitions
+            beautifyIndex: null,
+            lastSelectedBuilding: null
           }
         ),
 
@@ -46,7 +50,15 @@ export var SideMenu = React.createClass(
           UIComponents.SideMenuZoom()
 
         ),
-        UIComponents.SideMenuStats({player: this.props.player})
+        UIComponents.SideMenuStats({player: this.props.player}),
+        UIComponents.SideMenuModifierButton(
+          {
+            player: this.props.player,
+            // Todo react definitions
+            hasNewModifier: null,
+            lastModifierCount: null
+          }
+        )
 
       )
     );

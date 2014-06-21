@@ -71,6 +71,9 @@ var ReactUI = (function () {
         eventManager.addEventListener("makeSavePopup", function (event) {
             self.makeSavePopup();
         });
+        eventManager.addEventListener("makeModifierPopup", function (event) {
+            self.makeModifierPopup(event.content);
+        });
         eventManager.addEventListener("closeTopPopup", function (event) {
             self.closeTopPopup();
         });
@@ -138,6 +141,12 @@ var ReactUI = (function () {
                     content: name
                 });
             }
+        });
+    };
+
+    ReactUI.prototype.makeModifierPopup = function (props) {
+        this.makePopup("ModifierPopup", {
+            player: props.player
         });
     };
 

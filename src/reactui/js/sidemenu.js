@@ -5,6 +5,7 @@
 /// <reference path="js/sidemenusave.d.ts" />
 /// <reference path="js/sidemenustats.d.ts" />
 /// <reference path="js/sidemenutools.d.ts" />
+/// <reference path="js/sidemenumodifierbutton.d.ts" />
 var UIComponents;
 (function (UIComponents) {
     UIComponents.SideMenu = React.createClass({
@@ -22,8 +23,16 @@ var UIComponents;
                 player: this.props.player,
                 frameImages: this.props.frameImages,
                 setSelectedTool: this.setSelectedTool,
-                selectedTool: this.state.selectedTool
-            }), React.DOM.div({ id: "side-menu-other-buttons", className: "grid-column" }, UIComponents.SideMenuSave(), UIComponents.SideMenuMapmode(), UIComponents.SideMenuZoom()), UIComponents.SideMenuStats({ player: this.props.player })));
+                selectedTool: this.state.selectedTool,
+                // Todo react definitions
+                beautifyIndex: null,
+                lastSelectedBuilding: null
+            }), React.DOM.div({ id: "side-menu-other-buttons", className: "grid-column" }, UIComponents.SideMenuSave(), UIComponents.SideMenuMapmode(), UIComponents.SideMenuZoom()), UIComponents.SideMenuStats({ player: this.props.player }), UIComponents.SideMenuModifierButton({
+                player: this.props.player,
+                // Todo react definitions
+                hasNewModifier: null,
+                lastModifierCount: null
+            })));
         }
     });
 })(UIComponents || (UIComponents = {}));

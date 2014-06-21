@@ -49,6 +49,9 @@ declare class ReactUI {
     public makeInfoPopup(props: any): void;
     public makeLoadPopup(): void;
     public makeSavePopup(): void;
+    public makeModifierPopup(props: {
+        player: Player;
+    }): void;
     public makeRecruitPopup(props: {
         player: Player;
     }): void;

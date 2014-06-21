@@ -1756,6 +1756,7 @@ class Game
     var data: any = {};
     data.id = player.id;
     data.money = player.money;
+    data.clicks = player.clicks;
     data.experience = player.experience;
 
 
@@ -1790,10 +1791,8 @@ class Game
     
     player.money = data.money;
 
-    if (data.experience)
-    {
-      player.addExperience(data.experience);
-    }
+    player.experience = data.experience || 0;
+    player.clicks = data.clicks || 0;
 
     if (data.stats)
     {
@@ -2868,6 +2867,7 @@ class ClickTool extends Tool
     }
 
     var finalAmount = player.addMoney(baseAmount, "click");
+    player.addClicks(1);
 
     if (DRAW_CLICK_POPUPS)
     {

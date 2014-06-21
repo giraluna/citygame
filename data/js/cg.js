@@ -790,7 +790,8 @@ var playerBuildableBuildings = [];
 });
 
 // easier balancing
-var balanceValues = [
+// cost, base profit
+var basevalues = [
     [25, 0.3],
     [300, 1],
     [1500, 2],
@@ -803,7 +804,7 @@ var balanceValues = [
 for (var i = 0; i < playerBuildableBuildings.length; i++) {
     var type = playerBuildableBuildings[i];
 
-    type.cost = balanceValues[i][0];
-    type.baseProfit = balanceValues[i][1];
+    type.cost = basevalues[i][0];
+    type.baseProfit = basevalues[i][1];
 }
 //# sourceMappingURL=cg.js.map

@@ -1386,7 +1386,7 @@ var Game = (function () {
 
         data.employees = player.employees;
         for (var _e in data.employees) {
-            delete player.employees[_e].player;
+            delete data.employees[_e].player;
         }
         data.modifiers = [];
         for (var _mod in player.modifiers) {

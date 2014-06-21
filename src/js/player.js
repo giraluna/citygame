@@ -153,7 +153,6 @@ var Player = (function () {
         var value = this.getBuildCost(type) * 0.66;
 
         this.addMoney(value, "soldContent");
-        this.removeContent(content);
     };
     Player.prototype.addMoney = function (initialAmount, incomeType, daysPerTick, date) {
         var amount = this.getIndexedProfit(incomeType, initialAmount);

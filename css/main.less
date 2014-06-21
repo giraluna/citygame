@@ -6,6 +6,7 @@
 @light-button-bot: hsv(0, 0, 91%);
 
 @side-menu-width: 250px;
+@side-menu-width-small: 180px;
 
 .single-gradient(@dir, @col1, @col2)
 {
@@ -160,6 +161,10 @@ progress::-webkit-progress-value { background: #080; }
   display: flex;
   flex-flow: column;
   flex: 0 0 @side-menu-width;
+  @media(max-width: 600px)
+  {
+    flex: 0 0 @side-menu-width-small;
+  }
 
   position: relative;
   margin: 10px 0;
@@ -418,6 +423,10 @@ progress::-webkit-progress-value { background: #080; }
   display: flex;
   flex-flow: column;
   flex: 0 0 @side-menu-width;
+  @media(max-width: 600px)
+  {
+    flex: 0 0 @side-menu-width-small;
+  }
   order: 2;
   background-color: white;
 
@@ -499,6 +508,13 @@ progress::-webkit-progress-value { background: #080; }
     {
       flex-flow: column;
       flex: 1;
+    }
+    .building-title
+    {
+      @media(max-width: 600px)
+      {
+        display: none;
+      }
     }
     .building-amount
     {

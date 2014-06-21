@@ -191,7 +191,6 @@ class Player
     var value = this.getBuildCost(type) * 0.66;
 
     this.addMoney(value, "soldContent");
-    this.removeContent(content);
   }
   addMoney(initialAmount, incomeType?: string, daysPerTick?: number, date?)
   {

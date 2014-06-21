@@ -2,6 +2,7 @@
 ///
 /// <reference path="../../data/js/cg.d.ts" />
 /// <reference path="../js/eventlistener.d.ts" />
+/// <reference path="../js/utility.d.ts" />
 var UIComponents;
 (function (UIComponents) {
     /**
@@ -10,18 +11,38 @@ var UIComponents;
     *   buildableTypes
     */
     UIComponents.SideMenuBuildings = React.createClass({
+        getInitialState: function () {
+            return { beautifyIndex: 0, lastSelectedBuilding: playerBuildableBuildings[0] };
+        },
         handleBuildingSelect: function (building, e) {
+            if (this.props.player.money < this.props.player.getBuildCost(building)) {
+                return;
+            }
             this.props.setSelectedTool(building.type);
+            this.setState({ lastSelectedBuilding: building });
 
-            var continuous = e.shiftKey;
+            var stopAfterOne = e && e.shiftKey ? e.shiftKey : false;
 
             eventManager.dispatchEvent({
                 type: "changeBuildingType",
                 content: {
                     building: building,
-                    continuous: continuous
+                    continuous: !stopAfterOne
                 }
             });
+        },
+        componentDidMount: function () {
+            eventManager.addEventListener("resizeSmaller", function (e) {
+                this.setState({ beautifyIndex: 2 });
+            }.bind(this));
+
+            eventManager.addEventListener("resizeBigger", function (e) {
+                this.setState({ beautifyIndex: 0 });
+            }.bind(this));
+
+            eventManager.addEventListener("buildHotkey", function (e) {
+                this.handleBuildingSelect(this.state.lastSelectedBuilding);
+            }.bind(this));
         },
         render: function () {
             var divs = [];
@@ -53,10 +74,16 @@ var UIComponents;
                     divProps.className += " selected-tool";
                 }
 
+                var costText = "" + beautify(buildCost, this.state.beautifyIndex);
+
+                if (this.state.beautifyIndex < 2) {
+                    costText += "$";
+                }
+
                 var image = this.props.frameImages[building.frame];
                 imageProps.src = image.src;
 
-                var div = React.DOM.div(divProps, React.DOM.div({ className: "building-image-container" }, React.DOM.img(imageProps, null)), React.DOM.div({ className: "building-content" }, React.DOM.div({ className: "building-content-wrapper" }, React.DOM.div(titleProps, building.title), React.DOM.div(costProps, "" + buildCost + "$")), React.DOM.div(amountProps, amountBuilt)));
+                var div = React.DOM.div(divProps, React.DOM.div({ className: "building-image-container" }, React.DOM.img(imageProps, null)), React.DOM.div({ className: "building-content" }, React.DOM.div({ className: "building-content-wrapper" }, React.DOM.div(titleProps, building.title), React.DOM.div(costProps, costText)), React.DOM.div(amountProps, amountBuilt)));
 
                 divs.push(div);
             }

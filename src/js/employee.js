@@ -88,12 +88,6 @@ var Employee = (function () {
             var rand = Math.random();
 
             var adjustedGrowth = this.growth[skill] * (2 / Math.log(this.skills[skill] + 0.5));
-            console.log(rand, adjustedGrowth, this.growth[skill]);
-            if (rand + adjustedGrowth > 1) {
-                console.log("levelup");
-                this.skills[skill]++;
-                this.skillTotal++;
-            }
         }
     };
     return Employee;

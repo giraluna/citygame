@@ -18,6 +18,12 @@ var UIComponents;
                 content: type
             });
         },
+        componentDidMount: function () {
+            eventManager.addEventListener("buyHotkey", this.handleToolChange.bind(this, "buy"));
+            eventManager.addEventListener("sellHotkey", this.handleToolChange.bind(this, "sell"));
+            eventManager.addEventListener("clickHotkey", this.handleToolChange.bind(this, "click"));
+            eventManager.addEventListener("recruitHotkey", this.handleRecruit);
+        },
         render: function () {
             var props = {
                 click: {
@@ -38,7 +44,7 @@ var UIComponents;
             };
 
             var selectedTool = this.props.selectedTool;
-            if (selectedTool && this.refs[selectedTool]) {
+            if (selectedTool && props[selectedTool]) {
                 props[selectedTool].className += " selected-tool";
             }
 

@@ -25,17 +25,45 @@ var keyboardStates = {
             // r
             // recruit
             "82": function () {
-                document.getElementById("recruitBtn").click();
+                eventManager.dispatchEvent({
+                    type: "recruitHotkey",
+                    content: ""
+                });
+                //document.getElementById("recruitBtn").click();
             },
             // u
             // buy
             "85": function () {
-                document.getElementById("buyBtn").click();
+                eventManager.dispatchEvent({
+                    type: "buyHotkey",
+                    content: ""
+                });
+                //document.getElementById("buyBtn").click();
             },
             // b
             // build
             "66": function () {
-                document.getElementById("buildBtn").click();
+                eventManager.dispatchEvent({
+                    type: "buildHotkey",
+                    content: ""
+                });
+                //document.getElementById("buildBtn").click();
+            },
+            // c
+            // click
+            "67": function () {
+                eventManager.dispatchEvent({
+                    type: "clickHotkey",
+                    content: ""
+                });
+            },
+            // s
+            // sell
+            "83": function () {
+                eventManager.dispatchEvent({
+                    type: "sellHotkey",
+                    content: ""
+                });
             }
         }
     }

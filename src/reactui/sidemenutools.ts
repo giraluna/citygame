@@ -25,6 +25,13 @@ export var SideMenuTools = React.createClass(
       content: type
     });
   },
+  componentDidMount: function()
+  {
+    eventManager.addEventListener("buyHotkey", this.handleToolChange.bind(this, "buy"));
+    eventManager.addEventListener("sellHotkey", this.handleToolChange.bind(this, "sell"));
+    eventManager.addEventListener("clickHotkey", this.handleToolChange.bind(this, "click"));
+    eventManager.addEventListener("recruitHotkey", this.handleRecruit);
+  },
 
   render: function()
   {

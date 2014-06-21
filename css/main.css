@@ -104,6 +104,11 @@ progress::-webkit-progress-value {
   position: relative;
   margin: 10px 0;
 }
+@media (max-width: 600px) {
+  #side-menu {
+    flex: 0 0 180px;
+  }
+}
 #side-menu button {
   width: 70px;
 }
@@ -282,6 +287,11 @@ progress::-webkit-progress-value {
   order: 2;
   background-color: white;
 }
+@media (max-width: 600px) {
+  #react-side-menu {
+    flex: 0 0 180px;
+  }
+}
 #react-side-menu > * {
   pointer-events: auto;
 }
@@ -348,6 +358,11 @@ progress::-webkit-progress-value {
 #side-menu-buildings .side-building .building-content-wrapper {
   flex-flow: column;
   flex: 1;
+}
+@media (max-width: 600px) {
+  #side-menu-buildings .side-building .building-title {
+    display: none;
+  }
 }
 #side-menu-buildings .side-building .building-amount {
   flex: 0 0 30px;

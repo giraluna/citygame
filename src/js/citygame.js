@@ -1217,6 +1217,11 @@ var Game = (function () {
         if (game.renderer) {
             game.renderer.resize(SCREEN_WIDTH, SCREEN_HEIGHT);
         }
+        if (window.innerWidth <= 600) {
+            eventManager.dispatchEvent({ type: "resizeSmaller", content: "" });
+        } else if (window.innerWidth > 600) {
+            eventManager.dispatchEvent({ type: "resizeBigger", content: "" });
+        }
     };
 
     Game.prototype.changeTool = function (tool) {

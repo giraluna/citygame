@@ -11,10 +11,10 @@ module cellModifiers
       title: "Nice enviroment",
       range: range,
       strength: strength,
-      targets: ["apartment"],
+      targets: ["apartment", "office"],
       effect:
       {
-        multiplier: 0.1
+        multiplier: 0.3
       },
       landValue:
       {
@@ -53,7 +53,8 @@ module cellModifiers
       targets: ["fastfood", "shopping"],
       effect:
       {
-        addedProfit: 0.1,
+        addedProfit: 0.3,
+        multiplier: 0.2
       },
       scaling: function(strength)
       {
@@ -78,8 +79,8 @@ module cellModifiers
       targets: ["fastfood"],
       effect:
       {
-        addedProfit: -0.15,
-        multiplier: -0.25,
+        addedProfit: -0.25,
+        multiplier: -0.3,
       }
     });
   }
@@ -95,8 +96,8 @@ module cellModifiers
       targets: ["shopping"],
       effect:
       {
-        addedProfit: -0.075,
-        multiplier: -0.15,
+        addedProfit: -0.2,
+        multiplier: -0.2,
       }
     });
   }
@@ -109,10 +110,11 @@ module cellModifiers
       title: "Nearby stores",
       range: range,
       strength: strength,
-      targets: ["fastfood"],
+      targets: ["fastfood", "parking"],
       effect:
       {
-        addedProfit: 0.2
+        addedProfit: 0.25,
+        multiplier: 0.25
       }
     });
   }
@@ -125,11 +127,11 @@ module cellModifiers
       title: "Nearby station",
       range: range,
       strength: strength,
-      targets: ["fastfood", "shopping", "office", "apartment"],
+      targets: ["fastfood", "shopping", "office", "apartment", "parking"],
       effect:
       {
         addedProfit: 0.5,
-        multiplier: 0.2
+        multiplier: 0.5
       },
       landValue:
       {
@@ -154,8 +156,8 @@ module cellModifiers
       targets: ["parking"],
       effect:
       {
-        addedProfit: -0.075,
-        multiplier: -0.15,
+        addedProfit: -0.2,
+        multiplier: -0.2,
       }
     });
   }
@@ -171,7 +173,8 @@ module cellModifiers
       targets: ["fastfood", "shopping"],
       effect:
       {
-        addedProfit: 0.1
+        addedProfit: 0.25,
+        multiplier: 0.1
       }
     });
   }
@@ -187,7 +190,6 @@ module cellModifiers
       targets: ["fastfood", "shopping", "apartment", "office"],
       effect:
       {
-        addedProfit: -0.2,
         multiplier: -0.2
       },
       scaling: function(strength)
@@ -202,6 +204,26 @@ module cellModifiers
         {
           return invertedDistance * invertedDistanceRatio / 2;
         }
+      }
+    });
+  }
+
+  export function nearbyRoad(range: number, strength: number = 1)
+  {
+    return(
+    {
+      type: "nearbyRoad",
+      title: "Nearby Road",
+      range: range,
+      strength: strength,
+      targets: ["parking"],
+      effect:
+      {
+        multiplier: 0.2
+      },
+      scaling: function(strength)
+      {
+        return 1;
       }
     });
   }

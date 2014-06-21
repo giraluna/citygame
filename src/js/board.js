@@ -60,7 +60,7 @@ var Board = (function () {
             coasts: coasts
         });
 
-        var rivers = this.mapGenInfo.rivers = mapGeneration.makeRivers(coasts, 0.4, {
+        var rivers = this.mapGenInfo.rivers = mapGeneration.makeRivers(coasts, 0.5, {
             width: this.width / 4,
             mapHeight: this.height,
             depth: this.height,
@@ -96,6 +96,7 @@ var Board = (function () {
 
     Board.prototype.generateCity = function () {
         this.mapGenInfo.mainStationPos = cityGeneration.placeBuilding(this, "smallstation", 0.4, [{ flags: ["water"], radius: 4 }]);
+        cityGeneration.placeStationRoads(this);
         cityGeneration.placeMainSubwayLines(this);
         cityGeneration.placeInitialHousing(this);
     };

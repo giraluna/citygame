@@ -50,6 +50,7 @@ class Player
   updateElements()
   {
     var beautified = beautify(this.money) + "$";
+    var expBeautifyIndex = this.experienceToNextLevel > 999999 ? 2 : 0;
 
     eventManager.dispatchEvent({type: "updatePlayerMoney", content: beautified});
     eventManager.dispatchEvent(
@@ -57,8 +58,8 @@ class Player
         type: "updatePlayerExp",
         content:
         {
-          experience: beautify(this.experience),
-          nextLevel: beautify(this.experienceToNextLevel),
+          experience: beautify(this.experience, expBeautifyIndex),
+          nextLevel: beautify(this.experienceToNextLevel, expBeautifyIndex),
           level: this.level,
           percentage: this.getExperiencePercentage()
         }

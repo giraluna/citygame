@@ -931,7 +931,7 @@ var Game = (function () {
         this.systemsManager = new SystemsManager(1000);
         var id = "player" + (idGenerator.player++);
         var player = new Player(id);
-        player.money += 10;
+        player.money += 100;
 
         //player.addMoney(100);
         this.reactUI = new ReactUI(player, this.frameImages);
@@ -1076,7 +1076,7 @@ var Game = (function () {
         var recruitFN = function () {
             if (Object.keys(self.players["player0"].employees).length < 1) {
                 // TODO
-                if (false) {
+                if (self.players["player0"].usedInitialRecruit) {
                     eventManager.dispatchEvent({
                         type: "makeInfoPopup", content: {
                             text: [

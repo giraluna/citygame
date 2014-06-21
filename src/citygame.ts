@@ -1203,7 +1203,7 @@ class Game
     this.systemsManager = new SystemsManager(1000);
     var id = "player" + (idGenerator.player++);
     var player = new Player(id);
-    player.money += 10;
+    player.money += 100;
     //player.addMoney(100);
     this.reactUI = new ReactUI(player, this.frameImages);
     this.players[player.id] = player;
@@ -1378,7 +1378,7 @@ class Game
         if ( Object.keys(self.players["player0"].employees).length < 1 )
         {
           // TODO
-          if ( false) //self.players["player0"].usedInitialRecruit)
+          if (self.players["player0"].usedInitialRecruit)
           {
             eventManager.dispatchEvent({type: "makeInfoPopup", content:
               {

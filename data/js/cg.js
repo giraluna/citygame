@@ -147,68 +147,156 @@ var cg = {
             "road_h": {
                 "type": "road_h",
                 "baseType": "road",
+                "title": "Road",
                 "anchor": [0.5, 1.0],
-                "frame": "road_h.png"
+                "frame": "road_h.png",
+                "effects": [
+                    {
+                        "type": "nearbyRoad",
+                        "range": 1,
+                        "strength": 1
+                    }
+                ]
             },
             "road_v": {
                 "type": "road_v",
                 "baseType": "road",
+                "title": "Road",
                 "anchor": [0.5, 1.0],
-                "frame": "road_v.png"
+                "frame": "road_v.png",
+                "effects": [
+                    {
+                        "type": "nearbyRoad",
+                        "range": 1,
+                        "strength": 1
+                    }
+                ]
             },
             "road_ne": {
                 "type": "road_ne",
                 "baseType": "road",
+                "title": "Road",
                 "anchor": [0.5, 1.0],
-                "frame": "road_ne.png"
+                "frame": "road_ne.png",
+                "effects": [
+                    {
+                        "type": "nearbyRoad",
+                        "range": 1,
+                        "strength": 1
+                    }
+                ]
             },
             "road_nw": {
                 "type": "road_nw",
                 "baseType": "road",
+                "title": "Road",
                 "anchor": [0.5, 1.0],
-                "frame": "road_nw.png"
+                "frame": "road_nw.png",
+                "effects": [
+                    {
+                        "type": "nearbyRoad",
+                        "range": 1,
+                        "strength": 1
+                    }
+                ]
             },
             "road_sw": {
                 "type": "road_sw",
                 "baseType": "road",
+                "title": "Road",
                 "anchor": [0.5, 1.0],
-                "frame": "road_sw.png"
+                "frame": "road_sw.png",
+                "effects": [
+                    {
+                        "type": "nearbyRoad",
+                        "range": 1,
+                        "strength": 1
+                    }
+                ]
             },
             "road_es": {
                 "type": "road_es",
                 "baseType": "road",
+                "title": "Road",
                 "anchor": [0.5, 1.0],
-                "frame": "road_se.png"
+                "frame": "road_se.png",
+                "effects": [
+                    {
+                        "type": "nearbyRoad",
+                        "range": 1,
+                        "strength": 1
+                    }
+                ]
             },
             "road_nesw": {
                 "type": "road_nesw",
                 "baseType": "road",
+                "title": "Road",
                 "anchor": [0.5, 1.0],
-                "frame": "road_news.png"
+                "frame": "road_news.png",
+                "effects": [
+                    {
+                        "type": "nearbyRoad",
+                        "range": 1,
+                        "strength": 1
+                    }
+                ]
             },
             "road_new": {
                 "type": "road_new",
                 "baseType": "road",
+                "title": "Road",
                 "anchor": [0.5, 1.0],
-                "frame": "road_new.png"
+                "frame": "road_new.png",
+                "effects": [
+                    {
+                        "type": "nearbyRoad",
+                        "range": 1,
+                        "strength": 1
+                    }
+                ]
             },
             "road_nsw": {
                 "type": "road_nsw",
                 "baseType": "road",
+                "title": "Road",
                 "anchor": [0.5, 1.0],
-                "frame": "road_nsw.png"
+                "frame": "road_nsw.png",
+                "effects": [
+                    {
+                        "type": "nearbyRoad",
+                        "range": 1,
+                        "strength": 1
+                    }
+                ]
             },
             "road_esw": {
                 "type": "road_esw",
                 "baseType": "road",
+                "title": "Road",
                 "anchor": [0.5, 1.0],
-                "frame": "road_sew.png"
+                "frame": "road_sew.png",
+                "effects": [
+                    {
+                        "type": "nearbyRoad",
+                        "range": 1,
+                        "strength": 1
+                    }
+                ]
             },
             "road_nes": {
                 "type": "road_nes",
                 "baseType": "road",
+                "title": "Road",
                 "anchor": [0.5, 1.0],
-                "frame": "road_nse.png"
+                "frame": "road_nse.png",
+                "effects": [
+                    {
+                        "type": "nearbyRoad",
+                        "range": 1,
+                        "strength": 1
+                    }
+                ]
             }
         },
         "tubes": {
@@ -285,9 +373,9 @@ var cg = {
                 "baseType": "building",
                 "categoryType": "apartment",
                 "title": "Apartment 1",
-                "baseProfit": 1.2,
+                "baseProfit": 16,
                 "daysForProfitTick": 30,
-                "cost": 25,
+                "cost": 3000,
                 "buildTime": 14,
                 "anchor": [0.5, 1],
                 "frame": "house1.png",
@@ -311,9 +399,9 @@ var cg = {
                 "baseType": "building",
                 "categoryType": "apartment",
                 "title": "Apartment 2",
-                "baseProfit": 2.5,
+                "baseProfit": 200,
                 "daysForProfitTick": 30,
-                "cost": 50,
+                "cost": 100000,
                 "buildTime": 21,
                 "anchor": [0.5, 1],
                 "frame": "house2.png",
@@ -467,9 +555,9 @@ var cg = {
                 "baseType": "building",
                 "categoryType": "fastfood",
                 "title": "Fast food restaurant",
-                "baseProfit": 1,
+                "baseProfit": 3,
                 "daysForProfitTick": 1,
-                "cost": 25,
+                "cost": 150,
                 "buildTime": 14,
                 "anchor": [0.5, 1],
                 "frame": "fastfood.png",
@@ -487,9 +575,9 @@ var cg = {
                 "baseType": "building",
                 "categoryType": "shopping",
                 "title": "Convenience store",
-                "baseProfit": 1,
+                "baseProfit": 8,
                 "daysForProfitTick": 1,
-                "cost": 25,
+                "cost": 1000,
                 "buildTime": 14,
                 "anchor": [0.5, 1],
                 "frame": "conveniencestore.png",
@@ -512,9 +600,9 @@ var cg = {
                 "baseType": "building",
                 "categoryType": "office",
                 "title": "Small office",
-                "baseProfit": 3,
+                "baseProfit": 40,
                 "daysForProfitTick": 90,
-                "cost": 50,
+                "cost": 10000,
                 "buildTime": 21,
                 "anchor": [0.5, 1],
                 "frame": "smalloffice.png",
@@ -591,9 +679,9 @@ var cg = {
                 "categoryType": "shopping",
                 "title": "Stretchy store (test)",
                 "size": [2, 1],
-                "baseProfit": 1,
+                "baseProfit": 60,
                 "daysForProfitTick": 1,
-                "cost": 50,
+                "cost": 25000,
                 "buildTime": 14,
                 "anchor": [0.6666, 1],
                 "frame": "stretchystore.png",
@@ -601,13 +689,13 @@ var cg = {
                 "effects": [
                     {
                         "type": "shoppingCompetition",
-                        "range": 2,
-                        "strength": 1
+                        "range": 4,
+                        "strength": 2
                     },
                     {
                         "type": "nearbyShopping",
-                        "range": 2,
-                        "strength": 1
+                        "range": 4,
+                        "strength": 2
                     }
                 ]
             },
@@ -616,9 +704,9 @@ var cg = {
                 "baseType": "building",
                 "categoryType": "factory",
                 "title": "Factory",
-                "baseProfit": 1.5,
+                "baseProfit": 100,
                 "daysForProfitTick": 1,
-                "cost": 50,
+                "cost": 50000,
                 "buildTime": 14,
                 "anchor": [0.5, 1],
                 "frame": "factory.png",
@@ -685,10 +773,10 @@ function findType(typeName, target) {
 var playerBuildableBuildings = [];
 [
     "parkinglot",
-    "fastfood",
     "conveniencestore",
     "house1",
     "smalloffice",
+    "stretchystore",
     "factory",
     "house2"
 ].forEach(function (type) {

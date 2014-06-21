@@ -8,5 +8,6 @@ declare module cityGeneration {
     }
     function placeBuilding(board: any, _buildingType: string, includedArea: number, exclusions?: IExclusionTypes[]): any;
     function placeMainSubwayLines(board: any): void;
+    function placeStationRoads(board: any): void;
     function placeInitialHousing(board: any): void;
 }

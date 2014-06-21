@@ -34,6 +34,7 @@ declare module cellModifiers {
         targets: string[];
         effect: {
             addedProfit: number;
+            multiplier: number;
         };
         scaling: (strength: any) => any;
         landValue: {
@@ -71,6 +72,7 @@ declare module cellModifiers {
         targets: string[];
         effect: {
             addedProfit: number;
+            multiplier: number;
         };
     };
     function nearbyStation(range: number, strength?: number): {
@@ -108,6 +110,7 @@ declare module cellModifiers {
         targets: string[];
         effect: {
             addedProfit: number;
+            multiplier: number;
         };
     };
     function nearbyFactory(range: number, strength?: number): {
@@ -117,7 +120,6 @@ declare module cellModifiers {
         strength: number;
         targets: string[];
         effect: {
-            addedProfit: number;
             multiplier: number;
         };
         scaling: (strength: any) => any;
@@ -126,5 +128,16 @@ declare module cellModifiers {
             multiplier: number;
             falloffFN: (distance: any, invertedDistance: any, invertedDistanceRatio: any) => number;
         };
+    };
+    function nearbyRoad(range: number, strength?: number): {
+        type: string;
+        title: string;
+        range: number;
+        strength: number;
+        targets: string[];
+        effect: {
+            multiplier: number;
+        };
+        scaling: (strength: any) => number;
     };
 }

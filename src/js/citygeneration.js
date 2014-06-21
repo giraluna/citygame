@@ -88,7 +88,7 @@ var cityGeneration;
             connectedToLand.push(getRandomArrayItem(["n", "e", "s", "w"]));
         }
 
-        var start = board.mapGenInfo.mainStationPos;
+        var start = board.mapGenInfo.mainStationPos.slice(0);
 
         for (var i = 0; i < connectedToLand.length; i++) {
             var dir = connectedToLand[i];
@@ -120,6 +120,86 @@ var cityGeneration;
         }
     }
     cityGeneration.placeMainSubwayLines = placeMainSubwayLines;
+
+    function placeStationRoads(board) {
+        var connectedToLand = {};
+        var hasConnection = false;
+
+        for (var dir in board.mapGenInfo.coasts) {
+            if (board.mapGenInfo.coasts[dir].hasCoast !== true) {
+                connectedToLand[dir] = true;
+                hasConnection = true;
+            }
+        }
+        if (!hasConnection) {
+            var randDir = getRandomArrayItem(["n", "e", "s", "w"]);
+            connectedToLand[randDir] = true;
+        }
+        var start = board.mapGenInfo.mainStationPos.slice(0);
+
+        var adjust = [0, 0];
+        var adjustMappings = {
+            n: [0, 1],
+            s: [0, -1],
+            e: [-1, 0],
+            w: [1, 0]
+        };
+
+        var landDirs = Object.keys(connectedToLand);
+        var horDirs = [];
+        var verDirs = [];
+
+        ["n", "s"].forEach(function (dir) {
+            if (landDirs.indexOf(dir) !== -1)
+                verDirs.push(dir);
+        });
+        ["e", "w"].forEach(function (dir) {
+            if (landDirs.indexOf(dir) !== -1)
+                horDirs.push(dir);
+        });
+
+        [horDirs, verDirs].forEach(function (dirSet) {
+            if (dirSet.length === 1) {
+                var side = landDirs.length > 1 ? 1 : 0;
+                adjust[0] += adjustMappings[dirSet[0]][0] * side;
+                adjust[1] += adjustMappings[dirSet[0]][1] * side;
+            } else {
+                var dirToModify = adjust[0] === 0 ? 0 : 1;
+                adjust[dirToModify] += Math.round(Math.random()) * 2 - 1; //-1 or 1
+            }
+        });
+        start[0] += adjust[0];
+        start[1] += adjust[1];
+
+        for (var dir in connectedToLand) {
+            var end;
+
+            switch (dir) {
+                case "w": {
+                    end = [0, start[1]];
+                    break;
+                }
+                case "n": {
+                    end = [start[0], 0];
+                    break;
+                }
+                case "e": {
+                    end = [board.width - 1, start[1]];
+                    break;
+                }
+                case "s": {
+                    end = [start[0], board.height - 1];
+                    break;
+                }
+            }
+
+            var toChange = board.getCells(manhattanSelect(start, end));
+            for (var j = 0; j < toChange.length; j++) {
+                toChange[j].changeContent(cg["content"]["roads"]["road_nesw"]);
+            }
+        }
+    }
+    cityGeneration.placeStationRoads = placeStationRoads;
 
     function placeInitialHousing(board) {
         var populationToPlace = board.population;

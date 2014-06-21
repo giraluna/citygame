@@ -89,7 +89,7 @@ class Board
 
     var rivers = this.mapGenInfo.rivers = mapGeneration.makeRivers(
       coasts,
-      0.4,
+      0.5,
     {
       width: this.width / 4,
       mapHeight: this.height,
@@ -133,6 +133,7 @@ class Board
     this.mapGenInfo.mainStationPos =
       cityGeneration.placeBuilding(this, "smallstation", 0.4,
       [{flags:["water"], radius: 4}]);
+    cityGeneration.placeStationRoads(this);
     cityGeneration.placeMainSubwayLines(this);
     cityGeneration.placeInitialHousing(this);
   }

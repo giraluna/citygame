@@ -8,9 +8,9 @@ var cellModifiers;
             title: "Nice enviroment",
             range: range,
             strength: strength,
-            targets: ["apartment"],
+            targets: ["apartment", "office"],
             effect: {
-                multiplier: 0.1
+                multiplier: 0.3
             },
             landValue: {
                 radius: 4,
@@ -48,7 +48,8 @@ var cellModifiers;
             strength: strength,
             targets: ["fastfood", "shopping"],
             effect: {
-                addedProfit: 0.1
+                addedProfit: 0.3,
+                multiplier: 0.2
             },
             scaling: function (strength) {
                 return strength;
@@ -70,8 +71,8 @@ var cellModifiers;
             strength: strength,
             targets: ["fastfood"],
             effect: {
-                addedProfit: -0.15,
-                multiplier: -0.25
+                addedProfit: -0.25,
+                multiplier: -0.3
             }
         });
     }
@@ -86,8 +87,8 @@ var cellModifiers;
             strength: strength,
             targets: ["shopping"],
             effect: {
-                addedProfit: -0.075,
-                multiplier: -0.15
+                addedProfit: -0.2,
+                multiplier: -0.2
             }
         });
     }
@@ -100,9 +101,10 @@ var cellModifiers;
             title: "Nearby stores",
             range: range,
             strength: strength,
-            targets: ["fastfood"],
+            targets: ["fastfood", "parking"],
             effect: {
-                addedProfit: 0.2
+                addedProfit: 0.25,
+                multiplier: 0.25
             }
         });
     }
@@ -115,10 +117,10 @@ var cellModifiers;
             title: "Nearby station",
             range: range,
             strength: strength,
-            targets: ["fastfood", "shopping", "office", "apartment"],
+            targets: ["fastfood", "shopping", "office", "apartment", "parking"],
             effect: {
                 addedProfit: 0.5,
-                multiplier: 0.2
+                multiplier: 0.5
             },
             landValue: {
                 radius: 20,
@@ -140,8 +142,8 @@ var cellModifiers;
             strength: strength,
             targets: ["parking"],
             effect: {
-                addedProfit: -0.075,
-                multiplier: -0.15
+                addedProfit: -0.2,
+                multiplier: -0.2
             }
         });
     }
@@ -156,7 +158,8 @@ var cellModifiers;
             strength: strength,
             targets: ["fastfood", "shopping"],
             effect: {
-                addedProfit: 0.1
+                addedProfit: 0.25,
+                multiplier: 0.1
             }
         });
     }
@@ -171,7 +174,6 @@ var cellModifiers;
             strength: strength,
             targets: ["fastfood", "shopping", "apartment", "office"],
             effect: {
-                addedProfit: -0.2,
                 multiplier: -0.2
             },
             scaling: function (strength) {
@@ -187,5 +189,23 @@ var cellModifiers;
         });
     }
     cellModifiers.nearbyFactory = nearbyFactory;
+
+    function nearbyRoad(range, strength) {
+        if (typeof strength === "undefined") { strength = 1; }
+        return ({
+            type: "nearbyRoad",
+            title: "Nearby Road",
+            range: range,
+            strength: strength,
+            targets: ["parking"],
+            effect: {
+                multiplier: 0.2
+            },
+            scaling: function (strength) {
+                return 1;
+            }
+        });
+    }
+    cellModifiers.nearbyRoad = nearbyRoad;
 })(cellModifiers || (cellModifiers = {}));
 //# sourceMappingURL=cellmodifiers.js.map

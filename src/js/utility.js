@@ -350,7 +350,7 @@ function getArea(props) {
 }
 
 function singleSelect(a, b) {
-    return [a];
+    return [b];
 }
 
 function rectSelect(a, b) {
@@ -461,7 +461,7 @@ function formatEveryThirdPower(notations) {
 }
 
 function rawFormatter(value) {
-    return (Math.round(value * 1000) / 1000).toFixed(1);
+    return Math.round((value * 1000) / 1000);
 }
 
 var numberFormatters = [

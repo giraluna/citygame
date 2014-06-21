@@ -21,13 +21,13 @@ var UIComponents;
             this.props.setSelectedTool(building.type);
             this.setState({ lastSelectedBuilding: building });
 
-            var stopAfterOne = e && e.shiftKey ? e.shiftKey : false;
+            var continuous = e && e.shiftKey ? e.shiftKey : false;
 
             eventManager.dispatchEvent({
                 type: "changeBuildingType",
                 content: {
                     building: building,
-                    continuous: !stopAfterOne
+                    continuous: continuous
                 }
             });
         },
@@ -53,7 +53,7 @@ var UIComponents;
 
                 var buildCost = player.getBuildCost(building);
                 var canAfford = player.money >= buildCost;
-                var amountBuilt = player.amountBuiltPerType[building.categoryType];
+                var amountBuilt = player.amountBuiltPerType[building.type];
 
                 var divProps = { className: "side-building", key: building.type };
 

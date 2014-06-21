@@ -71,7 +71,6 @@ declare module cellModifiers {
         strength: number;
         targets: string[];
         effect: {
-            addedProfit: number;
             multiplier: number;
         };
     };

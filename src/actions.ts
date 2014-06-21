@@ -141,9 +141,13 @@ module actions
     var baseCost = player.getBuildCost(building);
     var adjustedCost = getActionCost([employee.skills["construction"]], baseCost).actual;
 
-    console.log(adjustedCost);
     if (player.money < adjustedCost) return;
 
+    var size = building.size || [1,1];
+    var endX = cell.gridPos[0] + size[0]-1;
+    var endY = cell.gridPos[1] + size[1]-1;
+
+    var buildArea = cell.board.getCells(rectSelect(cell.gridPos, [endX, endY]));
 
     player.addMoney(-adjustedCost, "buildingCost");
 
@@ -153,7 +157,10 @@ module actions
 
     var actionTime = getActionTime([employee.skills["construction"]], building.buildTime);
 
-    cell.changeContent(cg.content.underConstruction, true, player);
+    for (var i = 0; i < buildArea.length; i++)
+    {
+      buildArea[i].changeContent(cg.content.underConstruction, true, player);
+    }
     eventManager.dispatchEvent({type: "updateWorld", content: ""});
 
     var constructBuildingConfirmFN = function()
@@ -167,11 +174,6 @@ module actions
     };
     var constructBuildingCompleteFN = function()
     {
-      var size = building.size || [1,1];
-      var endX = cell.gridPos[0] + size[0]-1;
-      var endY = cell.gridPos[1] + size[1]-1;
-
-      var buildArea = cell.board.getCells(rectSelect(cell.gridPos, [endX, endY]));
 
       blinkerTODO.addCells(buildArea, blinkerId);
       blinkerTODO.start();

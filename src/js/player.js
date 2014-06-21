@@ -4,7 +4,7 @@
 /// <reference path="js/eventlistener.d.ts" />
 /// <reference path="js/utility.d.ts" />
 var Player = (function () {
-    function Player(id, experience, color) {
+    function Player(id, color) {
         if (typeof color === "undefined") { color = 0xFF0000; }
         this.money = 0;
         this.level = 1;
@@ -22,15 +22,12 @@ var Player = (function () {
         this.modifierEffects = {
             profit: {},
             buildCost: {},
-            recruitQuality: 1,
-            click: 1
+            recruitQuality: 1
         };
         this.indexedProfits = {};
         this.id = id;
         this.color = color;
         this.init();
-        if (experience)
-            this.addExperience(experience);
         this.updateElements();
     }
     Player.prototype.updateElements = function () {
@@ -50,22 +47,23 @@ var Player = (function () {
     };
     Player.prototype.init = function () {
         for (var building in cg.content.buildings) {
-            var type = cg.content.buildings[building].categoryType;
-            if (!this.ownedContent[type]) {
-                this.ownedContent[type] = [];
+            var type = cg.content.buildings[building];
+
+            if (!this.ownedContent[type.categoryType]) {
+                this.ownedContent[type.categoryType] = [];
             }
-            if (this.amountBuiltPerType[type] === undefined) {
-                this.amountBuiltPerType[type] = 0;
+            if (this.amountBuiltPerType[type.type] === undefined) {
+                this.amountBuiltPerType[type.type] = 0;
             }
-            if (this.incomePerType[type] === undefined) {
-                this.incomePerType[type] = 0;
+            if (this.incomePerType[type.categoryType] === undefined) {
+                this.incomePerType[type.categoryType] = 0;
             }
 
-            this.modifierEffects.profit[type] = {
+            this.modifierEffects.profit[type.categoryType] = {
                 addedProfit: 0,
                 multiplier: 1
             };
-            this.modifierEffects.buildCost[type] = {
+            this.modifierEffects.buildCost[type.categoryType] = {
                 addedCost: 0,
                 multiplier: 1
             };
@@ -76,6 +74,10 @@ var Player = (function () {
         };
         this.modifierEffects.buildCost["global"] = {
             addedCost: 0,
+            multiplier: 1
+        };
+        this.modifierEffects.profit["click"] = {
+            addedProfit: 0.1,
             multiplier: 1
         };
 
@@ -132,23 +134,20 @@ var Player = (function () {
         this.removeCell(cell);
     };
     Player.prototype.addContent = function (content) {
-        var type = content.categoryType;
-
         // for trees etc.
-        if (!this.ownedContent[type])
+        if (!this.ownedContent[content.categoryType])
             return;
 
-        this.ownedContent[type].push(content);
-        this.amountBuiltPerType[type]++;
+        this.ownedContent[content.categoryType].push(content);
+        this.amountBuiltPerType[content.type.type]++;
         content.player = this;
     };
     Player.prototype.removeContent = function (content) {
-        var type = content.categoryType;
-        this.ownedContent[type] = this.ownedContent[type].filter(function (building) {
+        this.ownedContent[content.categoryType] = this.ownedContent[content.categoryType].filter(function (building) {
             return building.id !== content.id;
         });
 
-        this.amountBuiltPerType[type]--;
+        this.amountBuiltPerType[content.type.type]--;
     };
     Player.prototype.sellContent = function (content) {
         var type = content.type;
@@ -161,15 +160,15 @@ var Player = (function () {
     Player.prototype.addMoney = function (initialAmount, incomeType, daysPerTick, date) {
         var amount = this.getIndexedProfit(incomeType, initialAmount);
 
-        if (amount > 0) {
+        if (amount > 0 && incomeType !== "sell" && incomeType !== "initial") {
             if (daysPerTick)
                 amount *= daysPerTick;
-            if (incomeType !== "sell" && incomeType !== "initial")
-                this.addExperience(amount);
+
+            this.addExperience(amount);
         }
 
         if (incomeType) {
-            if (!this.incomePerType[incomeType]) {
+            if (this.incomePerType[incomeType] === undefined) {
                 this.incomePerType[incomeType] = 0;
             }
 
@@ -187,8 +186,12 @@ var Player = (function () {
             _m[date.day] ? _m[date.day] += amount : _m[date.day] = amount;
         }
 
+        if (!isFinite(amount))
+            debugger;
         this.money += amount;
         this.updateElements();
+
+        return amount;
     };
     Player.prototype.addModifier = function (modifier) {
         if (this.modifiers[modifier.type])
@@ -249,7 +252,7 @@ var Player = (function () {
     };
     Player.prototype.getBuildCost = function (type) {
         var cost = type.cost;
-        var alreadyBuilt = this.amountBuiltPerType[type.categoryType];
+        var alreadyBuilt = this.amountBuiltPerType[type.type];
 
         cost += this.modifierEffects.buildCost[type.categoryType].addedCost;
         cost += this.modifierEffects.buildCost["global"].addedCost;
@@ -262,7 +265,7 @@ var Player = (function () {
         return Math.round(cost);
     };
     Player.prototype.getCellBuyCost = function (baseCost) {
-        return baseCost * Math.pow(1.3, Object.keys(this.ownedCells).length);
+        return baseCost * Math.pow(1.2, Object.keys(this.ownedCells).length);
     };
     Player.prototype.addExperience = function (amount) {
         this.experience += amount;
@@ -302,20 +305,20 @@ var Player = (function () {
     };
     Player.prototype.getModifiedProfit = function (initialAmount, type) {
         var amount = initialAmount;
-        if (amount > 0) {
-            amount += this.modifierEffects.profit["global"].addedProfit;
 
-            if (type) {
-                if (this.modifierEffects.profit[type]) {
-                    amount += this.modifierEffects.profit[type].addedProfit;
-                    amount *= this.modifierEffects.profit[type].multiplier;
-                }
+        amount += this.modifierEffects.profit["global"].addedProfit;
+
+        if (type) {
+            if (this.modifierEffects.profit[type]) {
+                amount += this.modifierEffects.profit[type].addedProfit;
+                amount *= this.modifierEffects.profit[type].multiplier;
             }
-            amount *= this.modifierEffects.profit["global"].multiplier;
-
-            if (amount < 0)
-                amount = 0;
         }
+        amount *= this.modifierEffects.profit["global"].multiplier;
+
+        if (initialAmount > 0 && amount < 0)
+            amount = 0;
+
         return amount;
     };
     Player.prototype.getIndexedProfit = function (type, amount) {

@@ -446,7 +446,7 @@ function getArea(props:
 
 function singleSelect(a:number[], b: number[])
 {
-  return [a];
+  return [b];
 }
 
 function rectSelect(a:number[], b:number[]): number[]
@@ -584,7 +584,7 @@ function formatEveryThirdPower(notations): any
 }
 
 function rawFormatter(value) {
-  return (Math.round(value * 1000) / 1000).toFixed(1);
+  return Math.round((value * 1000) / 1000);
 }
 
 var numberFormatters = [

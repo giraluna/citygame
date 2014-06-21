@@ -113,8 +113,7 @@ module cellModifiers
       targets: ["fastfood", "parking"],
       effect:
       {
-        addedProfit: 0.25,
-        multiplier: 0.25
+        multiplier: 0.2
       }
     });
   }
@@ -130,8 +129,8 @@ module cellModifiers
       targets: ["fastfood", "shopping", "office", "apartment", "parking"],
       effect:
       {
-        addedProfit: 0.5,
-        multiplier: 0.5
+        addedProfit: 0.25,
+        multiplier: 0.25
       },
       landValue:
       {
@@ -150,7 +149,7 @@ module cellModifiers
     return(
     {
       type: "parkingCompetition",
-      title: "Competing stores",
+      title: "Competing lots",
       range: range,
       strength: strength,
       targets: ["parking"],
@@ -219,7 +218,7 @@ module cellModifiers
       targets: ["parking"],
       effect:
       {
-        multiplier: 0.2
+        multiplier: 0.15
       },
       scaling: function(strength)
       {

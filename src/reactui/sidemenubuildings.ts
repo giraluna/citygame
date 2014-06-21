@@ -29,7 +29,7 @@ export var SideMenuBuildings = React.createClass(
     this.setState({lastSelectedBuilding: building});
 
 
-    var stopAfterOne = e && e.shiftKey ? e.shiftKey : false;
+    var continuous = e && e.shiftKey ? e.shiftKey : false;
 
     eventManager.dispatchEvent(
       {
@@ -37,7 +37,7 @@ export var SideMenuBuildings = React.createClass(
         content:
         {
           building: building,
-          continuous: !stopAfterOne
+          continuous: continuous
         }
       })
   },
@@ -71,7 +71,7 @@ export var SideMenuBuildings = React.createClass(
 
       var buildCost = player.getBuildCost(building);
       var canAfford = player.money >= buildCost;
-      var amountBuilt = player.amountBuiltPerType[building.categoryType];
+      var amountBuilt = player.amountBuiltPerType[building.type];
 
       var divProps: any = {className: "side-building", key: building.type};
 

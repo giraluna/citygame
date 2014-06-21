@@ -103,8 +103,7 @@ var cellModifiers;
             strength: strength,
             targets: ["fastfood", "parking"],
             effect: {
-                addedProfit: 0.25,
-                multiplier: 0.25
+                multiplier: 0.2
             }
         });
     }
@@ -119,8 +118,8 @@ var cellModifiers;
             strength: strength,
             targets: ["fastfood", "shopping", "office", "apartment", "parking"],
             effect: {
-                addedProfit: 0.5,
-                multiplier: 0.5
+                addedProfit: 0.25,
+                multiplier: 0.25
             },
             landValue: {
                 radius: 20,
@@ -137,7 +136,7 @@ var cellModifiers;
         if (typeof strength === "undefined") { strength = 1; }
         return ({
             type: "parkingCompetition",
-            title: "Competing stores",
+            title: "Competing lots",
             range: range,
             strength: strength,
             targets: ["parking"],
@@ -199,7 +198,7 @@ var cellModifiers;
             strength: strength,
             targets: ["parking"],
             effect: {
-                multiplier: 0.2
+                multiplier: 0.15
             },
             scaling: function (strength) {
                 return 1;

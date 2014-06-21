@@ -1786,7 +1786,7 @@ class Game
   }
   loadPlayer(data: any)
   {
-    var player = new Player(data.id, data.experience);
+    var player = new Player(data.id);
     
     player.money = data.money;
 
@@ -2858,22 +2858,21 @@ class ClickTool extends Tool
   onActivate(target: Cell)
   {
     var player = game.players.player0;
-    var clickAmount = 0;
-    if (!target.content || !target.content.player ||
-      target.content.player.id !== player.id)
+    var baseAmount = 0;
+
+    if (target.content && target.content.player &&
+      target.content.player.id === player.id)
     {
-      clickAmount = 0.1;
-    }
-    else
-    {
-      clickAmount = target.content.modifiedProfit * 0.25 * player.modifierEffects.click;
+      baseAmount += player.getIndexedProfit(
+        target.content.type.categoryType, target.content.modifiedProfit) * 0.25;
     }
 
-    player.addMoney(clickAmount, "click");
+    var finalAmount = player.addMoney(baseAmount, "click");
 
     if (DRAW_CLICK_POPUPS)
     {
-      game.uiDrawer.makeCellPopup(target, "" + clickAmount, game.worldRenderer.worldSprite);
+      game.uiDrawer.makeCellPopup(target, "" +
+        finalAmount.toFixed(3), game.worldRenderer.worldSprite);
     }
   }
 }

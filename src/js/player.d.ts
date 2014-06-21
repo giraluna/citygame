@@ -24,7 +24,7 @@ declare class Player {
     public indexedProfits: any;
     public moneySpan: HTMLElement;
     public incomeSpan: HTMLElement;
-    constructor(id: string, experience?: number, color?: number);
+    constructor(id: string, color?: number);
     public updateElements(): void;
     public init(): void;
     public addEventListeners(): void;
@@ -37,7 +37,7 @@ declare class Player {
     public addContent(content: any): void;
     public removeContent(content: any): void;
     public sellContent(content: any): void;
-    public addMoney(initialAmount: any, incomeType?: string, daysPerTick?: number, date?: any): void;
+    public addMoney(initialAmount: any, incomeType?: string, daysPerTick?: number, date?: any): any;
     public addModifier(modifier: any): void;
     public applyModifier(modifier: any): void;
     public applyAllModifiers(): void;

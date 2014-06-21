@@ -200,7 +200,14 @@ class ProfitSystem extends System
 
         for (var jj = 0; jj < targets.length; jj++)
         {
-          profitPerThisType += targets[jj].modifiedProfit;
+          var profit = targets[jj].modifiedProfit;
+
+          // content isn't removed in place
+          // which means the array here is the pre-splicing ver
+          // which probably makes this whole system pointless
+          // 
+          // but this check means it doesn't fall apart at least
+          if (isFinite(profit)) profitPerThisType += profit;
         }
         player.addMoney(profitPerThisType, this.targetTypes[ii],
           this.activationRate, currentDate);

@@ -9,4 +9,8 @@ declare module playerModifiers {
         }[];
     }
     var testModifier: IPlayerModifier;
+    var clickModifier1: IPlayerModifier;
+    var clickModifier2: IPlayerModifier;
+    var clickModifier3: IPlayerModifier;
+    var clickModifier4: IPlayerModifier;
 }

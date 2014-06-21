@@ -17,7 +17,7 @@
 /// <reference path="landvalueoverlay.d.ts" />
 /// <reference path="utility.d.ts" />
 /// <reference path="arraylogic.d.ts" />
-declare var SCREEN_WIDTH: number, SCREEN_HEIGHT: number, TILE_WIDTH: number, TILE_HEIGHT: number, TILES: number, WORLD_WIDTH: number, WORLD_HEIGHT: number, ZOOM_LEVELS: number[], AMT_OF_BOARDS: number;
+declare var SCREEN_WIDTH: number, SCREEN_HEIGHT: number, TILE_WIDTH: number, TILE_HEIGHT: number, TILES: number, WORLD_WIDTH: number, WORLD_HEIGHT: number, ZOOM_LEVELS: number[], AMT_OF_BOARDS: number, DRAW_CLICK_POPUPS: boolean;
 declare var idGenerator: any;
 declare class Sprite extends PIXI.Sprite {
     public type: string;
@@ -324,7 +324,6 @@ declare class BuildTool extends Tool {
     public changeBuilding(buildingType: any, continuous?: boolean): void;
     public activate(selectedCells: any[]): void;
 }
-declare var clickCount: number;
 declare class ClickTool extends Tool {
     constructor();
     public onActivate(target: Cell): void;

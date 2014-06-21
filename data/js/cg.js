@@ -42,6 +42,12 @@ var cg = {
         }
     },
     "content": {
+        "underConstruction": {
+            "type": "underConstruction",
+            "baseType": "underConstruction",
+            "anchor": [0.5, 1],
+            "frame": "underconstruction.png"
+        },
         "plants": {
             "grass": {
                 "tree1": {

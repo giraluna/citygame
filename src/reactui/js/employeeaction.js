@@ -88,12 +88,15 @@ var UIComponents;
                         var dataProp = selectedAction.data[prop];
                         if (dataProp) {
                             var toAssign = {};
+
+                            var value = actions.getActionCost(skills, dataProp.amount);
+
                             if (dataProp.approximate === true) {
                                 toAssign.approximate = true;
-                                toAssign.amount = actions.getActionTime(skills, dataProp.amount).approximate;
+                                toAssign.amount = value.approximate;
                             } else if (dataProp.approximate === false) {
                                 toAssign.approximate = false;
-                                toAssign.amount = dataProp.amount;
+                                toAssign.amount = value.actual;
                             } else {
                                 toAssign = null;
                             }

@@ -21,8 +21,8 @@ export var SideMenuStats = React.createClass(
     eventManager.addEventListener("updatePlayerExp", function(event)
     {
       var levelString = "Level   " + event.content.level + " " +
-        event.content.experience + " / " + event.content.nextLevel +
-        " [" + event.content.percentage + "%]";
+        event.content.experience + " / " + event.content.nextLevel; /*+
+        " [" + event.content.percentage + "%]";*/
 
       exp.value = event.content.percentage;
       expText.innerHTML = levelString;

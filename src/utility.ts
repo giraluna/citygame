@@ -579,12 +579,12 @@ function formatEveryThirdPower(notations): any
         notationValue = notations[base];
       }
     }
-    return ( Math.round(value * 1000) / 1000 ) + notationValue;
+    return ( (Math.round(value * 1000) / 1000).toFixed(1) ) + notationValue;
   };
 }
 
 function rawFormatter(value) {
-  return Math.round(value * 1000) / 1000;
+  return (Math.round(value * 1000) / 1000).toFixed(1);
 }
 
 var numberFormatters = [

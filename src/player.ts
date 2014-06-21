@@ -31,7 +31,8 @@ class Player
   {
     profit: {},
     buildCost: {},
-    recruitQuality: 1
+    recruitQuality: 1,
+    click: 1
   };
 
   indexedProfits: any = {};
@@ -163,7 +164,7 @@ class Player
   {
     var value = this.getCellBuyCost(cell.landValue) * 0.66;
 
-    this.addMoney(value, "soldCell");
+    this.addMoney(value, "sell");
     this.removeCell(cell);
   }
   addContent( content )
@@ -192,7 +193,7 @@ class Player
     if (!type.cost) return;
     var value = this.getBuildCost(type) * 0.66;
 
-    this.addMoney(value, "soldContent");
+    this.addMoney(value, "sell");
   }
   addMoney(initialAmount, incomeType?: string, daysPerTick?: number, date?)
   {
@@ -201,7 +202,7 @@ class Player
     if (amount > 0)
     {
       if (daysPerTick) amount *= daysPerTick;
-      this.addExperience(amount);
+      if (incomeType !== "sell" && incomeType !== "initial") this.addExperience(amount);
     }
 
 
@@ -309,19 +310,19 @@ class Player
     var cost = type.cost;
     var alreadyBuilt = this.amountBuiltPerType[type.categoryType];
 
-    cost *= Math.pow(1.1, alreadyBuilt);
-
     cost += this.modifierEffects.buildCost[type.categoryType].addedCost;
     cost += this.modifierEffects.buildCost["global"].addedCost;
 
     cost *= this.modifierEffects.buildCost[type.categoryType].multiplier;
     cost *= this.modifierEffects.buildCost["global"].multiplier;
 
+    cost *= Math.pow(1.5, alreadyBuilt);
+
     return Math.round(cost);
   }
   getCellBuyCost(baseCost)
   {
-    return baseCost * Math.pow(1.1, Object.keys(this.ownedCells).length);
+    return baseCost * Math.pow(1.3, Object.keys(this.ownedCells).length);
   }
   addExperience(amount)
   {
@@ -332,14 +333,19 @@ class Player
       this.levelUp();
     }
   }
-  levelUp()
+  levelUp(callSize: number = 0)
   {
     this.level++;
     this.setExperienceToNextLevel();
 
     if (this.experience >= this.experienceToNextLevel)
     {
-      this.levelUp();
+      if (callSize > 101)
+      {
+        throw new Error();
+        return;
+      }
+      this.levelUp(callSize++);
     }
   }
   getExperienceForLevel(level)

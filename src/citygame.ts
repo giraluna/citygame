@@ -32,7 +32,8 @@ var SCREEN_WIDTH = 720,
     WORLD_WIDTH = TILES * TILE_WIDTH,
     WORLD_HEIGHT = TILES * TILE_HEIGHT,
     ZOOM_LEVELS = [1],
-    AMT_OF_BOARDS = 1;
+    AMT_OF_BOARDS = 1,
+    DRAW_CLICK_POPUPS = true;
 
 var idGenerator = idGenerator || {};
 idGenerator.content = 0;
@@ -1182,7 +1183,6 @@ class Game
     this.initContainers();
     this.initTools();
     this.bindElements();
-    this.changeTool("grass");
 
     for (var i = 0; i < AMT_OF_BOARDS; i++)
     {
@@ -1203,8 +1203,7 @@ class Game
     this.systemsManager = new SystemsManager(1000);
     var id = "player" + (idGenerator.player++);
     var player = new Player(id);
-    player.money += 100;
-    //player.addMoney(100);
+    player.addMoney(100, "initial");
     this.reactUI = new ReactUI(player, this.frameImages);
     this.players[player.id] = player;
     // TODO have content types register themselves
@@ -1783,6 +1782,11 @@ class Game
     var player = new Player(data.id, data.experience);
     
     player.money = data.money;
+
+    if (data.experience)
+    {
+      player.addExperience(data.experience);
+    }
 
     if (data.stats)
     {
@@ -2832,7 +2836,6 @@ class BuildTool extends Tool
     }
   }
 }
-var clickCount = 0;
 
 class ClickTool extends Tool
 {
@@ -2847,8 +2850,24 @@ class ClickTool extends Tool
   }
   onActivate(target: Cell)
   {
-    // TODO direct reference
-    game.uiDrawer.makeCellPopup(target, "" + clickCount++, game.worldRenderer.worldSprite);
+    var player = game.players.player0;
+    var clickAmount = 0;
+    if (!target.content || !target.content.player ||
+      target.content.player.id !== player.id)
+    {
+      clickAmount = 0.1;
+    }
+    else
+    {
+      clickAmount = target.content.modifiedProfit * 0.25 * player.modifierEffects.click;
+    }
+
+    player.addMoney(clickAmount, "click");
+
+    if (DRAW_CLICK_POPUPS)
+    {
+      game.uiDrawer.makeCellPopup(target, "" + clickAmount, game.worldRenderer.worldSprite);
+    }
   }
 }
 

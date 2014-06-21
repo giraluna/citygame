@@ -197,13 +197,8 @@ var ReactUI = (function () {
         if (props.player.ownedCells[props.cell.gridPos])
             return;
 
-        var buyCost = props.cell.landValue;
-        if (props.cell.content) {
-            buyCost += 10;
-            if (props.cell.content.type.cost) {
-                buyCost += props.cell.content.type.cost * 1.15;
-            }
-        }
+        var buyCost = props.player.getCellBuyCost(props.cell.landValue);
+
         var buySelected = function (selected) {
             actions.buyCell(props.player, props.cell, selected.employee, buyCost);
         };
@@ -273,7 +268,7 @@ var ReactUI = (function () {
                     },
                     cost: {
                         approximate: false,
-                        amount: props.buildingTemplate.cost
+                        amount: props.player.getBuildCost(props.buildingTemplate)
                     }
                 },
                 baseDuration: props.buildingTemplate.buildTime,

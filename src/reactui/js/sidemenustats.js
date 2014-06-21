@@ -14,7 +14,7 @@ var UIComponents;
             });
 
             eventManager.addEventListener("updatePlayerExp", function (event) {
-                var levelString = "Level   " + event.content.level + " " + event.content.experience + " / " + event.content.nextLevel + " [" + event.content.percentage + "%]";
+                var levelString = "Level   " + event.content.level + " " + event.content.experience + " / " + event.content.nextLevel;
 
                 exp.value = event.content.percentage;
                 expText.innerHTML = levelString;

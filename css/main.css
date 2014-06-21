@@ -40,18 +40,18 @@
 }
 .interactive:hover {
   z-index: 1000;
-  background-color: #9db6bd;
+  background-color: #ddd;
 }
 .interactive:active {
-  background-color: #587982;
+  background-color: #080;
   color: #ddd;
 }
 .selected-tool {
-  background-color: #587982;
+  background-color: #080;
   color: #ddd;
 }
 .selected-tool:hover {
-  background-color: #587982;
+  background-color: #080;
 }
 html,
 body {

@@ -22,7 +22,8 @@ var Player = (function () {
         this.modifierEffects = {
             profit: {},
             buildCost: {},
-            recruitQuality: 1
+            recruitQuality: 1,
+            click: 1
         };
         this.indexedProfits = {};
         this.id = id;
@@ -127,7 +128,7 @@ var Player = (function () {
     Player.prototype.sellCell = function (cell) {
         var value = this.getCellBuyCost(cell.landValue) * 0.66;
 
-        this.addMoney(value, "soldCell");
+        this.addMoney(value, "sell");
         this.removeCell(cell);
     };
     Player.prototype.addContent = function (content) {
@@ -155,7 +156,7 @@ var Player = (function () {
             return;
         var value = this.getBuildCost(type) * 0.66;
 
-        this.addMoney(value, "soldContent");
+        this.addMoney(value, "sell");
     };
     Player.prototype.addMoney = function (initialAmount, incomeType, daysPerTick, date) {
         var amount = this.getIndexedProfit(incomeType, initialAmount);
@@ -163,7 +164,8 @@ var Player = (function () {
         if (amount > 0) {
             if (daysPerTick)
                 amount *= daysPerTick;
-            this.addExperience(amount);
+            if (incomeType !== "sell" && incomeType !== "initial")
+                this.addExperience(amount);
         }
 
         if (incomeType) {
@@ -249,18 +251,18 @@ var Player = (function () {
         var cost = type.cost;
         var alreadyBuilt = this.amountBuiltPerType[type.categoryType];
 
-        cost *= Math.pow(1.1, alreadyBuilt);
-
         cost += this.modifierEffects.buildCost[type.categoryType].addedCost;
         cost += this.modifierEffects.buildCost["global"].addedCost;
 
         cost *= this.modifierEffects.buildCost[type.categoryType].multiplier;
         cost *= this.modifierEffects.buildCost["global"].multiplier;
 
+        cost *= Math.pow(1.5, alreadyBuilt);
+
         return Math.round(cost);
     };
     Player.prototype.getCellBuyCost = function (baseCost) {
-        return baseCost * Math.pow(1.1, Object.keys(this.ownedCells).length);
+        return baseCost * Math.pow(1.3, Object.keys(this.ownedCells).length);
     };
     Player.prototype.addExperience = function (amount) {
         this.experience += amount;
@@ -269,12 +271,17 @@ var Player = (function () {
             this.levelUp();
         }
     };
-    Player.prototype.levelUp = function () {
+    Player.prototype.levelUp = function (callSize) {
+        if (typeof callSize === "undefined") { callSize = 0; }
         this.level++;
         this.setExperienceToNextLevel();
 
         if (this.experience >= this.experienceToNextLevel) {
-            this.levelUp();
+            if (callSize > 101) {
+                throw new Error();
+                return;
+            }
+            this.levelUp(callSize++);
         }
     };
     Player.prototype.getExperienceForLevel = function (level) {

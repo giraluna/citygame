@@ -45,7 +45,7 @@ declare class Player {
     public getBuildCost(type: any): number;
     public getCellBuyCost(baseCost: any): number;
     public addExperience(amount: any): void;
-    public levelUp(): void;
+    public levelUp(callSize?: number): void;
     public getExperienceForLevel(level: any): number;
     public setExperienceToNextLevel(): void;
     public getExperiencePercentage(): number;

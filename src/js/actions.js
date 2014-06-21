@@ -118,6 +118,7 @@ var actions;
         var baseCost = player.getBuildCost(building);
         var adjustedCost = getActionCost([employee.skills["construction"]], baseCost).actual;
 
+        console.log(adjustedCost);
         if (player.money < adjustedCost)
             return;
 
@@ -128,6 +129,9 @@ var actions;
         var blinkerId = blinkerTODO.idGenerator++;
 
         var actionTime = getActionTime([employee.skills["construction"]], building.buildTime);
+
+        cell.changeContent(cg.content.underConstruction, true, player);
+        eventManager.dispatchEvent({ type: "updateWorld", content: "" });
 
         var constructBuildingConfirmFN = function () {
             blinkerTODO.removeCells(blinkerId);
@@ -172,7 +176,7 @@ var actions;
         var avgSkill = skills.reduce(function (a, b) {
             return a + b;
         }) / skills.length;
-        var workRate = adjustFN ? adjustFN(avgSkill) : 2 / Math.log(avgSkill + 1);
+        var workRate = adjustFN ? adjustFN(avgSkill) : Math.pow(1 - 0.166904 * Math.log(avgSkill), 1 / 2.5);
 
         var approximate = Math.round(base * workRate);
         var actual = Math.round(approximate + randRange(-base * variance, base * variance));
@@ -183,16 +187,12 @@ var actions;
         });
     }
     function getActionTime(skills, base) {
-        return getSkillAdjust(skills, base, function actionTimeAdjustFN(avgSkill) {
-            return 2 / Math.log(avgSkill + 1);
-        }, 0.25);
+        return getSkillAdjust(skills, base, null, 0.25);
     }
     actions.getActionTime = getActionTime;
 
     function getActionCost(skills, base) {
-        return getSkillAdjust(skills, base, function actionCostAdjustFN(avgSkill) {
-            return 2 / Math.log(avgSkill + 3);
-        }, 0.25);
+        return getSkillAdjust(skills, base, null, 0);
     }
     actions.getActionCost = getActionCost;
 })(actions || (actions = {}));

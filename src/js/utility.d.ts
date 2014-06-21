@@ -70,6 +70,6 @@ declare function arrayToPolygon(points: any): PIXI.Polygon;
 declare function arrayToPoint(point: any): PIXI.Point;
 declare function getReverseDir(dir: string): string;
 declare function formatEveryThirdPower(notations: any): any;
-declare function rawFormatter(value: any): number;
+declare function rawFormatter(value: any): string;
 declare var numberFormatters: any[];
 declare function beautify(value: number, formatterIndex?: number): any;

@@ -58,7 +58,7 @@ module UIComponents
         onTouchStart: this.handleClose,
         draggable: true,
         onDrag: stopBubble
-      }, this.props.closeBtnText || "Cancel");
+      }, this.props.closeBtnText || "Close");
 
       var rows = [];
       for (var i = 0; i < this.props.player.unlockedModifiers.length; i++)
@@ -70,7 +70,8 @@ module UIComponents
           data:
           {
             title: modifier.title,
-            cost: beautify(modifier.cost) + "$",
+            cost:  modifier.cost,
+            costString: beautify(modifier.cost) + "$",
             description: modifier.description,
 
             modifier: modifier
@@ -85,8 +86,9 @@ module UIComponents
         },
         {
           label: "Cost",
-          key: "cost",
-          defaultOrder: "asc"
+          key: "costString",
+          defaultOrder: "asc",
+          propToSortBy: "cost"
         },
         {
           label: "Description",

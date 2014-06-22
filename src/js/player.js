@@ -285,7 +285,7 @@ var Player = (function () {
         return Math.round(cost);
     };
     Player.prototype.getCellBuyCost = function (baseCost) {
-        return baseCost * Math.pow(1.2, Object.keys(this.ownedCells).length);
+        return baseCost * Math.pow(1.1, Object.keys(this.ownedCells).length);
     };
     Player.prototype.addExperience = function (amount) {
         this.experience += amount;
@@ -357,7 +357,7 @@ var Player = (function () {
     Player.prototype.getUnlockConditionVariable = function (conditionType) {
         if (["clicks", "money", "level"].indexOf(conditionType) !== -1) {
             return this[conditionType];
-        } else if (this.amountBuiltPerType[conditionType]) {
+        } else if (this.amountBuiltPerType[conditionType] !== undefined) {
             return this.amountBuiltPerType[conditionType];
         }
     };
@@ -367,29 +367,36 @@ var Player = (function () {
         if (modifier.unlockConditions === ["default"])
             return true;
 
+        var unlocked = true;
+
         for (var i = 0; i < modifier.unlockConditions.length; i++) {
             var condition = modifier.unlockConditions[i];
 
             var toCheckAgainst = this.getUnlockConditionVariable(condition.type);
 
             if (toCheckAgainst < condition.value)
-                return false;
+                unlocked = false;
         }
-
-        return true;
+        return unlocked;
     };
     Player.prototype.setInitialAvailableModifiers = function (allModifiers) {
-        for (var i = 0; i < allModifiers.length; i++) {
-            var mod = allModifiers[i];
+        if (!this.lockedModifiers || this.lockedModifiers.length < 1) {
+            this.lockedModifiers = allModifiers.slice(0);
+        }
+
+        for (var i = 0; i < this.lockedModifiers.length; i++) {
+            var mod = this.lockedModifiers[i];
 
             if (this.checkIfUnlocked(mod)) {
-                this.unlockedModifiers.push(mod);
-            } else {
-                this.lockedModifiers.push(mod);
+                this.unlockModifier(mod);
             }
         }
     };
     Player.prototype.checkLockedModifiers = function (conditionType) {
+        var unlocks = playerModifiers.modifiersByUnlock[conditionType];
+        if (!unlocks)
+            return;
+
         if (this.recentlyCheckedUnlockConditions[conditionType]) {
             return;
         } else {
@@ -398,10 +405,6 @@ var Player = (function () {
                 this.recentlyCheckedUnlockConditions[conditionType] = false;
             }.bind(this), this.maxCheckFrequency);
         }
-
-        var unlocks = playerModifiers.modifiersByUnlock[conditionType];
-        if (!unlocks)
-            return;
 
         var unlockValues = Object.keys(unlocks);
 
@@ -412,6 +415,8 @@ var Player = (function () {
                 var modifiers = unlocks[unlockValues[i]];
                 for (var j = 0; j < modifiers.length; j++) {
                     if (this.modifiers[modifiers[j].type])
+                        continue;
+                    else if (this.unlockedModifiers.indexOf(modifiers[j]) > -1)
                         continue;
 
                     var unlocked = this.checkIfUnlocked(modifiers[j]);
@@ -424,11 +429,10 @@ var Player = (function () {
         }
     };
     Player.prototype.unlockModifier = function (modifier) {
-        if (this.modifiers[modifier.type] || this.unlockedModifiers.indexOf(modifier) > -1) {
-            return;
+        if (!this.modifiers[modifier.type] || this.unlockedModifiers.indexOf(modifier) <= -1) {
+            this.unlockedModifiers.push(modifier);
         }
 
-        this.unlockedModifiers.push(modifier);
         var index = this.lockedModifiers.indexOf(modifier);
         if (index > -1)
             this.lockedModifiers.splice(index, 1);

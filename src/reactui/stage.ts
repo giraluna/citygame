@@ -31,7 +31,9 @@ export var Stage = React.createClass(
         UIComponents.SideMenu(
           {
             player: this.props.player,
-            frameImages: this.props.frameImages
+            frameImages: this.props.frameImages,
+            // todo react definitions
+            selectedTool: null
           }
         )
       )

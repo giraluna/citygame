@@ -352,7 +352,7 @@ class Player
   }
   getCellBuyCost(baseCost)
   {
-    return baseCost * Math.pow(1.2, Object.keys(this.ownedCells).length);
+    return baseCost * Math.pow(1.1, Object.keys(this.ownedCells).length);
   }
   addExperience(amount)
   {
@@ -438,7 +438,7 @@ class Player
     {
       return this[conditionType];
     }
-    else if (this.amountBuiltPerType[conditionType])
+    else if (this.amountBuiltPerType[conditionType] !== undefined)
     {
       return this.amountBuiltPerType[conditionType];
     }
@@ -448,35 +448,40 @@ class Player
     if (!modifier.unlockConditions) return false;
     if (modifier.unlockConditions === ["default"]) return true;
 
+    var unlocked = true;
+
     for (var i = 0; i < modifier.unlockConditions.length; i++)
     {
       var condition = modifier.unlockConditions[i];
 
       var toCheckAgainst = this.getUnlockConditionVariable(condition.type);
 
-      if (toCheckAgainst < condition.value) return false;
+      if (toCheckAgainst < condition.value) unlocked = false;
     }
-
-    return true;
+    return unlocked;
   }
   setInitialAvailableModifiers(allModifiers: playerModifiers.IPlayerModifier[])
   {
-    for (var i = 0; i < allModifiers.length; i++)
+    if (!this.lockedModifiers || this.lockedModifiers.length < 1)
     {
-      var mod = allModifiers[i];
+      this.lockedModifiers = allModifiers.slice(0);
+    }
+
+    for (var i = 0; i < this.lockedModifiers.length; i++)
+    {
+      var mod = this.lockedModifiers[i];
 
       if (this.checkIfUnlocked(mod))
       {
-        this.unlockedModifiers.push(mod);
-      }
-      else
-      {
-        this.lockedModifiers.push(mod);
+        this.unlockModifier(mod);
       }
     }
   }
   checkLockedModifiers(conditionType: string)
   {
+    var unlocks = playerModifiers.modifiersByUnlock[conditionType];
+    if (!unlocks) return;
+
     if (this.recentlyCheckedUnlockConditions[conditionType])
     {
       return;
@@ -489,9 +494,6 @@ class Player
         this.recentlyCheckedUnlockConditions[conditionType] = false;
       }.bind(this), this.maxCheckFrequency);
     }
-
-    var unlocks = playerModifiers.modifiersByUnlock[conditionType];
-    if (!unlocks) return;
 
     var unlockValues = Object.keys(unlocks);
 
@@ -506,6 +508,7 @@ class Player
         for (var j = 0; j < modifiers.length; j++)
         {
           if (this.modifiers[modifiers[j].type]) continue;
+          else if (this.unlockedModifiers.indexOf(modifiers[j]) > -1) continue;
 
           var unlocked = this.checkIfUnlocked(modifiers[j]);
 
@@ -519,12 +522,11 @@ class Player
   }
   unlockModifier(modifier: playerModifiers.IPlayerModifier)
   {
-    if (this.modifiers[modifier.type] || this.unlockedModifiers.indexOf(modifier) > -1)
+    if (!this.modifiers[modifier.type] || this.unlockedModifiers.indexOf(modifier) <= -1)
     {
-      return;
+      this.unlockedModifiers.push(modifier);
     }
 
-    this.unlockedModifiers.push(modifier);
     var index = this.lockedModifiers.indexOf(modifier);
     if (index > -1) this.lockedModifiers.splice(index, 1);
   }

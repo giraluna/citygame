@@ -28,7 +28,9 @@ var UIComponents;
                 }
             }, popups), UIComponents.SideMenu({
                 player: this.props.player,
-                frameImages: this.props.frameImages
+                frameImages: this.props.frameImages,
+                // todo react definitions
+                selectedTool: null
             })));
         }
     });

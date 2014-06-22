@@ -16,6 +16,22 @@ declare module playerModifiers {
     var clickModifier2: IPlayerModifier;
     var clickModifier3: IPlayerModifier;
     var clickModifier4: IPlayerModifier;
+    var clickModifier5: IPlayerModifier;
+    var parkingModifier1: IPlayerModifier;
+    var parkingModifier2: IPlayerModifier;
+    var parkingModifier3: IPlayerModifier;
+    var convenienceModifier1: IPlayerModifier;
+    var convenienceModifier2: IPlayerModifier;
+    var convenienceModifier3: IPlayerModifier;
+    var apartmentModifier1: IPlayerModifier;
+    var apartmentModifier2: IPlayerModifier;
+    var apartmentModifier3: IPlayerModifier;
+    var officeModifier1: IPlayerModifier;
+    var officeModifier2: IPlayerModifier;
+    var officeModifier3: IPlayerModifier;
+    var factoryModifier1: IPlayerModifier;
+    var factoryModifier2: IPlayerModifier;
+    var factoryModifier3: IPlayerModifier;
     /**
     * unlockConditions:
     * [

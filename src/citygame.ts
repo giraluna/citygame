@@ -39,7 +39,6 @@ var idGenerator = idGenerator || {};
 idGenerator.content = 0;
 idGenerator.player = 0;
 
-
 class Sprite extends PIXI.Sprite
 {
   type: string;
@@ -1382,7 +1381,7 @@ class Game
             eventManager.dispatchEvent({type: "makeInfoPopup", content:
               {
                 text: ["Already used initial recruitment.",
-                "Wait 5 seconds (todo)"]
+                "Wait 5 seconds and try again (todo)"]
               }
             });
           }
@@ -1816,6 +1815,7 @@ class Game
     this.players["player0"] = player;
     this.reactUI.player = player;
     player.addExperience(0); // refresh
+    player.setInitialAvailableModifiers(playerModifiers.allModifiers);
     player.updateElements();
   }
   render()
@@ -1825,6 +1825,7 @@ class Game
     TWEEN.update();
 
     this.systemsManager.update();
+
     requestAnimFrame( this.render.bind(this) );
   }
   resetLayers()

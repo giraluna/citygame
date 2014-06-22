@@ -750,7 +750,7 @@ var cg: any =
         "type": "bigoffice",
         "baseType": "building",
         "categoryType": "office",
-        "title": "Big office (test)",
+        "title": "Big office",
         "size": [2,2],
         "baseProfit": 3,
         "daysForProfitTick": 90,
@@ -773,7 +773,7 @@ var cg: any =
         "type": "stretchystore",
         "baseType": "building",
         "categoryType": "shopping",
-        "title": "Stretchy store (test)",
+        "title": "Stretchy store",
         "size": [2,1],
         "baseProfit": 60,
         "daysForProfitTick": 1,
@@ -900,11 +900,11 @@ var basevalues =
 [
   [25, 0.3],
   [300, 1],
-  [1500, 2],
-  [5000, 4],
-  [20000, 8],
+  [1500, 4],
+  [5000, 6],
+  [20000, 10],
   [50000, 20],
-  [100000, 30]
+  [100000, 35]
 ];
 
 for (var i = 0; i < playerBuildableBuildings.length; i++)

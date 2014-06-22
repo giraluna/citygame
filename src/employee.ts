@@ -1,6 +1,7 @@
 /// <reference path="js/utility.d.ts" />
 /// <reference path="../data/js/names.d.ts" />
-
+/// <reference path="../data/js/playermodifiers.d.ts" />
+/// 
 var idGenerator = idGenerator || {};
 idGenerator.employee = 0;
 

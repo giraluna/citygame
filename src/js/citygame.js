@@ -1078,7 +1078,7 @@ var Game = (function () {
                         type: "makeInfoPopup", content: {
                             text: [
                                 "Already used initial recruitment.",
-                                "Wait 5 seconds (todo)"]
+                                "Wait 5 seconds and try again (todo)"]
                         }
                     });
                 } else {
@@ -1431,6 +1431,7 @@ var Game = (function () {
         this.players["player0"] = player;
         this.reactUI.player = player;
         player.addExperience(0); // refresh
+        player.setInitialAvailableModifiers(playerModifiers.allModifiers);
         player.updateElements();
     };
     Game.prototype.render = function () {
@@ -1439,6 +1440,7 @@ var Game = (function () {
         TWEEN.update();
 
         this.systemsManager.update();
+
         requestAnimFrame(this.render.bind(this));
     };
     Game.prototype.resetLayers = function () {

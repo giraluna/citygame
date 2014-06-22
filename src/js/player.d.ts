@@ -22,6 +22,9 @@ declare class Player {
     public incomePerDate: any;
     public incomePerType: any;
     public modifiers: any;
+    public dynamicModifiers: any;
+    public levelUpModifiers: any;
+    public specialModifiers: any;
     public modifierEffects: any;
     public unlockedModifiers: any[];
     public lockedModifiers: any[];
@@ -44,10 +47,12 @@ declare class Player {
     public removeContent(content: any): void;
     public sellContent(content: any): void;
     public addMoney(initialAmount: any, incomeType?: string, daysPerTick?: number, date?: any): any;
-    public addModifier(modifier: any): void;
+    public addModifier(modifier: any, collection?: string): void;
+    public addSpecialModifier(modifier: any): void;
+    public addDynamicModifier(sourceModifier: any): void;
     public applyModifier(modifier: any): void;
     public applyAllModifiers(): void;
-    public removeModifier(modifier: any): void;
+    public removeModifier(modifier: any, collection?: string): void;
     public getBuildCost(type: any): number;
     public getCellBuyCost(baseCost: any): number;
     public addExperience(amount: any): void;
@@ -63,5 +68,6 @@ declare class Player {
     public setInitialAvailableModifiers(allModifiers: playerModifiers.IPlayerModifier[]): void;
     public checkLockedModifiers(conditionType: string): void;
     public unlockModifier(modifier: playerModifiers.IPlayerModifier): void;
+    public updateDynamicModifiers(conditionType: string): void;
     public addClicks(amount: number): void;
 }

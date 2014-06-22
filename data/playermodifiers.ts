@@ -5,13 +5,15 @@ module playerModifiers
     type: string;
     title: string;
     description: string;
-    effects:
+    effects?:
     {
       targets: string[];
       addedProfit?: number;
       multiplier?: number;
       buildCost?: number;
     }[];
+    uniqueEffect?: (any) => void;
+    dynamicEffect?: {[target: string]: (any) => any;};
     unlockConditions?: any;
 
   }

@@ -22,7 +22,6 @@ declare module cellModifiers {
         strength: number;
         targets: string[];
         effect: {
-            addedProfit: number;
             multiplier: number;
         };
     };
@@ -121,7 +120,6 @@ declare module cellModifiers {
         effect: {
             multiplier: number;
         };
-        scaling: (strength: any) => any;
         landValue: {
             radius: number;
             multiplier: number;

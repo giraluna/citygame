@@ -29,6 +29,10 @@ class Player
   incomePerType: any = {};
 
   modifiers: any = {};
+  dynamicModifiers: any = {};
+  levelUpModifiers: any = {};
+  specialModifiers: any = {};
+
   modifierEffects: any =
   {
     profit: {},
@@ -189,6 +193,8 @@ class Player
     this.amountBuiltPerType[content.type.type]++;
     this.checkLockedModifiers(content.type.type);
     content.player = this;
+
+    this.updateDynamicModifiers(content.type.type);
   }
   removeContent( content )
   {
@@ -199,6 +205,8 @@ class Player
     });
 
     this.amountBuiltPerType[content.type.type]--;
+
+    this.updateDynamicModifiers(content.type.type);
   }
   sellContent( content )
   {
@@ -242,33 +250,68 @@ class Player
       _m[date.day] ? _m[date.day] += amount : _m[date.day] = amount;
     }
 
-    if (!isFinite(amount)) debugger;
+    if (!isFinite(amount)) throw new Error("Infinite amount of money added");
     this.money += amount;
     this.checkLockedModifiers("money");
     this.updateElements();
 
     return amount;
   }
-  addModifier(modifier)
+  addModifier(modifier, collection:string="modifiers")
   {
-    if (this.modifiers[modifier.type]) return;
+    if (this[collection][modifier.type]) return;
     if (modifier.cost && modifier.cost > this.money) return;
-    else
-    {
-      var index = this.unlockedModifiers.indexOf(modifier);
-      {
-        if (index > -1)
-        {
-          this.unlockedModifiers.splice(index, 1);
-        }
-      }
-      this.modifiers[modifier.type] = Object.create(modifier);
 
+    var index = this.unlockedModifiers.indexOf(modifier);
+    {
+      if (index > -1)
+      {
+        this.unlockedModifiers.splice(index, 1);
+      }
+    }
+    this[collection][modifier.type] = Object.create(modifier);
+    if (modifier.effects)
+    {
       this.applyModifier(modifier);
     }
+
+
     if (modifier.cost)
     {
       this.addMoney(-modifier.cost);
+    }
+    if (modifier.uniqueEffect)
+    {
+      modifier.uniqueEffect(this);
+    }
+    if (modifier.dynamicEffect)
+    {
+      this.addDynamicModifier(modifier);
+    }
+  }
+  addSpecialModifier(modifier)
+  {
+    if (this.specialModifiers[modifier.type])
+    {
+      this.removeModifier(this.specialModifiers[modifier.type], "specialModifiers");
+    }
+
+    this.addModifier(modifier, "specialModifiers");
+  }
+  addDynamicModifier(sourceModifier)
+  {
+    for (var condition in sourceModifier.dynamicEffect)
+    {
+      var modifier = sourceModifier.dynamicEffect[condition];
+
+      if (!this.dynamicModifiers[condition])
+      {
+        this.dynamicModifiers[condition] = {};
+      }
+
+      this.dynamicModifiers[condition][sourceModifier.type] = modifier;
+
+      this.updateDynamicModifiers(condition);
     }
   }
   applyModifier(modifier)
@@ -302,9 +345,9 @@ class Player
       this.applyModifier( this.modifiers[_modifier] );
     };
   }
-  removeModifier(modifier)
+  removeModifier(modifier, collection:string="modifiers")
   {
-    if (!this.modifiers[modifier.type])
+    if (!this[collection][modifier.type])
     {
       console.warn("Modifier ", modifier, " does not exist on player ", this);
       return;
@@ -332,7 +375,7 @@ class Player
       }
     }
 
-    this.modifiers[modifier.type] = null;
+    this[collection][modifier.type] = null;
     delete this.modifiers[modifier.type];
   }
   getBuildCost(type)
@@ -529,6 +572,14 @@ class Player
 
     var index = this.lockedModifiers.indexOf(modifier);
     if (index > -1) this.lockedModifiers.splice(index, 1);
+  }
+  updateDynamicModifiers(conditionType: string)
+  {
+    for (var _mod in this.dynamicModifiers[conditionType])
+    {
+      var dynamicEffect = this.dynamicModifiers[conditionType][_mod];
+      dynamicEffect.call(null, this);
+    }
   }
   addClicks(amount: number)
   {

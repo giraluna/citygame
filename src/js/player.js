@@ -21,6 +21,9 @@ var Player = (function () {
         this.incomePerDate = {};
         this.incomePerType = {};
         this.modifiers = {};
+        this.dynamicModifiers = {};
+        this.levelUpModifiers = {};
+        this.specialModifiers = {};
         this.modifierEffects = {
             profit: {},
             buildCost: {},
@@ -149,6 +152,8 @@ var Player = (function () {
         this.amountBuiltPerType[content.type.type]++;
         this.checkLockedModifiers(content.type.type);
         content.player = this;
+
+        this.updateDynamicModifiers(content.type.type);
     };
     Player.prototype.removeContent = function (content) {
         this.ownedContent[content.categoryType] = this.ownedContent[content.categoryType].filter(function (building) {
@@ -156,6 +161,8 @@ var Player = (function () {
         });
 
         this.amountBuiltPerType[content.type.type]--;
+
+        this.updateDynamicModifiers(content.type.type);
     };
     Player.prototype.sellContent = function (content) {
         var type = content.type;
@@ -195,31 +202,59 @@ var Player = (function () {
         }
 
         if (!isFinite(amount))
-            debugger;
+            throw new Error("Infinite amount of money added");
         this.money += amount;
         this.checkLockedModifiers("money");
         this.updateElements();
 
         return amount;
     };
-    Player.prototype.addModifier = function (modifier) {
-        if (this.modifiers[modifier.type])
+    Player.prototype.addModifier = function (modifier, collection) {
+        if (typeof collection === "undefined") { collection = "modifiers"; }
+        if (this[collection][modifier.type])
             return;
         if (modifier.cost && modifier.cost > this.money)
             return;
-        else {
-            var index = this.unlockedModifiers.indexOf(modifier);
-             {
-                if (index > -1) {
-                    this.unlockedModifiers.splice(index, 1);
-                }
-            }
-            this.modifiers[modifier.type] = Object.create(modifier);
 
+        var index = this.unlockedModifiers.indexOf(modifier);
+         {
+            if (index > -1) {
+                this.unlockedModifiers.splice(index, 1);
+            }
+        }
+        this[collection][modifier.type] = Object.create(modifier);
+        if (modifier.effects) {
             this.applyModifier(modifier);
         }
+
         if (modifier.cost) {
             this.addMoney(-modifier.cost);
+        }
+        if (modifier.uniqueEffect) {
+            modifier.uniqueEffect(this);
+        }
+        if (modifier.dynamicEffect) {
+            this.addDynamicModifier(modifier);
+        }
+    };
+    Player.prototype.addSpecialModifier = function (modifier) {
+        if (this.specialModifiers[modifier.type]) {
+            this.removeModifier(this.specialModifiers[modifier.type], "specialModifiers");
+        }
+
+        this.addModifier(modifier, "specialModifiers");
+    };
+    Player.prototype.addDynamicModifier = function (sourceModifier) {
+        for (var condition in sourceModifier.dynamicEffect) {
+            var modifier = sourceModifier.dynamicEffect[condition];
+
+            if (!this.dynamicModifiers[condition]) {
+                this.dynamicModifiers[condition] = {};
+            }
+
+            this.dynamicModifiers[condition][sourceModifier.type] = modifier;
+
+            this.updateDynamicModifiers(condition);
         }
     };
     Player.prototype.applyModifier = function (modifier) {
@@ -245,8 +280,9 @@ var Player = (function () {
         }
         ;
     };
-    Player.prototype.removeModifier = function (modifier) {
-        if (!this.modifiers[modifier.type]) {
+    Player.prototype.removeModifier = function (modifier, collection) {
+        if (typeof collection === "undefined") { collection = "modifiers"; }
+        if (!this[collection][modifier.type]) {
             console.warn("Modifier ", modifier, " does not exist on player ", this);
             return;
         }
@@ -267,7 +303,7 @@ var Player = (function () {
             }
         }
 
-        this.modifiers[modifier.type] = null;
+        this[collection][modifier.type] = null;
         delete this.modifiers[modifier.type];
     };
     Player.prototype.getBuildCost = function (type) {
@@ -436,6 +472,12 @@ var Player = (function () {
         var index = this.lockedModifiers.indexOf(modifier);
         if (index > -1)
             this.lockedModifiers.splice(index, 1);
+    };
+    Player.prototype.updateDynamicModifiers = function (conditionType) {
+        for (var _mod in this.dynamicModifiers[conditionType]) {
+            var dynamicEffect = this.dynamicModifiers[conditionType][_mod];
+            dynamicEffect.call(null, this);
+        }
     };
     Player.prototype.addClicks = function (amount) {
         this.clicks += amount;

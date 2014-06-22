@@ -36,8 +36,7 @@ module cellModifiers
       targets: ["apartment"],
       effect:
       {
-        addedProfit: -0.1,
-        multiplier: -0.15
+        multiplier: -0.1
       }
     });
   }
@@ -189,11 +188,7 @@ module cellModifiers
       targets: ["fastfood", "shopping", "apartment", "office"],
       effect:
       {
-        multiplier: -0.2
-      },
-      scaling: function(strength)
-      {
-        return strength;
+        multiplier: -0.15
       },
       landValue:
       {

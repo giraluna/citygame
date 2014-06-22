@@ -28,6 +28,7 @@ declare module UIComponents {
         sortBy: {
             column: any;
             order: any;
+            currColumnIndex: any;
         };
     }, React.ReactComponent<{
         columns: any;
@@ -35,6 +36,7 @@ declare module UIComponents {
         sortBy: {
             column: any;
             order: any;
+            currColumnIndex: any;
         };
     }, {}>>;
 }

@@ -54,7 +54,8 @@ export var SideMenuStats = React.createClass(
   {
     var self = this;
     var player = this.props.player;
-    var lowestLevel = Object.keys(player.unlockedLevelUpModifiers).sort()[0];
+    var lastIndex = Object.keys(player.unlockedLevelUpModifiers).length - 1;
+    var lowestLevel = Object.keys(player.unlockedLevelUpModifiers).sort()[lastIndex];
 
     var lowestModifierList = player.unlockedLevelUpModifiers[lowestLevel];
 
@@ -72,17 +73,21 @@ export var SideMenuStats = React.createClass(
       content:
       {
         player: player,
+        text: ["Select your bonus perk for level " + lowestLevel,
+        "You only get to pick one"],
         modifierList: lowestModifierList,
         onOk: function(selected)
         {
-          player.addLevelUpModifier(selected.data.modifier);
+          var success = player.addLevelUpModifier(selected.data.modifier);
           eventManager.dispatchEvent({type: "updateReact", content: ""});
 
           self.setState(
           {
             hasLevelUpUpgrade: false
           });
-          return true;
+
+          if (success !== false) return true;
+          else return false;
         }
       }
     });

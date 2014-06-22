@@ -59,8 +59,8 @@ var UIComponents;
                     key: modifier.type,
                     data: {
                         title: modifier.title,
-                        cost: modifier.cost,
-                        costString: beautify(modifier.cost) + "$",
+                        cost: modifier.cost || null,
+                        costString: modifier.cost !== undefined ? beautify(modifier.cost) + "$" : null,
                         description: modifier.description,
                         modifier: modifier
                     }
@@ -84,6 +84,8 @@ var UIComponents;
                 }
             ];
 
+            var text = this.splitMultilineText(this.props.text) || null;
+
             return (React.DOM.div({
                 className: "popup",
                 style: this.props.initialStyle,
@@ -92,7 +94,7 @@ var UIComponents;
                 onDrag: this.handleDrag,
                 onDragEnd: this.handleDragEnd,
                 onTouchStart: this.handleDragStart
-            }, React.DOM.div({ className: "popup-content", draggable: true, onDrag: stopBubble }, UIComponents.List({
+            }, React.DOM.p({ className: "popup-text" }, text), React.DOM.div({ className: "popup-content", draggable: true, onDrag: stopBubble }, UIComponents.List({
                 // TODO fix declaration file and remove
                 // typescript qq without these
                 selected: null,

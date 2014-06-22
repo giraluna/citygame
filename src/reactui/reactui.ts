@@ -213,6 +213,7 @@ class ReactUI
   makeModifierPopup(props:
   {
     player: Player;
+    text?: any;
     modifierList?: any[];
     onOk?: any;
     onClose?: any;
@@ -230,6 +231,7 @@ class ReactUI
     this.makePopup("ModifierPopup",
     {
       player: props.player,
+      text: props.text || null,
       modifierList: props.modifierList || props.player.unlockedModifiers,
       onOk: onOk,
       onClose: props.onClose || null

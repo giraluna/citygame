@@ -34,7 +34,8 @@ var UIComponents;
                 selected: initialSelected,
                 sortBy: {
                     column: initialColumn,
-                    order: initialColumn.defaultOrder || "desc"
+                    order: initialColumn.defaultOrder || "desc",
+                    currColumnIndex: this.props.initialColumns.indexOf(initialColumn)
                 }
             });
         },
@@ -75,7 +76,8 @@ var UIComponents;
             this.setState({
                 sortBy: {
                     column: column,
-                    order: order
+                    order: order,
+                    currColumnIndex: this.state.columns.indexOf(column)
                 }
             });
         },
@@ -88,14 +90,23 @@ var UIComponents;
         },
         sort: function () {
             var selectedColumn = this.state.sortBy.column;
+
+            var nextIndex = (this.state.sortBy.currColumnIndex + 1) % this.state.columns.length;
+            var alternateColumn = this.state.columns[nextIndex];
+
             var propToSortBy = selectedColumn.propToSortBy || selectedColumn.key;
+            var alternatePropToSortBy = alternateColumn.propToSortBy || alternateColumn.key;
             var itemsToSort = this.props.listItems;
 
             if (selectedColumn.sortingFunction) {
                 itemsToSort.sort(selectedColumn.sortingFunction);
             } else {
                 itemsToSort.sort(function (a, b) {
-                    return a.data[propToSortBy] > b.data[propToSortBy] ? 1 : -1;
+                    if (a.data[propToSortBy] === b.data[propToSortBy]) {
+                        return a.data[alternatePropToSortBy] > b.data[alternatePropToSortBy] ? 1 : -1;
+                    } else {
+                        return a.data[propToSortBy] > b.data[propToSortBy] ? 1 : -1;
+                    }
                 });
             }
 

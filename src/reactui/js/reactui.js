@@ -155,6 +155,7 @@ var ReactUI = (function () {
 
         this.makePopup("ModifierPopup", {
             player: props.player,
+            text: props.text || null,
             modifierList: props.modifierList || props.player.unlockedModifiers,
             onOk: onOk,
             onClose: props.onClose || null

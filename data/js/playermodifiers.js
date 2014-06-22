@@ -189,8 +189,7 @@ var playerModifiers;
     playerModifiers.convenienceModifier2 = {
         type: "convenienceModifier2",
         title: "Hot dog meat efficiency",
-        description: "Convenience stores +1$ /s",
-        //description: "You don't want to know",
+        description: "You don't want to know (+1$/s)",
         cost: 1500,
         unlockConditions: [
             {
@@ -201,7 +200,7 @@ var playerModifiers;
         effects: [
             {
                 targets: ["shopping"],
-                addedProfit: 0.5
+                addedProfit: 1
             }
         ]
     };

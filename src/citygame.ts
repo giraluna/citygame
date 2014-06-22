@@ -1506,6 +1506,13 @@ class Game
       {
         self.mouseEventHandler.scroller.zoom( event.content );
       });
+
+      // options todo
+      var popupToggle = <HTMLInputElement> document.getElementById("draw-click-popups");
+      popupToggle.addEventListener("change", function(e)
+      {
+        DRAW_CLICK_POPUPS = popupToggle.checked;
+      });
       
   }
   bindRenderer()
@@ -2375,10 +2382,8 @@ class UIDrawer
       {
         var _mod = cell.content.modifiers[modifier];
         text += "Modifier: " + _mod.title + "\n";
-        text += "Strength: " + _mod.strength + "\n";
-        text += "Adj strength: " + _mod.scaling(_mod.strength).toFixed(3) + "\n";
-        text += "--------------\n";
       }
+      if (Object.keys(cell.content.modifiers).length > 0) text += "-------\n";
       text += "Final profit: " + finalAmount + "/d";
     }
 

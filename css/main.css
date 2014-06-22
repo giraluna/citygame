@@ -171,6 +171,7 @@ progress::-webkit-progress-value {
 #bottom-menu #show-info {
   text-decoration: none;
   float: right;
+  margin-left: 20px;
 }
 #bottom-menu #show-info:hover {
   text-decoration: underline;

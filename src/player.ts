@@ -3,6 +3,7 @@
 /// <reference path="js/employee.d.ts" />
 /// <reference path="../data/js/cg.d.ts" />
 /// <reference path="../data/js/playermodifiers.d.ts" />
+/// <reference path="../data/js/levelupmodifiers.d.ts" />
 /// <reference path="js/eventlistener.d.ts" />
 /// <reference path="js/utility.d.ts" />
 
@@ -42,6 +43,13 @@ class Player
 
   unlockedModifiers = [];
   lockedModifiers = [];
+  unlockedLevelUpModifiers:
+  {
+    [level:number]: playerModifiers.IPlayerModifier[];
+  } = {};
+  levelUpModifiersPerLevelUp: number = 4;
+  levelsAlreadyUnlockedFor: any = {};
+  levelsAlreadyPicked: any = {};
 
   recentlyCheckedUnlockConditions: any = {};
   maxCheckFrequency: number = 1000;
@@ -410,6 +418,7 @@ class Player
   {
     this.level++;
     this.setExperienceToNextLevel();
+    this.unlockLevelUpModifiers(this.level);
 
     if (this.experience >= this.experienceToNextLevel)
     {
@@ -585,6 +594,47 @@ class Player
   {
     this.clicks += amount;
     this.checkLockedModifiers("clicks");
+  }
+  unlockLevelUpModifiers(level)
+  {
+    var modifiersForThisLevel = levelUpModifiers.modifiersByUnlock[level];
+
+    if (!modifiersForThisLevel) return;
+    else if (this.levelsAlreadyUnlockedFor[level]) return;
+
+
+    var toUnlock = [];
+
+    if (Object.keys(modifiersForThisLevel).length <= this.levelUpModifiersPerLevelUp)
+    {
+      for (var _mod in modifiersForThisLevel)
+      {
+        toUnlock.push(modifiersForThisLevel[_mod]);
+      }
+    }
+    else
+    {
+      for (var i = 0; i < this.levelUpModifiersPerLevelUp; i++)
+      {
+        toUnlock.push(getRandomProperty(modifiersForThisLevel));
+      }
+    }
+
+    this.unlockedLevelUpModifiers[level] = toUnlock;
+    this.levelsAlreadyUnlockedFor[level] = true;
+  }
+  addLevelUpModifier(modifier, preventMultiplePerLevel:boolean = true)
+  {
+    var level = modifier.unlockConditions[0].value;
+
+    if (preventMultiplePerLevel && this.levelsAlreadyPicked[level]) return false;
+
+    this.addModifier(modifier, "levelUpModifiers");
+
+    this.unlockedLevelUpModifiers[level] = null;
+    delete this.unlockedLevelUpModifiers[level];
+
+    this.levelsAlreadyPicked[level] = true;
   }
 }
 

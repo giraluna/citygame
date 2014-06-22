@@ -23,7 +23,8 @@ var levelUpModifiers;
         description: "+200$",
         unlockConditions: [
             {
-                level: 5
+                type: "level",
+                value: 5
             }
         ],
         uniqueEffect: function (player) {
@@ -37,7 +38,8 @@ var levelUpModifiers;
         description: "+500$",
         unlockConditions: [
             {
-                level: 10
+                type: "level",
+                value: 10
             }
         ],
         uniqueEffect: function (player) {
@@ -51,7 +53,8 @@ var levelUpModifiers;
         description: "+2000$",
         unlockConditions: [
             {
-                level: 20
+                type: "level",
+                value: 20
             }
         ],
         uniqueEffect: function (player) {
@@ -65,13 +68,12 @@ var levelUpModifiers;
         description: "+0.2 / click for every parking lot",
         unlockConditions: [
             {
-                level: 5
+                type: "level",
+                value: 5
             }
         ],
         dynamicEffect: {
             "parkinglot": function (player) {
-                console.log(player);
-                console.log(player.amountBuiltPerType["parkinglot"]);
                 player.addSpecialModifier({
                     type: "clicksPerParking",
                     title: "Clicks per parking",
@@ -86,6 +88,33 @@ var levelUpModifiers;
             }
         }
     };
+
+    levelUpModifiers.modifiersByUnlock = (function () {
+        var base = {};
+
+        for (var _mod in playerModifiers) {
+            var modifier = playerModifiers[_mod];
+            if (modifier.unlockConditions) {
+                for (var i = 0; i < modifier.unlockConditions.length; i++) {
+                    var condition = modifier.unlockConditions[i];
+
+                    if (condition === "default") {
+                        if (!base.default)
+                            base.default = [];
+                        base.default.push(modifier);
+                        continue;
+                    }
+
+                    if (!base[condition.type])
+                        base[condition.type] = {};
+
+                    var arr = base[condition.type][condition.value] = [];
+                    arr.push(modifier);
+                }
+            }
+        }
+        return base;
+    })();
 
     levelUpModifiers.allModifiers = (function () {
         var all = [];

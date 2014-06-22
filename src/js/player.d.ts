@@ -2,6 +2,7 @@
 /// <reference path="employee.d.ts" />
 /// <reference path="../../data/js/cg.d.ts" />
 /// <reference path="../../data/js/playermodifiers.d.ts" />
+/// <reference path="../../data/js/levelupmodifiers.d.ts" />
 /// <reference path="eventlistener.d.ts" />
 /// <reference path="utility.d.ts" />
 declare class Player {
@@ -28,6 +29,12 @@ declare class Player {
     public modifierEffects: any;
     public unlockedModifiers: any[];
     public lockedModifiers: any[];
+    public unlockedLevelUpModifiers: {
+        [level: number]: playerModifiers.IPlayerModifier[];
+    };
+    public levelUpModifiersPerLevelUp: number;
+    public levelsAlreadyUnlockedFor: any;
+    public levelsAlreadyPicked: any;
     public recentlyCheckedUnlockConditions: any;
     public maxCheckFrequency: number;
     public indexedProfits: any;
@@ -70,4 +77,6 @@ declare class Player {
     public unlockModifier(modifier: playerModifiers.IPlayerModifier): void;
     public updateDynamicModifiers(conditionType: string): void;
     public addClicks(amount: number): void;
+    public unlockLevelUpModifiers(level: any): void;
+    public addLevelUpModifier(modifier: any, preventMultiplePerLevel?: boolean): boolean;
 }

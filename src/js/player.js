@@ -2,6 +2,7 @@
 /// <reference path="js/employee.d.ts" />
 /// <reference path="../data/js/cg.d.ts" />
 /// <reference path="../data/js/playermodifiers.d.ts" />
+/// <reference path="../data/js/levelupmodifiers.d.ts" />
 /// <reference path="js/eventlistener.d.ts" />
 /// <reference path="js/utility.d.ts" />
 var Player = (function () {
@@ -31,6 +32,10 @@ var Player = (function () {
         };
         this.unlockedModifiers = [];
         this.lockedModifiers = [];
+        this.unlockedLevelUpModifiers = {};
+        this.levelUpModifiersPerLevelUp = 4;
+        this.levelsAlreadyUnlockedFor = {};
+        this.levelsAlreadyPicked = {};
         this.recentlyCheckedUnlockConditions = {};
         this.maxCheckFrequency = 1000;
         this.indexedProfits = {};
@@ -334,6 +339,7 @@ var Player = (function () {
         if (typeof callSize === "undefined") { callSize = 0; }
         this.level++;
         this.setExperienceToNextLevel();
+        this.unlockLevelUpModifiers(this.level);
 
         if (this.experience >= this.experienceToNextLevel) {
             if (callSize > 101) {
@@ -482,6 +488,43 @@ var Player = (function () {
     Player.prototype.addClicks = function (amount) {
         this.clicks += amount;
         this.checkLockedModifiers("clicks");
+    };
+    Player.prototype.unlockLevelUpModifiers = function (level) {
+        var modifiersForThisLevel = levelUpModifiers.modifiersByUnlock[level];
+
+        if (!modifiersForThisLevel)
+            return;
+        else if (this.levelsAlreadyUnlockedFor[level])
+            return;
+
+        var toUnlock = [];
+
+        if (Object.keys(modifiersForThisLevel).length <= this.levelUpModifiersPerLevelUp) {
+            for (var _mod in modifiersForThisLevel) {
+                toUnlock.push(modifiersForThisLevel[_mod]);
+            }
+        } else {
+            for (var i = 0; i < this.levelUpModifiersPerLevelUp; i++) {
+                toUnlock.push(getRandomProperty(modifiersForThisLevel));
+            }
+        }
+
+        this.unlockedLevelUpModifiers[level] = toUnlock;
+        this.levelsAlreadyUnlockedFor[level] = true;
+    };
+    Player.prototype.addLevelUpModifier = function (modifier, preventMultiplePerLevel) {
+        if (typeof preventMultiplePerLevel === "undefined") { preventMultiplePerLevel = true; }
+        var level = modifier.unlockConditions[0].value;
+
+        if (preventMultiplePerLevel && this.levelsAlreadyPicked[level])
+            return false;
+
+        this.addModifier(modifier, "levelUpModifiers");
+
+        this.unlockedLevelUpModifiers[level] = null;
+        delete this.unlockedLevelUpModifiers[level];
+
+        this.levelsAlreadyPicked[level] = true;
     };
     return Player;
 })();

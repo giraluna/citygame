@@ -1783,6 +1783,15 @@ class Game
     {
       data.modifiers.push(player.modifiers[_mod].type);
     }
+    data.levelUpModifiers = [];
+    for (var _mod in player.levelUpModifiers)
+    {
+      data.levelUpModifiers.push(player.levelUpModifiers[_mod].type);
+    }
+    data.levelsAlreadyUnlockedFor = player.levelsAlreadyUnlockedFor;
+
+
+
     data.stats =
     {
       incomePerType: player.incomePerType,
@@ -1810,6 +1819,11 @@ class Game
     {
       player.addModifier(playerModifiers[data.modifiers[_mod]]);
     }
+    for (var _mod in data.levelUpModifiers)
+    {
+      player.addLevelUpModifier(levelUpModifiers[data.levelUpModifiers[_mod]]);
+    }
+    player.levelsAlreadyUnlockedFor = data.levelsAlreadyUnlockedFor;
 
     for (var employee in data.employees)
     {

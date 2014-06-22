@@ -29,7 +29,8 @@ module levelUpModifiers
     unlockConditions:
     [
       {
-        level: 5
+        type: "level",
+        value: 5
       }
     ],
     uniqueEffect: function(player)
@@ -46,7 +47,8 @@ module levelUpModifiers
     unlockConditions:
     [
       {
-        level: 10
+        type: "level",
+        value: 10
       }
     ],
     uniqueEffect: function(player)
@@ -63,7 +65,8 @@ module levelUpModifiers
     unlockConditions:
     [
       {
-        level: 20
+        type: "level",
+        value: 20
       }
     ],
     uniqueEffect: function(player)
@@ -80,15 +83,14 @@ module levelUpModifiers
     unlockConditions:
     [
       {
-        level: 5
+        type: "level",
+        value: 5
       }
     ],
     dynamicEffect:
     {
       "parkinglot": function(player)
       {
-        console.log(player);
-        console.log(player.amountBuiltPerType["parkinglot"]);
         player.addSpecialModifier(
         {
           type: "clicksPerParking",
@@ -106,7 +108,35 @@ module levelUpModifiers
     }
   }
 
+  export var modifiersByUnlock = (function()
+  {
+    var base: any = {};
 
+    for (var _mod in playerModifiers)
+    {
+      var modifier = playerModifiers[_mod]
+      if (modifier.unlockConditions)
+      {
+        for (var i = 0; i < modifier.unlockConditions.length; i++)
+        {
+          var condition = modifier.unlockConditions[i];
+
+          if (condition === "default")
+          {
+            if (!base.default) base.default = [];
+            base.default.push(modifier);
+            continue;
+          }
+
+          if (!base[condition.type]) base[condition.type] = {};
+
+          var arr = base[condition.type][condition.value] = [];
+          arr.push(modifier);
+        }
+      }
+    }
+    return base;
+  })();
 
 
   export var allModifiers = (function()

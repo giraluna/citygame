@@ -18,11 +18,11 @@ var UIComponents;
             return (React.DOM.div({ id: "save-buttons", className: "grid-row" }, React.DOM.div({
                 className: "grid-cell interactive",
                 onClick: this.handleSave,
-                onTouch: this.handleSave
+                onTouchStart: this.handleSave
             }, "save"), React.DOM.div({
                 className: "grid-cell interactive",
                 onClick: this.handleLoad,
-                onTouch: this.handleLoad
+                onTouchStart: this.handleLoad
             }, "load")));
         }
     });

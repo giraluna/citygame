@@ -68,6 +68,7 @@ var UIComponents;
                 } else {
                     divProps.className += " interactive";
                     divProps.onClick = this.handleBuildingSelect.bind(null, building);
+                    divProps.onTouchStart = this.handleBuildingSelect.bind(null, building);
                 }
 
                 if (this.props.selectedTool && this.props.selectedTool === building.type) {

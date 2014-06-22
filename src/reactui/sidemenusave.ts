@@ -31,7 +31,7 @@ export var SideMenuSave = React.createClass(
           {
             className: "grid-cell interactive",
             onClick: this.handleSave,
-            onTouch: this.handleSave
+            onTouchStart: this.handleSave
           },
           "save"
         ),
@@ -39,7 +39,7 @@ export var SideMenuSave = React.createClass(
           {
             className: "grid-cell interactive",
             onClick: this.handleLoad,
-            onTouch: this.handleLoad
+            onTouchStart: this.handleLoad
           },
           "load"
         )

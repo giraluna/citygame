@@ -42,19 +42,22 @@ export var SideMenuTools = React.createClass(
       {
         ref: "click",
         className:"grid-cell interactive",
-        onClick: this.handleToolChange.bind(null, "click")
+        onClick: this.handleToolChange.bind(null, "click"),
+        onTouchStart: this.handleToolChange.bind(null, "click")
       },
       buy:
       {
         ref: "buy",
         className:"grid-cell interactive",
-        onClick: this.handleToolChange.bind(null, "buy")
+        onClick: this.handleToolChange.bind(null, "buy"),
+        onTouchStart: this.handleToolChange.bind(null, "buy")
       },
       sell:
       {
         ref: "sell",
         className:"grid-cell interactive",
-        onClick: this.handleToolChange.bind(null, "sell")
+        onClick: this.handleToolChange.bind(null, "sell"),
+        onTouchStart: this.handleToolChange.bind(null, "sell")
       }
     }
 
@@ -75,7 +78,8 @@ export var SideMenuTools = React.createClass(
             {
               ref: "recruit",
               className:"grid-cell interactive",
-              onClick: this.handleRecruit
+              onClick: this.handleRecruit,
+              onTouchStart: this.handleRecruit
             },
             "recruit"
           )

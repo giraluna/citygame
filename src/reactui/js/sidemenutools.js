@@ -29,17 +29,20 @@ var UIComponents;
                 click: {
                     ref: "click",
                     className: "grid-cell interactive",
-                    onClick: this.handleToolChange.bind(null, "click")
+                    onClick: this.handleToolChange.bind(null, "click"),
+                    onTouchStart: this.handleToolChange.bind(null, "click")
                 },
                 buy: {
                     ref: "buy",
                     className: "grid-cell interactive",
-                    onClick: this.handleToolChange.bind(null, "buy")
+                    onClick: this.handleToolChange.bind(null, "buy"),
+                    onTouchStart: this.handleToolChange.bind(null, "buy")
                 },
                 sell: {
                     ref: "sell",
                     className: "grid-cell interactive",
-                    onClick: this.handleToolChange.bind(null, "sell")
+                    onClick: this.handleToolChange.bind(null, "sell"),
+                    onTouchStart: this.handleToolChange.bind(null, "sell")
                 }
             };
 
@@ -51,7 +54,8 @@ var UIComponents;
             return (React.DOM.div({ id: "side-menu-tools", className: "grid-column" }, React.DOM.div({ className: "grid-row" }, React.DOM.div(props.click, "click"), React.DOM.div({
                 ref: "recruit",
                 className: "grid-cell interactive",
-                onClick: this.handleRecruit
+                onClick: this.handleRecruit,
+                onTouchStart: this.handleRecruit
             }, "recruit")), React.DOM.div({ className: "grid-row" }, React.DOM.div(props.buy, "buy plot"), React.DOM.div(props.sell, "sell"))));
         }
     });

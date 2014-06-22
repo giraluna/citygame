@@ -89,6 +89,7 @@ export var SideMenuBuildings = React.createClass(
       {
         divProps.className += " interactive";
         divProps.onClick = this.handleBuildingSelect.bind(null, building);
+        divProps.onTouchStart = this.handleBuildingSelect.bind(null, building);
       }
 
       

@@ -19,9 +19,15 @@ export var SideMenuModifierButton = React.createClass(
   handleOpenModifiers: function()
   {
     this.setState({hasNewModifier: false});
-
-    eventManager.dispatchEvent({type: "makeModifierPopup",
-      content: this.props.player});
+    eventManager.dispatchEvent(
+      {
+        type: "makeModifierPopup",
+        content:
+        {
+          player: this.props.player,
+          modifierList: this.props.player.unlockedModifiers
+        }
+      });
   },
 
   componentWillReceiveProps: function(newProps: any)

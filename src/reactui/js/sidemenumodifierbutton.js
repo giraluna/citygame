@@ -12,10 +12,13 @@ var UIComponents;
         },
         handleOpenModifiers: function () {
             this.setState({ hasNewModifier: false });
-
             eventManager.dispatchEvent({
                 type: "makeModifierPopup",
-                content: this.props.player });
+                content: {
+                    player: this.props.player,
+                    modifierList: this.props.player.unlockedModifiers
+                }
+            });
         },
         componentWillReceiveProps: function (newProps) {
             var newModifierCount = newProps.player.unlockedModifiers.length;

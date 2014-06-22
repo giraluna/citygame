@@ -52,6 +52,9 @@ declare class ReactUI {
     public makeSavePopup(): void;
     public makeModifierPopup(props: {
         player: Player;
+        modifierList?: any[];
+        onOk?: any;
+        onClose?: any;
     }): void;
     public makeRecruitPopup(props: {
         player: Player;

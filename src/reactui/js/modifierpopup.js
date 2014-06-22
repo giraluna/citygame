@@ -16,12 +16,14 @@ var UIComponents;
         },
         handleOk: function () {
             var selected = this.refs.modifierList.state.selected;
-
             if (!selected)
                 return false;
 
-            this.props.player.addModifier(selected.data.modifier);
-            eventManager.dispatchEvent({ type: "updateReact", content: "" });
+            var closeAfter = this.props.onOk.call(null, selected);
+
+            if (closeAfter === true) {
+                this.handleClose();
+            }
         },
         applyRowStyle: function (item, rowProps) {
             if (item.data.modifier.cost > this.props.player.money) {
@@ -51,8 +53,8 @@ var UIComponents;
             }, this.props.closeBtnText || "Close");
 
             var rows = [];
-            for (var i = 0; i < this.props.player.unlockedModifiers.length; i++) {
-                var modifier = this.props.player.unlockedModifiers[i];
+            for (var i = 0; i < this.props.modifierList.length; i++) {
+                var modifier = this.props.modifierList[i];
                 rows.push({
                     key: modifier.type,
                     data: {

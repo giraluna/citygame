@@ -106,7 +106,7 @@ class ReactUI
     });
     eventManager.addEventListener("makeModifierPopup", function(event)
     {
-      self.makeModifierPopup({player:event.content});
+      self.makeModifierPopup(event.content);
     });
     eventManager.addEventListener("closeTopPopup", function(event)
     {
@@ -213,11 +213,26 @@ class ReactUI
   makeModifierPopup(props:
   {
     player: Player;
+    modifierList?: any[];
+    onOk?: any;
+    onClose?: any;
   })
   {
+    var onOk = props.onOk || function(selected)
+    {
+      props.player.addModifier(selected.data.modifier);
+      eventManager.dispatchEvent({type: "updateReact", content: ""});
+
+      return false;
+    }
+
+
     this.makePopup("ModifierPopup",
     {
-      player: props.player
+      player: props.player,
+      modifierList: props.modifierList || props.player.unlockedModifiers,
+      onOk: onOk,
+      onClose: props.onClose || null
     });
   }
 

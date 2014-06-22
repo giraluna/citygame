@@ -13,9 +13,7 @@ var UIComponents;
         componentWillReceiveProps: function (newProps) {
             var newUpgradeCount = Object.keys(newProps.player.unlockedLevelUpModifiers).length;
 
-            console.log(newUpgradeCount, this.state.lastModifierCount);
-            if (newUpgradeCount > this.state.lastModifierCount) {
-                console.log("lol");
+            if (newUpgradeCount > 0) {
                 this.setState({ hasLevelUpUpgrade: true });
             }
 
@@ -41,11 +39,36 @@ var UIComponents;
             this.props.player.addMoney(0);
         },
         handleOpenModifiers: function () {
-            this.setState({ hasLevelUpUpgrade: false });
+            var self = this;
+            var player = this.props.player;
+            var lowestLevel = Object.keys(player.unlockedLevelUpModifiers).sort()[0];
+
+            var lowestModifierList = player.unlockedLevelUpModifiers[lowestLevel];
+
+            if (!lowestModifierList) {
+                this.setState({
+                    hasLevelUpUpgrade: false
+                });
+
+                return;
+            }
 
             eventManager.dispatchEvent({
                 type: "makeModifierPopup",
-                content: this.props.player });
+                content: {
+                    player: player,
+                    modifierList: lowestModifierList,
+                    onOk: function (selected) {
+                        player.addLevelUpModifier(selected.data.modifier);
+                        eventManager.dispatchEvent({ type: "updateReact", content: "" });
+
+                        self.setState({
+                            hasLevelUpUpgrade: false
+                        });
+                        return true;
+                    }
+                }
+            });
         },
         render: function () {
             var progressProps = {

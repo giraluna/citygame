@@ -112,9 +112,9 @@ module levelUpModifiers
   {
     var base: any = {};
 
-    for (var _mod in playerModifiers)
+    for (var _mod in levelUpModifiers)
     {
-      var modifier = playerModifiers[_mod]
+      var modifier = levelUpModifiers[_mod]
       if (modifier.unlockConditions)
       {
         for (var i = 0; i < modifier.unlockConditions.length; i++)
@@ -130,8 +130,12 @@ module levelUpModifiers
 
           if (!base[condition.type]) base[condition.type] = {};
 
-          var arr = base[condition.type][condition.value] = [];
-          arr.push(modifier);
+          if (!base[condition.type][condition.value])
+          {
+            base[condition.type][condition.value] = [];
+          }
+
+          base[condition.type][condition.value].push(modifier);
         }
       }
     }
@@ -142,11 +146,11 @@ module levelUpModifiers
   export var allModifiers = (function()
   {
     var all = [];
-    for (var _mod in playerModifiers)
+    for (var _mod in levelUpModifiers)
     {
-      if (playerModifiers[_mod].type)
+      if (levelUpModifiers[_mod].type)
       {
-        all.push(playerModifiers[_mod]);
+        all.push(levelUpModifiers[_mod]);
       }
     }
     return all;

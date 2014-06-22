@@ -1788,15 +1788,8 @@ class Game
     {
       data.levelUpModifiers.push(player.levelUpModifiers[_mod].type);
     }
-    data.levelsAlreadyUnlockedFor = player.levelsAlreadyUnlockedFor;
+    data.levelsAlreadyPicked = player.levelsAlreadyPicked;
 
-
-
-    data.stats =
-    {
-      incomePerType: player.incomePerType,
-      incomePerDate: player.incomePerDate
-    }
 
     return data;
   }
@@ -1823,7 +1816,7 @@ class Game
     {
       player.addLevelUpModifier(levelUpModifiers[data.levelUpModifiers[_mod]]);
     }
-    player.levelsAlreadyUnlockedFor = data.levelsAlreadyUnlockedFor;
+    player.levelsAlreadyPicked = data.levelsAlreadyPicked;
 
     for (var employee in data.employees)
     {

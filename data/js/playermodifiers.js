@@ -422,8 +422,11 @@ var playerModifiers;
                     if (!base[condition.type])
                         base[condition.type] = {};
 
-                    var arr = base[condition.type][condition.value] = [];
-                    arr.push(modifier);
+                    if (!base[condition.type][condition.value]) {
+                        base[condition.type][condition.value] = [];
+                    }
+
+                    base[condition.type][condition.value].push(modifier);
                 }
             }
         }

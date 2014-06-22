@@ -92,8 +92,8 @@ var levelUpModifiers;
     levelUpModifiers.modifiersByUnlock = (function () {
         var base = {};
 
-        for (var _mod in playerModifiers) {
-            var modifier = playerModifiers[_mod];
+        for (var _mod in levelUpModifiers) {
+            var modifier = levelUpModifiers[_mod];
             if (modifier.unlockConditions) {
                 for (var i = 0; i < modifier.unlockConditions.length; i++) {
                     var condition = modifier.unlockConditions[i];
@@ -108,8 +108,11 @@ var levelUpModifiers;
                     if (!base[condition.type])
                         base[condition.type] = {};
 
-                    var arr = base[condition.type][condition.value] = [];
-                    arr.push(modifier);
+                    if (!base[condition.type][condition.value]) {
+                        base[condition.type][condition.value] = [];
+                    }
+
+                    base[condition.type][condition.value].push(modifier);
                 }
             }
         }
@@ -118,9 +121,9 @@ var levelUpModifiers;
 
     levelUpModifiers.allModifiers = (function () {
         var all = [];
-        for (var _mod in playerModifiers) {
-            if (playerModifiers[_mod].type) {
-                all.push(playerModifiers[_mod]);
+        for (var _mod in levelUpModifiers) {
+            if (levelUpModifiers[_mod].type) {
+                all.push(levelUpModifiers[_mod]);
             }
         }
         return all;

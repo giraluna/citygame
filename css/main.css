@@ -297,6 +297,9 @@ progress::-webkit-progress-value {
 #react-side-menu > * {
   pointer-events: auto;
 }
+.new-modifier {
+  box-shadow: 0px 0px 12px #fff inset, 0px 0px 4px #ff0;
+}
 #side-menu-tools {
   flex: 0 0 100px;
   order: 1;
@@ -380,10 +383,10 @@ progress::-webkit-progress-value {
 #player-level-wrapper {
   position: relative;
   width: 100%;
-  height: 40px;
-  flex: 0 0 40px;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
+  margin-bottom: 50px;
 }
 #player-level-wrapper > * {
   width: 100%;

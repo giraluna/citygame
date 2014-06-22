@@ -1408,12 +1408,7 @@ var Game = (function () {
         for (var _mod in player.levelUpModifiers) {
             data.levelUpModifiers.push(player.levelUpModifiers[_mod].type);
         }
-        data.levelsAlreadyUnlockedFor = player.levelsAlreadyUnlockedFor;
-
-        data.stats = {
-            incomePerType: player.incomePerType,
-            incomePerDate: player.incomePerDate
-        };
+        data.levelsAlreadyPicked = player.levelsAlreadyPicked;
 
         return data;
     };
@@ -1436,7 +1431,7 @@ var Game = (function () {
         for (var _mod in data.levelUpModifiers) {
             player.addLevelUpModifier(levelUpModifiers[data.levelUpModifiers[_mod]]);
         }
-        player.levelsAlreadyUnlockedFor = data.levelsAlreadyUnlockedFor;
+        player.levelsAlreadyPicked = data.levelsAlreadyPicked;
 
         for (var employee in data.employees) {
             data.employees[employee] = new Employee(names, data.employees[employee]);

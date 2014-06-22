@@ -33,7 +33,6 @@ declare class Player {
         [level: number]: playerModifiers.IPlayerModifier[];
     };
     public levelUpModifiersPerLevelUp: number;
-    public levelsAlreadyUnlockedFor: any;
     public levelsAlreadyPicked: any;
     public recentlyCheckedUnlockConditions: any;
     public maxCheckFrequency: number;

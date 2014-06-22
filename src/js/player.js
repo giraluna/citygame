@@ -34,7 +34,6 @@ var Player = (function () {
         this.lockedModifiers = [];
         this.unlockedLevelUpModifiers = {};
         this.levelUpModifiersPerLevelUp = 4;
-        this.levelsAlreadyUnlockedFor = {};
         this.levelsAlreadyPicked = {};
         this.recentlyCheckedUnlockConditions = {};
         this.maxCheckFrequency = 1000;
@@ -490,11 +489,13 @@ var Player = (function () {
         this.checkLockedModifiers("clicks");
     };
     Player.prototype.unlockLevelUpModifiers = function (level) {
-        var modifiersForThisLevel = levelUpModifiers.modifiersByUnlock[level];
+        var modifiersForThisLevel = levelUpModifiers.modifiersByUnlock.level[level];
 
         if (!modifiersForThisLevel)
             return;
-        else if (this.levelsAlreadyUnlockedFor[level])
+        else if (this.unlockedLevelUpModifiers[level])
+            return;
+        else if (this.levelsAlreadyPicked[level])
             return;
 
         var toUnlock = [];
@@ -510,7 +511,6 @@ var Player = (function () {
         }
 
         this.unlockedLevelUpModifiers[level] = toUnlock;
-        this.levelsAlreadyUnlockedFor[level] = true;
     };
     Player.prototype.addLevelUpModifier = function (modifier, preventMultiplePerLevel) {
         if (typeof preventMultiplePerLevel === "undefined") { preventMultiplePerLevel = true; }

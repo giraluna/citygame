@@ -48,7 +48,6 @@ class Player
     [level:number]: playerModifiers.IPlayerModifier[];
   } = {};
   levelUpModifiersPerLevelUp: number = 4;
-  levelsAlreadyUnlockedFor: any = {};
   levelsAlreadyPicked: any = {};
 
   recentlyCheckedUnlockConditions: any = {};
@@ -597,10 +596,11 @@ class Player
   }
   unlockLevelUpModifiers(level)
   {
-    var modifiersForThisLevel = levelUpModifiers.modifiersByUnlock[level];
+    var modifiersForThisLevel = levelUpModifiers.modifiersByUnlock.level[level];
 
     if (!modifiersForThisLevel) return;
-    else if (this.levelsAlreadyUnlockedFor[level]) return;
+    else if (this.unlockedLevelUpModifiers[level]) return;
+    else if (this.levelsAlreadyPicked[level]) return;
 
 
     var toUnlock = [];
@@ -621,7 +621,6 @@ class Player
     }
 
     this.unlockedLevelUpModifiers[level] = toUnlock;
-    this.levelsAlreadyUnlockedFor[level] = true;
   }
   addLevelUpModifier(modifier, preventMultiplePerLevel:boolean = true)
   {

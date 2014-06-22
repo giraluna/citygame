@@ -24,6 +24,7 @@ declare module playerModifiers {
     var parkingModifier1: IPlayerModifier;
     var parkingModifier2: IPlayerModifier;
     var parkingModifier3: IPlayerModifier;
+    var parkingModifier4: IPlayerModifier;
     var convenienceModifier1: IPlayerModifier;
     var convenienceModifier2: IPlayerModifier;
     var convenienceModifier3: IPlayerModifier;

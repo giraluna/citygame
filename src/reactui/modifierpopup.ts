@@ -90,7 +90,7 @@ module UIComponents
         {
           label: "Cost",
           key: "costString",
-          defaultOrder: "asc",
+          defaultOrder: "desc",
           propToSortBy: "cost"
         },
         {
@@ -115,7 +115,8 @@ module UIComponents
           onTouchStart: this.handleDragStart,
         },
           React.DOM.p( {className:"popup-text"}, text),
-          React.DOM.div( {className:"popup-content", draggable: true, onDrag: stopBubble},
+          React.DOM.div( {className:"popup-content modifier-list",
+              draggable: true, onDrag: stopBubble},
             UIComponents.List(
             {
               // TODO fix declaration file and remove

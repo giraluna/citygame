@@ -89,6 +89,21 @@ var levelUpModifiers;
         }
     };
 
+    levelUpModifiers.increasedLevelUpModifiers = {
+        type: "increasedLevelUpModifiers",
+        title: "Increased knowledge",
+        description: "Choose from one extra modifier on subsequent level ups",
+        unlockConditions: [
+            {
+                type: "level",
+                value: 5
+            }
+        ],
+        uniqueEffect: function (player) {
+            player.levelUpModifiersPerLevelUp = 5;
+        }
+    };
+
     levelUpModifiers.modifiersByUnlock = (function () {
         var base = {};
 

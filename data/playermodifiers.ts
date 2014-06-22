@@ -213,6 +213,27 @@ module playerModifiers
       }
     ]
   }
+  export var parkingModifier4: IPlayerModifier =
+  {
+    type: "parkingModifier4",
+    title: "Parking hyperspace efficiency",
+    description: "Parking profits * 1.5",
+    cost: 10000,
+    unlockConditions:
+    [
+      {
+        type: "parkinglot",
+        value: 15
+      }
+    ],
+    effects:
+    [
+      {
+        targets: ["parking"],
+        multiplier: 1.5
+      }
+    ]
+  }
   export var convenienceModifier1: IPlayerModifier =
   {
     type: "convenienceModifier1",
@@ -237,8 +258,8 @@ module playerModifiers
   export var convenienceModifier2: IPlayerModifier =
   {
     type: "convenienceModifier2",
-    title: "Hot dog meat efficiency",
-    description: "You don't want to know (+1$/s)",
+    title: "Mystery meat hot dogs",
+    description: "Convenience stores +1$ /s",
     cost: 1500,
     unlockConditions:
     [

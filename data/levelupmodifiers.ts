@@ -108,6 +108,24 @@ module levelUpModifiers
     }
   }
 
+  export var increasedLevelUpModifiers: playerModifiers.IPlayerModifier =
+  {
+    type: "increasedLevelUpModifiers",
+    title: "Increased knowledge",
+    description: "Choose from one extra modifier on subsequent level ups",
+    unlockConditions:
+    [
+      {
+        type: "level",
+        value: 5
+      }
+    ],
+    uniqueEffect: function(player)
+    {
+      player.levelUpModifiersPerLevelUp = 5;
+    }
+  }
+
   export var modifiersByUnlock = (function()
   {
     var base: any = {};

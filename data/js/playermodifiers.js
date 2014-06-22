@@ -168,6 +168,24 @@ var playerModifiers;
             }
         ]
     };
+    playerModifiers.parkingModifier4 = {
+        type: "parkingModifier4",
+        title: "Parking hyperspace efficiency",
+        description: "Parking profits * 1.5",
+        cost: 10000,
+        unlockConditions: [
+            {
+                type: "parkinglot",
+                value: 15
+            }
+        ],
+        effects: [
+            {
+                targets: ["parking"],
+                multiplier: 1.5
+            }
+        ]
+    };
     playerModifiers.convenienceModifier1 = {
         type: "convenienceModifier1",
         title: "Bigger soda cups",
@@ -188,8 +206,8 @@ var playerModifiers;
     };
     playerModifiers.convenienceModifier2 = {
         type: "convenienceModifier2",
-        title: "Hot dog meat efficiency",
-        description: "You don't want to know (+1$/s)",
+        title: "Mystery meat hot dogs",
+        description: "Convenience stores +1$ /s",
         cost: 1500,
         unlockConditions: [
             {

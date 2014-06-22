@@ -212,6 +212,8 @@ progress::-webkit-progress-value {
 }
 .popup .popup-content {
   display: inline-block;
+  max-height: 350px;
+  overflow-y: scroll;
 }
 .popup .popup-content > * {
   border: 1px solid #587982;

@@ -123,7 +123,7 @@ export var List = React.createClass({
 
     var nextIndex = (this.state.sortBy.currColumnIndex + 1) % this.state.columns.length;
     var alternateColumn = this.state.columns[nextIndex];
-    
+
     var propToSortBy = selectedColumn.propToSortBy || selectedColumn.key;
     var alternatePropToSortBy = alternateColumn.propToSortBy || alternateColumn.key;
     var itemsToSort = this.props.listItems;
@@ -238,23 +238,27 @@ export var List = React.createClass({
     });
 
     return(
-      React.DOM.table(
-          {
-            tabIndex: 1
-          },
-        React.DOM.colgroup(null,
-          columns
-        ),
+      React.DOM.div(null,
 
-        React.DOM.thead(null,
-          React.DOM.tr(null,
-            headerLabels
+        React.DOM.table(
+            {
+              tabIndex: 1
+            },
+          React.DOM.colgroup(null,
+            columns
+          ),
+
+          React.DOM.thead(null,
+            React.DOM.tr(null,
+              headerLabels
+            )
+          ),
+
+          React.DOM.tbody(null,
+            rows
           )
-        ),
-
-        React.DOM.tbody(null,
-          rows
         )
+        
       )
     );
   }

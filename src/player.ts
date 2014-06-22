@@ -596,16 +596,24 @@ class Player
   }
   unlockLevelUpModifiers(level)
   {
-    var modifiersForThisLevel = levelUpModifiers.modifiersByUnlock.level[level];
+    if (!levelUpModifiers.modifiersByUnlock.level[level]) return;
 
-    if (!modifiersForThisLevel) return;
-    else if (this.unlockedLevelUpModifiers[level]) return;
+    var modifiersForThisLevel = levelUpModifiers.modifiersByUnlock.level[level].slice(0);
+
+    if (this.unlockedLevelUpModifiers[level]) return;
     else if (this.levelsAlreadyPicked[level]) return;
 
+    if (this.levelUpModifiers[level])
+    {
+      modifiersForThisLevel = modifiersForThisLevel.filter(function(mod)
+      {
+        return this.levelUpModifiers[level].indexOf(modifiersForThisLevel) > -1
+      });
+    }
 
     var toUnlock = [];
 
-    if (Object.keys(modifiersForThisLevel).length <= this.levelUpModifiersPerLevelUp)
+    if (modifiersForThisLevel.length <= this.levelUpModifiersPerLevelUp)
     {
       for (var _mod in modifiersForThisLevel)
       {
@@ -616,9 +624,16 @@ class Player
     {
       for (var i = 0; i < this.levelUpModifiersPerLevelUp; i++)
       {
-        toUnlock.push(getRandomProperty(modifiersForThisLevel));
+        if (modifiersForThisLevel.length < 1) break;
+
+        var indexToAdd = randInt(0, modifiersForThisLevel.length -1);
+        var toAdd = modifiersForThisLevel.splice(indexToAdd, 1);
+        console.log(modifiersForThisLevel);
+
+        toUnlock.push(toAdd);
       }
     }
+
 
     this.unlockedLevelUpModifiers[level] = toUnlock;
   }

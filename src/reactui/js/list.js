@@ -179,9 +179,9 @@ var UIComponents;
                 rows.push(React.DOM.tr(rowProps, cells));
             });
 
-            return (React.DOM.table({
+            return (React.DOM.div(null, React.DOM.table({
                 tabIndex: 1
-            }, React.DOM.colgroup(null, columns), React.DOM.thead(null, React.DOM.tr(null, headerLabels)), React.DOM.tbody(null, rows)));
+            }, React.DOM.colgroup(null, columns), React.DOM.thead(null, React.DOM.tr(null, headerLabels)), React.DOM.tbody(null, rows))));
         }
     });
 })(UIComponents || (UIComponents = {}));

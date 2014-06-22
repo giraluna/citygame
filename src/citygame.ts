@@ -1816,7 +1816,7 @@ class Game
     {
       player.addLevelUpModifier(levelUpModifiers[data.levelUpModifiers[_mod]]);
     }
-    player.levelsAlreadyPicked = data.levelsAlreadyPicked;
+    player.levelsAlreadyPicked = data.levelsAlreadyPicked || {};
 
     for (var employee in data.employees)
     {

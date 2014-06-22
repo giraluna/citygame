@@ -1431,7 +1431,7 @@ var Game = (function () {
         for (var _mod in data.levelUpModifiers) {
             player.addLevelUpModifier(levelUpModifiers[data.levelUpModifiers[_mod]]);
         }
-        player.levelsAlreadyPicked = data.levelsAlreadyPicked;
+        player.levelsAlreadyPicked = data.levelsAlreadyPicked || {};
 
         for (var employee in data.employees) {
             data.employees[employee] = new Employee(names, data.employees[employee]);

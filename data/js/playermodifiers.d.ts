@@ -2,12 +2,15 @@ declare module playerModifiers {
     interface IPlayerModifier {
         type: string;
         title: string;
-        description: string;
+        description: any;
         effects?: {
             targets: string[];
             addedProfit?: number;
             multiplier?: number;
-            buildCost?: number;
+            buildCost?: {
+                multiplier?: number;
+                addedCost?: number;
+            };
         }[];
         uniqueEffect?: (any: any) => void;
         dynamicEffect?: {

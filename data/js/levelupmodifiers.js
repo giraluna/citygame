@@ -65,7 +65,7 @@ var levelUpModifiers;
     levelUpModifiers.clicksPerParking = {
         type: "clicksPerParking",
         title: "Clicks per parking",
-        description: "+0.2 / click for every parking lot",
+        description: "+0.2$ / click for every parking lot",
         unlockConditions: [
             {
                 type: "level",
@@ -77,7 +77,7 @@ var levelUpModifiers;
                 player.addSpecialModifier({
                     type: "clicksPerParking",
                     title: "Clicks per parking",
-                    description: "+0.2 / click for every parking lot",
+                    description: "+0.2$ / click for every parking lot",
                     effects: [
                         {
                             targets: ["click"],
@@ -89,10 +89,37 @@ var levelUpModifiers;
         }
     };
 
+    levelUpModifiers.clicksPerLevel1 = {
+        type: "clicksPerLevel1",
+        title: "Reverse carpal tunnel syndrome",
+        description: "Clicking profit * 1.02 per level",
+        unlockConditions: [
+            {
+                type: "level",
+                value: 5
+            }
+        ],
+        dynamicEffect: {
+            "level": function (player) {
+                player.addSpecialModifier({
+                    type: "clicksPerLevel1",
+                    title: "Reverse carpal tunnel syndrome",
+                    description: "Clicks * 1.02 per level",
+                    effects: [
+                        {
+                            targets: ["click"],
+                            multiplier: 1 + (player.level * 0.02)
+                        }
+                    ]
+                });
+            }
+        }
+    };
+
     levelUpModifiers.increasedLevelUpModifiers = {
         type: "increasedLevelUpModifiers",
         title: "Increased knowledge",
-        description: "Choose from one extra modifier on subsequent level ups",
+        description: ["Choose from one extra modifier", "(if available) on subsequent level ups"],
         unlockConditions: [
             {
                 type: "level",
@@ -100,8 +127,63 @@ var levelUpModifiers;
             }
         ],
         uniqueEffect: function (player) {
-            player.levelUpModifiersPerLevelUp = 5;
+            player.levelUpModifiersPerLevelUp++;
         }
+    };
+
+    levelUpModifiers.shoppingCostReduction1 = {
+        type: "shoppingCostReduction1",
+        title: "Supply chain",
+        description: "Shopping buildings 20% cheaper to build",
+        unlockConditions: [
+            {
+                type: "level",
+                value: 5
+            }
+        ],
+        effects: [
+            {
+                targets: ["shopping"],
+                buildCost: {
+                    multiplier: 0.8
+                }
+            }
+        ]
+    };
+    levelUpModifiers.betterSellPrice = {
+        type: "betterSellPrice",
+        title: "Real estate flipping",
+        description: [
+            "Get back an additional 15% of the cost",
+            "when selling buildings and land"],
+        unlockConditions: [
+            {
+                type: "level",
+                value: 10
+            }
+        ],
+        uniqueEffect: function (player) {
+            player.modifierEffects.sellPrice += 0.15;
+        }
+    };
+    levelUpModifiers.parkingCostReduction1 = {
+        type: "parkingCostReduction1",
+        title: "Discount asphalt",
+        description: "Parking lots 35% cheaper to build",
+        unlockConditions: [
+            {
+                type: "level",
+                value: 5
+            }
+        ],
+        effects: [
+            {
+                targets: ["parking"],
+                buildCost: {
+                    multiplier: 0.65
+                }
+            }
+        ]
     };
 
     levelUpModifiers.modifiersByUnlock = (function () {

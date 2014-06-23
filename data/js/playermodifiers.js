@@ -50,7 +50,7 @@ var playerModifiers;
     playerModifiers.clickModifier3 = {
         type: "clickModifier3",
         title: "Rolled up sleeves",
-        description: "clicks * 1.2",
+        description: "Clicking profit * 1.2",
         cost: 1000,
         unlockConditions: [
             {
@@ -72,7 +72,7 @@ var playerModifiers;
     playerModifiers.clickModifier4 = {
         type: "clickModifier4",
         title: "A little bit of elbow grease",
-        description: "clicks * 1.2",
+        description: "Clicking profit * 1.2",
         cost: 5000,
         unlockConditions: [
             {
@@ -94,7 +94,7 @@ var playerModifiers;
     playerModifiers.clickModifier5 = {
         type: "clickModifier5",
         title: "A lot more elbow grease",
-        description: "clicks * 1.5",
+        description: "Clicking profit * 1.5",
         cost: 25000,
         unlockConditions: [
             {

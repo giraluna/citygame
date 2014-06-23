@@ -4,13 +4,17 @@ module playerModifiers
   {
     type: string;
     title: string;
-    description: string;
+    description: any; //string or array
     effects?:
     {
       targets: string[];
       addedProfit?: number;
       multiplier?: number;
-      buildCost?: number;
+      buildCost?:
+      {
+        multiplier?: number;
+        addedCost?: number;
+      };
     }[];
     uniqueEffect?: (any) => void;
     dynamicEffect?: {[target: string]: (any) => any;};
@@ -35,7 +39,6 @@ module playerModifiers
         multiplier: 4
       }
     ]
-    
   }
 
   export var clickModifier1: IPlayerModifier =
@@ -78,7 +81,7 @@ module playerModifiers
   {
     type: "clickModifier3",
     title: "Rolled up sleeves",
-    description: "clicks * 1.2",
+    description: "Clicking profit * 1.2",
     cost: 1000,
     unlockConditions:
     [
@@ -103,7 +106,7 @@ module playerModifiers
   {
     type: "clickModifier4",
     title: "A little bit of elbow grease",
-    description: "clicks * 1.2",
+    description: "Clicking profit * 1.2",
     cost: 5000,
     unlockConditions:
     [
@@ -128,7 +131,7 @@ module playerModifiers
   {
     type: "clickModifier5",
     title: "A lot more elbow grease",
-    description: "clicks * 1.5",
+    description: "Clicking profit * 1.5",
     cost: 25000,
     unlockConditions:
     [

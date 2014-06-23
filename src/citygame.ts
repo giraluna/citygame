@@ -1441,7 +1441,12 @@ class Game
 
       eventManager.addEventListener("changeTool", function(e)
       {
-        self.changeTool(e.content);
+        self.changeTool(e.content.type);
+        if (e.content.continuous === false)
+        {
+          self.tools[e.content.type].continuous = false;
+        }
+        else self.tools[e.content.type].continuous = true;
       });
 
       //info
@@ -1853,8 +1858,8 @@ class Game
   {
     if (newMode === this.currentMode) return;
 
-
-    this.toolCache[this.currentMode] = this.activeTool.type;
+    this.toolCache[this.currentMode] = this.activeTool ?
+      this.activeTool.type : "nothing";
 
     if (!this.toolCache[newMode])
     {
@@ -2526,6 +2531,7 @@ class Tool
   tintColor: number;
   activateCost: number;
   mapmode: string = "default";
+  continuous: boolean = true;
   button: HTMLInputElement;
 
   activate(target:Cell[])
@@ -2638,17 +2644,24 @@ class SellTool extends Tool
   } 
   onActivate(target: Cell)
   {
-    if (target.content)
+    var playerOwnsCell = (target.player && target.player.id === game.players.player0.id);
+    if (target.content && playerOwnsCell)
     {
-      if (target.content.player)
-      {
-        game.players.player0.sellContent(target.content);
-        target.changeContent("none");
-      }
+      game.players.player0.sellContent(target.content);
+      target.changeContent("none");
     }
-    else if (target.player && target.player.id === game.players.player0.id)
+    else if (playerOwnsCell)
     {
       game.players.player0.sellCell(target);
+    }
+
+    if (!this.continuous)
+    {
+      eventManager.dispatchEvent(
+      {
+        type: "clickHotkey",
+        content: ""
+      });
     }
   }
 }
@@ -2744,6 +2757,14 @@ class BuyTool extends Tool
         cell: target
       }
     });
+    if (!this.continuous)
+    {
+      eventManager.dispatchEvent(
+      {
+        type: "clickHotkey",
+        content: ""
+      });
+    }
   }
 }
 
@@ -2772,7 +2793,11 @@ class BuildTool extends Tool
     this.canBuild = false;
     this.mainCell = undefined;
     this.continuous = false;
-    game.changeTool("nothing");
+    eventManager.dispatchEvent(
+    {
+      type: "clickHotkey",
+      content: ""
+    });
   }
   changeBuilding(buildingType, continuous:boolean = false)
   {

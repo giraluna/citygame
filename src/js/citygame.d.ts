@@ -265,6 +265,7 @@ declare class Tool {
     public tintColor: number;
     public activateCost: number;
     public mapmode: string;
+    public continuous: boolean;
     public button: HTMLInputElement;
     public activate(target: Cell[]): void;
     public onActivate(target: Cell): void;

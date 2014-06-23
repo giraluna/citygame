@@ -159,7 +159,7 @@ module actions
 
     for (var i = 0; i < buildArea.length; i++)
     {
-      buildArea[i].changeContent(cg.content.underConstruction, true, player);
+      buildArea[i].changeContent(cg.content.underConstruction, true);
     }
     eventManager.dispatchEvent({type: "updateWorld", content: ""});
 

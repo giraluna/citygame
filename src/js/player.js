@@ -178,6 +178,9 @@ var Player = (function () {
         var type = content.type;
         if (!type.cost)
             return;
+        if (!content.player || content.player.id !== this.id)
+            return;
+
         var value = this.getBuildCost(type) * this.modifierEffects.sellPrice;
 
         this.addMoney(value, "sell");
@@ -562,7 +565,6 @@ var Player = (function () {
 
                 var indexToAdd = randInt(0, modifiersForThisLevel.length - 1);
                 var toAdd = modifiersForThisLevel.splice(indexToAdd, 1);
-                console.log(modifiersForThisLevel, toAdd);
 
                 toUnlock.push(toAdd[0]);
             }

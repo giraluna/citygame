@@ -1129,7 +1129,11 @@ var Game = (function () {
         });
 
         eventManager.addEventListener("changeTool", function (e) {
-            self.changeTool(e.content);
+            self.changeTool(e.content.type);
+            if (e.content.continuous === false) {
+                self.tools[e.content.type].continuous = false;
+            } else
+                self.tools[e.content.type].continuous = true;
         });
 
         //info
@@ -1464,7 +1468,7 @@ var Game = (function () {
         if (newMode === this.currentMode)
             return;
 
-        this.toolCache[this.currentMode] = this.activeTool.type;
+        this.toolCache[this.currentMode] = this.activeTool ? this.activeTool.type : "nothing";
 
         if (!this.toolCache[newMode]) {
             this.changeTool("nothing");
@@ -1988,6 +1992,7 @@ activate(target:Cell[]);
 var Tool = (function () {
     function Tool() {
         this.mapmode = "default";
+        this.continuous = true;
     }
     Tool.prototype.activate = function (target) {
         for (var i = 0; i < target.length; i++) {
@@ -2088,13 +2093,19 @@ var SellTool = (function (_super) {
         this.button = null;
     }
     SellTool.prototype.onActivate = function (target) {
-        if (target.content) {
-            if (target.content.player) {
-                game.players.player0.sellContent(target.content);
-                target.changeContent("none");
-            }
-        } else if (target.player && target.player.id === game.players.player0.id) {
+        var playerOwnsCell = (target.player && target.player.id === game.players.player0.id);
+        if (target.content && playerOwnsCell) {
+            game.players.player0.sellContent(target.content);
+            target.changeContent("none");
+        } else if (playerOwnsCell) {
             game.players.player0.sellCell(target);
+        }
+
+        if (!this.continuous) {
+            eventManager.dispatchEvent({
+                type: "clickHotkey",
+                content: ""
+            });
         }
     };
     return SellTool;
@@ -2184,6 +2195,12 @@ var BuyTool = (function (_super) {
                 cell: target
             }
         });
+        if (!this.continuous) {
+            eventManager.dispatchEvent({
+                type: "clickHotkey",
+                content: ""
+            });
+        }
     };
     return BuyTool;
 })(Tool);
@@ -2206,7 +2223,10 @@ var BuildTool = (function (_super) {
         this.canBuild = false;
         this.mainCell = undefined;
         this.continuous = false;
-        game.changeTool("nothing");
+        eventManager.dispatchEvent({
+            type: "clickHotkey",
+            content: ""
+        });
     };
     BuildTool.prototype.changeBuilding = function (buildingType, continuous) {
         if (typeof continuous === "undefined") { continuous = false; }

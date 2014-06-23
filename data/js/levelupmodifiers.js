@@ -17,6 +17,9 @@ var levelUpModifiers;
         ]
     };
 
+    /////////////
+    // LEVEL 5 //
+    /////////////
     levelUpModifiers.fundingBoost1 = {
         type: "fundingBoost1",
         title: "Starting capital",
@@ -29,36 +32,6 @@ var levelUpModifiers;
         ],
         uniqueEffect: function (player) {
             player.addMoney(200);
-        }
-    };
-
-    levelUpModifiers.fundingBoost2 = {
-        type: "fundingBoost2",
-        title: "More starting capital",
-        description: "+500$",
-        unlockConditions: [
-            {
-                type: "level",
-                value: 10
-            }
-        ],
-        uniqueEffect: function (player) {
-            player.addMoney(500);
-        }
-    };
-
-    levelUpModifiers.fundingBoost3 = {
-        type: "fundingBoost3",
-        title: "External investors",
-        description: "+2000$",
-        unlockConditions: [
-            {
-                type: "level",
-                value: 20
-            }
-        ],
-        uniqueEffect: function (player) {
-            player.addMoney(2000);
         }
     };
 
@@ -150,22 +123,7 @@ var levelUpModifiers;
             }
         ]
     };
-    levelUpModifiers.betterSellPrice = {
-        type: "betterSellPrice",
-        title: "Real estate flipping",
-        description: [
-            "Get back an additional 15% of the cost",
-            "when selling buildings and land"],
-        unlockConditions: [
-            {
-                type: "level",
-                value: 10
-            }
-        ],
-        uniqueEffect: function (player) {
-            player.modifierEffects.sellPrice += 0.15;
-        }
-    };
+
     levelUpModifiers.parkingCostReduction1 = {
         type: "parkingCostReduction1",
         title: "Discount asphalt",
@@ -184,6 +142,92 @@ var levelUpModifiers;
                 }
             }
         ]
+    };
+
+    //////////////
+    // LEVEL 10 //
+    //////////////
+    levelUpModifiers.fundingBoost2 = {
+        type: "fundingBoost2",
+        title: "More starting capital",
+        description: "+500$",
+        unlockConditions: [
+            {
+                type: "level",
+                value: 10
+            }
+        ],
+        uniqueEffect: function (player) {
+            player.addMoney(500);
+        }
+    };
+
+    levelUpModifiers.betterSellPrice1 = {
+        type: "betterSellPrice1",
+        title: "Real estate flipping",
+        description: [
+            "Get back an additional 15% of the cost",
+            "when selling buildings and land"],
+        unlockConditions: [
+            {
+                type: "level",
+                value: 10
+            }
+        ],
+        uniqueEffect: function (player) {
+            player.modifierEffects.sellPrice += 0.15;
+        }
+    };
+
+    levelUpModifiers.increasedRecruitQuality1 = {
+        type: "increasedRecruitQuality1",
+        title: "Promising talent",
+        description: ["Better new recruits"],
+        unlockConditions: [
+            {
+                type: "level",
+                value: 10
+            }
+        ],
+        uniqueEffect: function (player) {
+            player.modifierEffects.recruitQuality += 0.25;
+        }
+    };
+
+    //////////////
+    // LEVEL 25 //
+    //////////////
+    levelUpModifiers.fundingBoost3 = {
+        type: "fundingBoost3",
+        title: "External investors",
+        description: "+2000$",
+        unlockConditions: [
+            {
+                type: "level",
+                value: 25
+            }
+        ],
+        uniqueEffect: function (player) {
+            player.addMoney(2000);
+        }
+    };
+
+    //////////////
+    // LEVEL 50 //
+    //////////////
+    levelUpModifiers.increasedRecruitQuality2 = {
+        type: "increasedRecruitQuality2",
+        title: "Talent scouts",
+        description: "Significantly better recruits",
+        unlockConditions: [
+            {
+                type: "level",
+                value: 50
+            }
+        ],
+        uniqueEffect: function (player) {
+            player.modifierEffects.recruitQuality += 0.75;
+        }
     };
 
     levelUpModifiers.modifiersByUnlock = (function () {

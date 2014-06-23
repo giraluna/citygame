@@ -351,7 +351,7 @@ var playerModifiers;
     playerModifiers.factoryModifier1 = {
         type: "factoryModifier1",
         title: "Steam powered factories",
-        description: "Factories +4$ /s",
+        description: "Factories +8$ /s",
         cost: 50000,
         unlockConditions: [
             {
@@ -362,14 +362,14 @@ var playerModifiers;
         effects: [
             {
                 targets: ["factory"],
-                addedProfit: 20
+                addedProfit: 8
             }
         ]
     };
     playerModifiers.factoryModifier2 = {
         type: "factoryModifier2",
         title: "Electricity powered factories",
-        description: "Factories +6$ /s",
+        description: "Factories +16$ /s",
         cost: 150000,
         unlockConditions: [
             {
@@ -380,14 +380,14 @@ var playerModifiers;
         effects: [
             {
                 targets: ["factory"],
-                addedProfit: 50
+                addedProfit: 16
             }
         ]
     };
     playerModifiers.factoryModifier3 = {
         type: "factoryModifier3",
         title: "Baby animal powered factories",
-        description: "Factory profits * 1.2",
+        description: "Factory profits * 1.5",
         cost: 500000,
         unlockConditions: [
             {

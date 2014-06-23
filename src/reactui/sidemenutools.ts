@@ -58,13 +58,26 @@ export var SideMenuTools = React.createClass(
         className:"grid-cell interactive",
         onClick: this.handleToolChange.bind(null, "sell"),
         onTouchStart: this.handleToolChange.bind(null, "sell")
+      },
+      recruit:
+      {
+        ref: "recruit",
+        className:"grid-cell interactive",
+        onClick: this.handleRecruit,
+        onTouchStart: this.handleRecruit
       }
     }
 
 
-
     var selectedTool = this.props.selectedTool;
-    if (selectedTool && props[selectedTool])
+    if (Object.keys(this.props.player.employees).length < 1)
+    {
+      props.recruit.className += " new-modifier";
+      
+      props.buy.className = "grid-cell disabled";
+      props.sell.className = "grid-cell disabled";
+    }
+    else if (selectedTool && props[selectedTool])
     {
       props[selectedTool].className += " selected-tool";
     }
@@ -74,15 +87,7 @@ export var SideMenuTools = React.createClass(
       React.DOM.div( {id:"side-menu-tools", className:"grid-column"},
         React.DOM.div( {className:"grid-row"},
           React.DOM.div(props.click, "click"),
-          React.DOM.div(
-            {
-              ref: "recruit",
-              className:"grid-cell interactive",
-              onClick: this.handleRecruit,
-              onTouchStart: this.handleRecruit
-            },
-            "recruit"
-          )
+          React.DOM.div(props.recruit, "recruit")
         ),
         React.DOM.div( {className:"grid-row"},
           React.DOM.div(props.buy, "buy plot"),

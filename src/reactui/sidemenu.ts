@@ -28,6 +28,7 @@ export var SideMenu = React.createClass(
       React.DOM.div( {id:"react-side-menu"},
         UIComponents.SideMenuTools(
           {
+            player: this.props.player,
             setSelectedTool: this.setSelectedTool,
             selectedTool: this.state.selectedTool
           }
@@ -50,7 +51,14 @@ export var SideMenu = React.createClass(
           UIComponents.SideMenuZoom()
 
         ),
-        UIComponents.SideMenuStats({player: this.props.player}),
+        UIComponents.SideMenuStats(
+          {
+            player: this.props.player,
+            // Todo react definitions
+            hasLevelUpUpgrade: null,
+            lastModifierCount: null
+          }
+        ),
         UIComponents.SideMenuModifierButton(
           {
             player: this.props.player,

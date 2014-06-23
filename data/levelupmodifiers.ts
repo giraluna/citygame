@@ -21,6 +21,10 @@ module levelUpModifiers
     ]
   }
 
+  /////////////
+  // LEVEL 5 //
+  /////////////
+
   export var fundingBoost1: playerModifiers.IPlayerModifier =
   {
     type: "fundingBoost1",
@@ -36,42 +40,6 @@ module levelUpModifiers
     uniqueEffect: function(player)
     {
       player.addMoney(200);
-    }
-  }
-
-  export var fundingBoost2: playerModifiers.IPlayerModifier =
-  {
-    type: "fundingBoost2",
-    title: "More starting capital",
-    description: "+500$",
-    unlockConditions:
-    [
-      {
-        type: "level",
-        value: 10
-      }
-    ],
-    uniqueEffect: function(player)
-    {
-      player.addMoney(500);
-    }
-  }
-
-  export var fundingBoost3: playerModifiers.IPlayerModifier =
-  {
-    type: "fundingBoost3",
-    title: "External investors",
-    description: "+2000$",
-    unlockConditions:
-    [
-      {
-        type: "level",
-        value: 20
-      }
-    ],
-    uniqueEffect: function(player)
-    {
-      player.addMoney(2000);
     }
   }
 
@@ -182,24 +150,7 @@ module levelUpModifiers
       }
     ]
   }
-  export var betterSellPrice: playerModifiers.IPlayerModifier =
-  {
-    type: "betterSellPrice",
-    title: "Real estate flipping",
-    description: ["Get back an additional 15% of the cost",
-    "when selling buildings and land"],
-    unlockConditions:
-    [
-      {
-        type: "level",
-        value: 10
-      }
-    ],
-    uniqueEffect: function(player)
-    {
-      player.modifierEffects.sellPrice += 0.15;
-    }
-  }
+
   export var parkingCostReduction1: playerModifiers.IPlayerModifier =
   {
     type: "parkingCostReduction1",
@@ -222,6 +173,109 @@ module levelUpModifiers
         }
       }
     ]
+  }
+
+  //////////////
+  // LEVEL 10 //
+  //////////////
+
+  export var fundingBoost2: playerModifiers.IPlayerModifier =
+  {
+    type: "fundingBoost2",
+    title: "More starting capital",
+    description: "+500$",
+    unlockConditions:
+    [
+      {
+        type: "level",
+        value: 10
+      }
+    ],
+    uniqueEffect: function(player)
+    {
+      player.addMoney(500);
+    }
+  }
+
+  export var betterSellPrice1: playerModifiers.IPlayerModifier =
+  {
+    type: "betterSellPrice1",
+    title: "Real estate flipping",
+    description: ["Get back an additional 15% of the cost",
+    "when selling buildings and land"],
+    unlockConditions:
+    [
+      {
+        type: "level",
+        value: 10
+      }
+    ],
+    uniqueEffect: function(player)
+    {
+      player.modifierEffects.sellPrice += 0.15;
+    }
+  }
+
+  export var increasedRecruitQuality1: playerModifiers.IPlayerModifier =
+  {
+    type: "increasedRecruitQuality1",
+    title: "Promising talent",
+    description: ["Better new recruits"],
+    unlockConditions:
+    [
+      {
+        type: "level",
+        value: 10
+      }
+    ],
+    uniqueEffect: function(player)
+    {
+      player.modifierEffects.recruitQuality += 0.25;
+    }
+  }
+
+  //////////////
+  // LEVEL 25 //
+  //////////////
+
+  export var fundingBoost3: playerModifiers.IPlayerModifier =
+  {
+    type: "fundingBoost3",
+    title: "External investors",
+    description: "+2000$",
+    unlockConditions:
+    [
+      {
+        type: "level",
+        value: 25
+      }
+    ],
+    uniqueEffect: function(player)
+    {
+      player.addMoney(2000);
+    }
+  }
+
+  //////////////
+  // LEVEL 50 //
+  //////////////
+  
+  export var increasedRecruitQuality2: playerModifiers.IPlayerModifier =
+  {
+    type: "increasedRecruitQuality2",
+    title: "Talent scouts",
+    description: "Significantly better recruits",
+    unlockConditions:
+    [
+      {
+        type: "level",
+        value: 50
+      }
+    ],
+    uniqueEffect: function(player)
+    {
+      player.modifierEffects.recruitQuality += 0.75;
+    }
   }
 
   export var modifiersByUnlock = (function()

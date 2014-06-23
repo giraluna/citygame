@@ -96,7 +96,7 @@ var Player = (function () {
             multiplier: 1
         };
         this.modifierEffects.profit["click"] = {
-            addedProfit: 0.1,
+            addedProfit: 1,
             multiplier: 1
         };
 

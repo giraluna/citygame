@@ -930,7 +930,8 @@ var Game = (function () {
         this.systemsManager = new SystemsManager(1000);
         var id = "player" + (idGenerator.player++);
         var player = new Player(id);
-        player.addMoney(100, "initial");
+
+        //player.addMoney(100, "initial");
         this.reactUI = new ReactUI(player, this.frameImages);
         this.players[player.id] = player;
 
@@ -1073,7 +1074,7 @@ var Game = (function () {
         var recruitFN = function () {
             if (Object.keys(self.players["player0"].employees).length < 1) {
                 // TODO
-                if (self.players["player0"].usedInitialRecruit) {
+                if (false) {
                     eventManager.dispatchEvent({
                         type: "makeInfoPopup", content: {
                             text: [
@@ -1086,7 +1087,7 @@ var Game = (function () {
                     eventManager.dispatchEvent({
                         type: "makeRecruitCompletePopup", content: {
                             player: self.players["player0"],
-                            employees: makeNewEmployees(randInt(4, 6), 2)
+                            employees: makeNewEmployees(randInt(4, 6), 2 * self.players["player0"].modifierEffects.recruitQuality)
                         }
                     });
                     window.setTimeout(function () {

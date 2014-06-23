@@ -430,7 +430,7 @@ module playerModifiers
   {
     type: "factoryModifier1",
     title: "Steam powered factories",
-    description: "Factories +4$ /s",
+    description: "Factories +8$ /s",
     cost: 50000,
     unlockConditions:
     [
@@ -443,7 +443,7 @@ module playerModifiers
     [
       {
         targets: ["factory"],
-        addedProfit: 20
+        addedProfit: 8
       }
     ]
   }
@@ -451,7 +451,7 @@ module playerModifiers
   {
     type: "factoryModifier2",
     title: "Electricity powered factories",
-    description: "Factories +6$ /s",
+    description: "Factories +16$ /s",
     cost: 150000,
     unlockConditions:
     [
@@ -464,7 +464,7 @@ module playerModifiers
     [
       {
         targets: ["factory"],
-        addedProfit: 50
+        addedProfit: 16
       }
     ]
   }
@@ -472,7 +472,7 @@ module playerModifiers
   {
     type: "factoryModifier3",
     title: "Baby animal powered factories",
-    description: "Factory profits * 1.2",
+    description: "Factory profits * 1.5",
     cost: 500000,
     unlockConditions:
     [

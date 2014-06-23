@@ -133,7 +133,7 @@ class Player
     };
     this.modifierEffects.profit["click"] =
     {
-      addedProfit: 0.1,
+      addedProfit: 1,
       multiplier: 1
     };
 

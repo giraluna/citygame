@@ -300,11 +300,16 @@ progress::-webkit-progress-value {
   pointer-events: auto;
 }
 .new-modifier {
-  box-shadow: 0px 0px 12px #fff inset, 0px 0px 4px #ff0;
+  z-index: 999;
+  box-shadow: 0px 0px 12px #fff inset, 0px 0px 10px #ff0;
 }
 #side-menu-tools {
   flex: 0 0 100px;
   order: 1;
+}
+#side-menu-tools .disabled {
+  background-color: #ccc;
+  color: #888;
 }
 #side-menu-buildings {
   flex: 1 0;

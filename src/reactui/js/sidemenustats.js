@@ -42,7 +42,9 @@ var UIComponents;
             var self = this;
             var player = this.props.player;
             var lastIndex = Object.keys(player.unlockedLevelUpModifiers).length - 1;
-            var lowestLevel = Object.keys(player.unlockedLevelUpModifiers).sort()[lastIndex];
+            var lowestLevel = Object.keys(player.unlockedLevelUpModifiers).sort(function (a, b) {
+                return parseInt(a) < parseInt(b) ? 1 : -1;
+            })[lastIndex];
 
             var lowestModifierList = player.unlockedLevelUpModifiers[lowestLevel];
 

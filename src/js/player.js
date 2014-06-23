@@ -28,7 +28,9 @@ var Player = (function () {
         this.modifierEffects = {
             profit: {},
             buildCost: {},
-            recruitQuality: 1
+            buyCost: {},
+            recruitQuality: 1,
+            sellPrice: 0.5
         };
         this.unlockedModifiers = [];
         this.lockedModifiers = [];
@@ -89,6 +91,10 @@ var Player = (function () {
             addedCost: 0,
             multiplier: 1
         };
+        this.modifierEffects.buyCost["global"] = {
+            addedCost: 0,
+            multiplier: 1
+        };
         this.modifierEffects.profit["click"] = {
             addedProfit: 0.1,
             multiplier: 1
@@ -142,7 +148,7 @@ var Player = (function () {
         }
     };
     Player.prototype.sellCell = function (cell) {
-        var value = this.getCellBuyCost(cell.landValue) * 0.66;
+        var value = this.getCellBuyCost(cell.landValue) * this.modifierEffects.sellPrice;
 
         this.addMoney(value, "sell");
         this.removeCell(cell);
@@ -172,7 +178,7 @@ var Player = (function () {
         var type = content.type;
         if (!type.cost)
             return;
-        var value = this.getBuildCost(type) * 0.66;
+        var value = this.getBuildCost(type) * this.modifierEffects.sellPrice;
 
         this.addMoney(value, "sell");
     };
@@ -274,6 +280,22 @@ var Player = (function () {
                 if (effect.multiplier) {
                     this.modifierEffects.profit[type].multiplier *= effect.multiplier;
                 }
+                if (effect.buildCost) {
+                    if (effect.buildCost.addedProfit) {
+                        this.modifierEffects.buildCost[type].addedCost += effect.buildCost.addedCost;
+                    }
+                    if (effect.buildCost.multiplier) {
+                        this.modifierEffects.buildCost[type].multiplier *= effect.buildCost.multiplier;
+                    }
+                }
+                if (effect.buyCost) {
+                    if (effect.buyCost.addedProfit) {
+                        this.modifierEffects.buyCost.addedCost += effect.buyCost.addedCost;
+                    }
+                    if (effect.buyCost.multiplier) {
+                        this.modifierEffects.buyCost.multiplier *= effect.buyCost.multiplier;
+                    }
+                }
                 this.clearIndexedProfits();
             }
         }
@@ -303,6 +325,22 @@ var Player = (function () {
                 if (effect.multiplier) {
                     this.modifierEffects.profit[type].multiplier *= (1 / effect.multiplier);
                 }
+                if (effect.buildCost) {
+                    if (effect.buildCost.addedProfit) {
+                        this.modifierEffects.buildCost[type].addedCost -= effect.buildCost.addedCost;
+                    }
+                    if (effect.buildCost.multiplier) {
+                        this.modifierEffects.buildCost[type].multiplier *= (1 / effect.buildCost.multiplier);
+                    }
+                }
+                if (effect.buycost) {
+                    if (effect.buycost.addedProfit) {
+                        this.modifierEffects.buyCost.addedCost -= effect.buycost.addedCost;
+                    }
+                    if (effect.buycost.multiplier) {
+                        this.modifierEffects.buyCost.multiplier *= (1 / effect.buycost.multiplier);
+                    }
+                }
                 this.clearIndexedProfits();
             }
         }
@@ -325,7 +363,12 @@ var Player = (function () {
         return Math.round(cost);
     };
     Player.prototype.getCellBuyCost = function (baseCost) {
-        return baseCost * Math.pow(1.1, Object.keys(this.ownedCells).length);
+        var adjusted = baseCost * Math.pow(1.2, Object.keys(this.ownedCells).length);
+
+        adjusted += this.modifierEffects.buyCost["global"].addedCost;
+        adjusted *= this.modifierEffects.buyCost["global"].multiplier;
+
+        return adjusted;
     };
     Player.prototype.addExperience = function (amount) {
         this.experience += amount;
@@ -339,6 +382,7 @@ var Player = (function () {
         this.level++;
         this.setExperienceToNextLevel();
         this.unlockLevelUpModifiers(this.level);
+        this.updateDynamicModifiers("level");
 
         if (this.experience >= this.experienceToNextLevel) {
             if (callSize > 101) {
@@ -518,9 +562,9 @@ var Player = (function () {
 
                 var indexToAdd = randInt(0, modifiersForThisLevel.length - 1);
                 var toAdd = modifiersForThisLevel.splice(indexToAdd, 1);
-                console.log(modifiersForThisLevel);
+                console.log(modifiersForThisLevel, toAdd);
 
-                toUnlock.push(toAdd);
+                toUnlock.push(toAdd[0]);
             }
         }
 

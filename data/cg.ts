@@ -745,11 +745,6 @@ var cg: any =
             "type": "nearbyParking",
             "range": 2,
             "strength": 1
-          },
-          {
-            "type": "parkingCompetition",
-            "range": 2,
-            "strength": 1
           }
         ]
       },

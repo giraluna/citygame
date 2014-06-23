@@ -128,8 +128,13 @@ var Content = (function () {
         };
         for (var _modifier in this.modifiers) {
             var modifier = this.modifiers[_modifier];
-            for (var prop in modifier.effect) {
-                totals[prop] += modifier.scaling(modifier.strength) * modifier.effect[prop];
+            if (!isFinite(modifier.strength) || modifier.strength <= 0) {
+                this.modifiers[_modifier] = null;
+                delete this.modifiers[_modifier];
+            } else {
+                for (var prop in modifier.effect) {
+                    totals[prop] += modifier.scaling(modifier.strength) * modifier.effect[prop];
+                }
             }
         }
         this.modifiedProfit = totals.addedProfit * totals.multiplier;

@@ -612,7 +612,14 @@ var cg = {
                 "buildTime": 21,
                 "anchor": [0.5, 1],
                 "frame": "smalloffice.png",
-                "canNotBuildOn": ["water", "building", "road"]
+                "canNotBuildOn": ["water", "building", "road"],
+                "effects": [
+                    {
+                        "type": "population",
+                        "range": 3,
+                        "strength": 1
+                    }
+                ]
             },
             "smallstation": {
                 "type": "smallstation",

@@ -1,4 +1,5 @@
 /// <reference path="../../lib/react.d.ts" />
+/// <reference path="js/splitmultilinetext.d.ts" />
 var UIComponents;
 (function (UIComponents) {
     /**
@@ -24,6 +25,7 @@ var UIComponents;
     *    title?
     */
     UIComponents.List = React.createClass({
+        mixins: [UIComponents.SplitMultilineText],
         getInitialState: function () {
             var initialColumn = this.props.initialColumn || this.props.initialColumns[0];
 
@@ -164,7 +166,7 @@ var UIComponents;
 
                     cells.push(React.DOM.td({
                         key: "" + item.key + "_" + column.key
-                    }, item.data[column.key] || null));
+                    }, self.splitMultilineText(item.data[column.key]) || null));
                 }
 
                 var rowProps = {};

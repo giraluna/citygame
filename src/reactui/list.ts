@@ -1,4 +1,5 @@
 /// <reference path="../../lib/react.d.ts" />
+/// <reference path="js/splitmultilinetext.d.ts" />
 
 module UIComponents
 {
@@ -27,6 +28,7 @@ module UIComponents
    */
 
 export var List = React.createClass({
+  mixins: [SplitMultilineText],
 
   getInitialState: function()
   {
@@ -219,7 +221,7 @@ export var List = React.createClass({
             {
               key: "" + item.key + "_" + column.key
             },
-            item.data[column.key] || null)
+            self.splitMultilineText( item.data[column.key] ) || null)
         );
       }
 

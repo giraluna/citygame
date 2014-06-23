@@ -41,7 +41,7 @@ var UIComponents;
             }.bind(this));
 
             eventManager.addEventListener("buildHotkey", function (e) {
-                this.handleBuildingSelect(this.state.lastSelectedBuilding);
+                this.handleBuildingSelect(this.state.lastSelectedBuilding, e.content);
             }.bind(this));
         },
         render: function () {

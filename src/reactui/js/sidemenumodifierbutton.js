@@ -44,7 +44,7 @@ var UIComponents;
                 onTouchStart: this.handleOpenModifiers
             };
             if (this.state.hasNewModifier) {
-                divProps.className += " new-modifier";
+                //divProps.className += " new-modifier";
             }
 
             var divText = "Available upgrades: ";

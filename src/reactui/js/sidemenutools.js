@@ -10,18 +10,36 @@ var UIComponents;
                 content: ""
             });
         },
-        handleToolChange: function (type) {
+        handleToolChange: function (type, e) {
             this.props.setSelectedTool(type);
+
+            var continuous = false;
+
+            if (type !== "click" && e && e.shiftKey)
+                continuous = true;
 
             eventManager.dispatchEvent({
                 type: "changeTool",
-                content: type
+                content: {
+                    type: type,
+                    continuous: continuous
+                }
             });
         },
         componentDidMount: function () {
-            eventManager.addEventListener("buyHotkey", this.handleToolChange.bind(this, "buy"));
-            eventManager.addEventListener("sellHotkey", this.handleToolChange.bind(this, "sell"));
-            eventManager.addEventListener("clickHotkey", this.handleToolChange.bind(this, "click"));
+            eventManager.addEventListener("buyHotkey", function (e) {
+                ;
+                this.handleToolChange("buy", e.content);
+            }.bind(this));
+
+            eventManager.addEventListener("sellHotkey", function (e) {
+                this.handleToolChange("sell", e.content);
+            }.bind(this));
+
+            eventManager.addEventListener("clickHotkey", function (e) {
+                this.handleToolChange("click", e.content);
+            }.bind(this));
+
             eventManager.addEventListener("recruitHotkey", this.handleRecruit);
         },
         render: function () {

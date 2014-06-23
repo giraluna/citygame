@@ -61,7 +61,7 @@ export var SideMenuModifierButton = React.createClass(
     };
     if (this.state.hasNewModifier)
     {
-      divProps.className += " new-modifier";
+      //divProps.className += " new-modifier";
     }
 
     var divText = "Available upgrades: ";

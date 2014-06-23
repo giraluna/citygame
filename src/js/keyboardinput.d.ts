@@ -8,10 +8,10 @@ declare var keyboardStates: {
             "109": () => void;
             "189": () => void;
             "82": () => void;
-            "85": () => void;
-            "66": () => void;
-            "67": () => void;
-            "83": () => void;
+            "85": (e: any) => void;
+            "66": (e: any) => void;
+            "67": (e: any) => void;
+            "83": (e: any) => void;
         };
     };
 };

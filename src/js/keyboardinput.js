@@ -33,36 +33,36 @@ var keyboardStates = {
             },
             // u
             // buy
-            "85": function () {
+            "85": function (e) {
                 eventManager.dispatchEvent({
                     type: "buyHotkey",
-                    content: ""
+                    content: e
                 });
                 //document.getElementById("buyBtn").click();
             },
             // b
             // build
-            "66": function () {
+            "66": function (e) {
                 eventManager.dispatchEvent({
                     type: "buildHotkey",
-                    content: ""
+                    content: e
                 });
                 //document.getElementById("buildBtn").click();
             },
             // c
             // click
-            "67": function () {
+            "67": function (e) {
                 eventManager.dispatchEvent({
                     type: "clickHotkey",
-                    content: ""
+                    content: e
                 });
             },
             // s
             // sell
-            "83": function () {
+            "83": function (e) {
                 eventManager.dispatchEvent({
                     type: "sellHotkey",
-                    content: ""
+                    content: e
                 });
             }
         }
@@ -107,7 +107,7 @@ var KeyboardEventHandler = (function () {
                 return;
             }
             event.preventDefault();
-            this.statesObj[this.currState]["keydown"][event.keyCode].call();
+            this.statesObj[this.currState]["keydown"][event.keyCode].call(null, event);
         }
     };
     KeyboardEventHandler.prototype.handleKeyup = function (event) {

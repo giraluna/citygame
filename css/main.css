@@ -213,6 +213,7 @@ progress::-webkit-progress-value {
 .popup .popup-content {
   display: inline-block;
   max-height: 350px;
+  max-width: 450px;
   overflow-y: scroll;
 }
 .popup .popup-content > * {
@@ -405,6 +406,7 @@ progress::-webkit-progress-value {
   -moz-appearance: none;
   appearance: none;
   border: none;
+  z-index: auto;
 }
 #player-level-wrapper span {
   display: flex;

@@ -55,7 +55,7 @@ export var SideMenuBuildings = React.createClass(
 
     eventManager.addEventListener("buildHotkey", function(e)
     {
-      this.handleBuildingSelect(this.state.lastSelectedBuilding);
+      this.handleBuildingSelect(this.state.lastSelectedBuilding, e.content);
     }.bind(this));
 
   },

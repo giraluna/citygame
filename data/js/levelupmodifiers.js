@@ -30,8 +30,11 @@ var levelUpModifiers;
                 value: 5
             }
         ],
-        uniqueEffect: function (player) {
-            player.addMoney(200);
+        onAdd: {
+            oneTime: true,
+            effect: function (player) {
+                player.addMoney(200);
+            }
         }
     };
 
@@ -99,8 +102,11 @@ var levelUpModifiers;
                 value: 5
             }
         ],
-        uniqueEffect: function (player) {
-            player.levelUpModifiersPerLevelUp++;
+        onAdd: {
+            oneTime: false,
+            effect: function (player) {
+                player.levelUpModifiersPerLevelUp++;
+            }
         }
     };
 
@@ -150,15 +156,18 @@ var levelUpModifiers;
     levelUpModifiers.fundingBoost2 = {
         type: "fundingBoost2",
         title: "More starting capital",
-        description: "+500$",
+        description: "+1000$",
         unlockConditions: [
             {
                 type: "level",
                 value: 10
             }
         ],
-        uniqueEffect: function (player) {
-            player.addMoney(500);
+        onAdd: {
+            oneTime: true,
+            effect: function (player) {
+                player.addMoney(1000);
+            }
         }
     };
 
@@ -216,8 +225,11 @@ var levelUpModifiers;
                 value: 10
             }
         ],
-        uniqueEffect: function (player) {
-            player.modifierEffects.sellPrice += 0.15;
+        onAdd: {
+            oneTime: false,
+            effect: function (player) {
+                player.modifierEffects.sellPrice += 0.15;
+            }
         }
     };
 
@@ -231,8 +243,11 @@ var levelUpModifiers;
                 value: 10
             }
         ],
-        uniqueEffect: function (player) {
-            player.modifierEffects.recruitQuality += 0.25;
+        onAdd: {
+            oneTime: false,
+            effect: function (player) {
+                player.modifierEffects.recruitQuality += 0.25;
+            }
         }
     };
 
@@ -242,15 +257,18 @@ var levelUpModifiers;
     levelUpModifiers.fundingBoost3 = {
         type: "fundingBoost3",
         title: "External investors",
-        description: "+2000$",
+        description: "+5000$",
         unlockConditions: [
             {
                 type: "level",
                 value: 25
             }
         ],
-        uniqueEffect: function (player) {
-            player.addMoney(2000);
+        onAdd: {
+            oneTime: true,
+            effect: function (player) {
+                player.addMoney(5000);
+            }
         }
     };
 
@@ -264,21 +282,55 @@ var levelUpModifiers;
                 value: 25
             }
         ],
-        uniqueEffect: function (player) {
-            player.addTimedModifier({
-                type: "buildRush1",
-                title: "Construction boom",
-                description: "All buildings 33% cheaper for 2 minutes",
-                lifeTime: 1000 * 120,
-                effects: [
-                    {
-                        targets: ["global"],
-                        buildCost: {
-                            multiplier: 0.666
+        onAdd: {
+            oneTime: true,
+            effect: function (player) {
+                player.addTimedModifier({
+                    type: "buildRush1",
+                    title: "Construction boom",
+                    description: "All buildings 33% cheaper for 2 minutes",
+                    lifeTime: 1000 * 120,
+                    effects: [
+                        {
+                            targets: ["global"],
+                            buildCost: {
+                                multiplier: 0.666
+                            }
                         }
-                    }
-                ]
-            });
+                    ]
+                });
+            }
+        }
+    };
+
+    levelUpModifiers.buyRush1 = {
+        type: "buyRush1",
+        title: "Land grab",
+        description: "Buying plots 50% cheaper for 2 minutes",
+        unlockConditions: [
+            {
+                type: "level",
+                value: 25
+            }
+        ],
+        onAdd: {
+            oneTime: true,
+            effect: function (player) {
+                player.addTimedModifier({
+                    type: "buildRush1",
+                    title: "Land grab",
+                    description: "Buying plots 50% cheaper for 2 minutes",
+                    lifeTime: 1000 * 120,
+                    effects: [
+                        {
+                            targets: ["global"],
+                            buyCost: {
+                                multiplier: 0.5
+                            }
+                        }
+                    ]
+                });
+            }
         }
     };
 
@@ -295,8 +347,11 @@ var levelUpModifiers;
                 value: 50
             }
         ],
-        uniqueEffect: function (player) {
-            player.modifierEffects.recruitQuality += 0.75;
+        onAdd: {
+            oneTime: false,
+            effect: function (player) {
+                player.modifierEffects.recruitQuality += 0.75;
+            }
         }
     };
 

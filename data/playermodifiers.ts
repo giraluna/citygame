@@ -16,7 +16,11 @@ module playerModifiers
         addedCost?: number;
       };
     }[];
-    uniqueEffect?: (any) => void;
+    onAdd?:
+    {
+      oneTime: boolean;
+      effect: (any) => void;
+    };
     dynamicEffect?: {[target: string]: (any) => any;};
     unlockConditions?: any;
 

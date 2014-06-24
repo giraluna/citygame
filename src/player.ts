@@ -274,7 +274,7 @@ class Player
 
     return amount;
   }
-  addModifier(modifier, collection:string="modifiers")
+  addModifier(modifier, collection:string="modifiers", firstTime:boolean = true)
   {
     if (this[collection][modifier.type]) return;
     if (modifier.cost && modifier.cost > this.money) return;
@@ -297,9 +297,12 @@ class Player
     {
       this.addMoney(-modifier.cost);
     }
-    if (modifier.uniqueEffect)
+    if (modifier.onAdd)
     {
-      modifier.uniqueEffect(this);
+      if (!modifier.onAdd.oneTime || firstTime === true)
+      {
+        modifier.onAdd.effect.call(null, this);
+      }
     }
     if (modifier.dynamicEffect)
     {
@@ -725,13 +728,14 @@ class Player
 
     this.unlockedLevelUpModifiers[level] = toUnlock;
   }
-  addLevelUpModifier(modifier, preventMultiplePerLevel:boolean = true)
+  addLevelUpModifier(modifier, preventMultiplePerLevel:boolean = true,
+    firstTime:boolean = true)
   {
     var level = modifier.unlockConditions[0].value;
 
     if (preventMultiplePerLevel && this.levelsAlreadyPicked[level]) return false;
 
-    this.addModifier(modifier, "levelUpModifiers");
+    this.addModifier(modifier, "levelUpModifiers", firstTime);
 
     this.unlockedLevelUpModifiers[level] = null;
     delete this.unlockedLevelUpModifiers[level];

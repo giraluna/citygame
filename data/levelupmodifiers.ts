@@ -37,9 +37,13 @@ module levelUpModifiers
         value: 5
       }
     ],
-    uniqueEffect: function(player)
+    onAdd:
     {
-      player.addMoney(200);
+      oneTime: true,
+      effect: function(player)
+      {
+        player.addMoney(200)
+      }
     }
   }
 
@@ -121,9 +125,13 @@ module levelUpModifiers
         value: 5
       }
     ],
-    uniqueEffect: function(player)
+    onAdd:
     {
-      player.levelUpModifiersPerLevelUp++;
+      oneTime: false,
+      effect: function(player)
+      {
+        player.levelUpModifiersPerLevelUp++;
+      }
     }
   }
 
@@ -183,7 +191,7 @@ module levelUpModifiers
   {
     type: "fundingBoost2",
     title: "More starting capital",
-    description: "+500$",
+    description: "+1000$",
     unlockConditions:
     [
       {
@@ -191,9 +199,13 @@ module levelUpModifiers
         value: 10
       }
     ],
-    uniqueEffect: function(player)
+    onAdd:
     {
-      player.addMoney(500);
+      oneTime: true,
+      effect: function(player)
+      {
+        player.addMoney(1000)
+      }
     }
   }
 
@@ -260,9 +272,13 @@ module levelUpModifiers
         value: 10
       }
     ],
-    uniqueEffect: function(player)
+    onAdd:
     {
-      player.modifierEffects.sellPrice += 0.15;
+      oneTime: false,
+      effect: function(player)
+      {
+        player.modifierEffects.sellPrice += 0.15;
+      }
     }
   }
 
@@ -278,9 +294,13 @@ module levelUpModifiers
         value: 10
       }
     ],
-    uniqueEffect: function(player)
+    onAdd:
     {
-      player.modifierEffects.recruitQuality += 0.25;
+      oneTime: false,
+      effect: function(player)
+      {
+        player.modifierEffects.recruitQuality += 0.25;
+      }
     }
   }
 
@@ -292,7 +312,7 @@ module levelUpModifiers
   {
     type: "fundingBoost3",
     title: "External investors",
-    description: "+2000$",
+    description: "+5000$",
     unlockConditions:
     [
       {
@@ -300,9 +320,13 @@ module levelUpModifiers
         value: 25
       }
     ],
-    uniqueEffect: function(player)
+    onAdd:
     {
-      player.addMoney(2000);
+      oneTime: true,
+      effect: function(player)
+      {
+        player.addMoney(5000)
+      }
     }
   }
 
@@ -318,25 +342,67 @@ module levelUpModifiers
         value: 25
       }
     ],
-    uniqueEffect: function(player)
+    onAdd:
     {
-      player.addTimedModifier(
+      oneTime: true,
+      effect: function(player)
       {
-        type: "buildRush1",
-        title: "Construction boom",
-        description: "All buildings 33% cheaper for 2 minutes",
-        lifeTime: 1000 * 120,
-        effects:
-        [
-          {
-            targets: ["global"],
-            buildCost:
+        player.addTimedModifier(
+        {
+          type: "buildRush1",
+          title: "Construction boom",
+          description: "All buildings 33% cheaper for 2 minutes",
+          lifeTime: 1000 * 120,
+          effects:
+          [
             {
-              multiplier: 0.666
+              targets: ["global"],
+              buildCost:
+              {
+                multiplier: 0.666
+              }
             }
-          }
-        ]
-      });
+          ]
+        })
+      }
+    }
+  }
+
+  export var buyRush1: playerModifiers.IPlayerModifier =
+  {
+    type: "buyRush1",
+    title: "Land grab",
+    description: "Buying plots 50% cheaper for 2 minutes",
+    unlockConditions:
+    [
+      {
+        type: "level",
+        value: 25
+      }
+    ],
+    onAdd:
+    {
+      oneTime: true,
+      effect: function(player)
+      {
+        player.addTimedModifier(
+        {
+          type: "buildRush1",
+          title: "Land grab",
+          description: "Buying plots 50% cheaper for 2 minutes",
+          lifeTime: 1000 * 120,
+          effects:
+          [
+            {
+              targets: ["global"],
+              buyCost:
+              {
+                multiplier: 0.5
+              }
+            }
+          ]
+        })
+      }
     }
   }
 
@@ -356,9 +422,13 @@ module levelUpModifiers
         value: 50
       }
     ],
-    uniqueEffect: function(player)
+    onAdd:
     {
-      player.modifierEffects.recruitQuality += 0.75;
+      oneTime: false,
+      effect: function(player)
+      {
+        player.modifierEffects.recruitQuality += 0.75;
+      }
     }
   }
 

@@ -223,8 +223,9 @@ var Player = (function () {
 
         return amount;
     };
-    Player.prototype.addModifier = function (modifier, collection) {
+    Player.prototype.addModifier = function (modifier, collection, firstTime) {
         if (typeof collection === "undefined") { collection = "modifiers"; }
+        if (typeof firstTime === "undefined") { firstTime = true; }
         if (this[collection][modifier.type])
             return;
         if (modifier.cost && modifier.cost > this.money)
@@ -244,8 +245,10 @@ var Player = (function () {
         if (modifier.cost) {
             this.addMoney(-modifier.cost);
         }
-        if (modifier.uniqueEffect) {
-            modifier.uniqueEffect(this);
+        if (modifier.onAdd) {
+            if (!modifier.onAdd.oneTime || firstTime === true) {
+                modifier.onAdd.effect.call(null, this);
+            }
         }
         if (modifier.dynamicEffect) {
             this.addDynamicModifier(modifier);
@@ -589,14 +592,15 @@ var Player = (function () {
 
         this.unlockedLevelUpModifiers[level] = toUnlock;
     };
-    Player.prototype.addLevelUpModifier = function (modifier, preventMultiplePerLevel) {
+    Player.prototype.addLevelUpModifier = function (modifier, preventMultiplePerLevel, firstTime) {
         if (typeof preventMultiplePerLevel === "undefined") { preventMultiplePerLevel = true; }
+        if (typeof firstTime === "undefined") { firstTime = true; }
         var level = modifier.unlockConditions[0].value;
 
         if (preventMultiplePerLevel && this.levelsAlreadyPicked[level])
             return false;
 
-        this.addModifier(modifier, "levelUpModifiers");
+        this.addModifier(modifier, "levelUpModifiers", firstTime);
 
         this.unlockedLevelUpModifiers[level] = null;
         delete this.unlockedLevelUpModifiers[level];

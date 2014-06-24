@@ -13,6 +13,7 @@ declare module levelUpModifiers {
     var increasedRecruitQuality1: playerModifiers.IPlayerModifier;
     var fundingBoost3: playerModifiers.IPlayerModifier;
     var buildRush1: playerModifiers.IPlayerModifier;
+    var buyRush1: playerModifiers.IPlayerModifier;
     var increasedRecruitQuality2: playerModifiers.IPlayerModifier;
     var modifiersByUnlock: any;
     var allModifiers: any[];

@@ -12,7 +12,10 @@ declare module playerModifiers {
                 addedCost?: number;
             };
         }[];
-        uniqueEffect?: (any: any) => void;
+        onAdd?: {
+            oneTime: boolean;
+            effect: (any: any) => void;
+        };
         dynamicEffect?: {
             [target: string]: (any: any) => any;
         };

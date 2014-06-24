@@ -54,7 +54,7 @@ declare class Player {
     public removeContent(content: any): void;
     public sellContent(content: any): void;
     public addMoney(initialAmount: any, incomeType?: string, daysPerTick?: number, date?: any): any;
-    public addModifier(modifier: any, collection?: string): void;
+    public addModifier(modifier: any, collection?: string, firstTime?: boolean): void;
     public addSpecialModifier(modifier: any): void;
     public addTimedModifier(modifier: any): void;
     public addDynamicModifier(sourceModifier: any): void;
@@ -79,5 +79,5 @@ declare class Player {
     public updateDynamicModifiers(conditionType: string): void;
     public addClicks(amount: number): void;
     public unlockLevelUpModifiers(level: any): void;
-    public addLevelUpModifier(modifier: any, preventMultiplePerLevel?: boolean): boolean;
+    public addLevelUpModifier(modifier: any, preventMultiplePerLevel?: boolean, firstTime?: boolean): boolean;
 }

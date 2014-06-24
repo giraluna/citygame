@@ -1824,11 +1824,12 @@ class Game
 
     for (var _mod in data.modifiers)
     {
-      player.addModifier(playerModifiers[data.modifiers[_mod]]);
+      player.addModifier(
+        playerModifiers[data.modifiers[_mod]], "modifiers", false);
     }
     for (var _mod in data.levelUpModifiers)
     {
-      player.addLevelUpModifier(levelUpModifiers[data.levelUpModifiers[_mod]]);
+      player.addLevelUpModifier(levelUpModifiers[data.levelUpModifiers[_mod]], true, false);
     }
     player.levelsAlreadyPicked = data.levelsAlreadyPicked || {};
 

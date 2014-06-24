@@ -1840,11 +1840,11 @@ class Game
       player.addEmployee(data.employees[employee]);
     }
 
+    player.setInitialAvailableModifiers();
 
     this.players["player0"] = player;
     this.reactUI.player = player;
     player.addExperience(0); // refresh
-    player.setInitialAvailableModifiers(playerModifiers.allModifiers);
     player.updateElements();
   }
   render()

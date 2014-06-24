@@ -181,15 +181,7 @@ module actions
       employee.active = true;
       employee.currentAction = undefined;
 
-      eventManager.dispatchEvent(
-      {
-        type: "makeInfoPopup",
-        content:
-        {
-          text: "Building at cell " + cell.gridPos + " has finished construction.",
-          onClose: constructBuildingConfirmFN
-        }
-      });
+      window.setTimeout(constructBuildingConfirmFN, 1000);
     }
 
     eventManager.dispatchEvent({type: "delayedAction", content:

@@ -51,7 +51,13 @@ module playerModifiers
     title: "Hardly working",
     description: "+0.2$ / click",
     cost: 50,
-    unlockConditions:["default"],
+    unlockConditions:
+    [
+      {
+        type: "level",
+        value: 1
+      }
+    ],
     effects:
     [
       {
@@ -370,7 +376,7 @@ module playerModifiers
   export var officeModifier1: IPlayerModifier =
   {
     type: "officeModifier1",
-    title: "Swingline Staplers",
+    title: "Red staplers",
     description: "Offices +4$ /s",
     cost: 5000,
     unlockConditions:
@@ -392,7 +398,7 @@ module playerModifiers
   {
     type: "officeModifier2",
     title: "Ass-resistant photocopiers",
-    description: "Offices +6$ /s",
+    description: "office profits * 1.2",
     cost: 15000,
     unlockConditions:
     [
@@ -405,7 +411,7 @@ module playerModifiers
     [
       {
         targets: ["office"],
-        addedProfit: 6
+        multiplier: 1.2
       }
     ]
   }
@@ -413,7 +419,7 @@ module playerModifiers
   {
     type: "officeModifier3",
     title: "Ass-seeking photocopiers",
-    description: "office profits * 1.2",
+    description: "office profits * 1.5",
     cost: 50000,
     unlockConditions:
     [
@@ -426,7 +432,7 @@ module playerModifiers
     [
       {
         targets: ["office"],
-        multiplier: 1.2
+        multiplier: 1.5
       }
     ]
   }

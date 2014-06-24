@@ -102,7 +102,7 @@ var Player = (function () {
         };
 
         this.setExperienceToNextLevel();
-        this.setInitialAvailableModifiers(playerModifiers.allModifiers);
+        this.setInitialAvailableModifiers();
     };
     Player.prototype.addEventListeners = function () {
     };
@@ -472,8 +472,6 @@ var Player = (function () {
     Player.prototype.checkIfUnlocked = function (modifier) {
         if (!modifier.unlockConditions)
             return false;
-        if (modifier.unlockConditions === ["default"])
-            return true;
 
         var unlocked = true;
 
@@ -487,10 +485,10 @@ var Player = (function () {
         }
         return unlocked;
     };
-    Player.prototype.setInitialAvailableModifiers = function (allModifiers) {
-        if (!this.lockedModifiers || this.lockedModifiers.length < 1) {
-            this.lockedModifiers = allModifiers.slice(0);
-        }
+    Player.prototype.setInitialAvailableModifiers = function () {
+        var allModifiers = playerModifiers.allModifiers;
+        this.lockedModifiers = allModifiers.slice(0);
+        this.unlockedModifiers = [];
 
         for (var i = 0; i < this.lockedModifiers.length; i++) {
             var mod = this.lockedModifiers[i];
@@ -537,7 +535,7 @@ var Player = (function () {
         }
     };
     Player.prototype.unlockModifier = function (modifier) {
-        if (!this.modifiers[modifier.type] || this.unlockedModifiers.indexOf(modifier) <= -1) {
+        if (!this.modifiers[modifier.type] && this.unlockedModifiers.indexOf(modifier) <= -1) {
             this.unlockedModifiers.push(modifier);
         }
 

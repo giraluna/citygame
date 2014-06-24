@@ -73,7 +73,7 @@ declare class Player {
     public clearIndexedProfits(): void;
     public getUnlockConditionVariable(conditionType: string): any;
     public checkIfUnlocked(modifier: playerModifiers.IPlayerModifier): boolean;
-    public setInitialAvailableModifiers(allModifiers: playerModifiers.IPlayerModifier[]): void;
+    public setInitialAvailableModifiers(): void;
     public checkLockedModifiers(conditionType: string): void;
     public unlockModifier(modifier: playerModifiers.IPlayerModifier): void;
     public updateDynamicModifiers(conditionType: string): void;

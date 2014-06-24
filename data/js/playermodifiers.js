@@ -21,7 +21,12 @@ var playerModifiers;
         title: "Hardly working",
         description: "+0.2$ / click",
         cost: 50,
-        unlockConditions: ["default"],
+        unlockConditions: [
+            {
+                type: "level",
+                value: 1
+            }
+        ],
         effects: [
             {
                 targets: ["click"],
@@ -296,7 +301,7 @@ var playerModifiers;
     };
     playerModifiers.officeModifier1 = {
         type: "officeModifier1",
-        title: "Swingline Staplers",
+        title: "Red staplers",
         description: "Offices +4$ /s",
         cost: 5000,
         unlockConditions: [
@@ -315,7 +320,7 @@ var playerModifiers;
     playerModifiers.officeModifier2 = {
         type: "officeModifier2",
         title: "Ass-resistant photocopiers",
-        description: "Offices +6$ /s",
+        description: "office profits * 1.2",
         cost: 15000,
         unlockConditions: [
             {
@@ -326,14 +331,14 @@ var playerModifiers;
         effects: [
             {
                 targets: ["office"],
-                addedProfit: 6
+                multiplier: 1.2
             }
         ]
     };
     playerModifiers.officeModifier3 = {
         type: "officeModifier3",
         title: "Ass-seeking photocopiers",
-        description: "office profits * 1.2",
+        description: "office profits * 1.5",
         cost: 50000,
         unlockConditions: [
             {
@@ -344,7 +349,7 @@ var playerModifiers;
         effects: [
             {
                 targets: ["office"],
-                multiplier: 1.2
+                multiplier: 1.5
             }
         ]
     };

@@ -139,7 +139,7 @@ class Player
     };
 
     this.setExperienceToNextLevel();
-    this.setInitialAvailableModifiers(playerModifiers.allModifiers);
+    this.setInitialAvailableModifiers();
   }
   addEventListeners()
   {
@@ -589,7 +589,6 @@ class Player
   checkIfUnlocked(modifier: playerModifiers.IPlayerModifier)
   {
     if (!modifier.unlockConditions) return false;
-    if (modifier.unlockConditions === ["default"]) return true;
 
     var unlocked = true;
 
@@ -603,12 +602,11 @@ class Player
     }
     return unlocked;
   }
-  setInitialAvailableModifiers(allModifiers: playerModifiers.IPlayerModifier[])
+  setInitialAvailableModifiers()
   {
-    if (!this.lockedModifiers || this.lockedModifiers.length < 1)
-    {
-      this.lockedModifiers = allModifiers.slice(0);
-    }
+    var allModifiers = playerModifiers.allModifiers;
+    this.lockedModifiers = allModifiers.slice(0);
+    this.unlockedModifiers = [];
 
     for (var i = 0; i < this.lockedModifiers.length; i++)
     {
@@ -665,7 +663,7 @@ class Player
   }
   unlockModifier(modifier: playerModifiers.IPlayerModifier)
   {
-    if (!this.modifiers[modifier.type] || this.unlockedModifiers.indexOf(modifier) <= -1)
+    if (!this.modifiers[modifier.type] && this.unlockedModifiers.indexOf(modifier) <= -1)
     {
       this.unlockedModifiers.push(modifier);
     }

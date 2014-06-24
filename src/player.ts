@@ -31,6 +31,7 @@ class Player
 
   modifiers: any = {};
   dynamicModifiers: any = {};
+  timedModifiers: any = {};
   levelUpModifiers: any = {};
   specialModifiers: any = {};
 
@@ -312,6 +313,28 @@ class Player
       this.removeModifier(this.specialModifiers[modifier.type], "specialModifiers");
     }
     this.addModifier(modifier, "specialModifiers");
+  }
+  addTimedModifier(modifier)
+  {
+    if (!modifier.lifeTime)
+    {
+      throw new Error("Timed modifier" + modifier.type + "has no life time set");
+    }
+    if (this.timedModifiers[modifier.type])
+    {
+      window.clearTimeout(this.timedModifiers[modifier.type]);
+    }
+
+    var removeTimedModifierFN = function()
+    {
+      this.removeModifier(this.specialModifiers[modifier.type], "specialModifiers");
+      window.clearTimeout(this.timedModifiers[modifier.type]);
+    }.bind(this);
+
+    this.timedModifiers[modifier.type] = window.setTimeout(removeTimedModifierFN,
+      modifier.lifeTime);
+
+    this.addSpecialModifier(modifier);
   }
   addDynamicModifier(sourceModifier)
   {

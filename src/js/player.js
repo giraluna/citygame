@@ -23,6 +23,7 @@ var Player = (function () {
         this.incomePerType = {};
         this.modifiers = {};
         this.dynamicModifiers = {};
+        this.timedModifiers = {};
         this.levelUpModifiers = {};
         this.specialModifiers = {};
         this.modifierEffects = {
@@ -255,6 +256,23 @@ var Player = (function () {
             this.removeModifier(this.specialModifiers[modifier.type], "specialModifiers");
         }
         this.addModifier(modifier, "specialModifiers");
+    };
+    Player.prototype.addTimedModifier = function (modifier) {
+        if (!modifier.lifeTime) {
+            throw new Error("Timed modifier" + modifier.type + "has no life time set");
+        }
+        if (this.timedModifiers[modifier.type]) {
+            window.clearTimeout(this.timedModifiers[modifier.type]);
+        }
+
+        var removeTimedModifierFN = function () {
+            this.removeModifier(this.specialModifiers[modifier.type], "specialModifiers");
+            window.clearTimeout(this.timedModifiers[modifier.type]);
+        }.bind(this);
+
+        this.timedModifiers[modifier.type] = window.setTimeout(removeTimedModifierFN, modifier.lifeTime);
+
+        this.addSpecialModifier(modifier);
     };
     Player.prototype.addDynamicModifier = function (sourceModifier) {
         for (var condition in sourceModifier.dynamicEffect) {

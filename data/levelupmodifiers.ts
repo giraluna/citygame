@@ -43,9 +43,9 @@ module levelUpModifiers
     }
   }
 
-  export var clicksPerParking: playerModifiers.IPlayerModifier =
+  export var clicksPerParking1: playerModifiers.IPlayerModifier =
   {
-    type: "clicksPerParking",
+    type: "clicksPerParking1",
     title: "Clicks per parking",
     description: "+0.2$ / click for every parking lot",
     unlockConditions:
@@ -61,7 +61,7 @@ module levelUpModifiers
       {
         player.addSpecialModifier(
         {
-          type: "clicksPerParking",
+          type: "clicksPerParking1",
           title: "Clicks per parking",
           description: "+0.2$ / click for every parking lot",
           effects:
@@ -109,9 +109,9 @@ module levelUpModifiers
     }
   }
 
-  export var increasedLevelUpModifiers: playerModifiers.IPlayerModifier =
+  export var increasedLevelUpModifiers1: playerModifiers.IPlayerModifier =
   {
-    type: "increasedLevelUpModifiers",
+    type: "increasedLevelUpModifiers1",
     title: "Increased knowledge",
     description: ["Choose from one extra modifier", "(if available) on subsequent level ups"],
     unlockConditions:
@@ -201,8 +201,8 @@ module levelUpModifiers
   {
     type: "america1",
     title: "The American way",
-    description: ["Fast food profit * 1.1 per parking",
-    "and vice versa"],
+    description: ["Fast food profit * 1.1 per",
+    "parking lot and vice versa"],
     unlockConditions:
     [
       {
@@ -303,6 +303,40 @@ module levelUpModifiers
     uniqueEffect: function(player)
     {
       player.addMoney(2000);
+    }
+  }
+
+  export var buildRush1: playerModifiers.IPlayerModifier =
+  {
+    type: "buildRush1",
+    title: "Construction boom",
+    description: "All buildings 33% cheaper for 2 minutes",
+    unlockConditions:
+    [
+      {
+        type: "level",
+        value: 25
+      }
+    ],
+    uniqueEffect: function(player)
+    {
+      player.addTimedModifier(
+      {
+        type: "buildRush1",
+        title: "Construction boom",
+        description: "All buildings 33% cheaper for 2 minutes",
+        lifeTime: 1000 * 120,
+        effects:
+        [
+          {
+            targets: ["global"],
+            buildCost:
+            {
+              multiplier: 0.666
+            }
+          }
+        ]
+      });
     }
   }
 

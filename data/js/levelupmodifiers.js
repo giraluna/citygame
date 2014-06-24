@@ -35,8 +35,8 @@ var levelUpModifiers;
         }
     };
 
-    levelUpModifiers.clicksPerParking = {
-        type: "clicksPerParking",
+    levelUpModifiers.clicksPerParking1 = {
+        type: "clicksPerParking1",
         title: "Clicks per parking",
         description: "+0.2$ / click for every parking lot",
         unlockConditions: [
@@ -48,7 +48,7 @@ var levelUpModifiers;
         dynamicEffect: {
             "parkinglot": function (player) {
                 player.addSpecialModifier({
-                    type: "clicksPerParking",
+                    type: "clicksPerParking1",
                     title: "Clicks per parking",
                     description: "+0.2$ / click for every parking lot",
                     effects: [
@@ -89,8 +89,8 @@ var levelUpModifiers;
         }
     };
 
-    levelUpModifiers.increasedLevelUpModifiers = {
-        type: "increasedLevelUpModifiers",
+    levelUpModifiers.increasedLevelUpModifiers1 = {
+        type: "increasedLevelUpModifiers1",
         title: "Increased knowledge",
         description: ["Choose from one extra modifier", "(if available) on subsequent level ups"],
         unlockConditions: [
@@ -166,8 +166,8 @@ var levelUpModifiers;
         type: "america1",
         title: "The American way",
         description: [
-            "Fast food profit * 1.1 per parking",
-            "and vice versa"],
+            "Fast food profit * 1.1 per",
+            "parking lot and vice versa"],
         unlockConditions: [
             {
                 type: "level",
@@ -251,6 +251,34 @@ var levelUpModifiers;
         ],
         uniqueEffect: function (player) {
             player.addMoney(2000);
+        }
+    };
+
+    levelUpModifiers.buildRush1 = {
+        type: "buildRush1",
+        title: "Construction boom",
+        description: "All buildings 33% cheaper for 2 minutes",
+        unlockConditions: [
+            {
+                type: "level",
+                value: 25
+            }
+        ],
+        uniqueEffect: function (player) {
+            player.addTimedModifier({
+                type: "buildRush1",
+                title: "Construction boom",
+                description: "All buildings 33% cheaper for 2 minutes",
+                lifeTime: 1000 * 120,
+                effects: [
+                    {
+                        targets: ["global"],
+                        buildCost: {
+                            multiplier: 0.666
+                        }
+                    }
+                ]
+            });
         }
     };
 

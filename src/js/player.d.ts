@@ -24,6 +24,7 @@ declare class Player {
     public incomePerType: any;
     public modifiers: any;
     public dynamicModifiers: any;
+    public timedModifiers: any;
     public levelUpModifiers: any;
     public specialModifiers: any;
     public modifierEffects: any;
@@ -55,6 +56,7 @@ declare class Player {
     public addMoney(initialAmount: any, incomeType?: string, daysPerTick?: number, date?: any): any;
     public addModifier(modifier: any, collection?: string): void;
     public addSpecialModifier(modifier: any): void;
+    public addTimedModifier(modifier: any): void;
     public addDynamicModifier(sourceModifier: any): void;
     public applyModifier(modifier: any): void;
     public applyAllModifiers(): void;

@@ -8,6 +8,7 @@ declare module levelUpModifiers {
     var shoppingCostReduction1: playerModifiers.IPlayerModifier;
     var parkingCostReduction1: playerModifiers.IPlayerModifier;
     var fundingBoost2: playerModifiers.IPlayerModifier;
+    var america1: playerModifiers.IPlayerModifier;
     var betterSellPrice1: playerModifiers.IPlayerModifier;
     var increasedRecruitQuality1: playerModifiers.IPlayerModifier;
     var fundingBoost3: playerModifiers.IPlayerModifier;

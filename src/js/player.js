@@ -254,7 +254,6 @@ var Player = (function () {
         if (this.specialModifiers[modifier.type]) {
             this.removeModifier(this.specialModifiers[modifier.type], "specialModifiers");
         }
-
         this.addModifier(modifier, "specialModifiers");
     };
     Player.prototype.addDynamicModifier = function (sourceModifier) {

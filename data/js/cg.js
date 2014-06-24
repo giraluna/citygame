@@ -782,6 +782,7 @@ var playerBuildableBuildings = [];
 [
     "parkinglot",
     "conveniencestore",
+    "fastfood",
     "house1",
     "smalloffice",
     "stretchystore",
@@ -796,6 +797,7 @@ var playerBuildableBuildings = [];
 var basevalues = [
     [25, 0.3],
     [300, 1],
+    [700, 2],
     [1500, 4],
     [5000, 6],
     [20000, 10],

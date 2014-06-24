@@ -311,7 +311,6 @@ class Player
     {
       this.removeModifier(this.specialModifiers[modifier.type], "specialModifiers");
     }
-
     this.addModifier(modifier, "specialModifiers");
   }
   addDynamicModifier(sourceModifier)

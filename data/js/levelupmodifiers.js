@@ -162,6 +162,48 @@ var levelUpModifiers;
         }
     };
 
+    levelUpModifiers.america1 = {
+        type: "america1",
+        title: "The American way",
+        description: [
+            "Fast food profit * 1.1 per parking",
+            "and vice versa"],
+        unlockConditions: [
+            {
+                type: "level",
+                value: 10
+            }
+        ],
+        dynamicEffect: {
+            "parkinglot": function (player) {
+                player.addSpecialModifier({
+                    type: "america1_a",
+                    title: "The American way A",
+                    description: "Fast food profit * 1.1 per parking",
+                    effects: [
+                        {
+                            targets: ["fastfood"],
+                            multiplier: 1 + player.amountBuiltPerType["parkinglot"] * 0.1
+                        }
+                    ]
+                });
+            },
+            "fastfood": function (player) {
+                player.addSpecialModifier({
+                    type: "america1_b",
+                    title: "The American way B",
+                    description: "Parking lot profit * 1.1 per fast food restaurant",
+                    effects: [
+                        {
+                            targets: ["parking"],
+                            multiplier: 1 + player.amountBuiltPerType["fastfood"] * 0.1
+                        }
+                    ]
+                });
+            }
+        }
+    };
+
     levelUpModifiers.betterSellPrice1 = {
         type: "betterSellPrice1",
         title: "Real estate flipping",

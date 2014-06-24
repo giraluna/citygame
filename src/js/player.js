@@ -366,7 +366,7 @@ var Player = (function () {
         return Math.round(cost);
     };
     Player.prototype.getCellBuyCost = function (baseCost) {
-        var adjusted = baseCost * Math.pow(1.2, Object.keys(this.ownedCells).length);
+        var adjusted = baseCost * Math.pow(1.15, Object.keys(this.ownedCells).length);
 
         adjusted += this.modifierEffects.buyCost["global"].addedCost;
         adjusted *= this.modifierEffects.buyCost["global"].multiplier;

@@ -408,10 +408,14 @@ progress::-webkit-progress-value {
   border: none;
   z-index: auto;
 }
-#player-level-wrapper span {
+#player-level-wrapper #level-string-wrapper {
+  position: relative;
   display: flex;
-  margin: 0 10px;
+  justify-content: space-between;
   align-items: center;
+  width: 95%;
+  margin: 0 auto;
+  height: 30px;
   color: white;
 }
 #side-menu-modifiers {

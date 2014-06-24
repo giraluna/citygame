@@ -22,17 +22,21 @@ var UIComponents;
         componentDidMount: function () {
             var money = this.refs.money.getDOMNode();
             var exp = this.refs.exp.getDOMNode();
+
             var expText = this.refs.expText.getDOMNode();
+            var levelText = this.refs.levelText.getDOMNode();
 
             eventManager.addEventListener("updatePlayerMoney", function (event) {
                 money.innerHTML = event.content;
             });
 
             eventManager.addEventListener("updatePlayerExp", function (event) {
-                var levelString = "Level   " + event.content.level + " " + event.content.experience + " / " + event.content.nextLevel;
+                var expString = event.content.experience + " / " + event.content.nextLevel;
+                var levelString = "Level   " + event.content.level + " ";
 
                 exp.value = event.content.percentage;
-                expText.innerHTML = levelString;
+                expText.innerHTML = expString;
+                levelText.innerHTML = levelString;
             });
 
             // forces update, kinda dumb
@@ -99,10 +103,15 @@ var UIComponents;
                 divProps.className = "interactive";
             }
 
-            return (React.DOM.div({ id: "side-menu-stats" }, React.DOM.div(divProps, React.DOM.progress(progressProps), React.DOM.span({
-                id: "player-level-text",
+            return (React.DOM.div({ id: "side-menu-stats" }, React.DOM.div(divProps, React.DOM.progress(progressProps), React.DOM.div({
+                id: "level-string-container"
+            }, React.DOM.div({
+                id: "level-string-wrapper"
+            }, React.DOM.span({
+                ref: "levelText"
+            }, null), React.DOM.span({
                 ref: "expText"
-            }, null)), React.DOM.div({ ref: "money" }, 0)));
+            }, null)))), React.DOM.div({ ref: "money" }, 0)));
         }
     });
 })(UIComponents || (UIComponents = {}));

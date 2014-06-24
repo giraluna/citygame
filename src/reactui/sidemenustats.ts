@@ -30,7 +30,9 @@ export var SideMenuStats = React.createClass(
   {
     var money = this.refs.money.getDOMNode();
     var exp = this.refs.exp.getDOMNode();
+
     var expText = this.refs.expText.getDOMNode();
+    var levelText = this.refs.levelText.getDOMNode();
 
     eventManager.addEventListener("updatePlayerMoney", function(event)
     {
@@ -39,12 +41,12 @@ export var SideMenuStats = React.createClass(
 
     eventManager.addEventListener("updatePlayerExp", function(event)
     {
-      var levelString = "Level   " + event.content.level + " " +
-        event.content.experience + " / " + event.content.nextLevel; /*+
-        " [" + event.content.percentage + "%]";*/
+      var expString = event.content.experience + " / " + event.content.nextLevel;
+      var levelString = "Level   " + event.content.level + " ";
 
       exp.value = event.content.percentage;
-      expText.innerHTML = levelString;
+      expText.innerHTML = expString;
+      levelText.innerHTML = levelString;
     });
 
     // forces update, kinda dumb
@@ -124,11 +126,23 @@ export var SideMenuStats = React.createClass(
         React.DOM.div( divProps,
           React.DOM.progress( progressProps),
 
-          React.DOM.span(
+          React.DOM.div(
+          {
+            id:"level-string-container"
+          },
+            React.DOM.div(
             {
-              id:"player-level-text",
-              ref: "expText",
-            }, null
+              id:"level-string-wrapper"
+            },
+              React.DOM.span(
+              {
+                ref: "levelText"
+              }, null),
+              React.DOM.span(
+              {
+                ref: "expText"
+              }, null)
+            )
           )
         ),
         React.DOM.div({ref: "money"}, 0)

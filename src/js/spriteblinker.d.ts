@@ -10,13 +10,14 @@ declare class Blinker extends Highlighter {
     };
     public idGenerator: number;
     private blinkFunctions;
+    private onRemoveCallbacks;
     private intervalFN;
     private blink;
     private clearFN;
     constructor(delay: number, color: number, repeat: number, autoStart?: boolean);
     public getToBlink(id?: number): any[];
     private makeBlinkFunctions();
-    public addCells(cells: any[], id?: number): number;
+    public addCells(cells: any[], onRemove?: any, id?: number): number;
     public removeCells(id: number): number;
     public start(): Blinker;
     public pause(): Blinker;

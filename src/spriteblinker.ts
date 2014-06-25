@@ -12,6 +12,7 @@ class Blinker extends Highlighter
   idGenerator: number = 0;
 
   private blinkFunctions: any[] = [];
+  private onRemoveCallbacks: any = {};
   private intervalFN: any;
   private blink: () => void;
 
@@ -70,12 +71,17 @@ class Blinker extends Highlighter
       }
     }.bind(this);
   }
-  addCells(cells: any[], id: number = this.idGenerator++)
+  addCells(cells: any[], onRemove?: any, id: number = this.idGenerator++)
   {
     if (!this.toBlink[id]) this.toBlink[id] = cells;
     else
     {
       this.toBlink[id] = this.toBlink[id].concat(cells);
+    }
+
+    if (onRemove)
+    {
+      this.onRemoveCallbacks[id] = onRemove;
     }
     
     return id;
@@ -94,6 +100,13 @@ class Blinker extends Highlighter
         this.clearFN(id);
         this.toBlink[id] = null;
         delete this.toBlink[id];
+      }
+
+      if (this.onRemoveCallbacks[id])
+      {
+        this.onRemoveCallbacks[id].call();
+        this.onRemoveCallbacks[id] = null;
+        delete this.onRemoveCallbacks[id];
       }
 
     }

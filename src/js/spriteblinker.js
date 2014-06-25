@@ -21,6 +21,7 @@ var Blinker = (function (_super) {
         this.toBlink = {};
         this.idGenerator = 0;
         this.blinkFunctions = [];
+        this.onRemoveCallbacks = {};
 
         this.repeat = repeat * 2;
 
@@ -69,12 +70,16 @@ var Blinker = (function (_super) {
             }
         }.bind(this);
     };
-    Blinker.prototype.addCells = function (cells, id) {
+    Blinker.prototype.addCells = function (cells, onRemove, id) {
         if (typeof id === "undefined") { id = this.idGenerator++; }
         if (!this.toBlink[id])
             this.toBlink[id] = cells;
         else {
             this.toBlink[id] = this.toBlink[id].concat(cells);
+        }
+
+        if (onRemove) {
+            this.onRemoveCallbacks[id] = onRemove;
         }
 
         return id;
@@ -89,6 +94,12 @@ var Blinker = (function (_super) {
                 this.clearFN(id);
                 this.toBlink[id] = null;
                 delete this.toBlink[id];
+            }
+
+            if (this.onRemoveCallbacks[id]) {
+                this.onRemoveCallbacks[id].call();
+                this.onRemoveCallbacks[id] = null;
+                delete this.onRemoveCallbacks[id];
             }
         }
 

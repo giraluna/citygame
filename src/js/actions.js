@@ -71,11 +71,25 @@ var actions;
     actions.buyCell = buyCell;
     ;
 
-    function recruitEmployee(player, employee) {
-        employee.active = false;
-        employee.currentAction = "recruit";
+    function recruitEmployee(props) {
+        // TODO circular reference
+        var _ = window;
+        var game = _.game;
 
-        var actionTime = getActionTime([employee.skills["recruitment"]], 14);
+        var player = game.players[props.playerId];
+        if (!player)
+            throw new Error();
+        var employee = player.employees[props.employeeId];
+
+        var data = Object.create(props);
+        if (data.finishedOn === undefined) {
+            data.time = getActionTime([employee.skills["recruitment"]], 14).approximate;
+        }
+
+        var onStartFN = function () {
+            employee.active = false;
+            employee.currentAction = "recruit";
+        };
 
         var employeeCount = getSkillAdjust([employee.skills["recruitment"]], 4, function employeeCountAdjustFN(avgSkill) {
             return 1 / (1.5 / Math.log(avgSkill + 1));
@@ -85,9 +99,11 @@ var actions;
             throw new Error("No player on employee");
         var adjustedSkill = employee.skills["recruitment"] * employee.player.modifierEffects.recruitQuality;
 
-        var newEmployees = makeNewEmployees(employeeCount.actual, adjustedSkill);
-
         var recruitCompleteFN = function () {
+            employee.active = true;
+            employee.currentAction = undefined;
+
+            var newEmployees = makeNewEmployees(employeeCount.actual, adjustedSkill);
             eventManager.dispatchEvent({
                 type: "makeRecruitCompletePopup",
                 content: {
@@ -100,9 +116,12 @@ var actions;
                 }
             });
         };
+
         eventManager.dispatchEvent({
-            type: "delayedAction", content: {
-                time: actionTime["actual"],
+            type: "delayedAction",
+            content: {
+                type: "recruitEmployee",
+                data: data,
                 onComplete: recruitCompleteFN
             }
         });

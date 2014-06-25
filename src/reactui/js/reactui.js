@@ -165,7 +165,10 @@ var ReactUI = (function () {
     ReactUI.prototype.makeRecruitPopup = function (props) {
         var self = this;
         var recruitWithSelected = function (selected) {
-            actions.recruitEmployee(props.player, selected.employee);
+            actions.recruitEmployee({
+                playerId: props.player.id,
+                employeeId: selected.employee.id
+            });
         };
         this.makeEmployeeActionPopup({
             player: props.player,
@@ -221,6 +224,19 @@ var ReactUI = (function () {
         var buyCost = props.player.getCellBuyCost(props.cell);
 
         var buySelected = function (selected) {
+            var adjusted = actions.getActionCost([selected.employee.skills["negotiation"]], buyCost).actual;
+
+            if (props.player.money < adjusted) {
+                eventManager.dispatchEvent({
+                    type: "makeInfoPopup",
+                    content: {
+                        text: "Not enough funds"
+                    }
+                });
+
+                return false;
+            }
+
             actions.buyCell({
                 gridPos: props.cell.gridPos,
                 boardId: props.cell.board.id,

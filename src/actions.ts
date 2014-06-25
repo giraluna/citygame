@@ -85,12 +85,33 @@ module actions
     });
   };
   
-  export function recruitEmployee(player: Player, employee: Employee)
+  export function recruitEmployee(props:
   {
-    employee.active = false;
-    employee.currentAction = "recruit";
+    playerId: string;
+    employeeId: string;
 
-    var actionTime = getActionTime([employee.skills["recruitment"]], 14);
+    finishedOn?: number;
+  })
+  {
+    // TODO circular reference
+    var _: any = window;
+    var game = _.game;
+
+    var player = game.players[props.playerId]
+    if (!player) throw new Error();
+    var employee = player.employees[props.employeeId];
+
+    var data: any = Object.create(props);
+    if (data.finishedOn === undefined)
+    {
+      data.time = getActionTime([employee.skills["recruitment"]], 14).approximate;
+    }
+
+    var onStartFN = function()
+    {
+      employee.active = false;
+      employee.currentAction = "recruit";
+    }
 
     var employeeCount = getSkillAdjust(
       [employee.skills["recruitment"]],
@@ -101,11 +122,13 @@ module actions
     if (!employee.player) throw new Error("No player on employee");
     var adjustedSkill = employee.skills["recruitment"] * employee.player.modifierEffects.recruitQuality;
 
-    var newEmployees = makeNewEmployees(employeeCount.actual, adjustedSkill);
-
 
     var recruitCompleteFN = function()
     {
+      employee.active = true;
+      employee.currentAction = undefined;
+
+      var newEmployees = makeNewEmployees(employeeCount.actual, adjustedSkill);
       eventManager.dispatchEvent(
       {
         type: "makeRecruitCompletePopup",
@@ -119,9 +142,14 @@ module actions
         }
       })
     }
-    eventManager.dispatchEvent({type: "delayedAction", content:
+
+    eventManager.dispatchEvent(
+    {
+      type: "delayedAction",
+      content:
       {
-        time: actionTime["actual"],
+        type: "recruitEmployee",
+        data: data,
         onComplete: recruitCompleteFN
       }
     });

@@ -12,7 +12,11 @@ declare module actions {
         employeeId: string;
         finishedOn?: number;
     }): void;
-    function recruitEmployee(player: Player, employee: Employee): void;
+    function recruitEmployee(props: {
+        playerId: string;
+        employeeId: string;
+        finishedOn?: number;
+    }): void;
     function constructBuilding(props: {
         gridPos: number[];
         boardId: string;

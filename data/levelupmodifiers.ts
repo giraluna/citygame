@@ -117,7 +117,7 @@ module levelUpModifiers
   {
     type: "increasedLevelUpModifiers1",
     title: "Increased knowledge",
-    description: ["Choose from one extra modifier", "(if available) on subsequent level ups"],
+    description: "Choose from one extra modifier (if available) on subsequent level ups",
     unlockConditions:
     [
       {
@@ -213,8 +213,7 @@ module levelUpModifiers
   {
     type: "america1",
     title: "The American way",
-    description: ["Fast food profit * 1.1 per",
-    "parking lot and vice versa"],
+    description: "Fast food profit * 1.1 per parking lot and vice versa",
     unlockConditions:
     [
       {
@@ -263,8 +262,7 @@ module levelUpModifiers
   {
     type: "betterSellPrice1",
     title: "Real estate flipping",
-    description: ["Get back an additional 15% of the cost",
-    "when selling buildings and land"],
+    description: "Get back an additional 15% of the cost when selling buildings and land",
     unlockConditions:
     [
       {
@@ -286,7 +284,7 @@ module levelUpModifiers
   {
     type: "increasedRecruitQuality1",
     title: "Promising talent",
-    description: ["Better new recruits"],
+    description: "Better new recruits",
     unlockConditions:
     [
       {

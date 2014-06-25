@@ -21,6 +21,7 @@ declare module cellModifiers {
         range: number;
         strength: number;
         targets: string[];
+        scaling: (strength: any) => number;
         effect: {
             multiplier: number;
         };

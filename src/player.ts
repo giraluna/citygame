@@ -198,7 +198,7 @@ class Player
   }
   sellCell( cell )
   {
-    var value = this.getCellBuyCost(cell.landValue) * this.modifierEffects.sellPrice;
+    var value = this.getCellBuyCost(cell) * this.modifierEffects.sellPrice;
 
     this.addMoney(value, "sell");
     this.removeCell(cell);

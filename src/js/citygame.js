@@ -559,6 +559,9 @@ var Cell = (function () {
 
             cell.updateLandValue();
         }
+        if (game.activeBoard && game.activeBoard.id === this.board.id) {
+            eventManager.dispatchEvent({ type: "updateLandValueMapmode", content: "" });
+        }
     };
     Cell.prototype.removePropagatedLandValueModifier = function (modifier) {
         var effectedCells = this.getDistances(modifier.landValue.radius, modifier.center);
@@ -589,6 +592,9 @@ var Cell = (function () {
             }
 
             cell.updateLandValue();
+        }
+        if (game.activeBoard && game.activeBoard.id === this.board.id) {
+            eventManager.dispatchEvent({ type: "updateLandValueMapmode", content: "" });
         }
     };
     Cell.prototype.updateLandValue = function () {
@@ -964,13 +970,18 @@ var Game = (function () {
         this.resize();
         this.render();
         this.updateWorld();
-
-        // TEMPORARY
-        game.uiDrawer.makeFadeyPopup([SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2], [0, 0], 5000, new PIXI.Text("ctrl+click to scroll\nshift+click to zoom", {
-            font: "bold 50px Arial",
-            fill: "#222222",
-            align: "center"
-        }), TWEEN.Easing.Quartic.In);
+        /*
+        game.uiDrawer.makeFadeyPopup(
+        [SCREEN_WIDTH / 2, SCREEN_HEIGHT/2],
+        [0, 0],
+        5000,
+        new PIXI.Text("ctrl+click to scroll\nshift+click to zoom",{
+        font: "bold 50px Arial",
+        fill: "#222222",
+        align: "center"
+        }),
+        TWEEN.Easing.Quartic.In
+        );*/
     };
     Game.prototype.initContainers = function () {
         var _stage = this.stage = new PIXI.Stage(0xFFFFFF);
@@ -1690,8 +1701,6 @@ var MouseEventHandler = (function () {
             game.updateWorld();
         } else if (event.originalEvent.ctrlKey || event.originalEvent.metaKey || (event.originalEvent.button === 1 || event.originalEvent.button === 2)) {
             this.startScroll(event);
-        } else if (event.originalEvent.shiftKey) {
-            this.startZoom(event);
         } else if (targetType === "world") {
             this.startCellAction(event);
         }
@@ -1761,6 +1770,11 @@ var MouseEventHandler = (function () {
         var pos = event.getLocalPosition(event.target);
         var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
 
+        if (event.originalEvent.shiftKey) {
+            game.activeTool.tempContinuous = true;
+        } else
+            game.activeTool.tempContinuous = false;
+
         this.currAction = "cellAction";
         this.startCell = gridPos;
         this.currCell = gridPos;
@@ -1805,8 +1819,6 @@ var MouseEventHandler = (function () {
         this.startCell = undefined;
         this.currCell = undefined;
         this.selectedCells = undefined;
-
-        eventManager.dispatchEvent({ type: "updateLandValueMapmode", content: "" });
 
         game.updateWorld(true);
     };
@@ -2015,6 +2027,7 @@ var Tool = (function () {
     function Tool() {
         this.mapmode = "default";
         this.continuous = true;
+        this.tempContinuous = true;
     }
     Tool.prototype.activate = function (target) {
         for (var i = 0; i < target.length; i++) {
@@ -2123,7 +2136,7 @@ var SellTool = (function (_super) {
             game.players.player0.sellCell(target);
         }
 
-        if (!this.continuous) {
+        if (!this.continuous && !this.tempContinuous) {
             eventManager.dispatchEvent({
                 type: "clickHotkey",
                 content: ""
@@ -2217,7 +2230,7 @@ var BuyTool = (function (_super) {
                 cell: target
             }
         });
-        if (!this.continuous) {
+        if (!this.continuous && !this.tempContinuous) {
             eventManager.dispatchEvent({
                 type: "clickHotkey",
                 content: ""
@@ -2290,7 +2303,7 @@ var BuildTool = (function (_super) {
                         player: game.players.player0,
                         buildingTemplate: this.selectedBuildingType,
                         cell: this.mainCell,
-                        onOk: (this.continuous ? function () {
+                        onOk: (this.continuous || this.tempContinuous ? function () {
                             return;
                         } : this.setDefaults.bind(this))
                     }

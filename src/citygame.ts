@@ -744,6 +744,10 @@ class Cell
 
       cell.updateLandValue();
     }
+    if (game.activeBoard && game.activeBoard.id === this.board.id)
+    {
+      eventManager.dispatchEvent({type:"updateLandValueMapmode", content:""});
+    }
   }
   removePropagatedLandValueModifier(modifier)
   {
@@ -781,6 +785,10 @@ class Cell
       }
 
       cell.updateLandValue();
+    }
+    if (game.activeBoard && game.activeBoard.id === this.board.id)
+    {
+      eventManager.dispatchEvent({type:"updateLandValueMapmode", content:""});
     }
   }
   updateLandValue()
@@ -1242,7 +1250,7 @@ class Game
     this.render();
     this.updateWorld();
 
-    // TEMPORARY
+    /*
     game.uiDrawer.makeFadeyPopup(
       [SCREEN_WIDTH / 2, SCREEN_HEIGHT/2],
       [0, 0],
@@ -1253,7 +1261,7 @@ class Game
         align: "center"
       }),
       TWEEN.Easing.Quartic.In
-      );
+    );*/
     }
     initContainers()
     {
@@ -2158,10 +2166,11 @@ class MouseEventHandler
     {
       this.startScroll(event);
     }
+    /*
     else if (event.originalEvent.shiftKey)
     {
       this.startZoom(event);
-    }
+    }*/
     else if (targetType === "world")
     {
       this.startCellAction(event);
@@ -2253,6 +2262,12 @@ class MouseEventHandler
     var pos = event.getLocalPosition(event.target);
     var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
 
+    if (event.originalEvent.shiftKey)
+    {
+      game.activeTool.tempContinuous = true;
+    }
+    else game.activeTool.tempContinuous = false;
+
     this.currAction = "cellAction";
     this.startCell = gridPos;
     this.currCell = gridPos;
@@ -2304,8 +2319,6 @@ class MouseEventHandler
     this.startCell = undefined;
     this.currCell = undefined;
     this.selectedCells = undefined;
-
-    eventManager.dispatchEvent({type:"updateLandValueMapmode", content:""});
 
     game.updateWorld(true);
   }
@@ -2564,6 +2577,7 @@ class Tool
   activateCost: number;
   mapmode: string = "default";
   continuous: boolean = true;
+  tempContinuous: boolean = true;
   button: HTMLInputElement;
 
   activate(target:Cell[])
@@ -2687,7 +2701,7 @@ class SellTool extends Tool
       game.players.player0.sellCell(target);
     }
 
-    if (!this.continuous)
+    if (!this.continuous && !this.tempContinuous)
     {
       eventManager.dispatchEvent(
       {
@@ -2789,7 +2803,7 @@ class BuyTool extends Tool
         cell: target
       }
     });
-    if (!this.continuous)
+    if (!this.continuous && !this.tempContinuous)
     {
       eventManager.dispatchEvent(
       {
@@ -2880,7 +2894,8 @@ class BuildTool extends Tool
             player: game.players.player0,
             buildingTemplate: this.selectedBuildingType,
             cell: this.mainCell,
-            onOk: ( this.continuous ? function(){return;} : this.setDefaults.bind(this) )
+            onOk: ( this.continuous || this.tempContinuous ?
+              function(){return;} : this.setDefaults.bind(this) )
           }
         });
       }

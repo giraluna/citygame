@@ -31,6 +31,13 @@ var cellModifiers;
             range: range,
             strength: strength,
             targets: ["apartment"],
+            scaling: function (strength) {
+                if (strength >= 3) {
+                    return 1 + Math.log(strength);
+                } else {
+                    return 0;
+                }
+            },
             effect: {
                 multiplier: -0.1
             }

@@ -117,6 +117,8 @@ var actions;
             });
         };
 
+        onStartFN.call(null);
+
         eventManager.dispatchEvent({
             type: "delayedAction",
             content: {
@@ -182,6 +184,7 @@ var actions;
 
             blinkerTODO.removeCells(blinkerId);
             eventManager.dispatchEvent({ type: "updateWorld", content: "" });
+
             return true;
         };
 

@@ -390,7 +390,7 @@ var cg = {
                 "effects": [
                     {
                         "type": "crowded",
-                        "range": 1,
+                        "range": 2,
                         "strength": 1
                     },
                     {
@@ -442,7 +442,7 @@ var cg = {
                 "effects": [
                     {
                         "type": "crowded",
-                        "range": 1,
+                        "range": 2,
                         "strength": 1
                     },
                     {
@@ -546,7 +546,7 @@ var cg = {
                 "effects": [
                     {
                         "type": "crowded",
-                        "range": 1,
+                        "range": 2,
                         "strength": 1
                     },
                     {

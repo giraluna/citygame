@@ -356,7 +356,7 @@ module playerModifiers
   {
     type: "fastFoodModifier3",
     title: "Jumbo-size diet soda cups",
-    description: "fastFood store profits * 1.3",
+    description: "Fast food restaurant profits * 1.3",
     cost: 7500,
     unlockConditions:
     [

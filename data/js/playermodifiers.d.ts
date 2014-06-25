@@ -34,6 +34,9 @@ declare module playerModifiers {
     var convenienceModifier1: IPlayerModifier;
     var convenienceModifier2: IPlayerModifier;
     var convenienceModifier3: IPlayerModifier;
+    var fastFoodModifier1: IPlayerModifier;
+    var fastFoodModifier2: IPlayerModifier;
+    var fastFoodModifier3: IPlayerModifier;
     var apartmentModifier1: IPlayerModifier;
     var apartmentModifier2: IPlayerModifier;
     var apartmentModifier3: IPlayerModifier;

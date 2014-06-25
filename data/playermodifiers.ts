@@ -250,7 +250,7 @@ module playerModifiers
   export var convenienceModifier1: IPlayerModifier =
   {
     type: "convenienceModifier1",
-    title: "Bigger soda cups",
+    title: "Newspaper stands",
     description: "Convenience stores +0.5$ /s",
     cost: 300,
     unlockConditions:
@@ -307,6 +307,69 @@ module playerModifiers
       {
         targets: ["shopping"],
         multiplier: 1.2
+      }
+    ]
+  }
+  export var fastFoodModifier1: IPlayerModifier =
+  {
+    type: "fastFoodModifier1",
+    title: "Jumbo-size fried",
+    description: "Fast food restaurants +1.5$ /s",
+    cost: 700,
+    unlockConditions:
+    [
+      {
+        type: "fastfood",
+        value: 1
+      }
+    ],
+    effects:
+    [
+      {
+        targets: ["fastfood"],
+        addedProfit: 1.5
+      }
+    ]
+  }
+  export var fastFoodModifier2: IPlayerModifier =
+  {
+    type: "fastFoodModifier2",
+    title: "Jumbo-size soda cups",
+    description: "Fast food restaurants +4$ /s",
+    cost: 2500,
+    unlockConditions:
+    [
+      {
+        type: "fastfood",
+        value: 4
+      }
+    ],
+    effects:
+    [
+      {
+        targets: ["fastfood"],
+        addedProfit: 4
+      }
+    ]
+  }
+  export var fastFoodModifier3: IPlayerModifier =
+  {
+    type: "fastFoodModifier3",
+    title: "Jumbo-size diet soda cups",
+    description: "fastFood store profits * 1.3",
+    cost: 7500,
+    unlockConditions:
+    [
+      {
+        type: "fastfood",
+        value: 5
+      }
+    ],
+    effects:
+    [
+      {
+        targets: ["fastfood"],
+        multiplier: 1.3
       }
     ]
   }

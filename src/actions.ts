@@ -38,6 +38,9 @@ module actions
     var price = player.getCellBuyCost(cell);
     price = getActionCost([employee.skills["negotiation"]], price).actual
 
+    var blinkerId = blinkerTODO.idGenerator++;
+
+
     var onStartFN = function()
     {
       player.ownedCellsAmount++;
@@ -53,8 +56,17 @@ module actions
       employee.trainSkill("negotiation");
       player.addCell(cell);
 
+      blinkerTODO.removeCells(blinkerId);
       eventManager.dispatchEvent({type: "updateWorld", content: ""});
       return true;
+    }
+
+    var startBlinkFN = function()
+    {
+      blinkerTODO.addCells([cell], null, blinkerId);
+      blinkerTODO.start();
+
+      window.setTimeout(onCompleteFN, 2400);
     }
 
     onStartFN.call(null);
@@ -66,7 +78,7 @@ module actions
       {
         type: "buyCell",
         data: data,
-        onComplete: onCompleteFN
+        onComplete: startBlinkFN
       }
     });
   };

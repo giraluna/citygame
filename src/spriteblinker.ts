@@ -4,7 +4,6 @@
 /// <reference path="js/eventlistener.d.ts" />
 /// 
 
-// mom, dad, I'm sorry.
 
 class Blinker extends Highlighter
 {

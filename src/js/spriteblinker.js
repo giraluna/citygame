@@ -9,7 +9,6 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-// mom, dad, I'm sorry.
 var Blinker = (function (_super) {
     __extends(Blinker, _super);
     function Blinker(delay, color, repeat, autoStart) {

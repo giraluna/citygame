@@ -1649,7 +1649,6 @@ class Game
         localStorage.getItem(autosaves[i]));
     }
     this.save("autosave");
-    console.log(this.players["player0"].money)
   }
   load(name: string)
   {

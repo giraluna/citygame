@@ -277,7 +277,15 @@ class Player
   addModifier(modifier, collection:string="modifiers", firstTime:boolean = true)
   {
     if (this[collection][modifier.type]) return;
-    if (modifier.cost && modifier.cost > this.money) return;
+    if (firstTime)
+    {
+      if (modifier.cost && modifier.cost > this.money) return;
+
+      if (modifier.cost)
+      {
+        this.addMoney(-modifier.cost);
+      }
+    }
 
     var index = this.unlockedModifiers.indexOf(modifier);
     {
@@ -287,15 +295,11 @@ class Player
       }
     }
     this[collection][modifier.type] = Object.create(modifier);
+
+
     if (modifier.effects)
     {
       this.applyModifier(modifier);
-    }
-
-
-    if (modifier.cost)
-    {
-      this.addMoney(-modifier.cost);
     }
     if (modifier.onAdd)
     {

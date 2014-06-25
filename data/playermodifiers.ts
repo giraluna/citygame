@@ -313,7 +313,7 @@ module playerModifiers
   export var fastFoodModifier1: IPlayerModifier =
   {
     type: "fastFoodModifier1",
-    title: "Jumbo-size fried",
+    title: "Jumbo-size fries",
     description: "Fast food restaurants +1.5$ /s",
     cost: 700,
     unlockConditions:
@@ -341,7 +341,7 @@ module playerModifiers
     [
       {
         type: "fastfood",
-        value: 4
+        value: 3
       }
     ],
     effects:
@@ -377,7 +377,7 @@ module playerModifiers
   {
     type: "apartmentModifier1",
     title: "Central heating",
-    description: "Apartments +2$ /s",
+    description: "Apartments +4$ /s",
     cost: 1500,
     unlockConditions:
     [
@@ -390,7 +390,7 @@ module playerModifiers
     [
       {
         targets: ["apartment"],
-        addedProfit: 2
+        addedProfit: 4
       }
     ]
   }
@@ -398,7 +398,7 @@ module playerModifiers
   {
     type: "apartmentModifier2",
     title: "Air conditioning",
-    description: "Apartments +4$ /s",
+    description: "Apartments +8$ /s",
     cost: 5000,
     unlockConditions:
     [
@@ -411,7 +411,7 @@ module playerModifiers
     [
       {
         targets: ["apartment"],
-        addedProfit: 4
+        addedProfit: 8
       }
     ]
   }
@@ -440,7 +440,7 @@ module playerModifiers
   {
     type: "officeModifier1",
     title: "Red staplers",
-    description: "Offices +4$ /s",
+    description: "Offices +8$ /s",
     cost: 5000,
     unlockConditions:
     [
@@ -453,7 +453,7 @@ module playerModifiers
     [
       {
         targets: ["office"],
-        addedProfit: 4
+        addedProfit: 8
       }
     ]
   }
@@ -503,7 +503,7 @@ module playerModifiers
   {
     type: "factoryModifier1",
     title: "Steam powered factories",
-    description: "Factories +8$ /s",
+    description: "Factories +12$ /s",
     cost: 50000,
     unlockConditions:
     [
@@ -516,7 +516,7 @@ module playerModifiers
     [
       {
         targets: ["factory"],
-        addedProfit: 8
+        addedProfit: 12
       }
     ]
   }
@@ -524,7 +524,7 @@ module playerModifiers
   {
     type: "factoryModifier2",
     title: "Electricity powered factories",
-    description: "Factories +16$ /s",
+    description: "Factories +20$ /s",
     cost: 150000,
     unlockConditions:
     [
@@ -537,7 +537,7 @@ module playerModifiers
     [
       {
         targets: ["factory"],
-        addedProfit: 16
+        addedProfit: 20
       }
     ]
   }

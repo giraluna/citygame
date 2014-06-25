@@ -247,7 +247,7 @@ var playerModifiers;
     };
     playerModifiers.fastFoodModifier1 = {
         type: "fastFoodModifier1",
-        title: "Jumbo-size fried",
+        title: "Jumbo-size fries",
         description: "Fast food restaurants +1.5$ /s",
         cost: 700,
         unlockConditions: [
@@ -271,7 +271,7 @@ var playerModifiers;
         unlockConditions: [
             {
                 type: "fastfood",
-                value: 4
+                value: 3
             }
         ],
         effects: [
@@ -302,7 +302,7 @@ var playerModifiers;
     playerModifiers.apartmentModifier1 = {
         type: "apartmentModifier1",
         title: "Central heating",
-        description: "Apartments +2$ /s",
+        description: "Apartments +4$ /s",
         cost: 1500,
         unlockConditions: [
             {
@@ -313,14 +313,14 @@ var playerModifiers;
         effects: [
             {
                 targets: ["apartment"],
-                addedProfit: 2
+                addedProfit: 4
             }
         ]
     };
     playerModifiers.apartmentModifier2 = {
         type: "apartmentModifier2",
         title: "Air conditioning",
-        description: "Apartments +4$ /s",
+        description: "Apartments +8$ /s",
         cost: 5000,
         unlockConditions: [
             {
@@ -331,7 +331,7 @@ var playerModifiers;
         effects: [
             {
                 targets: ["apartment"],
-                addedProfit: 4
+                addedProfit: 8
             }
         ]
     };
@@ -356,7 +356,7 @@ var playerModifiers;
     playerModifiers.officeModifier1 = {
         type: "officeModifier1",
         title: "Red staplers",
-        description: "Offices +4$ /s",
+        description: "Offices +8$ /s",
         cost: 5000,
         unlockConditions: [
             {
@@ -367,7 +367,7 @@ var playerModifiers;
         effects: [
             {
                 targets: ["office"],
-                addedProfit: 4
+                addedProfit: 8
             }
         ]
     };
@@ -410,7 +410,7 @@ var playerModifiers;
     playerModifiers.factoryModifier1 = {
         type: "factoryModifier1",
         title: "Steam powered factories",
-        description: "Factories +8$ /s",
+        description: "Factories +12$ /s",
         cost: 50000,
         unlockConditions: [
             {
@@ -421,14 +421,14 @@ var playerModifiers;
         effects: [
             {
                 targets: ["factory"],
-                addedProfit: 8
+                addedProfit: 12
             }
         ]
     };
     playerModifiers.factoryModifier2 = {
         type: "factoryModifier2",
         title: "Electricity powered factories",
-        description: "Factories +16$ /s",
+        description: "Factories +20$ /s",
         cost: 150000,
         unlockConditions: [
             {
@@ -439,7 +439,7 @@ var playerModifiers;
         effects: [
             {
                 targets: ["factory"],
-                addedProfit: 16
+                addedProfit: 20
             }
         ]
     };

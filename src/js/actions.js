@@ -8,69 +8,58 @@ var actions;
 (function (actions) {
     var blinkerTODO = new Blinker(600, 0x880055, -1, false);
 
-    function buyCell(player, cell, employee, buyCost) {
-        employee.active = false;
-        employee.currentAction = "buyCell";
-        var blinkerIdTODO = blinkerTODO.idGenerator++;
+    function buyCell(props) {
+        // TODO circular reference
+        var _ = window;
+        var game = _.game;
 
-        var actionTime = getActionTime([employee.skills["negotiation"]], 14);
+        var cell = game.getCell(props);
+        var player = game.players[props.playerId];
 
-        var price = getActionCost([employee.skills["negotiation"]], buyCost).actual;
+        if (!cell || !player)
+            throw new Error();
 
-        var buyCellConfirmFN = function () {
-            blinkerTODO.removeCells(blinkerIdTODO);
+        var employee = player.employees[props.employeeId];
+        var data = Object.create(props);
 
-            employee.trainSkill("negotiation");
+        if (data.finishedOn === undefined) {
+            data.time = getActionTime([employee.skills["negotiation"]], 14).approximate;
+        }
 
-            if (player.money < price) {
-                eventManager.dispatchEvent({
-                    type: "makeInfoPopup",
-                    content: {
-                        text: "Not enough funds"
-                    }
-                });
-                return false;
-            } else {
-                player.addCell(cell);
-                player.addMoney(-price);
-                eventManager.dispatchEvent({ type: "updateWorld", content: "" });
+        var price = player.getCellBuyCost(cell);
+        price = getActionCost([employee.skills["negotiation"]], price).actual;
 
-                return true;
-            }
-        }.bind(this);
-
-        var buyCellCancelFN = function () {
-            blinkerTODO.removeCells(blinkerIdTODO);
-        }.bind(this);
-
-        var onCompleteText = "Buy plot for " + price + "$?";
-
-        var buyCellCompleteFN = function () {
-            blinkerTODO.addCells([cell], blinkerIdTODO);
-            blinkerTODO.start();
-
+        var onStartFN = function () {
+            player.ownedCellsAmount++;
+            employee.active = false;
+            employee.currAction = "buyCell";
+            player.addMoney(-price);
+        };
+        var onCompleteFN = function () {
+            player.ownedCellsAmount--;
             employee.active = true;
-            employee.currentAction = undefined;
+            employee.currAction = undefined;
+            employee.trainSkill("negotiation");
+            player.addCell(cell);
 
-            eventManager.dispatchEvent({
-                type: "makeConfirmPopup",
-                content: {
-                    text: onCompleteText,
-                    onOk: buyCellConfirmFN,
-                    onClose: buyCellCancelFN
-                }
-            });
+            eventManager.dispatchEvent({ type: "updateWorld", content: "" });
+            return true;
         };
 
-        eventManager.dispatchEvent({ type: "updateWorld", content: "" });
+        onStartFN.call(null);
+
         eventManager.dispatchEvent({
-            type: "delayedAction", content: {
-                time: actionTime["actual"],
-                onComplete: buyCellCompleteFN
+            type: "delayedAction",
+            content: {
+                type: "buyCell",
+                data: data,
+                onComplete: onCompleteFN
             }
         });
     }
     actions.buyCell = buyCell;
+    ;
+
     function recruitEmployee(player, employee) {
         employee.active = false;
         employee.currentAction = "recruit";

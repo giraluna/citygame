@@ -18,6 +18,7 @@ declare class Player {
     public ownedContent: any;
     public amountBuiltPerType: any;
     public ownedCells: any;
+    public ownedCellsAmount: number;
     public employees: any;
     public usedInitialRecruit: boolean;
     public incomePerDate: any;
@@ -62,7 +63,7 @@ declare class Player {
     public applyAllModifiers(): void;
     public removeModifier(modifier: any, collection?: string): void;
     public getBuildCost(type: any): number;
-    public getCellBuyCost(baseCost: any): number;
+    public getCellBuyCost(cell: any): number;
     public addExperience(amount: any): void;
     public levelUp(callSize?: number): void;
     public getExperienceForLevel(level: any): number;

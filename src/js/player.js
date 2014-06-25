@@ -17,6 +17,7 @@ var Player = (function () {
         this.ownedContent = {};
         this.amountBuiltPerType = {};
         this.ownedCells = {};
+        this.ownedCellsAmount = 0;
         this.employees = {};
         this.usedInitialRecruit = false;
         this.incomePerDate = {};
@@ -137,6 +138,8 @@ var Player = (function () {
 
             cell.player = this;
             cell.addOverlay(this.color);
+
+            this.ownedCellsAmount++;
         }
     };
     Player.prototype.removeCell = function (cell) {
@@ -146,6 +149,7 @@ var Player = (function () {
 
             delete this.ownedCells[cell.gridPos];
             cell.player = null;
+            this.ownedCellsAmount--;
         }
     };
     Player.prototype.sellCell = function (cell) {
@@ -388,8 +392,8 @@ var Player = (function () {
 
         return Math.round(cost);
     };
-    Player.prototype.getCellBuyCost = function (baseCost) {
-        var adjusted = baseCost * Math.pow(1.15, Object.keys(this.ownedCells).length);
+    Player.prototype.getCellBuyCost = function (cell) {
+        var adjusted = cell.landValue * Math.pow(1.15, this.ownedCellsAmount);
 
         adjusted += this.modifierEffects.buyCost["global"].addedCost;
         adjusted *= this.modifierEffects.buyCost["global"].multiplier;

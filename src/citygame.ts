@@ -1617,6 +1617,28 @@ class Game
       this.boards[i].destroy();
     }
   }
+  getCell(props:
+  {
+    gridPos: number[];
+    boardId: number;
+  })
+  {
+    var boardIndex = undefined;
+    for (var i = 0; i < this.boards.length; i++)
+    {
+      if (this.boards[i].id == props.boardId)
+      {
+        boardIndex = i;
+        break;
+      }
+    }
+    if (boardIndex === undefined) throw new Error("No board found with id" +
+      props.boardId)
+    else
+    {
+      return this.boards[boardIndex].getCell(props.gridPos);
+    }
+  }
   save(name: string)
   {
     var toSave =
@@ -1761,6 +1783,7 @@ class Game
       });
 
       board.name = currToLoad.name || board.name;
+      board.id = currToLoad.id || board.id;
 
       newBoards.push(board);
     }
@@ -2378,7 +2401,7 @@ class UIDrawer
     if (game.worldRenderer.currentMapmode === "landValue")
     {
       text += "\nLand value: " + cell.landValue;
-      text += "\nApproximate cost: " + parseInt(game.players.player0.getCellBuyCost(cell.landValue));
+      text += "\nApproximate cost: " + parseInt(game.players.player0.getCellBuyCost(cell));
     }
     /*
     else

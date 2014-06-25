@@ -269,23 +269,24 @@ var DelayedActionSystem = (function (_super) {
     DelayedActionSystem.prototype.addEventListeners = function () {
         var self = this;
         eventManager.addEventListener("delayedAction", function (event) {
-            var _e = event.content;
-            self.addAction(self.lastTick, _e.time, _e.onComplete);
+            var action = event.content;
+            action.data.finishedOn = action.data.finishedOn || self.lastTick + action.data.time;
+
+            self.addAction(action);
         });
     };
 
-    DelayedActionSystem.prototype.addAction = function (currTick, time, action) {
-        var actionTime = currTick + time;
-        if (!this.callbacks[actionTime]) {
-            this.callbacks[actionTime] = [];
+    DelayedActionSystem.prototype.addAction = function (action) {
+        if (!this.callbacks[action.data.finishedOn]) {
+            this.callbacks[action.data.finishedOn] = [];
         }
-        this.callbacks[actionTime].push(action);
+        this.callbacks[action.data.finishedOn].push(action);
     };
 
     DelayedActionSystem.prototype.activate = function (currTick) {
         if (this.callbacks[currTick]) {
             for (var i = 0; i < this.callbacks[currTick].length; i++) {
-                this.callbacks[currTick][i].call();
+                this.callbacks[currTick][i].onComplete.call();
             }
             this.callbacks[currTick] = null;
             delete this.callbacks[currTick];

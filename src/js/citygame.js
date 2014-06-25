@@ -1269,6 +1269,20 @@ var Game = (function () {
             this.boards[i].destroy();
         }
     };
+    Game.prototype.getCell = function (props) {
+        var boardIndex = undefined;
+        for (var i = 0; i < this.boards.length; i++) {
+            if (this.boards[i].id == props.boardId) {
+                boardIndex = i;
+                break;
+            }
+        }
+        if (boardIndex === undefined)
+            throw new Error("No board found with id" + props.boardId);
+        else {
+            return this.boards[boardIndex].getCell(props.gridPos);
+        }
+    };
     Game.prototype.save = function (name) {
         var toSave = {
             player: this.savePlayer(this.players["player0"]),
@@ -1294,7 +1308,6 @@ var Game = (function () {
             localStorage.setItem("autosave" + (i + 2), localStorage.getItem(autosaves[i]));
         }
         this.save("autosave");
-        console.log(this.players["player0"].money);
     };
     Game.prototype.load = function (name) {
         var parsed = JSON.parse(localStorage.getItem(name));
@@ -1385,6 +1398,7 @@ var Game = (function () {
             });
 
             board.name = currToLoad.name || board.name;
+            board.id = currToLoad.id || board.id;
 
             newBoards.push(board);
         }
@@ -1868,7 +1882,7 @@ var UIDrawer = (function () {
 
         if (game.worldRenderer.currentMapmode === "landValue") {
             text += "\nLand value: " + cell.landValue;
-            text += "\nApproximate cost: " + parseInt(game.players.player0.getCellBuyCost(cell.landValue));
+            text += "\nApproximate cost: " + parseInt(game.players.player0.getCellBuyCost(cell));
         }
 
         /*

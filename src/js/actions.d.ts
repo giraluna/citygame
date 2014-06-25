@@ -4,7 +4,13 @@
 /// <reference path="eventlistener.d.ts" />
 /// <reference path="spriteblinker.d.ts" />
 declare module actions {
-    function buyCell(player: Player, cell: any, employee: Employee, buyCost: number): void;
+    function buyCell(props: {
+        gridPos: number[];
+        boardId: string;
+        playerId: string;
+        employeeId: string;
+        finishedOn?: number;
+    }): void;
     function recruitEmployee(player: Player, employee: Employee): void;
     function constructBuilding(props: {
         player: Player;

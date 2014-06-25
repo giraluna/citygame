@@ -321,11 +321,17 @@ class ReactUI
 
     if (props.player.ownedCells[props.cell.gridPos]) return;
 
-    var buyCost = props.player.getCellBuyCost(props.cell.landValue);
+    var buyCost = props.player.getCellBuyCost(props.cell);
 
     var buySelected = function(selected)
     {
-      actions.buyCell( props.player, props.cell, selected.employee, buyCost);
+      actions.buyCell(
+      {
+        gridPos: props.cell.gridPos,
+        boardId: props.cell.board.id,
+        playerId: props.player.id,
+        employeeId: selected.employee.id,
+      });
     }
     this.makeEmployeeActionPopup(
     {

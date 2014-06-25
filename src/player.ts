@@ -22,6 +22,7 @@ class Player
   ownedContent: any = {};
   amountBuiltPerType: any = {};
   ownedCells: any = {};
+  ownedCellsAmount: number = 0;
 
   employees: any = {};
   usedInitialRecruit: boolean = false;
@@ -180,6 +181,8 @@ class Player
 
       cell.player = this;
       cell.addOverlay(this.color);
+
+      this.ownedCellsAmount++;
     }
   }
   removeCell( cell )
@@ -190,6 +193,7 @@ class Player
 
       delete this.ownedCells[cell.gridPos];
       cell.player = null;
+      this.ownedCellsAmount--;
     }
   }
   sellCell( cell )
@@ -490,9 +494,9 @@ class Player
 
     return Math.round(cost);
   }
-  getCellBuyCost(baseCost)
+  getCellBuyCost(cell)
   {
-    var adjusted = baseCost * Math.pow(1.15, Object.keys(this.ownedCells).length);
+    var adjusted = cell.landValue * Math.pow(1.15, this.ownedCellsAmount);
 
     adjusted += this.modifierEffects.buyCost["global"].addedCost;
     adjusted *= this.modifierEffects.buyCost["global"].multiplier;

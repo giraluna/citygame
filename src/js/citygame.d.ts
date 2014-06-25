@@ -191,6 +191,10 @@ declare class Game {
     public changeTool(tool: any): void;
     public changeActiveBoard(index: number): void;
     public destroyAllBoards(): void;
+    public getCell(props: {
+        gridPos: number[];
+        boardId: number;
+    }): any;
     public save(name: string): void;
     public autosave(): void;
     public load(name: string): void;

@@ -949,6 +949,7 @@ var Game = (function () {
         this.systemsManager.addSystem("quarterlyProfitSystem", quarterlyProfitSystem);
 
         this.systemsManager.addSystem("delayedAction", new DelayedActionSystem(1, this.systemsManager));
+        this.systemsManager.addSystem("autosave", new AutosaveSystem(60, this.systemsManager));
 
         var dateSystem = new DateSystem(1, this.systemsManager, document.getElementById("date"));
         this.systemsManager.addSystem("date", dateSystem);
@@ -1153,9 +1154,9 @@ var Game = (function () {
         this.bindRenderer();
 
         //resize
-        window.addEventListener('resize', game.resize, false);
+        window.addEventListener("resize", game.resize, false);
 
-        window.setInterval(self.autosave.bind(self), 1000 * 60);
+        eventManager.addEventListener("autosave", this.autosave.bind(this));
 
         //edit mode select
         var editmodeSelect = document.getElementById("editmode-select");
@@ -1293,6 +1294,7 @@ var Game = (function () {
             localStorage.setItem("autosave" + (i + 2), localStorage.getItem(autosaves[i]));
         }
         this.save("autosave");
+        console.log(this.players["player0"].money);
     };
     Game.prototype.load = function (name) {
         var parsed = JSON.parse(localStorage.getItem(name));

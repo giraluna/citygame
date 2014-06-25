@@ -1226,6 +1226,7 @@ class Game
 
 
     this.systemsManager.addSystem("delayedAction", new DelayedActionSystem(1, this.systemsManager));
+    this.systemsManager.addSystem("autosave", new AutosaveSystem(60, this.systemsManager));
 
     var dateSystem = new DateSystem(1, this.systemsManager,
       document.getElementById("date") );
@@ -1473,9 +1474,9 @@ class Game
       this.bindRenderer();
 
       //resize
-      window.addEventListener('resize', game.resize, false);
+      window.addEventListener("resize", game.resize, false);
 
-      window.setInterval(self.autosave.bind(self), 1000 * 60);
+      eventManager.addEventListener("autosave", this.autosave.bind(this));
 
       //edit mode select
       var editmodeSelect = <HTMLInputElement> document.getElementById("editmode-select");
@@ -1648,6 +1649,7 @@ class Game
         localStorage.getItem(autosaves[i]));
     }
     this.save("autosave");
+    console.log(this.players["player0"].money)
   }
   load(name: string)
   {
@@ -1803,7 +1805,6 @@ class Game
       data.levelUpModifiers.push(player.levelUpModifiers[_mod].type);
     }
     data.levelsAlreadyPicked = player.levelsAlreadyPicked;
-
 
     return data;
   }

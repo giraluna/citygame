@@ -293,4 +293,19 @@ var DelayedActionSystem = (function (_super) {
     };
     return DelayedActionSystem;
 })(System);
+
+// This is a seperate system, because even though it should be easier
+// with just setinterval theres some weird scope fuckery where blurred
+// tabs keep calling the function with outdated values
+var AutosaveSystem = (function (_super) {
+    __extends(AutosaveSystem, _super);
+    function AutosaveSystem(activationRate, systemsManager) {
+        _super.call(this, activationRate, systemsManager.tickNumber);
+        this.systemsManager = systemsManager;
+    }
+    AutosaveSystem.prototype.activate = function (currTick) {
+        eventManager.dispatchEvent({ type: "autosave", content: "" });
+    };
+    return AutosaveSystem;
+})(System);
 //# sourceMappingURL=systems.js.map

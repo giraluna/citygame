@@ -4,6 +4,8 @@
 /// <reference path="js/eventlistener.d.ts" />
 /// <reference path="js/spriteblinker.d.ts" />
 /// 
+/// <reference path="../data/js/cg.d.ts" />
+
 module actions
 {
   var blinkerTODO = new Blinker(600, 0x880055, -1, false);
@@ -127,67 +129,93 @@ module actions
 
   export function constructBuilding(props:
   {
-    player: Player;
-    cell: any;
-    building: any;
-    employee: Employee;
+    gridPos: number[];
+    boardId: string;
+    buildingType: string;
+    playerId: string;
+    employeeId: string;
+
+    finishedOn?: number;
   })
   {
-    var player = props.player;
-    var cell = props.cell;
-    var building = props.building;
-    var employee = props.employee;
+    // TODO circular reference
+    var _: any = window;
+    var game = _.game;
 
-    var baseCost = player.getBuildCost(building);
+    var cell = game.getCell(props);
+    var player = game.players[props.playerId]
+
+    if (!cell || !player) throw new Error();
+
+    var employee = player.employees[props.employeeId];
+    var buildingType = findType(props.buildingType);
+
+    var data: any = Object.create(props);
+    if (data.finishedOn === undefined)
+    {
+      data.time = getActionTime([employee.skills["construction"]], buildingType.buildTime).approximate;
+    }
+
+    var baseCost = player.getBuildCost(buildingType);
     var adjustedCost = getActionCost([employee.skills["construction"]], baseCost).actual;
 
     if (player.money < adjustedCost) return;
 
-    var size = building.size || [1,1];
+    var size = buildingType.size || [1,1];
     var endX = cell.gridPos[0] + size[0]-1;
     var endY = cell.gridPos[1] + size[1]-1;
 
     var buildArea = cell.board.getCells(rectSelect(cell.gridPos, [endX, endY]));
 
-    player.addMoney(-adjustedCost, "buildingCost");
 
-    employee.active = false;
-    employee.currentAction = "constructBuilding";
     var blinkerId = blinkerTODO.idGenerator++;
 
-    var actionTime = getActionTime([employee.skills["construction"]], building.buildTime);
 
-    for (var i = 0; i < buildArea.length; i++)
+    var onStartFN = function()
     {
-      buildArea[i].changeContent(cg.content.underConstruction, true);
-    }
-    eventManager.dispatchEvent({type: "updateWorld", content: ""});
+      for (var i = 0; i < buildArea.length; i++)
+      {
+        buildArea[i].changeContent(cg.content.underConstruction, true);
+      }
 
-    var constructBuildingConfirmFN = function()
-    {
-      blinkerTODO.removeCells(blinkerId);
-      employee.trainSkill("construction");
+      player.amountBuiltPerType[buildingType.type]++;
+      player.addMoney(-adjustedCost, "buildingCost");
+      employee.active = false;
+      employee.currentAction = "constructBuilding";
 
-      cell.changeContent(building, true, player);
-      eventManager.dispatchEvent({type:"updateLandValueMapmode", content:""});
       eventManager.dispatchEvent({type: "updateWorld", content: ""});
-    };
+    }
     var constructBuildingCompleteFN = function()
     {
-
-      blinkerTODO.addCells(buildArea, blinkerId);
-      blinkerTODO.start();
-
+      player.amountBuiltPerType[buildingType.type]--;
       employee.active = true;
       employee.currentAction = undefined;
+      employee.trainSkill("construction");
+      cell.changeContent(buildingType, true, player);
 
-      window.setTimeout(constructBuildingConfirmFN, 1000);
+      blinkerTODO.removeCells(blinkerId);
+      eventManager.dispatchEvent({type: "updateWorld", content: ""});
+      return true;
     }
 
-    eventManager.dispatchEvent({type: "delayedAction", content:
+    var startBlinkFN = function()
+    {
+      blinkerTODO.addCells(buildArea, null, blinkerId);
+      blinkerTODO.start();
+
+      window.setTimeout(constructBuildingCompleteFN, 2400);
+    }
+
+    onStartFN.call(null);
+
+    eventManager.dispatchEvent(
+    {
+      type: "delayedAction",
+      content:
       {
-        time: actionTime["actual"],
-        onComplete: constructBuildingCompleteFN
+        type: "constructBuilding",
+        data: data,
+        onComplete: startBlinkFN
       }
     });
   }

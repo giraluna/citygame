@@ -407,10 +407,11 @@ class ReactUI
       {
         actions.constructBuilding(
         {
-          player: props.player,
-          cell: props.cell,
-          building: props.buildingTemplate,
-          employee: selected.employee
+          playerId: props.player.id,
+          gridPos: props.cell.gridPos,
+          boardId: props.cell.board.id,
+          buildingType: props.buildingTemplate.type,
+          employeeId: selected.employee.id
         });
         props.onOk.call();
       }

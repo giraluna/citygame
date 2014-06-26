@@ -202,6 +202,7 @@ declare class Game {
     public loadBoards(data: any): void;
     public savePlayer(player: Player): any;
     public loadPlayer(data: any): void;
+    public prestigeReset(): void;
     public render(): void;
     public resetLayers(): void;
     public switchEditingMode(newMode: string): void;

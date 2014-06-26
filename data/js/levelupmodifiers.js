@@ -33,7 +33,7 @@ var levelUpModifiers;
         onAdd: {
             oneTime: true,
             effect: function (player) {
-                player.addMoney(200);
+                player.money += 200;
             }
         }
     };
@@ -166,7 +166,7 @@ var levelUpModifiers;
         onAdd: {
             oneTime: true,
             effect: function (player) {
-                player.addMoney(1000);
+                player.money += 1000;
             }
         }
     };
@@ -263,7 +263,7 @@ var levelUpModifiers;
         onAdd: {
             oneTime: true,
             effect: function (player) {
-                player.addMoney(5000);
+                player.money += 5000;
             }
         }
     };
@@ -347,6 +347,33 @@ var levelUpModifiers;
             oneTime: false,
             effect: function (player) {
                 player.modifierEffects.recruitQuality += 0.75;
+            }
+        }
+    };
+
+    levelUpModifiers.hotelParking1 = {
+        type: "hotelParking1",
+        title: "Valet service",
+        description: "Parking lot profits * 1.5 per hotel",
+        unlockConditions: [
+            {
+                type: "level",
+                value: 50
+            }
+        ],
+        dynamicEffect: {
+            "hotel": function (player) {
+                player.addSpecialModifier({
+                    type: "hotelParking1",
+                    title: "Reverse carpal tunnel syndrome",
+                    description: "Parking lot profits * 1.5 per hotel",
+                    effects: [
+                        {
+                            targets: ["parking"],
+                            multiplier: 1 + player.amountBuiltPerType["parkinglot"] * 0.5
+                        }
+                    ]
+                });
             }
         }
     };

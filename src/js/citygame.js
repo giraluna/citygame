@@ -1447,6 +1447,13 @@ var Game = (function () {
         }
         data.levelsAlreadyPicked = player.levelsAlreadyPicked;
 
+        data.prestige = {
+            prestige: player.prestige,
+            timesReset: player.timesReset,
+            permanentLevelupUpgrades: player.permanentLevelupUpgrades,
+            totalResetExperience: player.totalResetExperience
+        };
+
         data.stats = {
             incomePerType: player.incomePerType
         };
@@ -1480,12 +1487,85 @@ var Game = (function () {
             player.addEmployee(data.employees[employee]);
         }
 
+        if (data.prestige) {
+            for (var prop in data.prestige) {
+                player[prop] = data.prestige[prop];
+            }
+        }
+
         player.setInitialAvailableModifiers();
 
         this.players["player0"] = player;
         this.reactUI.player = player;
         player.addExperience(0); // refresh
         player.updateElements();
+    };
+    Game.prototype.prestigeReset = function () {
+        var player = this.players["player0"];
+
+        if (player.level < 100)
+            return;
+
+        var prestigeGained = player.experience / 1000000;
+
+        var resetWithSelectedModifier = function (toPerm) {
+            var newPlayer = new Player("player" + (idGenerator.player++));
+
+            newPlayer.incomePerDate = Object.create(player.incomePerDate);
+            newPlayer.incomePerType = Object.create(player.incomePerType);
+
+            newPlayer.timesReset = player.timesReset + 1;
+            newPlayer.totalResetExperience = player.totalResetExperience + player.experience;
+            newPlayer.permanentLevelupUpgrades = player.permanentLevelupUpgrades.slice(0);
+            newPlayer.permanentLevelupUpgrades.push(toPerm.data.modifier.type);
+
+            newPlayer.applyPermedModifiers();
+
+            newPlayer.setInitialAvailableModifiers();
+
+            this.players["player0"] = newPlayer;
+            this.reactUI.player = newPlayer;
+            newPlayer.addExperience(0); // refresh
+            newPlayer.updateElements();
+
+            this.resetLayers();
+            this.destroyAllBoards();
+
+            var newBoards = [new Board({ width: TILES })];
+
+            this.boards = newBoards;
+            this.changeActiveBoard(0);
+
+            eventManager.dispatchEvent({ type: "updateWorld", content: { clear: true } });
+            this.updateBoardSelect();
+
+            return true;
+        }.bind(this);
+
+        var modifiersAvailableToPerm = [];
+        for (var _mod in player.levelUpModifiers) {
+            var modifier = player.levelUpModifiers[_mod];
+            if (player.permanentLevelupUpgrades.indexOf(modifier.type) < 0) {
+                modifiersAvailableToPerm.push(modifier);
+            }
+        }
+        var newPrestige = player.prestige + prestigeGained;
+
+        eventManager.dispatchEvent({
+            type: "makeModifierPopup",
+            content: {
+                player: player,
+                text: [
+                    "Congratulations on reaching level 100!",
+                    "You can donate your money to charity and start again.", "",
+                    "You would gain an additional " + prestigeGained.toFixed(1) + " karma",
+                    "For a total of " + newPrestige.toFixed(1) + "% increased income",
+                    "You can also permanently unlock one of the following upgrades:"
+                ],
+                modifierList: modifiersAvailableToPerm,
+                onOk: resetWithSelectedModifier
+            }
+        });
     };
     Game.prototype.render = function () {
         this.renderer.render(this.stage);

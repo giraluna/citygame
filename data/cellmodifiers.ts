@@ -11,7 +11,7 @@ module cellModifiers
       title: "Nice enviroment",
       range: range,
       strength: strength,
-      targets: ["apartment", "office"],
+      targets: ["apartment", "office", "hotel"],
       effect:
       {
         multiplier: 0.3
@@ -136,7 +136,8 @@ module cellModifiers
       title: "Nearby station",
       range: range,
       strength: strength,
-      targets: ["fastfood", "shopping", "office", "apartment", "parking"],
+      targets: ["fastfood", "shopping", "office",
+        "apartment", "parking", "hotel"],
       effect:
       {
         addedProfit: 0.25,

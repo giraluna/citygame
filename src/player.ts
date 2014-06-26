@@ -17,7 +17,11 @@ class Player
   experience: number = 0;
   experienceForCurrentLevel: number = 0;
   experienceToNextLevel: number = 0;
-  eventListener: any;
+
+  timesReset: number = 0;
+  prestige: number = 0;
+  totalResetExperience: number = 0;
+  permanentLevelupUpgrades: string[] = [];
 
   ownedContent: any = {};
   amountBuiltPerType: any = {};
@@ -154,10 +158,6 @@ class Player
 
     this.setExperienceToNextLevel();
     this.setInitialAvailableModifiers();
-  }
-  addEventListeners()
-  {
-    
   }
 
   addEmployee(employee: Employee)
@@ -708,20 +708,19 @@ class Player
   }
   unlockLevelUpModifiers(level)
   {
+    var self = this;
     if (!levelUpModifiers.modifiersByUnlock.level[level]) return;
 
     var modifiersForThisLevel = levelUpModifiers.modifiersByUnlock.level[level].slice(0);
 
-    if (this.unlockedLevelUpModifiers[level]) return;
-    else if (this.levelsAlreadyPicked[level]) return;
+    if (this.levelsAlreadyPicked[level]) return;
 
-    if (this.levelUpModifiers[level])
+    
+    modifiersForThisLevel = modifiersForThisLevel.filter(function(mod)
     {
-      modifiersForThisLevel = modifiersForThisLevel.filter(function(mod)
-      {
-        return this.levelUpModifiers[level].indexOf(modifiersForThisLevel) > -1
-      });
-    }
+      debugger;
+      return !(self.levelUpModifiers[mod.type]);
+    });
 
     var toUnlock = [];
 
@@ -757,10 +756,24 @@ class Player
 
     this.addModifier(modifier, "levelUpModifiers", firstTime);
 
-    this.unlockedLevelUpModifiers[level] = null;
-    delete this.unlockedLevelUpModifiers[level];
+    if (preventMultiplePerLevel)
+    {
+      this.unlockedLevelUpModifiers[level] = null;
+      delete this.unlockedLevelUpModifiers[level];
+  
+      this.levelsAlreadyPicked[level] = true;
+    }
+  }
+  applyPermedModifiers(firstTime: boolean = true)
+  {
+    for (var i = 0; i < this.permanentLevelupUpgrades.length; i++)
+    {
+      var modType = this.permanentLevelupUpgrades[i];
 
-    this.levelsAlreadyPicked[level] = true;
+      var modifier = levelUpModifiers[modType];
+
+      this.addLevelUpModifier(modifier, false, firstTime);
+    }
   }
   addToRollingIncome(amount, date)
   {

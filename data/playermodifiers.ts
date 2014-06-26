@@ -207,8 +207,7 @@ module playerModifiers
   export var parkingModifier3: IPlayerModifier =
   {
     type: "parkingModifier3",
-    title: "Valet service",
-    //description: "Hire a professional Parker",
+    title: "Parking elevators",
     description: "Parking profits * 1.2",
     cost: 2000,
     unlockConditions:

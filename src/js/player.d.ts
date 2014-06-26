@@ -14,7 +14,10 @@ declare class Player {
     public experience: number;
     public experienceForCurrentLevel: number;
     public experienceToNextLevel: number;
-    public eventListener: any;
+    public timesReset: number;
+    public prestige: number;
+    public totalResetExperience: number;
+    public permanentLevelupUpgrades: string[];
     public ownedContent: any;
     public amountBuiltPerType: any;
     public ownedCells: any;
@@ -45,7 +48,6 @@ declare class Player {
     constructor(id: string, color?: number);
     public updateElements(): void;
     public init(): void;
-    public addEventListeners(): void;
     public addEmployee(employee: Employee): void;
     public getEmployees(): any[];
     public getActiveEmployees(): any[];
@@ -82,5 +84,6 @@ declare class Player {
     public addClicks(amount: number): void;
     public unlockLevelUpModifiers(level: any): void;
     public addLevelUpModifier(modifier: any, preventMultiplePerLevel?: boolean, firstTime?: boolean): boolean;
+    public applyPermedModifiers(firstTime?: boolean): void;
     public addToRollingIncome(amount: any, date: any): void;
 }

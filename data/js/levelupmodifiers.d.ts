@@ -15,6 +15,7 @@ declare module levelUpModifiers {
     var buildRush1: playerModifiers.IPlayerModifier;
     var buyRush1: playerModifiers.IPlayerModifier;
     var increasedRecruitQuality2: playerModifiers.IPlayerModifier;
+    var hotelParking1: playerModifiers.IPlayerModifier;
     var modifiersByUnlock: any;
     var allModifiers: any[];
 }

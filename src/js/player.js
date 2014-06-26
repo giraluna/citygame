@@ -14,6 +14,10 @@ var Player = (function () {
         this.experience = 0;
         this.experienceForCurrentLevel = 0;
         this.experienceToNextLevel = 0;
+        this.timesReset = 0;
+        this.prestige = 0;
+        this.totalResetExperience = 0;
+        this.permanentLevelupUpgrades = [];
         this.ownedContent = {};
         this.amountBuiltPerType = {};
         this.ownedCells = {};
@@ -113,8 +117,6 @@ var Player = (function () {
 
         this.setExperienceToNextLevel();
         this.setInitialAvailableModifiers();
-    };
-    Player.prototype.addEventListeners = function () {
     };
 
     Player.prototype.addEmployee = function (employee) {
@@ -571,21 +573,19 @@ var Player = (function () {
         this.checkLockedModifiers("clicks");
     };
     Player.prototype.unlockLevelUpModifiers = function (level) {
+        var self = this;
         if (!levelUpModifiers.modifiersByUnlock.level[level])
             return;
 
         var modifiersForThisLevel = levelUpModifiers.modifiersByUnlock.level[level].slice(0);
 
-        if (this.unlockedLevelUpModifiers[level])
-            return;
-        else if (this.levelsAlreadyPicked[level])
+        if (this.levelsAlreadyPicked[level])
             return;
 
-        if (this.levelUpModifiers[level]) {
-            modifiersForThisLevel = modifiersForThisLevel.filter(function (mod) {
-                return this.levelUpModifiers[level].indexOf(modifiersForThisLevel) > -1;
-            });
-        }
+        modifiersForThisLevel = modifiersForThisLevel.filter(function (mod) {
+            debugger;
+            return !(self.levelUpModifiers[mod.type]);
+        });
 
         var toUnlock = [];
 
@@ -617,10 +617,22 @@ var Player = (function () {
 
         this.addModifier(modifier, "levelUpModifiers", firstTime);
 
-        this.unlockedLevelUpModifiers[level] = null;
-        delete this.unlockedLevelUpModifiers[level];
+        if (preventMultiplePerLevel) {
+            this.unlockedLevelUpModifiers[level] = null;
+            delete this.unlockedLevelUpModifiers[level];
 
-        this.levelsAlreadyPicked[level] = true;
+            this.levelsAlreadyPicked[level] = true;
+        }
+    };
+    Player.prototype.applyPermedModifiers = function (firstTime) {
+        if (typeof firstTime === "undefined") { firstTime = true; }
+        for (var i = 0; i < this.permanentLevelupUpgrades.length; i++) {
+            var modType = this.permanentLevelupUpgrades[i];
+
+            var modifier = levelUpModifiers[modType];
+
+            this.addLevelUpModifier(modifier, false, firstTime);
+        }
     };
     Player.prototype.addToRollingIncome = function (amount, date) {
         if (date.day !== this.lastRollingIncomeDay) {

@@ -8,7 +8,7 @@ var cellModifiers;
             title: "Nice enviroment",
             range: range,
             strength: strength,
-            targets: ["apartment", "office"],
+            targets: ["apartment", "office", "hotel"],
             effect: {
                 multiplier: 0.3
             },
@@ -122,7 +122,9 @@ var cellModifiers;
             title: "Nearby station",
             range: range,
             strength: strength,
-            targets: ["fastfood", "shopping", "office", "apartment", "parking"],
+            targets: [
+                "fastfood", "shopping", "office",
+                "apartment", "parking", "hotel"],
             effect: {
                 addedProfit: 0.25,
                 multiplier: 0.25

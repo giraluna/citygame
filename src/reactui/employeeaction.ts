@@ -57,8 +57,10 @@ export var EmployeeAction = React.createClass({
     });
   },
 
-  handleSelectRow: function(key, employee)
+  handleSelectRow: function(item)
   {
+    var employee = item.data.employee;
+
     if (employee.active !== true) return;
     else
     {
@@ -66,7 +68,7 @@ export var EmployeeAction = React.createClass({
       {
         selected:
         {
-          key: key,
+          key: employee.id,
           employee: employee
         }
       });
@@ -85,8 +87,7 @@ export var EmployeeAction = React.createClass({
     {
       employees: this.props.employees,
       relevantSkills: this.props.relevantSkills,
-      selected: this.state.selected,
-      handleSelectRow: this.handleSelectRow
+      onRowChange: this.handleSelectRow
     });
 
     var actionData = <any> {};

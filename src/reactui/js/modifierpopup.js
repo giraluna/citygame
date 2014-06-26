@@ -74,7 +74,7 @@ var UIComponents;
                 {
                     label: "Cost",
                     key: "costString",
-                    defaultOrder: "desc",
+                    defaultOrder: "asc",
                     propToSortBy: "cost"
                 },
                 {

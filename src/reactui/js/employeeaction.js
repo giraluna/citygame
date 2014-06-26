@@ -49,13 +49,15 @@ var UIComponents;
                 action: this.props.action || null
             });
         },
-        handleSelectRow: function (key, employee) {
+        handleSelectRow: function (item) {
+            var employee = item.data.employee;
+
             if (employee.active !== true)
                 return;
             else {
                 this.setState({
                     selected: {
-                        key: key,
+                        key: employee.id,
                         employee: employee
                     }
                 });
@@ -70,8 +72,7 @@ var UIComponents;
             var el = UIComponents.EmployeeList({
                 employees: this.props.employees,
                 relevantSkills: this.props.relevantSkills,
-                selected: this.state.selected,
-                handleSelectRow: this.handleSelectRow
+                onRowChange: this.handleSelectRow
             });
 
             var actionData = {};

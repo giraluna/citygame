@@ -41,14 +41,11 @@ var UIComponents;
                 }
             });
         },
-        componentWillMount: function () {
-            this.sort();
-            this.setState({
-                selected: this.props.sortedItems[0]
-            });
-        },
         componentDidMount: function () {
             var self = this;
+
+            this.handleSelectRow(this.props.sortedItems[0]);
+
             this.getDOMNode().addEventListener("keydown", function (event) {
                 switch (event.keyCode) {
                     case 40: {
@@ -99,25 +96,33 @@ var UIComponents;
 
             var itemsToSort = this.props.listItems;
 
-            if (selectedColumn.sortingFunction) {
-                itemsToSort.sort(selectedColumn.sortingFunction);
-            } else {
-                itemsToSort.sort(function (a, b) {
-                    var propToSortBy = initialPropToSortBy;
-                    var nextIndex = self.state.sortBy.currColumnIndex;
+            var defaultSortFN = function (a, b) {
+                var propToSortBy = initialPropToSortBy;
+                var nextIndex = self.state.sortBy.currColumnIndex;
 
-                    for (var i = 0; i < self.state.columns.length; i++) {
-                        if (a.data[propToSortBy] === b.data[propToSortBy]) {
-                            nextIndex = (nextIndex + 1) % self.state.columns.length;
-                            var nextColumn = self.state.columns[nextIndex];
-                            propToSortBy = nextColumn.propToSortBy || nextColumn.key;
-                        } else {
-                            break;
-                        }
+                for (var i = 0; i < self.state.columns.length; i++) {
+                    if (a.data[propToSortBy] === b.data[propToSortBy]) {
+                        nextIndex = (nextIndex + 1) % self.state.columns.length;
+                        var nextColumn = self.state.columns[nextIndex];
+                        propToSortBy = nextColumn.propToSortBy || nextColumn.key;
+                    } else {
+                        break;
                     }
+                }
 
-                    return a.data[propToSortBy] > b.data[propToSortBy] ? 1 : -1;
+                return a.data[propToSortBy] > b.data[propToSortBy] ? 1 : -1;
+            };
+
+            if (selectedColumn.sortingFunction) {
+                itemsToSort.sort(function (a, b) {
+                    var sortFNResult = selectedColumn.sortingFunction(a, b);
+                    if (sortFNResult === 0) {
+                        sortFNResult = defaultSortFN(a, b);
+                    }
+                    return sortFNResult;
                 });
+            } else {
+                itemsToSort.sort(defaultSortFN);
             }
 
             if (this.state.sortBy.order === "desc") {
@@ -153,13 +158,13 @@ var UIComponents;
                 };
 
                 if (self.props.colStylingFN) {
-                    colProps = self.props.colStylingFN(colProps);
+                    colProps = self.props.colStylingFN(column, colProps);
                 }
 
                 columns.push(React.DOM.col(colProps));
                 headerLabels.push(React.DOM.th({
                     className: !column.notSortable ? "sortable-column" : null,
-                    title: column.title,
+                    title: column.title || colProps.title || null,
                     onMouseDown: self.handleSelectColumn.bind(null, column),
                     onTouchStart: self.handleSelectColumn.bind(null, column),
                     key: column.key
@@ -181,7 +186,7 @@ var UIComponents;
                     };
 
                     if (self.props.cellStylingFN) {
-                        cellProps = self.props.cellStylingFN(cellProps);
+                        cellProps = self.props.cellStylingFN(item, column, cellProps);
                     }
 
                     cells.push(React.DOM.td(cellProps, self.splitMultilineText(item.data[column.key]) || null));

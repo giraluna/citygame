@@ -69,8 +69,7 @@ var UIComponents;
                 ref: "employeeAction",
                 employees: employees,
                 relevantSkills: this.props.relevantSkills,
-                action: this.props.action,
-                selected: null
+                action: this.props.action
             };
             var stopBubble = function (e) {
                 e.stopPropagation();

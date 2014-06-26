@@ -50,18 +50,12 @@ export var List = React.createClass({
     });
   },
 
-  componentWillMount: function()
-  {
-    this.sort();
-    this.setState(
-    {
-      selected: this.props.sortedItems[0]
-    });
-  },
-
   componentDidMount: function()
   {
     var self = this;
+
+    this.handleSelectRow(this.props.sortedItems[0]);
+
     this.getDOMNode().addEventListener("keydown", function(event)
     {
       switch (event.keyCode)
@@ -129,33 +123,43 @@ export var List = React.createClass({
 
     var itemsToSort = this.props.listItems;
 
-    if (selectedColumn.sortingFunction)
+    var defaultSortFN = function(a, b)
     {
-      itemsToSort.sort(selectedColumn.sortingFunction);
+      var propToSortBy = initialPropToSortBy;
+      var nextIndex = self.state.sortBy.currColumnIndex;
+
+      for (var i = 0; i < self.state.columns.length; i++)
+      {
+        if (a.data[propToSortBy] === b.data[propToSortBy])
+        {
+          nextIndex = (nextIndex + 1) % self.state.columns.length;
+          var nextColumn = self.state.columns[nextIndex];
+          propToSortBy = nextColumn.propToSortBy || nextColumn.key;
+        }
+        else
+        {
+          break;
+        }
+      }
+
+      return a.data[propToSortBy] > b.data[propToSortBy] ? 1 : -1;
     }
-    else
+
+    if (selectedColumn.sortingFunction)
     {
       itemsToSort.sort(function(a, b)
       {
-        var propToSortBy = initialPropToSortBy;
-        var nextIndex = self.state.sortBy.currColumnIndex;
-
-        for (var i = 0; i < self.state.columns.length; i++)
+        var sortFNResult = selectedColumn.sortingFunction(a, b);
+        if (sortFNResult === 0)
         {
-          if (a.data[propToSortBy] === b.data[propToSortBy])
-          {
-            nextIndex = (nextIndex + 1) % self.state.columns.length;
-            var nextColumn = self.state.columns[nextIndex];
-            propToSortBy = nextColumn.propToSortBy || nextColumn.key;
-          }
-          else
-          {
-            break;
-          }
+          sortFNResult = defaultSortFN(a, b);
         }
-
-        return a.data[propToSortBy] > b.data[propToSortBy] ? 1 : -1;
-      });
+        return sortFNResult;
+      })
+    }
+    else
+    {
+      itemsToSort.sort(defaultSortFN);
     }
 
     if (this.state.sortBy.order === "desc")
@@ -193,14 +197,14 @@ export var List = React.createClass({
 
     this.state.columns.forEach(function(column)
     {
-      var colProps =
+      var colProps: any =
       {
         key: column.key
       };
 
       if (self.props.colStylingFN)
       {
-        colProps = self.props.colStylingFN(colProps);
+        colProps = self.props.colStylingFN(column, colProps);
       }
 
       columns.push(
@@ -210,7 +214,7 @@ export var List = React.createClass({
         React.DOM.th(
           {
             className: !column.notSortable ? "sortable-column" : null,
-            title: column.title,
+            title: column.title || colProps.title || null,
             onMouseDown: self.handleSelectColumn.bind(null, column),
             onTouchStart: self.handleSelectColumn.bind(null, column),
             key: column.key
@@ -237,7 +241,7 @@ export var List = React.createClass({
 
         if (self.props.cellStylingFN)
         {
-          cellProps = self.props.cellStylingFN(cellProps);
+          cellProps = self.props.cellStylingFN(item, column, cellProps);
         }
 
         cells.push(

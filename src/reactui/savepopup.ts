@@ -145,11 +145,7 @@ module UIComponents
           label: "Date",
           key: "date",
           defaultOrder: "desc",
-          propToSortBy: "accurateDate",
-          sortingFunCtion: function(a, b)
-          {
-            return new Date(a).getTime() - new Date(b).getTime();
-          }
+          propToSortBy: "accurateDate"
         },
         {
           label: "Delete",

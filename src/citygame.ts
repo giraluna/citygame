@@ -2430,7 +2430,7 @@ class UIDrawer
       }
     }*/
 
-    if (cell.content && cell.content.baseProfit)
+    if (cell.content && cell.content.player && cell.content.baseProfit)
     {
       var finalAmount = game.players.player0.getIndexedProfit(
         cell.content.type.categoryType, cell.content.modifiedProfit).toFixed(2);

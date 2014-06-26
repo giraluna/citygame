@@ -1909,7 +1909,7 @@ var UIDrawer = (function () {
         text += "Adj strength: " + _mod.scaling(_mod.strength).toFixed(3);
         }
         }*/
-        if (cell.content && cell.content.baseProfit) {
+        if (cell.content && cell.content.player && cell.content.baseProfit) {
             var finalAmount = game.players.player0.getIndexedProfit(cell.content.type.categoryType, cell.content.modifiedProfit).toFixed(2);
             text += "\n--------------\n";
             text += "Base profit: " + cell.content.baseProfit.toFixed(2) + "/d" + "\n";

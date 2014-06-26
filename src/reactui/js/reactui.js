@@ -158,7 +158,8 @@ var ReactUI = (function () {
             text: props.text || null,
             modifierList: props.modifierList || props.player.unlockedModifiers,
             onOk: onOk,
-            onClose: props.onClose || null
+            onClose: props.onClose || null,
+            okBtnText: props.okBtnText || "Buy"
         });
     };
 

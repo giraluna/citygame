@@ -4,8 +4,10 @@ declare module UIComponents {
     var SideMenuStats: React.ReactComponentFactory<{
         hasLevelUpUpgrade: boolean;
         lastModifierCount: number;
+        canPrestige: boolean;
     }, React.ReactComponent<{
         hasLevelUpUpgrade: boolean;
         lastModifierCount: number;
+        canPrestige: boolean;
     }, {}>>;
 }

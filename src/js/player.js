@@ -583,7 +583,6 @@ var Player = (function () {
             return;
 
         modifiersForThisLevel = modifiersForThisLevel.filter(function (mod) {
-            debugger;
             return !(self.levelUpModifiers[mod.type]);
         });
 

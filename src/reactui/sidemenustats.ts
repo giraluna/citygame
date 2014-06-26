@@ -11,7 +11,8 @@ export var SideMenuStats = React.createClass(
   {
     return {
       hasLevelUpUpgrade: false,
-      lastModifierCount: 0
+      lastModifierCount: 0,
+      canPrestige: false
     }
   },
   componentWillReceiveProps: function(newProps: any)
@@ -22,6 +23,10 @@ export var SideMenuStats = React.createClass(
     if (newUpgradeCount > 0)
     {
       this.setState({hasLevelUpUpgrade: true});
+    }
+    else if (newProps.player.level >= 100)
+    {
+      this.setState({canPrestige: true})
     }
 
     this.setState({lastModifierCount: newUpgradeCount})
@@ -84,6 +89,7 @@ export var SideMenuStats = React.createClass(
         text: ["Select your bonus perk for level " + lowestLevel,
         "You only get to pick one"],
         modifierList: lowestModifierList,
+        okBtnText: "Select",
         onOk: function(selected)
         {
           var success = player.addLevelUpModifier(selected.data.modifier);
@@ -98,6 +104,24 @@ export var SideMenuStats = React.createClass(
           else return false;
         }
       }
+    });
+  },
+
+  handleOpenPrestige: function()
+  {
+    if (!this.state.canPrestige)
+    {
+      return;
+    }
+    var onResetFN = function()
+    {
+      this.setState({canPrestige: false});
+    }.bind(this);
+
+    eventManager.dispatchEvent(
+    {
+      type: "prestigeReset",
+      content: onResetFN
     });
   },
 
@@ -121,6 +145,14 @@ export var SideMenuStats = React.createClass(
 
       divProps.onClick = this.handleOpenModifiers;
       divProps.onTouchStart = this.handleOpenModifiers;
+      divProps.className = "interactive";
+    }
+    else if (this.state.canPrestige)
+    {
+      progressProps.className = "new-modifier";
+
+      divProps.onClick = this.handleOpenPrestige;
+      divProps.onTouchStart = this.handleOpenPrestige;
       divProps.className = "interactive";
     }
 

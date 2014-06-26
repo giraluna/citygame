@@ -217,6 +217,7 @@ class ReactUI
     modifierList?: any[];
     onOk?: any;
     onClose?: any;
+    okBtnText?: string;
   })
   {
     var onOk = props.onOk || function(selected)
@@ -234,7 +235,8 @@ class ReactUI
       text: props.text || null,
       modifierList: props.modifierList || props.player.unlockedModifiers,
       onOk: onOk,
-      onClose: props.onClose || null
+      onClose: props.onClose || null,
+      okBtnText: props.okBtnText || "Buy"
     });
   }
 

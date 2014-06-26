@@ -1206,6 +1206,11 @@ var Game = (function () {
             self.mouseEventHandler.scroller.zoom(event.content);
         });
 
+        // prestige
+        eventManager.addEventListener("prestigeReset", function (event) {
+            self.prestigeReset(event.content);
+        });
+
         // options todo
         var popupToggle = document.getElementById("draw-click-popups");
         popupToggle.addEventListener("change", function (e) {
@@ -1500,7 +1505,7 @@ var Game = (function () {
         player.addExperience(0); // refresh
         player.updateElements();
     };
-    Game.prototype.prestigeReset = function () {
+    Game.prototype.prestigeReset = function (onReset) {
         var player = this.players["player0"];
 
         if (player.level < 100)
@@ -1539,6 +1544,8 @@ var Game = (function () {
             eventManager.dispatchEvent({ type: "updateWorld", content: { clear: true } });
             this.updateBoardSelect();
 
+            if (onReset)
+                onReset.call();
             return true;
         }.bind(this);
 
@@ -1563,7 +1570,8 @@ var Game = (function () {
                     "You can also permanently unlock one of the following upgrades:"
                 ],
                 modifierList: modifiersAvailableToPerm,
-                onOk: resetWithSelectedModifier
+                onOk: resetWithSelectedModifier,
+                okBtnText: "Reset"
             }
         });
     };

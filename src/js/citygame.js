@@ -1447,6 +1447,10 @@ var Game = (function () {
         }
         data.levelsAlreadyPicked = player.levelsAlreadyPicked;
 
+        data.stats = {
+            incomePerType: player.incomePerType
+        };
+
         return data;
     };
     Game.prototype.loadPlayer = function (data) {

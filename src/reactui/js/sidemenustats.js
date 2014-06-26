@@ -20,14 +20,17 @@ var UIComponents;
             this.setState({ lastModifierCount: newUpgradeCount });
         },
         componentDidMount: function () {
-            var money = this.refs.money.getDOMNode();
+            var money = this.refs.moneyText.getDOMNode();
+            var profit = this.refs.profitText.getDOMNode();
+
             var exp = this.refs.exp.getDOMNode();
 
             var expText = this.refs.expText.getDOMNode();
             var levelText = this.refs.levelText.getDOMNode();
 
             eventManager.addEventListener("updatePlayerMoney", function (event) {
-                money.innerHTML = event.content;
+                money.innerHTML = event.content.total;
+                profit.innerHTML = "$" + event.content.rolling + "/d";
             });
 
             eventManager.addEventListener("updatePlayerExp", function (event) {
@@ -106,12 +109,20 @@ var UIComponents;
             return (React.DOM.div({ id: "side-menu-stats" }, React.DOM.div(divProps, React.DOM.progress(progressProps), React.DOM.div({
                 id: "level-string-container"
             }, React.DOM.div({
-                id: "level-string-wrapper"
+                id: "level-string-wrapper",
+                className: "stat-string-wrapper"
             }, React.DOM.span({
                 ref: "levelText"
             }, null), React.DOM.span({
                 ref: "expText"
-            }, null)))), React.DOM.div({ ref: "money" }, 0)));
+            }, null)))), React.DOM.div({ id: "money-string-container" }, React.DOM.div({
+                id: "money-string-wrapper",
+                className: "stat-string-wrapper"
+            }, React.DOM.span({
+                ref: "moneyText"
+            }, null), React.DOM.span({
+                ref: "profitText"
+            }, null)))));
         }
     });
 })(UIComponents || (UIComponents = {}));

@@ -28,7 +28,9 @@ export var SideMenuStats = React.createClass(
   },
   componentDidMount: function()
   {
-    var money = this.refs.money.getDOMNode();
+    var money = this.refs.moneyText.getDOMNode();
+    var profit = this.refs.profitText.getDOMNode();
+
     var exp = this.refs.exp.getDOMNode();
 
     var expText = this.refs.expText.getDOMNode();
@@ -36,7 +38,8 @@ export var SideMenuStats = React.createClass(
 
     eventManager.addEventListener("updatePlayerMoney", function(event)
     {
-      money.innerHTML = event.content;
+      money.innerHTML = event.content.total;
+      profit.innerHTML = "$" + event.content.rolling + "/d";
     });
 
     eventManager.addEventListener("updatePlayerExp", function(event)
@@ -132,7 +135,8 @@ export var SideMenuStats = React.createClass(
           },
             React.DOM.div(
             {
-              id:"level-string-wrapper"
+              id:"level-string-wrapper",
+              className:"stat-string-wrapper"
             },
               React.DOM.span(
               {
@@ -145,7 +149,22 @@ export var SideMenuStats = React.createClass(
             )
           )
         ),
-        React.DOM.div({ref: "money"}, 0)
+        React.DOM.div( {id: "money-string-container"},
+          React.DOM.div(
+          {
+            id:"money-string-wrapper",
+            className:"stat-string-wrapper"
+          },
+            React.DOM.span(
+            {
+              ref: "moneyText"
+            }, null),
+            React.DOM.span(
+            {
+              ref: "profitText"
+            }, null)
+          )
+        )
       )
     );
   }

@@ -30,6 +30,9 @@ class Player
   incomePerDate: any = {};
   incomePerType: any = {};
 
+  rollingIncome: number[] = [0, 0, 0];
+  lastRollingIncomeDay: number;
+
   modifiers: any = {};
   dynamicModifiers: any = {};
   timedModifiers: any = {};
@@ -74,7 +77,18 @@ class Player
     var beautified = beautify(this.money) + "$";
     var expBeautifyIndex = this.experienceToNextLevel > 999999 ? 2 : 0;
 
-    eventManager.dispatchEvent({type: "updatePlayerMoney", content: beautified});
+    var rolling = this.rollingIncome.reduce(function(a,b)
+    {
+      return a+b;
+    }) / 3;
+
+    var money =
+    {
+      total: beautified,
+      rolling: rolling.toFixed(1)
+    }
+
+    eventManager.dispatchEvent({type: "updatePlayerMoney", content: money});
     eventManager.dispatchEvent(
       {
         type: "updatePlayerExp",
@@ -269,6 +283,7 @@ class Player
       _m.total += amount;
 
       _m[date.day] ? _m[date.day] += amount : _m[date.day] = amount;
+      this.addToRollingIncome(amount, date);
     }
 
     if (!isFinite(amount)) throw new Error("Infinite amount of money added");
@@ -747,6 +762,17 @@ class Player
     delete this.unlockedLevelUpModifiers[level];
 
     this.levelsAlreadyPicked[level] = true;
+  }
+  addToRollingIncome(amount, date)
+  {
+
+    if (date.day !== this.lastRollingIncomeDay)
+    {
+      this.lastRollingIncomeDay = date.day;
+      this.rollingIncome = this.rollingIncome.slice(1,3);
+      this.rollingIncome.push(0);
+    }
+    this.rollingIncome[this.rollingIncome.length-1] += amount;
   }
 }
 

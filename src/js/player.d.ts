@@ -23,6 +23,8 @@ declare class Player {
     public usedInitialRecruit: boolean;
     public incomePerDate: any;
     public incomePerType: any;
+    public rollingIncome: number[];
+    public lastRollingIncomeDay: number;
     public modifiers: any;
     public dynamicModifiers: any;
     public timedModifiers: any;
@@ -81,4 +83,5 @@ declare class Player {
     public addClicks(amount: number): void;
     public unlockLevelUpModifiers(level: any): void;
     public addLevelUpModifier(modifier: any, preventMultiplePerLevel?: boolean, firstTime?: boolean): boolean;
+    public addToRollingIncome(amount: any, date: any): void;
 }

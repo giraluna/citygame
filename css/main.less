@@ -548,6 +548,11 @@ progress::-webkit-progress-value { background: #080; }
 {
   flex: 0 0 auto;
   order: 4;
+
+  >*
+  {
+    flex: 0 0 auto;
+  }
 }
 #player-level-wrapper
 {
@@ -557,6 +562,7 @@ progress::-webkit-progress-value { background: #080; }
   align-items: center;
   justify-content: center;
   margin-bottom: 50px;
+  color: white;
 
   >*
   {
@@ -573,17 +579,16 @@ progress::-webkit-progress-value { background: #080; }
     border: none;
     z-index: auto;
   }
-  #level-string-wrapper
-  {
-    position: relative;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 95%;
-    margin: 0 auto;
-    height: 30px;
-    color: white;
-  }
+}
+.stat-string-wrapper
+{
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 95%;
+  margin: 0 auto;
+  height: 30px;
 }
 
 #side-menu-modifiers

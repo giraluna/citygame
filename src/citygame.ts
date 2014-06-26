@@ -1837,6 +1837,11 @@ class Game
     }
     data.levelsAlreadyPicked = player.levelsAlreadyPicked;
 
+    data.stats =
+    {
+      incomePerType: player.incomePerType
+    }
+
     return data;
   }
   loadPlayer(data: any)

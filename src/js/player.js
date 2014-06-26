@@ -22,6 +22,7 @@ var Player = (function () {
         this.usedInitialRecruit = false;
         this.incomePerDate = {};
         this.incomePerType = {};
+        this.rollingIncome = [0, 0, 0];
         this.modifiers = {};
         this.dynamicModifiers = {};
         this.timedModifiers = {};
@@ -51,7 +52,16 @@ var Player = (function () {
         var beautified = beautify(this.money) + "$";
         var expBeautifyIndex = this.experienceToNextLevel > 999999 ? 2 : 0;
 
-        eventManager.dispatchEvent({ type: "updatePlayerMoney", content: beautified });
+        var rolling = this.rollingIncome.reduce(function (a, b) {
+            return a + b;
+        }) / 3;
+
+        var money = {
+            total: beautified,
+            rolling: rolling.toFixed(1)
+        };
+
+        eventManager.dispatchEvent({ type: "updatePlayerMoney", content: money });
         eventManager.dispatchEvent({
             type: "updatePlayerExp",
             content: {
@@ -217,6 +227,7 @@ var Player = (function () {
             _m.total += amount;
 
             _m[date.day] ? _m[date.day] += amount : _m[date.day] = amount;
+            this.addToRollingIncome(amount, date);
         }
 
         if (!isFinite(amount))
@@ -611,6 +622,14 @@ var Player = (function () {
         delete this.unlockedLevelUpModifiers[level];
 
         this.levelsAlreadyPicked[level] = true;
+    };
+    Player.prototype.addToRollingIncome = function (amount, date) {
+        if (date.day !== this.lastRollingIncomeDay) {
+            this.lastRollingIncomeDay = date.day;
+            this.rollingIncome = this.rollingIncome.slice(1, 3);
+            this.rollingIncome.push(0);
+        }
+        this.rollingIncome[this.rollingIncome.length - 1] += amount;
     };
     return Player;
 })();

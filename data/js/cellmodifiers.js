@@ -142,7 +142,7 @@ var cellModifiers;
         if (typeof strength === "undefined") { strength = 1; }
         return ({
             type: "parkingCompetition",
-            title: "Competing lots",
+            title: "Competing parking lots",
             range: range,
             strength: strength,
             targets: ["parking"],
@@ -177,7 +177,7 @@ var cellModifiers;
             title: "Nearby Factory",
             range: range,
             strength: strength,
-            targets: ["fastfood", "shopping", "apartment", "office"],
+            targets: ["fastfood", "shopping", "apartment", "office", "hotel"],
             effect: {
                 multiplier: -0.15
             },
@@ -209,5 +209,42 @@ var cellModifiers;
         });
     }
     cellModifiers.nearbyRoad = nearbyRoad;
+
+    function nearbyHotel(range, strength) {
+        if (typeof strength === "undefined") { strength = 1; }
+        return ({
+            type: "nearbyHotel",
+            title: "Nearby Hotel",
+            range: range,
+            strength: strength,
+            targets: ["office"],
+            effect: {
+                multiplier: 0.33
+            },
+            landValue: {
+                radius: 6,
+                multiplier: 0.05,
+                falloffFN: function (distance, invertedDistance, invertedDistanceRatio) {
+                    return invertedDistance * invertedDistanceRatio / 2;
+                }
+            }
+        });
+    }
+    cellModifiers.nearbyHotel = nearbyHotel;
+
+    function hotelCompetition(range, strength) {
+        if (typeof strength === "undefined") { strength = 1; }
+        return ({
+            type: "hotelCompetition",
+            title: "Competing hotels",
+            range: range,
+            strength: strength,
+            targets: ["hotel"],
+            effect: {
+                multiplier: -0.2
+            }
+        });
+    }
+    cellModifiers.hotelCompetition = hotelCompetition;
 })(cellModifiers || (cellModifiers = {}));
 //# sourceMappingURL=cellmodifiers.js.map

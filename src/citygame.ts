@@ -1223,7 +1223,7 @@ class Game
     this.players[player.id] = player;
     // TODO have content types register themselves
     var dailyProfitSystem = new ProfitSystem(1, this.systemsManager, this.players,
-      ["fastfood", "shopping", "parking", "factory"]);
+      ["fastfood", "shopping", "parking", "factory", "hotel"]);
     var monthlyProfitSystem = new ProfitSystem(30, this.systemsManager, this.players,
       ["apartment"]);
     var quarterlyProfitSystem = new ProfitSystem(90, this.systemsManager, this.players,

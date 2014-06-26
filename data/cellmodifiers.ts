@@ -159,7 +159,7 @@ module cellModifiers
     return(
     {
       type: "parkingCompetition",
-      title: "Competing lots",
+      title: "Competing parking lots",
       range: range,
       strength: strength,
       targets: ["parking"],
@@ -196,7 +196,7 @@ module cellModifiers
       title: "Nearby Factory",
       range: range,
       strength: strength,
-      targets: ["fastfood", "shopping", "apartment", "office"],
+      targets: ["fastfood", "shopping", "apartment", "office", "hotel"],
       effect:
       {
         multiplier: -0.15
@@ -229,6 +229,47 @@ module cellModifiers
       scaling: function(strength)
       {
         return 1;
+      }
+    });
+  }
+
+  export function nearbyHotel(range: number, strength: number = 1)
+  {
+    return(
+    {
+      type: "nearbyHotel",
+      title: "Nearby Hotel",
+      range: range,
+      strength: strength,
+      targets: ["office"],
+      effect:
+      {
+        multiplier: 0.33
+      },
+      landValue:
+      {
+        radius: 6,
+        multiplier: 0.05,
+        falloffFN: function(distance, invertedDistance, invertedDistanceRatio)
+        {
+          return invertedDistance * invertedDistanceRatio / 2;
+        }
+      }
+    });
+  }
+
+  export function hotelCompetition(range: number, strength: number = 1)
+  {
+    return(
+    {
+      type: "hotelCompetition",
+      title: "Competing hotels",
+      range: range,
+      strength: strength,
+      targets: ["hotel"],
+      effect:
+      {
+        multiplier: -0.2,
       }
     });
   }

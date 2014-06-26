@@ -138,4 +138,29 @@ declare module cellModifiers {
         };
         scaling: (strength: any) => number;
     };
+    function nearbyHotel(range: number, strength?: number): {
+        type: string;
+        title: string;
+        range: number;
+        strength: number;
+        targets: string[];
+        effect: {
+            multiplier: number;
+        };
+        landValue: {
+            radius: number;
+            multiplier: number;
+            falloffFN: (distance: any, invertedDistance: any, invertedDistanceRatio: any) => number;
+        };
+    };
+    function hotelCompetition(range: number, strength?: number): {
+        type: string;
+        title: string;
+        range: number;
+        strength: number;
+        targets: string[];
+        effect: {
+            multiplier: number;
+        };
+    };
 }

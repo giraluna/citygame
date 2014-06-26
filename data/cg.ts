@@ -808,7 +808,7 @@ var cg: any =
         "baseProfit": 100,
         "daysForProfitTick": 1,
         "cost": 50000,
-        "buildTime": 14,
+        "buildTime": 21,
         "anchor": [0.5, 1],
         "frame": "factory.png",
         "canNotBuildOn": ["water", "building", "road"],
@@ -819,6 +819,33 @@ var cg: any =
             "range": 4,
             "strength": 1
           }
+        ]
+      },
+      "hotel":
+      {
+        "type": "hotel",
+        "baseType": "building",
+        "categoryType": "hotel",
+        "title": "Hotel",
+        "baseProfit": 100,
+        "daysForProfitTick": 1,
+        "cost": 250000,
+        "buildTime": 21,
+        "anchor": [0.5, 1],
+        "frame": "hotel.png",
+        "canNotBuildOn": ["water", "building", "road"],
+        "effects":
+        [
+          {
+            "type": "nearbyHotel",
+            "range": 4,
+            "strength": 1
+          },
+          {
+            "type": "hotelCompetition",
+            "range": 3,
+            "strength": 1
+          },
         ]
       }
     }
@@ -892,8 +919,9 @@ var playerBuildableBuildings = [];
   "house1",
   "smalloffice",
   "stretchystore",
+  "house2",
   "factory",
-  "house2"
+  "hotel"
 ].forEach(function(type){playerBuildableBuildings.push(findType(type))});
 
 // easier balancing
@@ -908,7 +936,8 @@ var basevalues =
   [5000, 10],
   [20000, 14],
   [50000, 23],
-  [100000, 50]
+  [100000, 50],
+  [250000, 100]
 ];
 
 for (var i = 0; i < playerBuildableBuildings.length; i++)

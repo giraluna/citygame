@@ -144,7 +144,7 @@ module UIComponents
         {
           label: "Date",
           key: "date",
-          defaultOrder: "asc",
+          defaultOrder: "desc",
           propToSortBy: "accurateDate",
           sortingFunCtion: function(a, b)
           {

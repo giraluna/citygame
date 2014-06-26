@@ -70,6 +70,7 @@ var UIComponents;
                 return;
             var order;
             if (this.state.sortBy.column.key === column.key) {
+                // flips order
                 order = this.state.sortBy.order === "desc" ? "asc" : "desc";
             } else {
                 order = column.defaultOrder;
@@ -91,28 +92,35 @@ var UIComponents;
             });
         },
         sort: function () {
+            var self = this;
             var selectedColumn = this.state.sortBy.column;
 
-            var nextIndex = (this.state.sortBy.currColumnIndex + 1) % this.state.columns.length;
-            var alternateColumn = this.state.columns[nextIndex];
+            var initialPropToSortBy = selectedColumn.propToSortBy || selectedColumn.key;
 
-            var propToSortBy = selectedColumn.propToSortBy || selectedColumn.key;
-            var alternatePropToSortBy = alternateColumn.propToSortBy || alternateColumn.key;
             var itemsToSort = this.props.listItems;
 
             if (selectedColumn.sortingFunction) {
                 itemsToSort.sort(selectedColumn.sortingFunction);
             } else {
                 itemsToSort.sort(function (a, b) {
-                    if (a.data[propToSortBy] === b.data[propToSortBy]) {
-                        return a.data[alternatePropToSortBy] > b.data[alternatePropToSortBy] ? 1 : -1;
-                    } else {
-                        return a.data[propToSortBy] > b.data[propToSortBy] ? 1 : -1;
+                    var propToSortBy = initialPropToSortBy;
+                    var nextIndex = self.state.sortBy.currColumnIndex;
+
+                    for (var i = 0; i < self.state.columns.length; i++) {
+                        if (a.data[propToSortBy] === b.data[propToSortBy]) {
+                            nextIndex = (nextIndex + 1) % self.state.columns.length;
+                            var nextColumn = self.state.columns[nextIndex];
+                            propToSortBy = nextColumn.propToSortBy || nextColumn.key;
+                        } else {
+                            break;
+                        }
                     }
+
+                    return a.data[propToSortBy] > b.data[propToSortBy] ? 1 : -1;
                 });
             }
 
-            if (this.state.sortBy.order === "asc") {
+            if (this.state.sortBy.order === "desc") {
                 itemsToSort.reverse();
             }
 
@@ -144,6 +152,10 @@ var UIComponents;
                     key: column.key
                 };
 
+                if (self.props.colStylingFN) {
+                    colProps = self.props.colStylingFN(colProps);
+                }
+
                 columns.push(React.DOM.col(colProps));
                 headerLabels.push(React.DOM.th({
                     className: !column.notSortable ? "sortable-column" : null,
@@ -164,9 +176,15 @@ var UIComponents;
                 for (var _column in self.state.columns) {
                     var column = self.state.columns[_column];
 
-                    cells.push(React.DOM.td({
+                    var cellProps = {
                         key: "" + item.key + "_" + column.key
-                    }, self.splitMultilineText(item.data[column.key]) || null));
+                    };
+
+                    if (self.props.cellStylingFN) {
+                        cellProps = self.props.cellStylingFN(cellProps);
+                    }
+
+                    cells.push(React.DOM.td(cellProps, self.splitMultilineText(item.data[column.key]) || null));
                 }
 
                 var rowProps = {};

@@ -1221,6 +1221,7 @@ class Game
     //player.addMoney(100, "initial");
     this.reactUI = new ReactUI(player, this.frameImages);
     this.players[player.id] = player;
+    
     // TODO have content types register themselves
     var dailyProfitSystem = new ProfitSystem(1, this.systemsManager, this.players,
       ["fastfood", "shopping", "parking", "factory", "hotel"]);

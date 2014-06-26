@@ -90,6 +90,7 @@ export var List = React.createClass({
     var order;
     if (this.state.sortBy.column.key === column.key)
     {
+      // flips order
       order = this.state.sortBy.order === "desc" ?
         "asc" :
         "desc";
@@ -121,13 +122,11 @@ export var List = React.createClass({
 
   sort: function()
   {
+    var self = this;
     var selectedColumn = this.state.sortBy.column;
 
-    var nextIndex = (this.state.sortBy.currColumnIndex + 1) % this.state.columns.length;
-    var alternateColumn = this.state.columns[nextIndex];
+    var initialPropToSortBy = selectedColumn.propToSortBy || selectedColumn.key;
 
-    var propToSortBy = selectedColumn.propToSortBy || selectedColumn.key;
-    var alternatePropToSortBy = alternateColumn.propToSortBy || alternateColumn.key;
     var itemsToSort = this.props.listItems;
 
     if (selectedColumn.sortingFunction)
@@ -138,18 +137,28 @@ export var List = React.createClass({
     {
       itemsToSort.sort(function(a, b)
       {
-        if (a.data[propToSortBy] === b.data[propToSortBy])
+        var propToSortBy = initialPropToSortBy;
+        var nextIndex = self.state.sortBy.currColumnIndex;
+
+        for (var i = 0; i < self.state.columns.length; i++)
         {
-          return a.data[alternatePropToSortBy] > b.data[alternatePropToSortBy] ? 1 : -1;
+          if (a.data[propToSortBy] === b.data[propToSortBy])
+          {
+            nextIndex = (nextIndex + 1) % self.state.columns.length;
+            var nextColumn = self.state.columns[nextIndex];
+            propToSortBy = nextColumn.propToSortBy || nextColumn.key;
+          }
+          else
+          {
+            break;
+          }
         }
-        else
-        {
-          return a.data[propToSortBy] > b.data[propToSortBy] ? 1 : -1;
-        }
+
+        return a.data[propToSortBy] > b.data[propToSortBy] ? 1 : -1;
       });
     }
 
-    if (this.state.sortBy.order === "asc")
+    if (this.state.sortBy.order === "desc")
     {
       itemsToSort.reverse();
     }
@@ -189,6 +198,11 @@ export var List = React.createClass({
         key: column.key
       };
 
+      if (self.props.colStylingFN)
+      {
+        colProps = self.props.colStylingFN(colProps);
+      }
+
       columns.push(
         React.DOM.col(colProps)
       );
@@ -216,11 +230,18 @@ export var List = React.createClass({
       {
         var column = self.state.columns[_column];
 
+        var cellProps =
+        {
+          key: "" + item.key + "_" + column.key
+        };
+
+        if (self.props.cellStylingFN)
+        {
+          cellProps = self.props.cellStylingFN(cellProps);
+        }
+
         cells.push(
-          React.DOM.td(
-            {
-              key: "" + item.key + "_" + column.key
-            },
+          React.DOM.td( cellProps,
             self.splitMultilineText( item.data[column.key] ) || null)
         );
       }

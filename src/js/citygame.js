@@ -2296,7 +2296,8 @@ var BuildTool = (function (_super) {
 
     BuildTool.prototype.activate = function (selectedCells) {
         if (this.canBuild === true) {
-            if (game.players.player0.money >= this.selectedBuildingType.cost) {
+            var cost = game.players.player0.getBuildCost(this.selectedBuildingType);
+            if (game.players.player0.money >= cost) {
                 eventManager.dispatchEvent({
                     type: "makeBuildingConstructPopup",
                     content: {

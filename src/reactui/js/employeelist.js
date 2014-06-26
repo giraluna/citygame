@@ -26,7 +26,7 @@ var UIComponents;
         },
         applyCellStyle: function (item, column, cellProps) {
             if (this.props.relevantSkills && this.props.relevantSkills.length > 0) {
-                if (this.props.relevantSkills.indexOf(column.key) < 0) {
+                if (this.props.relevantSkills.indexOf(column.key) < 0 && column.key !== "name") {
                     cellProps["className"] = "irrelevant-cell";
                 }
             }

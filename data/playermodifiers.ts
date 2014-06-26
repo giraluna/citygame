@@ -503,7 +503,7 @@ module playerModifiers
   {
     type: "factoryModifier1",
     title: "Steam powered factories",
-    description: "Factories +12$ /s",
+    description: "Factories +15$ /s",
     cost: 50000,
     unlockConditions:
     [
@@ -516,7 +516,7 @@ module playerModifiers
     [
       {
         targets: ["factory"],
-        addedProfit: 12
+        addedProfit: 15
       }
     ]
   }
@@ -524,7 +524,7 @@ module playerModifiers
   {
     type: "factoryModifier2",
     title: "Electricity powered factories",
-    description: "Factories +20$ /s",
+    description: "Factories +30$ /s",
     cost: 150000,
     unlockConditions:
     [
@@ -537,7 +537,7 @@ module playerModifiers
     [
       {
         targets: ["factory"],
-        addedProfit: 20
+        addedProfit: 30
       }
     ]
   }
@@ -558,6 +558,72 @@ module playerModifiers
     [
       {
         targets: ["factory"],
+        multiplier: 1.5
+      }
+    ]
+  }
+  export var hotelModifier1: IPlayerModifier =
+  {
+    type: "hotelModifier1",
+    title: "Heated swimming pool",
+    description: "Hotels +30$ /s",
+    cost: 200000,
+    unlockConditions:
+    [
+      {
+        type: "hotel",
+        value: 1
+      }
+    ],
+    effects:
+    [
+      {
+        targets: ["hotel"],
+        addedProfit: 30
+      }
+    ]
+  }
+  export var hotelModifier2: IPlayerModifier =
+  {
+    type: "hotelModifier2",
+    title: "Imported cleaning staff",
+    description: "Building hotels is 15% cheaper",
+    cost: 400000,
+    unlockConditions:
+    [
+      {
+        type: "hotel",
+        value: 3
+      }
+    ],
+    effects:
+    [
+      {
+        targets: ["hotel"],
+        buildCost:
+        {
+          multiplier: 0.85
+        }
+      }
+    ]
+  }
+  export var hotelModifier3: IPlayerModifier =
+  {
+    type: "hotelModifier3",
+    title: "Swim-up bar",
+    description: "hotel profits * 1.5",
+    cost: 500000,
+    unlockConditions:
+    [
+      {
+        type: "hotel",
+        value: 5
+      }
+    ],
+    effects:
+    [
+      {
+        targets: ["hotel"],
         multiplier: 1.5
       }
     ]

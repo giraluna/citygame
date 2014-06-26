@@ -39,7 +39,6 @@ declare class Player {
     public levelUpModifiersPerLevelUp: number;
     public levelsAlreadyPicked: any;
     public recentlyCheckedUnlockConditions: any;
-    public maxCheckFrequency: number;
     public indexedProfits: any;
     public moneySpan: HTMLElement;
     public incomeSpan: HTMLElement;
@@ -77,7 +76,7 @@ declare class Player {
     public getUnlockConditionVariable(conditionType: string): any;
     public checkIfUnlocked(modifier: playerModifiers.IPlayerModifier): boolean;
     public setInitialAvailableModifiers(): void;
-    public checkLockedModifiers(conditionType: string): void;
+    public checkLockedModifiers(conditionType: string, timeout?: number): void;
     public unlockModifier(modifier: playerModifiers.IPlayerModifier): void;
     public updateDynamicModifiers(conditionType: string): void;
     public addClicks(amount: number): void;

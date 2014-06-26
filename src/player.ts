@@ -58,7 +58,6 @@ class Player
   levelsAlreadyPicked: any = {};
 
   recentlyCheckedUnlockConditions: any = {};
-  maxCheckFrequency: number = 1000;
 
   indexedProfits: any = {};
 
@@ -224,9 +223,8 @@ class Player
     
     this.ownedContent[content.categoryType].push(content);
     this.amountBuiltPerType[content.type.type]++;
-    this.checkLockedModifiers(content.type.type);
+    this.checkLockedModifiers(content.type.type, -1);
     content.player = this;
-
     this.updateDynamicModifiers(content.type.type);
   }
   removeContent( content )
@@ -641,7 +639,8 @@ class Player
       }
     }
   }
-  checkLockedModifiers(conditionType: string)
+  checkLockedModifiers(conditionType: string,
+    timeout: number = 1000)
   {
     var unlocks = playerModifiers.modifiersByUnlock[conditionType];
     if (!unlocks) return;
@@ -650,13 +649,13 @@ class Player
     {
       return;
     }
-    else
+    else if (timeout > 0)
     {
       this.recentlyCheckedUnlockConditions[conditionType] = true;
       window.setTimeout(function()
       {
         this.recentlyCheckedUnlockConditions[conditionType] = false;
-      }.bind(this), this.maxCheckFrequency);
+      }.bind(this), timeout);
     }
 
     var unlockValues = Object.keys(unlocks);

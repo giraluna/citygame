@@ -1855,8 +1855,8 @@ class Game
 
     if (data.stats)
     {
-      player.incomePerDate = data.stats.incomePerDate;
-      player.incomePerType = data.stats.incomePerType;
+      player.incomePerDate = data.stats.incomePerDate || {};
+      player.incomePerType = data.stats.incomePerType || {};
     }
 
     for (var _mod in data.modifiers)

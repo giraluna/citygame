@@ -41,7 +41,6 @@ var Player = (function () {
         this.levelUpModifiersPerLevelUp = 4;
         this.levelsAlreadyPicked = {};
         this.recentlyCheckedUnlockConditions = {};
-        this.maxCheckFrequency = 1000;
         this.indexedProfits = {};
         this.id = id;
         this.color = color;
@@ -175,9 +174,8 @@ var Player = (function () {
 
         this.ownedContent[content.categoryType].push(content);
         this.amountBuiltPerType[content.type.type]++;
-        this.checkLockedModifiers(content.type.type);
+        this.checkLockedModifiers(content.type.type, -1);
         content.player = this;
-
         this.updateDynamicModifiers(content.type.type);
     };
     Player.prototype.removeContent = function (content) {
@@ -516,18 +514,19 @@ var Player = (function () {
             }
         }
     };
-    Player.prototype.checkLockedModifiers = function (conditionType) {
+    Player.prototype.checkLockedModifiers = function (conditionType, timeout) {
+        if (typeof timeout === "undefined") { timeout = 1000; }
         var unlocks = playerModifiers.modifiersByUnlock[conditionType];
         if (!unlocks)
             return;
 
         if (this.recentlyCheckedUnlockConditions[conditionType]) {
             return;
-        } else {
+        } else if (timeout > 0) {
             this.recentlyCheckedUnlockConditions[conditionType] = true;
             window.setTimeout(function () {
                 this.recentlyCheckedUnlockConditions[conditionType] = false;
-            }.bind(this), this.maxCheckFrequency);
+            }.bind(this), timeout);
         }
 
         var unlockValues = Object.keys(unlocks);

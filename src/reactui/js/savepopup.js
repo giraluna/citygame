@@ -22,7 +22,11 @@ var UIComponents;
     UIComponents.SavePopup = React.createClass({
         mixins: [UIComponents.Draggable, UIComponents.SplitMultilineText],
         componentDidMount: function () {
-            this.refs.inputElement.getDOMNode().value = this.refs.savedGameList.state.selected.data.name;
+            var setValue = function () {
+                this.refs.inputElement.getDOMNode().value = this.refs.savedGameList.state.selected.data.name;
+            }.bind(this);
+
+            window.setTimeout(setValue, 50);
         },
         handleOk: function (e) {
             var self = this;

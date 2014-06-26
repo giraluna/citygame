@@ -46,6 +46,9 @@ declare module playerModifiers {
     var factoryModifier1: IPlayerModifier;
     var factoryModifier2: IPlayerModifier;
     var factoryModifier3: IPlayerModifier;
+    var hotelModifier1: IPlayerModifier;
+    var hotelModifier2: IPlayerModifier;
+    var hotelModifier3: IPlayerModifier;
     /**
     * unlockConditions:
     * [

@@ -503,13 +503,13 @@ class Player
     cost *= this.modifierEffects.buildCost[type.categoryType].multiplier;
     cost *= this.modifierEffects.buildCost["global"].multiplier;
 
-    cost *= Math.pow(1.5, alreadyBuilt);
+    cost *= Math.pow(1.3, alreadyBuilt);
 
     return Math.round(cost);
   }
   getCellBuyCost(cell)
   {
-    var adjusted = cell.landValue * Math.pow(1.15, this.ownedCellsAmount);
+    var adjusted = cell.landValue * Math.pow(1.1, this.ownedCellsAmount);
 
     adjusted += this.modifierEffects.buyCost["global"].addedCost;
     adjusted *= this.modifierEffects.buyCost["global"].multiplier;

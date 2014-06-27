@@ -461,7 +461,7 @@ var cg: any =
           },
           {
             "type": "population",
-            "range": 2,
+            "range": 3,
             "strength": 1
           }
         ]
@@ -489,7 +489,7 @@ var cg: any =
           },
           {
             "type": "population",
-            "range": 2,
+            "range": 3,
             "strength": 2
           }
         ]
@@ -517,7 +517,7 @@ var cg: any =
           },
           {
             "type": "population",
-            "range": 2,
+            "range": 3,
             "strength": 1
           }
         ]
@@ -545,7 +545,7 @@ var cg: any =
           },
           {
             "type": "population",
-            "range": 2,
+            "range": 3,
             "strength": 2
           }
         ]
@@ -573,7 +573,7 @@ var cg: any =
           },
           {
             "type": "population",
-            "range": 2,
+            "range": 3,
             "strength": 2
           }
         ]
@@ -601,7 +601,7 @@ var cg: any =
           },
           {
             "type": "population",
-            "range": 2,
+            "range": 3,
             "strength": 2
           }
         ]
@@ -629,7 +629,7 @@ var cg: any =
           },
           {
             "type": "population",
-            "range": 2,
+            "range": 3,
             "strength": 1
           }
         ]

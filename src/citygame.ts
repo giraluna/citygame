@@ -1900,6 +1900,7 @@ class Game
     }
 
     player.setInitialAvailableModifiers();
+    player.applyPrestige();
 
     this.players["player0"] = player;
     this.reactUI.player = player;
@@ -1916,7 +1917,7 @@ class Game
 
     var resetWithSelectedModifier = function(toPerm)
     {
-      var newPlayer = new Player("player" + (idGenerator.player++));
+      var newPlayer = new Player(player.id);
 
       newPlayer.incomePerDate = Object.create(player.incomePerDate);
       newPlayer.incomePerType = Object.create(player.incomePerType);
@@ -1927,10 +1928,11 @@ class Game
       newPlayer.permanentLevelupUpgrades.push(toPerm.data.modifier.type);
 
       newPlayer.applyPermedModifiers();
+      newPlayer.applyPrestige();
 
       newPlayer.setInitialAvailableModifiers();
 
-      this.players["player0"] = newPlayer;
+      this.players[player.id] = newPlayer;
       this.reactUI.player = newPlayer;
       newPlayer.addExperience(0); // refresh
       newPlayer.updateElements();
@@ -1968,8 +1970,9 @@ class Game
         text:
         [
           "Congratulations on reaching level 100!",
-          "You can donate your money to charity and start again.", "",
-          "You would gain an additional " + prestigeGained.toFixed(1) + " karma",
+          "You can start over from scratch in a new city",
+          "",
+          "You would gain an additional " + prestigeGained.toFixed(1) + " prestige",
           "For a total of " + newPrestige.toFixed(1) + "% increased income",
           "You can also permanently unlock one of the following upgrades:"
         ],

@@ -430,6 +430,10 @@ module levelUpModifiers
     }
   }
 
+  //////////////
+  // LEVEL 75 //
+  //////////////
+
   export var hotelParking1: playerModifiers.IPlayerModifier =
   {
     type: "hotelParking1",
@@ -439,7 +443,7 @@ module levelUpModifiers
     [
       {
         type: "level",
-        value: 50
+        value: 75
       }
     ],
     dynamicEffect:

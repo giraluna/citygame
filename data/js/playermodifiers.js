@@ -16,6 +16,27 @@ var playerModifiers;
         ]
     };
 
+    playerModifiers.prestigeDefault = {
+        type: "prestigeToProfitDefault",
+        title: "Default prestige modifier",
+        description: "1% total profit per prestige",
+        dynamicEffect: {
+            "prestige": function (player) {
+                player.addSpecialModifier({
+                    type: "prestigeToProfitDefault",
+                    title: "Default prestige modifier",
+                    description: "1% total profit per prestige",
+                    effects: [
+                        {
+                            targets: ["global"],
+                            multiplier: 1 + player.prestige * 0.01
+                        }
+                    ]
+                });
+            }
+        }
+    };
+
     playerModifiers.clickModifier1 = {
         type: "clickModifier1",
         title: "Hardly working",

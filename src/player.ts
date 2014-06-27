@@ -158,6 +158,8 @@ class Player
 
     this.setExperienceToNextLevel();
     this.setInitialAvailableModifiers();
+
+    this.addModifier(playerModifiers.prestigeDefault);
   }
 
   addEmployee(employee: Employee)
@@ -503,13 +505,13 @@ class Player
     cost *= this.modifierEffects.buildCost[type.categoryType].multiplier;
     cost *= this.modifierEffects.buildCost["global"].multiplier;
 
-    cost *= Math.pow(1.3, alreadyBuilt);
+    cost *= Math.pow(1.4, alreadyBuilt);
 
     return Math.round(cost);
   }
   getCellBuyCost(cell)
   {
-    var adjusted = cell.landValue * Math.pow(1.1, this.ownedCellsAmount);
+    var adjusted = cell.landValue * Math.pow(1.12, this.ownedCellsAmount);
 
     adjusted += this.modifierEffects.buyCost["global"].addedCost;
     adjusted *= this.modifierEffects.buyCost["global"].multiplier;
@@ -598,7 +600,7 @@ class Player
   }
   getUnlockConditionVariable(conditionType: string)
   {
-    if (["clicks", "money", "level"].indexOf(conditionType) !== -1)
+    if (["clicks", "money", "level", "prestige"].indexOf(conditionType) !== -1)
     {
       return this[conditionType];
     }
@@ -773,6 +775,11 @@ class Player
 
       this.addLevelUpModifier(modifier, false, firstTime);
     }
+  }
+  applyPrestige()
+  {
+    this.prestige = this.totalResetExperience / 1000000;
+    this.updateDynamicModifiers("prestige");
   }
   addToRollingIncome(amount, date)
   {

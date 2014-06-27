@@ -22,6 +22,7 @@ declare module playerModifiers {
         unlockConditions?: any;
     }
     var testModifier: IPlayerModifier;
+    var prestigeDefault: IPlayerModifier;
     var clickModifier1: IPlayerModifier;
     var clickModifier2: IPlayerModifier;
     var clickModifier3: IPlayerModifier;

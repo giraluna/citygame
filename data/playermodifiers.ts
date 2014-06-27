@@ -45,6 +45,32 @@ module playerModifiers
     ]
   }
 
+  export var prestigeDefault: IPlayerModifier =
+  {
+    type: "prestigeToProfitDefault",
+    title: "Default prestige modifier",
+    description: "1% total profit per prestige",
+    dynamicEffect:
+    {
+      "prestige": function(player)
+      {
+        player.addSpecialModifier(
+        {
+          type: "prestigeToProfitDefault",
+          title: "Default prestige modifier",
+          description: "1% total profit per prestige",
+          effects:
+          [
+            {
+              targets: ["global"],
+              multiplier: 1 + player.prestige * 0.01
+            }
+          ]
+        });
+      }
+    }
+  }
+
   export var clickModifier1: IPlayerModifier =
   {
     type: "clickModifier1",

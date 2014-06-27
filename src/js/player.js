@@ -117,6 +117,8 @@ var Player = (function () {
 
         this.setExperienceToNextLevel();
         this.setInitialAvailableModifiers();
+
+        this.addModifier(playerModifiers.prestigeDefault);
     };
 
     Player.prototype.addEmployee = function (employee) {
@@ -399,12 +401,12 @@ var Player = (function () {
         cost *= this.modifierEffects.buildCost[type.categoryType].multiplier;
         cost *= this.modifierEffects.buildCost["global"].multiplier;
 
-        cost *= Math.pow(1.3, alreadyBuilt);
+        cost *= Math.pow(1.4, alreadyBuilt);
 
         return Math.round(cost);
     };
     Player.prototype.getCellBuyCost = function (cell) {
-        var adjusted = cell.landValue * Math.pow(1.1, this.ownedCellsAmount);
+        var adjusted = cell.landValue * Math.pow(1.12, this.ownedCellsAmount);
 
         adjusted += this.modifierEffects.buyCost["global"].addedCost;
         adjusted *= this.modifierEffects.buyCost["global"].multiplier;
@@ -481,7 +483,7 @@ var Player = (function () {
         this.indexedProfits = {};
     };
     Player.prototype.getUnlockConditionVariable = function (conditionType) {
-        if (["clicks", "money", "level"].indexOf(conditionType) !== -1) {
+        if (["clicks", "money", "level", "prestige"].indexOf(conditionType) !== -1) {
             return this[conditionType];
         } else if (this.amountBuiltPerType[conditionType] !== undefined) {
             return this.amountBuiltPerType[conditionType];
@@ -632,6 +634,10 @@ var Player = (function () {
 
             this.addLevelUpModifier(modifier, false, firstTime);
         }
+    };
+    Player.prototype.applyPrestige = function () {
+        this.prestige = this.totalResetExperience / 1000000;
+        this.updateDynamicModifiers("prestige");
     };
     Player.prototype.addToRollingIncome = function (amount, date) {
         if (date.day !== this.lastRollingIncomeDay) {

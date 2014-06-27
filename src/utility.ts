@@ -165,7 +165,6 @@ interface ISpritesheetData
 }
 function spritesheetToImages(sheetData: ISpritesheetData, baseUrl: string)
 {
-  var sheetData = sheetData;
   var sheetImg = new Image();
   sheetImg.src = baseUrl + sheetData.meta.image;
 

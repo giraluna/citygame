@@ -116,7 +116,6 @@ function rollDice(dice, sides) {
 }
 
 function spritesheetToImages(sheetData, baseUrl) {
-    var sheetData = sheetData;
     var sheetImg = new Image();
     sheetImg.src = baseUrl + sheetData.meta.image;
 

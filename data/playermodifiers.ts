@@ -47,7 +47,7 @@ module playerModifiers
 
   export var prestigeDefault: IPlayerModifier =
   {
-    type: "prestigeToProfitDefault",
+    type: "prestigeDefault",
     title: "Default prestige modifier",
     description: "1% total profit per prestige",
     dynamicEffect:
@@ -56,7 +56,7 @@ module playerModifiers
       {
         player.addSpecialModifier(
         {
-          type: "prestigeToProfitDefault",
+          type: "prestigeDefault",
           title: "Default prestige modifier",
           description: "1% total profit per prestige",
           effects:

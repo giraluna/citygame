@@ -430,6 +430,43 @@ module levelUpModifiers
     }
   }
 
+  export var prestigeEffectIncrease1: playerModifiers.IPlayerModifier =
+  {
+    type: "prestigeEffectIncrease1",
+    title: "Increased prestige effect",
+    description: "0.5% additional profit per prestige",
+    unlockConditions:
+    [
+      {
+        type: "level",
+        value: 50
+      },
+      {
+        type: "prestige",
+        value: 1
+      }
+    ],
+    dynamicEffect:
+    {
+      "prestige": function(player)
+      {
+        player.addSpecialModifier(
+        {
+          type: "prestigeEffectIncrease1",
+          title: "Increased prestige effect",
+          description: "0.5% additional profit per prestige",
+          effects:
+          [
+            {
+              targets: ["global"],
+              multiplier: 1 + player.prestige * 0.005
+            }
+          ]
+        });
+      }
+    }
+  }
+
   //////////////
   // LEVEL 75 //
   //////////////

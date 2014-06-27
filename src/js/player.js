@@ -585,7 +585,12 @@ var Player = (function () {
             return;
 
         modifiersForThisLevel = modifiersForThisLevel.filter(function (mod) {
-            return !(self.levelUpModifiers[mod.type]);
+            if (self.levelUpModifiers[mod.type])
+                return false;
+            else if (self.checkIfUnlocked(mod))
+                return true;
+            else
+                return false;
         });
 
         var toUnlock = [];

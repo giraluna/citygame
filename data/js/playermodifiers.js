@@ -17,13 +17,13 @@ var playerModifiers;
     };
 
     playerModifiers.prestigeDefault = {
-        type: "prestigeToProfitDefault",
+        type: "prestigeDefault",
         title: "Default prestige modifier",
         description: "1% total profit per prestige",
         dynamicEffect: {
             "prestige": function (player) {
                 player.addSpecialModifier({
-                    type: "prestigeToProfitDefault",
+                    type: "prestigeDefault",
                     title: "Default prestige modifier",
                     description: "1% total profit per prestige",
                     effects: [

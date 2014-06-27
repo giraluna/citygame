@@ -351,6 +351,40 @@ var levelUpModifiers;
         }
     };
 
+    levelUpModifiers.prestigeEffectIncrease1 = {
+        type: "prestigeEffectIncrease1",
+        title: "Increased prestige effect",
+        description: "0.5% additional profit per prestige",
+        unlockConditions: [
+            {
+                type: "level",
+                value: 50
+            },
+            {
+                type: "prestige",
+                value: 1
+            }
+        ],
+        dynamicEffect: {
+            "prestige": function (player) {
+                player.addSpecialModifier({
+                    type: "prestigeEffectIncrease1",
+                    title: "Increased prestige effect",
+                    description: "0.5% additional profit per prestige",
+                    effects: [
+                        {
+                            targets: ["global"],
+                            multiplier: 1 + player.prestige * 0.005
+                        }
+                    ]
+                });
+            }
+        }
+    };
+
+    //////////////
+    // LEVEL 75 //
+    //////////////
     levelUpModifiers.hotelParking1 = {
         type: "hotelParking1",
         title: "Valet service",
@@ -358,7 +392,7 @@ var levelUpModifiers;
         unlockConditions: [
             {
                 type: "level",
-                value: 50
+                value: 75
             }
         ],
         dynamicEffect: {

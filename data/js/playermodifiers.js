@@ -146,7 +146,7 @@ var playerModifiers;
         cost: 50,
         unlockConditions: [
             {
-                type: "parkinglot",
+                type: "parking",
                 value: 1
             }
         ],
@@ -164,7 +164,7 @@ var playerModifiers;
         cost: 500,
         unlockConditions: [
             {
-                type: "parkinglot",
+                type: "parking",
                 value: 5
             }
         ],
@@ -182,7 +182,7 @@ var playerModifiers;
         cost: 2000,
         unlockConditions: [
             {
-                type: "parkinglot",
+                type: "parking",
                 value: 10
             }
         ],
@@ -200,7 +200,7 @@ var playerModifiers;
         cost: 10000,
         unlockConditions: [
             {
-                type: "parkinglot",
+                type: "parking",
                 value: 15
             }
         ],
@@ -218,7 +218,7 @@ var playerModifiers;
         cost: 300,
         unlockConditions: [
             {
-                type: "conveniencestore",
+                type: "shopping",
                 value: 1
             }
         ],
@@ -231,12 +231,12 @@ var playerModifiers;
     };
     playerModifiers.convenienceModifier2 = {
         type: "convenienceModifier2",
-        title: "Mystery meat hot dogs",
+        title: "Lottery tickets",
         description: "Convenience stores +1$ /s",
         cost: 1500,
         unlockConditions: [
             {
-                type: "conveniencestore",
+                type: "shopping",
                 value: 3
             }
         ],
@@ -249,12 +249,12 @@ var playerModifiers;
     };
     playerModifiers.convenienceModifier3 = {
         type: "convenienceModifier3",
-        title: "Lottery tickets",
+        title: "Liquor license",
         description: "Convenience store profits * 1.2",
         cost: 5000,
         unlockConditions: [
             {
-                type: "conveniencestore",
+                type: "shopping",
                 value: 5
             }
         ],
@@ -326,7 +326,7 @@ var playerModifiers;
         cost: 1500,
         unlockConditions: [
             {
-                type: "house1",
+                type: "apartment",
                 value: 1
             }
         ],
@@ -344,7 +344,7 @@ var playerModifiers;
         cost: 5000,
         unlockConditions: [
             {
-                type: "house1",
+                type: "apartment",
                 value: 3
             }
         ],
@@ -362,7 +362,7 @@ var playerModifiers;
         cost: 15000,
         unlockConditions: [
             {
-                type: "house1",
+                type: "apartment",
                 value: 5
             }
         ],
@@ -380,7 +380,7 @@ var playerModifiers;
         cost: 5000,
         unlockConditions: [
             {
-                type: "smalloffice",
+                type: "office",
                 value: 1
             }
         ],
@@ -398,7 +398,7 @@ var playerModifiers;
         cost: 15000,
         unlockConditions: [
             {
-                type: "smalloffice",
+                type: "office",
                 value: 3
             }
         ],
@@ -416,7 +416,7 @@ var playerModifiers;
         cost: 50000,
         unlockConditions: [
             {
-                type: "smalloffice",
+                type: "office",
                 value: 5
             }
         ],

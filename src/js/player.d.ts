@@ -20,6 +20,7 @@ declare class Player {
     public permanentLevelupUpgrades: string[];
     public ownedContent: any;
     public amountBuiltPerType: any;
+    public amountBuiltPerCategory: any;
     public ownedCells: any;
     public ownedCellsAmount: number;
     public employees: any;

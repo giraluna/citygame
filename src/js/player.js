@@ -20,6 +20,7 @@ var Player = (function () {
         this.permanentLevelupUpgrades = [];
         this.ownedContent = {};
         this.amountBuiltPerType = {};
+        this.amountBuiltPerCategory = {};
         this.ownedCells = {};
         this.ownedCellsAmount = 0;
         this.employees = {};
@@ -84,6 +85,9 @@ var Player = (function () {
             }
             if (this.amountBuiltPerType[type.type] === undefined) {
                 this.amountBuiltPerType[type.type] = 0;
+            }
+            if (this.amountBuiltPerCategory[type.categoryType] === undefined) {
+                this.amountBuiltPerCategory[type.categoryType] = 0;
             }
             if (this.incomePerType[type.categoryType] === undefined) {
                 this.incomePerType[type.categoryType] = 0;
@@ -178,7 +182,10 @@ var Player = (function () {
 
         this.ownedContent[content.categoryType].push(content);
         this.amountBuiltPerType[content.type.type]++;
+        this.amountBuiltPerCategory[content.type.categoryType]++;
+
         this.checkLockedModifiers(content.type.type, -1);
+        this.checkLockedModifiers(content.type.categoryType, -1);
         content.player = this;
         this.updateDynamicModifiers(content.type.type);
     };
@@ -188,6 +195,7 @@ var Player = (function () {
         });
 
         this.amountBuiltPerType[content.type.type]--;
+        this.amountBuiltPerCategory[content.type.categoryType]--;
 
         this.updateDynamicModifiers(content.type.type);
     };
@@ -487,6 +495,8 @@ var Player = (function () {
             return this[conditionType];
         } else if (this.amountBuiltPerType[conditionType] !== undefined) {
             return this.amountBuiltPerType[conditionType];
+        } else if (this.amountBuiltPerCategory[conditionType] !== undefined) {
+            return this.amountBuiltPerCategory[conditionType];
         }
     };
     Player.prototype.checkIfUnlocked = function (modifier) {
@@ -587,10 +597,8 @@ var Player = (function () {
         modifiersForThisLevel = modifiersForThisLevel.filter(function (mod) {
             if (self.levelUpModifiers[mod.type])
                 return false;
-            else if (self.checkIfUnlocked(mod))
-                return true;
             else
-                return false;
+                return (self.checkIfUnlocked(mod));
         });
 
         var toUnlock = [];

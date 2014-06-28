@@ -25,6 +25,7 @@ class Player
 
   ownedContent: any = {};
   amountBuiltPerType: any = {};
+  amountBuiltPerCategory: any = {};
   ownedCells: any = {};
   ownedCellsAmount: number = 0;
 
@@ -118,6 +119,10 @@ class Player
       if (this.amountBuiltPerType[type.type] === undefined)
       {
         this.amountBuiltPerType[type.type] = 0;
+      }
+      if (this.amountBuiltPerCategory[type.categoryType] === undefined)
+      {
+        this.amountBuiltPerCategory[type.categoryType] = 0;
       }
       if (this.incomePerType[type.categoryType] === undefined)
       {
@@ -225,7 +230,10 @@ class Player
     
     this.ownedContent[content.categoryType].push(content);
     this.amountBuiltPerType[content.type.type]++;
+    this.amountBuiltPerCategory[content.type.categoryType]++;
+
     this.checkLockedModifiers(content.type.type, -1);
+    this.checkLockedModifiers(content.type.categoryType, -1);
     content.player = this;
     this.updateDynamicModifiers(content.type.type);
   }
@@ -238,6 +246,7 @@ class Player
     });
 
     this.amountBuiltPerType[content.type.type]--;
+    this.amountBuiltPerCategory[content.type.categoryType]--;
 
     this.updateDynamicModifiers(content.type.type);
   }
@@ -608,6 +617,10 @@ class Player
     {
       return this.amountBuiltPerType[conditionType];
     }
+    else if (this.amountBuiltPerCategory[conditionType] !== undefined)
+    {
+      return this.amountBuiltPerCategory[conditionType];
+    }
   }
   checkIfUnlocked(modifier: playerModifiers.IPlayerModifier)
   {
@@ -721,8 +734,7 @@ class Player
     modifiersForThisLevel = modifiersForThisLevel.filter(function(mod)
     {
       if (self.levelUpModifiers[mod.type]) return false;
-      else if (self.checkIfUnlocked(mod)) return true;
-      else return false;
+      else return (self.checkIfUnlocked(mod));
     });
 
     var toUnlock = [];

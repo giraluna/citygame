@@ -197,7 +197,7 @@ module playerModifiers
     unlockConditions:
     [
       {
-        type: "parkinglot",
+        type: "parking",
         value: 1
       }
     ],
@@ -218,7 +218,7 @@ module playerModifiers
     unlockConditions:
     [
       {
-        type: "parkinglot",
+        type: "parking",
         value: 5
       }
     ],
@@ -239,7 +239,7 @@ module playerModifiers
     unlockConditions:
     [
       {
-        type: "parkinglot",
+        type: "parking",
         value: 10
       }
     ],
@@ -260,7 +260,7 @@ module playerModifiers
     unlockConditions:
     [
       {
-        type: "parkinglot",
+        type: "parking",
         value: 15
       }
     ],
@@ -281,7 +281,7 @@ module playerModifiers
     unlockConditions:
     [
       {
-        type: "conveniencestore",
+        type: "shopping",
         value: 1
       }
     ],
@@ -296,13 +296,13 @@ module playerModifiers
   export var convenienceModifier2: IPlayerModifier =
   {
     type: "convenienceModifier2",
-    title: "Mystery meat hot dogs",
+    title: "Lottery tickets",
     description: "Convenience stores +1$ /s",
     cost: 1500,
     unlockConditions:
     [
       {
-        type: "conveniencestore",
+        type: "shopping",
         value: 3
       }
     ],
@@ -317,13 +317,13 @@ module playerModifiers
   export var convenienceModifier3: IPlayerModifier =
   {
     type: "convenienceModifier3",
-    title: "Lottery tickets",
+    title: "Liquor license",
     description: "Convenience store profits * 1.2",
     cost: 5000,
     unlockConditions:
     [
       {
-        type: "conveniencestore",
+        type: "shopping",
         value: 5
       }
     ],
@@ -407,7 +407,7 @@ module playerModifiers
     unlockConditions:
     [
       {
-        type: "house1",
+        type: "apartment",
         value: 1
       }
     ],
@@ -428,7 +428,7 @@ module playerModifiers
     unlockConditions:
     [
       {
-        type: "house1",
+        type: "apartment",
         value: 3
       }
     ],
@@ -449,7 +449,7 @@ module playerModifiers
     unlockConditions:
     [
       {
-        type: "house1",
+        type: "apartment",
         value: 5
       }
     ],
@@ -470,7 +470,7 @@ module playerModifiers
     unlockConditions:
     [
       {
-        type: "smalloffice",
+        type: "office",
         value: 1
       }
     ],
@@ -491,7 +491,7 @@ module playerModifiers
     unlockConditions:
     [
       {
-        type: "smalloffice",
+        type: "office",
         value: 3
       }
     ],
@@ -512,7 +512,7 @@ module playerModifiers
     unlockConditions:
     [
       {
-        type: "smalloffice",
+        type: "office",
         value: 5
       }
     ],

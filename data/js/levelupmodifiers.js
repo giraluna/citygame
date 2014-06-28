@@ -299,6 +299,26 @@ var levelUpModifiers;
         }
     };
 
+    levelUpModifiers.buildCostReduction1 = {
+        type: "buildCostReduction1",
+        title: "Deunionization",
+        description: "All buildings are 5% cheaper to build",
+        unlockConditions: [
+            {
+                type: "level",
+                value: 25
+            }
+        ],
+        effects: [
+            {
+                targets: ["global"],
+                buildCost: {
+                    multiplier: 0.95
+                }
+            }
+        ]
+    };
+
     levelUpModifiers.buyRush1 = {
         type: "buyRush1",
         title: "Land grab",
@@ -323,6 +343,62 @@ var levelUpModifiers;
                             buyCost: {
                                 multiplier: 0.5
                             }
+                        }
+                    ]
+                });
+            }
+        }
+    };
+
+    levelUpModifiers.clickFrenzy1 = {
+        type: "clickFrenzy1",
+        title: "Click frenzy",
+        description: "Clicking profits *7 for 2 minutes",
+        unlockConditions: [
+            {
+                type: "level",
+                value: 25
+            }
+        ],
+        onAdd: {
+            oneTime: true,
+            effect: function (player) {
+                player.addTimedModifier({
+                    type: "clickFrenzy1",
+                    title: "Click frenzy",
+                    description: "Clicking profits * 7 for 2 minutes",
+                    lifeTime: 1000 * 60 * 2,
+                    effects: [
+                        {
+                            targets: ["click"],
+                            multiplier: 1 + 7
+                        }
+                    ]
+                });
+            }
+        }
+    };
+
+    levelUpModifiers.branchOffices1 = {
+        type: "branchOffices1",
+        title: "Branch offices",
+        description: "2% higher global profit per office building",
+        unlockConditions: [
+            {
+                type: "level",
+                value: 50
+            }
+        ],
+        dynamicEffect: {
+            "office": function (player) {
+                player.addSpecialModifier({
+                    type: "branchOffices1",
+                    title: "Branch offices",
+                    description: "2% higher global profit per office building",
+                    effects: [
+                        {
+                            targets: ["global"],
+                            multiplier: 1 + player.amountBuiltPerCategory["office"] * 0.02
                         }
                     ]
                 });
@@ -382,6 +458,33 @@ var levelUpModifiers;
         }
     };
 
+    levelUpModifiers.branchOffices2 = {
+        type: "branchOffices2",
+        title: "Company headquarters",
+        description: "3% higher global profit per office building",
+        unlockConditions: [
+            {
+                type: "level",
+                value: 50
+            }
+        ],
+        dynamicEffect: {
+            "office": function (player) {
+                player.addSpecialModifier({
+                    type: "branchOffices2",
+                    title: "Company headquarters",
+                    description: "3% higher global profit per office building",
+                    effects: [
+                        {
+                            targets: ["global"],
+                            multiplier: 1 + player.amountBuiltPerCategory["office"] * 0.03
+                        }
+                    ]
+                });
+            }
+        }
+    };
+
     //////////////
     // LEVEL 75 //
     //////////////
@@ -399,12 +502,97 @@ var levelUpModifiers;
             "hotel": function (player) {
                 player.addSpecialModifier({
                     type: "hotelParking1",
-                    title: "Reverse carpal tunnel syndrome",
+                    title: "Valet service",
                     description: "Parking lot profits * 1.5 per hotel",
                     effects: [
                         {
                             targets: ["parking"],
-                            multiplier: 1 + player.amountBuiltPerType["parkinglot"] * 0.5
+                            multiplier: 1 + player.amountBuiltPerCategory["hotel"] * 0.5
+                        }
+                    ]
+                });
+            }
+        }
+    };
+
+    levelUpModifiers.hotelFastfood1 = {
+        type: "hotelFastfood1",
+        title: "Food poisoning scare",
+        description: "Fast food profits * 1.5 per hotel",
+        unlockConditions: [
+            {
+                type: "level",
+                value: 75
+            }
+        ],
+        dynamicEffect: {
+            "hotel": function (player) {
+                player.addSpecialModifier({
+                    type: "hotelFastfood1",
+                    title: "Food poisoning scare",
+                    description: "Fast food profits * 1.5 per hotel",
+                    effects: [
+                        {
+                            targets: ["fastfood"],
+                            multiplier: 1 + player.amountBuiltPerCategory["hotel"] * 0.5
+                        }
+                    ]
+                });
+            }
+        }
+    };
+
+    levelUpModifiers.factoryPerLevel1 = {
+        type: "factoryPerLevel1",
+        title: "Experienced foremen",
+        description: "Factory profits * 1.01 per level",
+        unlockConditions: [
+            {
+                type: "level",
+                value: 75
+            }
+        ],
+        dynamicEffect: {
+            "level": function (player) {
+                player.addSpecialModifier({
+                    type: "factoryPerLevel1",
+                    title: "Experienced foremen",
+                    description: "Factory profits * 1.01 per level",
+                    effects: [
+                        {
+                            targets: ["factory"],
+                            multiplier: 1 + player.level * 0.01
+                        }
+                    ]
+                });
+            }
+        }
+    };
+
+    levelUpModifiers.prestigeHotel1 = {
+        type: "prestigeHotel1",
+        title: "Prestigious hotels",
+        description: "Hotel profits * 1.02 per prestige",
+        unlockConditions: [
+            {
+                type: "level",
+                value: 75
+            },
+            {
+                type: "prestige",
+                value: 1
+            }
+        ],
+        dynamicEffect: {
+            "prestige": function (player) {
+                player.addSpecialModifier({
+                    type: "prestigeHotel1",
+                    title: "Prestigious hotels",
+                    description: "Hotel profits * 1.02 per prestige",
+                    effects: [
+                        {
+                            targets: ["hotel"],
+                            multiplier: 1 + player.prestige * 0.02
                         }
                     ]
                 });

@@ -424,7 +424,7 @@ var Player = (function () {
         return Math.round(cost);
     };
     Player.prototype.getCellBuyCost = function (cell) {
-        var adjusted = cell.landValue * Math.pow(1.12, this.ownedCellsAmount);
+        var adjusted = cell.landValue * Math.pow(1.1, this.ownedCellsAmount);
 
         adjusted += this.modifierEffects.buyCost["global"].addedCost;
         adjusted *= this.modifierEffects.buyCost["global"].multiplier;

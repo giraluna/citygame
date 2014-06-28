@@ -108,7 +108,7 @@ export var SideMenuBuildings = React.createClass(
       }
 
 
-      var image = this.props.frameImages[building.frame];
+      var image = this.props.frameImages[building.icon];
       imageProps.src = image.src;
 
       var div = React.DOM.div(divProps,

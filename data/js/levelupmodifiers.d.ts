@@ -4,7 +4,6 @@ declare module levelUpModifiers {
     var fundingBoost1: playerModifiers.IPlayerModifier;
     var clicksPerParking1: playerModifiers.IPlayerModifier;
     var clicksPerLevel1: playerModifiers.IPlayerModifier;
-    var increasedLevelUpModifiers1: playerModifiers.IPlayerModifier;
     var shoppingCostReduction1: playerModifiers.IPlayerModifier;
     var parkingCostReduction1: playerModifiers.IPlayerModifier;
     var fundingBoost2: playerModifiers.IPlayerModifier;

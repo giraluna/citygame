@@ -112,7 +112,7 @@ module levelUpModifiers
       }
     }
   }
-
+  /*
   export var increasedLevelUpModifiers1: playerModifiers.IPlayerModifier =
   {
     type: "increasedLevelUpModifiers1",
@@ -133,7 +133,7 @@ module levelUpModifiers
         player.levelUpModifiersPerLevelUp++;
       }
     }
-  }
+  }*/
 
   export var shoppingCostReduction1: playerModifiers.IPlayerModifier =
   {

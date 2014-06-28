@@ -22,7 +22,7 @@ declare var idGenerator: any;
 declare class Sprite extends PIXI.Sprite {
     public type: string;
     public content: Content;
-    constructor(template: any);
+    constructor(template: any, frameIndex?: number);
 }
 declare class GroundSprite extends Sprite {
     public cell: Cell;
@@ -30,7 +30,7 @@ declare class GroundSprite extends Sprite {
 }
 declare class ContentSprite extends Sprite {
     public content: Content;
-    constructor(type: any, content: any);
+    constructor(type: any, content: any, frameIndex: number);
 }
 declare class Content {
     public type: any;

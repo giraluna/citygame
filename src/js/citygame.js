@@ -36,8 +36,10 @@ idGenerator.player = 0;
 
 var Sprite = (function (_super) {
     __extends(Sprite, _super);
-    function Sprite(template) {
-        var _texture = PIXI.Texture.fromFrame(template.frame);
+    function Sprite(template, frameIndex) {
+        var frame = isFinite(frameIndex) ? template.frame[frameIndex] : template.frame;
+        console.log(frame);
+        var _texture = PIXI.Texture.fromFrame(frame);
         _super.call(this, _texture); //pixi caches and reuses the texture as needed
 
         this.type = template.type;
@@ -62,9 +64,9 @@ var GroundSprite = (function (_super) {
 
 var ContentSprite = (function (_super) {
     __extends(ContentSprite, _super);
-    function ContentSprite(type, content) {
+    function ContentSprite(type, content, frameIndex) {
         this.content = content;
-        _super.call(this, type);
+        _super.call(this, type, frameIndex);
     }
     return ContentSprite;
 })(Sprite);
@@ -110,16 +112,14 @@ var Content = (function () {
     }
     Content.prototype.init = function (type, layer) {
         if (typeof layer === "undefined") { layer = "content"; }
-        // todo needs to be split into multiple sprites for
-        // large content z depth to be right
-        var _s = this.sprite = new ContentSprite(type, this);
+        for (var i = 0; i < this.cells.length; i++) {
+            var _cell = this.cells[i];
+            var _s = this.sprite = new ContentSprite(type, this, i);
 
-        // sprites aligned at the lowest point
-        var spriteOrigin = [this.baseCell.gridPos[0] + this.size[0] - 1, this.baseCell.gridPos[1] + this.size[1] - 1];
+            _s.position = _cell.board.getCell(_cell.gridPos).sprite.position.clone();
 
-        _s.position = this.baseCell.board.getCell(spriteOrigin).sprite.position.clone();
-
-        this.baseCell.board.addSpriteToLayer(layer, _s, this.baseCell.gridPos);
+            _cell.board.addSpriteToLayer(layer, _s, _cell.gridPos);
+        }
     };
     Content.prototype.applyModifiers = function () {
         var totals = {

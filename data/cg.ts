@@ -51,12 +51,13 @@ var cg: any =
   },
   "content":
   {
+
     "underConstruction":
     {
       "type": "underConstruction",
       "baseType": "underConstruction",
       "anchor": [0.5, 1],
-      "frame": "underconstruction.png"
+      "frame": ["underconstruction.png"]
     },
     "plants":
     {
@@ -67,7 +68,7 @@ var cg: any =
           "type": "tree1",
           "baseType": "plant",
           "anchor": [0.5, 1],
-          "frame": "tree1.png",
+          "frame": ["tree1.png"],
           "canBuildOn": ["grass"],
           "effects":
           [
@@ -83,7 +84,7 @@ var cg: any =
           "type": "tree2",
           "baseType": "plant",
           "anchor": [0.5, 1],
-          "frame": "tree2.png",
+          "frame": ["tree2.png"],
           "canBuildOn": ["grass"],
           "effects":
           [
@@ -99,7 +100,7 @@ var cg: any =
           "type": "tree3",
           "baseType": "plant",
           "anchor": [0.5, 1],
-          "frame": "tree3.png",
+          "frame": ["tree3.png"],
           "canBuildOn": ["grass"],
           "effects":
           [
@@ -115,7 +116,7 @@ var cg: any =
           "type": "tree4",
           "baseType": "plant",
           "anchor": [0.5, 1],
-          "frame": "tree4.png",
+          "frame": ["tree4.png"],
           "canBuildOn": ["grass"],
           "effects":
           [
@@ -131,7 +132,7 @@ var cg: any =
           "type": "tree5",
           "baseType": "plant",
           "anchor": [0.5, 1],
-          "frame": "tree5.png",
+          "frame": ["tree5.png"],
           "canBuildOn": ["grass"],
           "effects":
           [
@@ -150,7 +151,7 @@ var cg: any =
           "type": "cactus",
           "baseType": "plant",
           "anchor": [0.5, 1.5],
-          "frame": "cactus.png",
+          "frame": ["cactus.png"],
           "canBuildOn": ["sand"]
         }
       },
@@ -161,7 +162,7 @@ var cg: any =
           "type": "tentacle",
           "baseType": "plant",
           "anchor": [0.5, 1.5],
-          "frame": "tentacle.png",
+          "frame": ["tentacle.png"],
           "canBuildOn": ["water"]
         }
       },
@@ -172,7 +173,7 @@ var cg: any =
           "type": "snowman",
           "baseType": "plant",
           "anchor": [0.5, 1.25],
-          "frame": "snowman.png",
+          "frame": ["snowman.png"],
           "canBuildOn": ["snow"]
         }
       }
@@ -185,7 +186,7 @@ var cg: any =
         "baseType": "road",
         "title": "Road",
         "anchor": [0.5, 1.0],
-        "frame": "road_h.png",
+        "frame": ["road_h.png"],
         "effects":
         [
           {
@@ -201,7 +202,7 @@ var cg: any =
         "baseType": "road",
         "title": "Road",
         "anchor": [0.5, 1.0],
-        "frame": "road_v.png",
+        "frame": ["road_v.png"],
         "effects":
         [
           {
@@ -217,7 +218,7 @@ var cg: any =
         "baseType": "road",
         "title": "Road",
         "anchor": [0.5, 1.0],
-        "frame": "road_ne.png",
+        "frame": ["road_ne.png"],
         "effects":
         [
           {
@@ -233,7 +234,7 @@ var cg: any =
         "baseType": "road",
         "title": "Road",
         "anchor": [0.5, 1.0],
-        "frame": "road_nw.png",
+        "frame": ["road_nw.png"],
         "effects":
         [
           {
@@ -249,7 +250,7 @@ var cg: any =
         "baseType": "road",
         "title": "Road",
         "anchor": [0.5, 1.0],
-        "frame": "road_sw.png",
+        "frame": ["road_sw.png"],
         "effects":
         [
           {
@@ -265,7 +266,7 @@ var cg: any =
         "baseType": "road",
         "title": "Road",
         "anchor": [0.5, 1.0],
-        "frame": "road_se.png",
+        "frame": ["road_se.png"],
         "effects":
         [
           {
@@ -281,7 +282,7 @@ var cg: any =
         "baseType": "road",
         "title": "Road",
         "anchor": [0.5, 1.0],
-        "frame": "road_news.png",
+        "frame": ["road_news.png"],
         "effects":
         [
           {
@@ -297,7 +298,7 @@ var cg: any =
         "baseType": "road",
         "title": "Road",
         "anchor": [0.5, 1.0],
-        "frame": "road_new.png",
+        "frame": ["road_new.png"],
         "effects":
         [
           {
@@ -313,7 +314,7 @@ var cg: any =
         "baseType": "road",
         "title": "Road",
         "anchor": [0.5, 1.0],
-        "frame": "road_nsw.png",
+        "frame": ["road_nsw.png"],
         "effects":
         [
           {
@@ -329,7 +330,7 @@ var cg: any =
         "baseType": "road",
         "title": "Road",
         "anchor": [0.5, 1.0],
-        "frame": "road_sew.png",
+        "frame": ["road_sew.png"],
         "effects":
         [
           {
@@ -345,7 +346,7 @@ var cg: any =
         "baseType": "road",
         "title": "Road",
         "anchor": [0.5, 1.0],
-        "frame": "road_nse.png",
+        "frame": ["road_nse.png"],
         "effects":
         [
           {
@@ -363,77 +364,77 @@ var cg: any =
         "type": "tube_h",
         "baseType": "tube",
         "anchor": [0.5, 1.0],
-        "frame": "tube_h.png"
+        "frame": ["tube_h.png"]
       },
       "tube_v":
       {
         "type": "tube_v",
         "baseType": "tube",
         "anchor": [0.5, 1.0],
-        "frame": "tube_v.png"
+        "frame": ["tube_v.png"]
       },
       "tube_ne":
       {
         "type": "tube_ne",
         "baseType": "tube",
         "anchor": [0.5, 1.0],
-        "frame": "tube_ne.png"
+        "frame": ["tube_ne.png"]
       },
       "tube_nw":
       {
         "type": "tube_nw",
         "baseType": "tube",
         "anchor": [0.5, 1.0],
-        "frame": "tube_nw.png"
+        "frame": ["tube_nw.png"]
       },
       "tube_sw":
       {
         "type": "tube_sw",
         "baseType": "tube",
         "anchor": [0.5, 1.0],
-        "frame": "tube_sw.png"
+        "frame": ["tube_sw.png"]
       },
       "tube_es":
       {
         "type": "tube_es",
         "baseType": "tube",
         "anchor": [0.5, 1.0],
-        "frame": "tube_se.png"
+        "frame": ["tube_se.png"]
       },
       "tube_nesw":
       {
         "type": "tube_nesw",
         "baseType": "tube",
         "anchor": [0.5, 1.0],
-        "frame": "tube_news.png"
+        "frame": ["tube_news.png"]
       },
       "tube_new":
       {
         "type": "tube_new",
         "baseType": "tube",
         "anchor": [0.5, 1.0],
-        "frame": "tube_new.png"
+        "frame": ["tube_new.png"]
       },
       "tube_nsw":
       {
         "type": "tube_nsw",
         "baseType": "tube",
         "anchor": [0.5, 1.0],
-        "frame": "tube_nsw.png"
+        "frame": ["tube_nsw.png"]
       },
       "tube_esw":
       {
         "type": "tube_esw",
         "baseType": "tube",
         "anchor": [0.5, 1.0],
-        "frame": "tube_sew.png"
+        "frame": ["tube_sew.png"]
       },
       "tube_nes":
       {
         "type": "tube_nes",
         "baseType": "tube",
         "anchor": [0.5, 1.0],
-        "frame": "tube_nse.png"
+        "frame": ["tube_nse.png"]
       }
     },
     "buildings":
@@ -449,7 +450,7 @@ var cg: any =
         "cost": 3000,
         "buildTime": 14,
         "anchor": [0.5, 1],
-        "frame": "house1.png",
+        "frame": ["house1.png"],
         "canNotBuildOn": ["water", "building", "road"],
         "population": 5,
         "effects":
@@ -477,7 +478,7 @@ var cg: any =
         "cost": 100000,
         "buildTime": 21,
         "anchor": [0.5, 1],
-        "frame": "house2.png",
+        "frame": ["house2.png"],
         "canNotBuildOn": ["water", "building", "road"],
         "population": 10,
         "effects":
@@ -505,7 +506,7 @@ var cg: any =
         "cost": 25,
         "buildTime": 14,
         "anchor": [0.5, 1],
-        "frame": "house3.png",
+        "frame": ["house3.png"],
         "canNotBuildOn": ["water", "building", "road"],
         "population": 5,
         "effects":
@@ -533,7 +534,7 @@ var cg: any =
         "cost": 50,
         "buildTime": 21,
         "anchor": [0.5, 1],
-        "frame": "house4.png",
+        "frame": ["house4.png"],
         "canNotBuildOn": ["water", "building", "road"],
         "population": 10,
         "effects":
@@ -561,7 +562,7 @@ var cg: any =
         "cost": 50,
         "buildTime": 21,
         "anchor": [0.5, 1],
-        "frame": "house5.png",
+        "frame": ["house5.png"],
         "canNotBuildOn": ["water", "building", "road"],
         "population": 10,
         "effects":
@@ -589,7 +590,7 @@ var cg: any =
         "cost": 50,
         "buildTime": 21,
         "anchor": [0.5, 1],
-        "frame": "house6.png",
+        "frame": ["house6.png"],
         "canNotBuildOn": ["water", "building", "road"],
         "population": 10,
         "effects":
@@ -617,7 +618,7 @@ var cg: any =
         "cost": 25,
         "buildTime": 14,
         "anchor": [0.425, 1],
-        "frame": "house7.png",
+        "frame": ["house7.png"],
         "canNotBuildOn": ["water", "building", "road"],
         "population": 5,
         "effects":
@@ -645,7 +646,7 @@ var cg: any =
         "cost": 150,
         "buildTime": 14,
         "anchor": [0.5, 1],
-        "frame": "fastfood.png",
+        "frame": ["fastfood.png"],
         "canNotBuildOn": ["water", "building", "road"],
         "effects":
         [
@@ -667,7 +668,7 @@ var cg: any =
         "cost": 1000,
         "buildTime": 14,
         "anchor": [0.5, 1],
-        "frame": "conveniencestore.png",
+        "frame": ["conveniencestore.png"],
         "canNotBuildOn": ["water", "building", "road"],
         "effects":
         [
@@ -694,7 +695,7 @@ var cg: any =
         "cost": 10000,
         "buildTime": 21,
         "anchor": [0.5, 1],
-        "frame": "smalloffice.png",
+        "frame": ["smalloffice.png"],
         "canNotBuildOn": ["water", "building", "road"],
         "effects":
         [
@@ -714,7 +715,7 @@ var cg: any =
         "cost": 0,
         "buildTime": 1,
         "anchor": [0.5, 1],
-        "frame": "smallstation.png",
+        "frame": ["smallstation.png"],
         "canNotBuildOn": ["water", "building", "road"],
         "underground": "tube_nesw",
         "effects":
@@ -737,7 +738,7 @@ var cg: any =
         "cost": 25,
         "buildTime": 14,
         "anchor": [0.5, 1],
-        "frame": "parkinglot.png",
+        "frame": ["parkinglot.png"],
         "canNotBuildOn": ["water", "building", "road"],
         "effects":
         [
@@ -745,29 +746,6 @@ var cg: any =
             "type": "nearbyParking",
             "range": 2,
             "strength": 1
-          }
-        ]
-      },
-      "bigoffice":
-      {
-        "type": "bigoffice",
-        "baseType": "building",
-        "categoryType": "office",
-        "title": "Big office",
-        "size": [2,2],
-        "baseProfit": 3,
-        "daysForProfitTick": 1,
-        "cost": 100,
-        "buildTime": 21,
-        "anchor": [0.6666, 1],
-        "frame": "bigoffice.png",
-        "canNotBuildOn": ["water", "building", "road"],
-        "effects":
-        [
-          {
-            "type": "nearbyStation",
-            "range": 3,
-            "strength": 10
           }
         ]
       },
@@ -782,8 +760,9 @@ var cg: any =
         "daysForProfitTick": 1,
         "cost": 25000,
         "buildTime": 14,
-        "anchor": [0.6666, 1],
-        "frame": "stretchystore.png",
+        "anchor": [0.5, 1],
+        "frame": ["hotel.png", "hotel.png"],
+        "icon": "stretchystore.png",
         "canNotBuildOn": ["water", "building", "road"],
         "effects":
         [
@@ -810,7 +789,7 @@ var cg: any =
         "cost": 50000,
         "buildTime": 21,
         "anchor": [0.5, 1],
-        "frame": "factory.png",
+        "frame": ["factory.png"],
         "canNotBuildOn": ["water", "building", "road"],
         "effects":
         [
@@ -832,7 +811,7 @@ var cg: any =
         "cost": 250000,
         "buildTime": 21,
         "anchor": [0.5, 1],
-        "frame": "hotel.png",
+        "frame": ["hotel.png"],
         "canNotBuildOn": ["water", "building", "road"],
         "effects":
         [
@@ -907,6 +886,24 @@ function findType(typeName: string, target: any = cg)
     else if (typeof target[prop] === "object")
     {
       translateModifierEffects(target[prop])
+    }
+  }
+}(cg));
+
+(function addIcons(target)
+{
+  for (var prop in target)
+  {
+    if (prop === "frame")
+    {
+      if (!target.icon && target.frame.length === 1)
+      {
+        target.icon = target.frame[0];
+      }
+    }
+    else if (typeof target[prop] === "object")
+    {
+      addIcons(target[prop])
     }
   }
 }(cg));

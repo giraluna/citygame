@@ -44,10 +44,11 @@ class Sprite extends PIXI.Sprite
   type: string;
   content: Content;
 
-  constructor( template )
+  constructor( template, frameIndex?: number )
   {
-    var _texture = PIXI.Texture.fromFrame(
-      template.frame);
+    var frame = isFinite(frameIndex) ? template.frame[frameIndex] : template.frame;
+    console.log(frame);
+    var _texture = PIXI.Texture.fromFrame(frame);
     super(_texture); //pixi caches and reuses the texture as needed
     
     this.type   = template.type;
@@ -76,10 +77,10 @@ class ContentSprite extends Sprite
 {
   content: Content;
 
-  constructor(type, content)
+  constructor(type, content, frameIndex: number)
   {
     this.content = content;
-    super(type);
+    super(type, frameIndex);
   }
 }
 
@@ -154,15 +155,16 @@ class Content
   {
     // todo needs to be split into multiple sprites for
     // large content z depth to be right
-    var _s = this.sprite = new ContentSprite( type, this );
+    
+    for (var i = 0; i < this.cells.length; i++)
+    {
+      var _cell = this.cells[i];
+      var _s = this.sprite = new ContentSprite( type, this, i );
 
-    // sprites aligned at the lowest point
-    var spriteOrigin =
-      [this.baseCell.gridPos[0] + this.size[0]-1, this.baseCell.gridPos[1] + this.size[1]-1]
+      _s.position = _cell.board.getCell(_cell.gridPos).sprite.position.clone();
 
-    _s.position = this.baseCell.board.getCell(spriteOrigin).sprite.position.clone();
-
-    this.baseCell.board.addSpriteToLayer(layer, _s, this.baseCell.gridPos);
+      _cell.board.addSpriteToLayer(layer, _s, _cell.gridPos);
+    }
   }
   applyModifiers()
   {

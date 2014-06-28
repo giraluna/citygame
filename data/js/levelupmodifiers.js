@@ -92,24 +92,28 @@ var levelUpModifiers;
         }
     };
 
-    levelUpModifiers.increasedLevelUpModifiers1 = {
-        type: "increasedLevelUpModifiers1",
-        title: "Increased knowledge",
-        description: "Choose from one extra modifier (if available) on subsequent level ups",
-        unlockConditions: [
-            {
-                type: "level",
-                value: 5
-            }
-        ],
-        onAdd: {
-            oneTime: false,
-            effect: function (player) {
-                player.levelUpModifiersPerLevelUp++;
-            }
-        }
-    };
-
+    /*
+    export var increasedLevelUpModifiers1: playerModifiers.IPlayerModifier =
+    {
+    type: "increasedLevelUpModifiers1",
+    title: "Increased knowledge",
+    description: "Choose from one extra modifier (if available) on subsequent level ups",
+    unlockConditions:
+    [
+    {
+    type: "level",
+    value: 5
+    }
+    ],
+    onAdd:
+    {
+    oneTime: false,
+    effect: function(player)
+    {
+    player.levelUpModifiersPerLevelUp++;
+    }
+    }
+    }*/
     levelUpModifiers.shoppingCostReduction1 = {
         type: "shoppingCostReduction1",
         title: "Supply chain",

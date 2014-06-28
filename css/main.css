@@ -103,6 +103,7 @@ progress::-webkit-progress-value {
   flex: 0 0 250px;
   position: relative;
   margin: 10px 0;
+  visibility: hidden;
 }
 @media (max-width: 600px) {
   #side-menu {

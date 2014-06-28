@@ -81,7 +81,7 @@ var UIComponents;
                     costText += "$";
                 }
 
-                var image = this.props.frameImages[building.frame];
+                var image = this.props.frameImages[building.icon];
                 imageProps.src = image.src;
 
                 var div = React.DOM.div(divProps, React.DOM.div({ className: "building-image-container" }, React.DOM.img(imageProps, null)), React.DOM.div({ className: "building-content" }, React.DOM.div({ className: "building-content-wrapper" }, React.DOM.div(titleProps, building.title), React.DOM.div(costProps, costText)), React.DOM.div(amountProps, amountBuilt)));

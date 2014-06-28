@@ -1,5 +1,7 @@
 /// <reference path="js/utility.d.ts" />
 /// <reference path="../data/js/names.d.ts" />
+/// <reference path="../data/js/playermodifiers.d.ts" />
+///
 var idGenerator = idGenerator || {};
 idGenerator.employee = 0;
 
@@ -88,6 +90,11 @@ var Employee = (function () {
             var rand = Math.random();
 
             var adjustedGrowth = this.growth[skill] * (2 / Math.log(this.skills[skill] + 0.5));
+
+            if (rand + adjustedGrowth > 1) {
+                this.skills[skill]++;
+                this.skillTotal++;
+            }
         }
     };
     return Employee;

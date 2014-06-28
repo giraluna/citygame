@@ -290,10 +290,6 @@ class ReactUI
     {
       
       props.player.addEmployee(selected.employee);
-      if (props.recruitingEmployee)
-      {
-        props.recruitingEmployee.trainSkill("recruitment");
-      }
     };
 
     var recruitCloseFN = function(selected)

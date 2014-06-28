@@ -193,9 +193,6 @@ var ReactUI = (function () {
         var self = this;
         var recruitConfirmFN = function (selected) {
             props.player.addEmployee(selected.employee);
-            if (props.recruitingEmployee) {
-                props.recruitingEmployee.trainSkill("recruitment");
-            }
         };
 
         var recruitCloseFN = function (selected) {

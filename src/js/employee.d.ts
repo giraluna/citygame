@@ -1,5 +1,6 @@
 /// <reference path="utility.d.ts" />
 /// <reference path="../../data/js/names.d.ts" />
+/// <reference path="../../data/js/playermodifiers.d.ts" />
 declare var idGenerator: any;
 interface ISkillsObj {
     negotiation: number;

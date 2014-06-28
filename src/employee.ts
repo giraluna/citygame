@@ -141,6 +141,12 @@ class Employee
 
       var adjustedGrowth =
         this.growth[skill] * ( 2 / Math.log(this.skills[skill] + 0.5) );
+
+      if (rand + adjustedGrowth > 1)
+      {
+        this.skills[skill]++;
+        this.skillTotal++;
+      }
     }
   }
 }

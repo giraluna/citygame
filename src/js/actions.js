@@ -102,6 +102,7 @@ var actions;
         var recruitCompleteFN = function () {
             employee.active = true;
             employee.currentAction = undefined;
+            employee.trainSkill("recruitment");
 
             var newEmployees = makeNewEmployees(employeeCount.actual, adjustedSkill);
             eventManager.dispatchEvent({

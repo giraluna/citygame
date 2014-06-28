@@ -188,6 +188,31 @@ module playerModifiers
       }
     ]
   }
+  export var clickModifier6: IPlayerModifier =
+  {
+    type: "clickModifier6",
+    title: "Way too much elbow grease",
+    description: "Clicking profit * 2",
+    cost: 100000,
+    unlockConditions:
+    [
+      {
+        type: "clicks",
+        value: 1500
+      },
+      {
+        type: "money",
+        value: 50000
+      }
+    ],
+    effects:
+    [
+      {
+        targets: ["click"],
+        multiplier: 2
+      }
+    ]
+  }
   export var parkingModifier1: IPlayerModifier =
   {
     type: "parkingModifier1",
@@ -297,7 +322,7 @@ module playerModifiers
   {
     type: "convenienceModifier2",
     title: "Lottery tickets",
-    description: "Convenience stores +1$ /s",
+    description: "Convenience stores +2$ /s",
     cost: 1500,
     unlockConditions:
     [
@@ -310,7 +335,7 @@ module playerModifiers
     [
       {
         targets: ["shopping"],
-        addedProfit: 1
+        addedProfit: 2
       }
     ]
   }
@@ -318,7 +343,7 @@ module playerModifiers
   {
     type: "convenienceModifier3",
     title: "Liquor license",
-    description: "Convenience store profits * 1.2",
+    description: "Convenience store profits * 1.3",
     cost: 5000,
     unlockConditions:
     [
@@ -331,7 +356,28 @@ module playerModifiers
     [
       {
         targets: ["shopping"],
-        multiplier: 1.2
+        multiplier: 1.3
+      }
+    ]
+  }
+  export var convenienceModifier4: IPlayerModifier =
+  {
+    type: "convenienceModifier4",
+    title: "Loss leaders",
+    description: "Shopping profits * 1.5",
+    cost: 25000,
+    unlockConditions:
+    [
+      {
+        type: "shopping",
+        value: 10
+      }
+    ],
+    effects:
+    [
+      {
+        targets: ["shopping"],
+        multiplier: 1.5
       }
     ]
   }
@@ -398,6 +444,27 @@ module playerModifiers
       }
     ]
   }
+  export var fastFoodModifier4: IPlayerModifier =
+  {
+    type: "fastFoodModifier4",
+    title: "Jumbo-size set meals",
+    description: "Fast food restaurant profits * 1.5",
+    cost: 35000,
+    unlockConditions:
+    [
+      {
+        type: "fastfood",
+        value: 10
+      }
+    ],
+    effects:
+    [
+      {
+        targets: ["fastfood"],
+        multiplier: 1.5
+      }
+    ]
+  }
   export var apartmentModifier1: IPlayerModifier =
   {
     type: "apartmentModifier1",
@@ -458,6 +525,27 @@ module playerModifiers
       {
         targets: ["apartment"],
         multiplier: 1.2
+      }
+    ]
+  }
+  export var apartmentModifier4: IPlayerModifier =
+  {
+    type: "apartmentModifier4",
+    title: "Fitness center",
+    description: "Apartment profits * 1.5",
+    cost: 75000,
+    unlockConditions:
+    [
+      {
+        type: "apartment",
+        value: 10
+      }
+    ],
+    effects:
+    [
+      {
+        targets: ["apartment"],
+        multiplier: 1.5
       }
     ]
   }
@@ -524,6 +612,27 @@ module playerModifiers
       }
     ]
   }
+  export var officeModifier4: IPlayerModifier =
+  {
+    type: "officeModifier4",
+    title: "Middle management",
+    description: "office profits * 1.5",
+    cost: 200000,
+    unlockConditions:
+    [
+      {
+        type: "office",
+        value: 5
+      }
+    ],
+    effects:
+    [
+      {
+        targets: ["office"],
+        multiplier: 1.5
+      }
+    ]
+  }
   export var factoryModifier1: IPlayerModifier =
   {
     type: "factoryModifier1",
@@ -549,7 +658,7 @@ module playerModifiers
   {
     type: "factoryModifier2",
     title: "Electricity powered factories",
-    description: "Factories +30$ /s",
+    description: "Factories +40$ /s",
     cost: 150000,
     unlockConditions:
     [
@@ -562,7 +671,7 @@ module playerModifiers
     [
       {
         targets: ["factory"],
-        addedProfit: 30
+        addedProfit: 40
       }
     ]
   }
@@ -571,12 +680,33 @@ module playerModifiers
     type: "factoryModifier3",
     title: "Baby animal powered factories",
     description: "Factory profits * 1.5",
-    cost: 500000,
+    cost: 350000,
     unlockConditions:
     [
       {
         type: "factory",
         value: 5
+      }
+    ],
+    effects:
+    [
+      {
+        targets: ["factory"],
+        multiplier: 1.5
+      }
+    ]
+  }
+  export var factoryModifier4: IPlayerModifier =
+  {
+    type: "factoryModifier4",
+    title: "Lubricated crankshafts",
+    description: "Factory profits * 1.5",
+    cost: 600000,
+    unlockConditions:
+    [
+      {
+        type: "factory",
+        value: 7
       }
     ],
     effects:
@@ -643,6 +773,27 @@ module playerModifiers
       {
         type: "hotel",
         value: 5
+      }
+    ],
+    effects:
+    [
+      {
+        targets: ["hotel"],
+        multiplier: 1.5
+      }
+    ]
+  }
+  export var hotelModifier4: IPlayerModifier =
+  {
+    type: "hotelModifier4",
+    title: "Guided tours",
+    description: "hotel profits * 1.5",
+    cost: 1000000,
+    unlockConditions:
+    [
+      {
+        type: "hotel",
+        value: 7
       }
     ],
     effects:

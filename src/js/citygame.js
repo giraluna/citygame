@@ -947,13 +947,17 @@ var Game = (function () {
         this.players[player.id] = player;
 
         // TODO have content types register themselves
-        var dailyProfitSystem = new ProfitSystem(1, this.systemsManager, this.players, ["fastfood", "shopping", "parking", "factory", "hotel"]);
-        var monthlyProfitSystem = new ProfitSystem(30, this.systemsManager, this.players, ["apartment"]);
-        var quarterlyProfitSystem = new ProfitSystem(90, this.systemsManager, this.players, ["office"]);
+        var dailyProfitSystem = new ProfitSystem(1, this.systemsManager, this.players, ["fastfood", "shopping", "parking", "factory", "hotel", "apartment", "office"]);
         this.systemsManager.addSystem("dailyProfitSystem", dailyProfitSystem);
+
+        /*
+        var monthlyProfitSystem = new ProfitSystem(30, this.systemsManager, this.players,
+        ["apartment"]);
+        var quarterlyProfitSystem = new ProfitSystem(90, this.systemsManager, this.players,
+        ["office"]);
         this.systemsManager.addSystem("monthlyProfitSystem", monthlyProfitSystem);
         this.systemsManager.addSystem("quarterlyProfitSystem", quarterlyProfitSystem);
-
+        */
         this.systemsManager.addSystem("delayedAction", new DelayedActionSystem(1, this.systemsManager));
         this.systemsManager.addSystem("autosave", new AutosaveSystem(60, this.systemsManager));
 

@@ -263,8 +263,8 @@ class Player
   addMoney(initialAmount, incomeType?: string, daysPerTick?: number, date?)
   {
     var amount = initialAmount;
-    
-    if (["sell", "initial"].indexOf(incomeType) > 0)
+
+    if (["sell", "initial"].indexOf(incomeType) < 0)
     {
       amount = this.getIndexedProfit(incomeType, initialAmount);
     }

@@ -518,7 +518,7 @@ var levelUpModifiers;
     levelUpModifiers.factoryPerLevel1 = {
         type: "factoryPerLevel1",
         title: "Experienced foremen",
-        description: "Factory profits * 1.01 per level",
+        description: "Factory profits * 1.02 per level",
         unlockConditions: [
             {
                 type: "level",
@@ -530,11 +530,11 @@ var levelUpModifiers;
                 player.addSpecialModifier({
                     type: "factoryPerLevel1",
                     title: "Experienced foremen",
-                    description: "Factory profits * 1.01 per level",
+                    description: "Factory profits * 1.02 per level",
                     effects: [
                         {
                             targets: ["factory"],
-                            multiplier: 1 + player.level * 0.01
+                            multiplier: 1 + player.level * 0.02
                         }
                     ]
                 });

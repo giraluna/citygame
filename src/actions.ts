@@ -55,8 +55,8 @@ module actions
       employee.active = true;
       employee.currAction = undefined;
       employee.trainSkill("negotiation");
-      player.addCell(cell);
       player.ownedCellsAmount--;
+      player.addCell(cell);
 
       blinkerTODO.removeCells(blinkerId);
       eventManager.dispatchEvent({type: "updateWorld", content: ""});
@@ -222,9 +222,9 @@ module actions
       employee.active = true;
       employee.currentAction = undefined;
       employee.trainSkill("construction");
+      player.amountBuiltPerType[buildingType.type]--;
       cell.changeContent(buildingType, true, player);
 
-      player.amountBuiltPerType[buildingType.type]--;
       blinkerTODO.removeCells(blinkerId);
       eventManager.dispatchEvent({type: "updateWorld", content: ""});
       

@@ -210,17 +210,14 @@ var Player = (function () {
 
         this.addMoney(value, "sell");
     };
-    Player.prototype.addMoney = function (initialAmount, incomeType, daysPerTick, date) {
+    Player.prototype.addMoney = function (initialAmount, incomeType, baseMultiplier, date) {
         var amount = initialAmount;
 
         if (["sell", "initial"].indexOf(incomeType) < 0) {
-            amount = this.getIndexedProfit(incomeType, initialAmount);
+            amount = this.getIndexedProfit(incomeType, initialAmount, baseMultiplier);
         }
 
         if (amount > 0 && incomeType !== "sell" && incomeType !== "initial") {
-            if (daysPerTick)
-                amount *= daysPerTick;
-
             this.addExperience(amount);
         }
 
@@ -472,14 +469,15 @@ var Player = (function () {
 
         return Math.floor(100 * (current / this.getExperienceForLevel(this.level)));
     };
-    Player.prototype.getModifiedProfit = function (initialAmount, type) {
+    Player.prototype.getModifiedProfit = function (initialAmount, type, baseMultiplier) {
         var amount = initialAmount;
+        var baseMultiplier = baseMultiplier || 1;
 
-        amount += this.modifierEffects.profit["global"].addedProfit;
+        amount += this.modifierEffects.profit["global"].addedProfit * baseMultiplier;
 
         if (type) {
             if (this.modifierEffects.profit[type]) {
-                amount += this.modifierEffects.profit[type].addedProfit;
+                amount += this.modifierEffects.profit[type].addedProfit * baseMultiplier;
                 if (amount > 0) {
                     amount *= this.modifierEffects.profit[type].multiplier;
                 }
@@ -494,12 +492,12 @@ var Player = (function () {
 
         return amount;
     };
-    Player.prototype.getIndexedProfit = function (type, amount) {
+    Player.prototype.getIndexedProfit = function (type, amount, baseMultiplier) {
         if (!this.indexedProfits[type])
             this.indexedProfits[type] = {};
 
         if (!this.indexedProfits[type][amount]) {
-            this.indexedProfits[type][amount] = this.getModifiedProfit(amount, type);
+            this.indexedProfits[type][amount] = this.getModifiedProfit(amount, type, baseMultiplier);
         }
 
         return this.indexedProfits[type][amount];

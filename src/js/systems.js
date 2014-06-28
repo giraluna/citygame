@@ -177,7 +177,7 @@ var ProfitSystem = (function (_super) {
                     if (isFinite(profit))
                         profitPerThisType += profit;
                 }
-                player.addMoney(profitPerThisType, this.targetTypes[ii], this.activationRate, currentDate);
+                player.addMoney(profitPerThisType, this.targetTypes[ii], targets.length, currentDate);
             }
         }
     };

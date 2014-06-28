@@ -260,18 +260,18 @@ class Player
 
     this.addMoney(value, "sell");
   }
-  addMoney(initialAmount, incomeType?: string, daysPerTick?: number, date?)
+  addMoney(initialAmount, incomeType?: string, baseMultiplier?: number, date?)
   {
     var amount = initialAmount;
 
     if (["sell", "initial"].indexOf(incomeType) < 0)
     {
-      amount = this.getIndexedProfit(incomeType, initialAmount);
+      amount = this.getIndexedProfit(incomeType, initialAmount, baseMultiplier);
     }
 
     if (amount > 0 && incomeType !== "sell" && incomeType !== "initial")
     {
-      if (daysPerTick) amount *= daysPerTick;
+      
       
       this.addExperience(amount);
     }
@@ -586,17 +586,18 @@ class Player
 
     return Math.floor( 100 * ( current / this.getExperienceForLevel(this.level) ) );
   }
-  getModifiedProfit(initialAmount: number, type?: string)
+  getModifiedProfit(initialAmount: number, type?: string, baseMultiplier?: number)
   {
     var amount = initialAmount;
+    var baseMultiplier = baseMultiplier || 1;
 
-    amount += this.modifierEffects.profit["global"].addedProfit;
+    amount += this.modifierEffects.profit["global"].addedProfit * baseMultiplier;
 
     if (type)
     {
       if (this.modifierEffects.profit[type])
       {
-        amount += this.modifierEffects.profit[type].addedProfit;
+        amount += this.modifierEffects.profit[type].addedProfit * baseMultiplier;
         if (amount > 0)
         {
           amount *= this.modifierEffects.profit[type].multiplier;
@@ -612,13 +613,13 @@ class Player
 
     return amount;
   }
-  getIndexedProfit(type, amount)
+  getIndexedProfit(type, amount, baseMultiplier)
   {
     if (!this.indexedProfits[type]) this.indexedProfits[type] = {};
 
     if (!this.indexedProfits[type][amount])
     {
-      this.indexedProfits[type][amount] = this.getModifiedProfit(amount, type);
+      this.indexedProfits[type][amount] = this.getModifiedProfit(amount, type, baseMultiplier);
     }
 
     return this.indexedProfits[type][amount];

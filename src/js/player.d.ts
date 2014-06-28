@@ -58,7 +58,7 @@ declare class Player {
     public addContent(content: any): void;
     public removeContent(content: any): void;
     public sellContent(content: any): void;
-    public addMoney(initialAmount: any, incomeType?: string, daysPerTick?: number, date?: any): any;
+    public addMoney(initialAmount: any, incomeType?: string, baseMultiplier?: number, date?: any): any;
     public subtractCost(amount: number): number;
     public addModifier(modifier: any, collection?: string, firstTime?: boolean): void;
     public addSpecialModifier(modifier: any): void;
@@ -74,8 +74,8 @@ declare class Player {
     public getExperienceForLevel(level: any): number;
     public setExperienceToNextLevel(): void;
     public getExperiencePercentage(): number;
-    public getModifiedProfit(initialAmount: number, type?: string): number;
-    public getIndexedProfit(type: any, amount: any): any;
+    public getModifiedProfit(initialAmount: number, type?: string, baseMultiplier?: number): number;
+    public getIndexedProfit(type: any, amount: any, baseMultiplier: any): any;
     public clearIndexedProfits(): void;
     public getUnlockConditionVariable(conditionType: string): any;
     public checkIfUnlocked(modifier: playerModifiers.IPlayerModifier): boolean;

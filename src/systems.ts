@@ -210,7 +210,7 @@ class ProfitSystem extends System
           if (isFinite(profit)) profitPerThisType += profit;
         }
         player.addMoney(profitPerThisType, this.targetTypes[ii],
-          this.activationRate, currentDate);
+          targets.length, currentDate);
       }
     }
   }

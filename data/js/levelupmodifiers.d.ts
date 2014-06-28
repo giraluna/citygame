@@ -19,11 +19,11 @@ declare module levelUpModifiers {
     var branchOffices1: playerModifiers.IPlayerModifier;
     var increasedRecruitQuality2: playerModifiers.IPlayerModifier;
     var prestigeEffectIncrease1: playerModifiers.IPlayerModifier;
-    var branchOffices2: playerModifiers.IPlayerModifier;
     var hotelParking1: playerModifiers.IPlayerModifier;
     var hotelFastfood1: playerModifiers.IPlayerModifier;
     var factoryPerLevel1: playerModifiers.IPlayerModifier;
     var prestigeHotel1: playerModifiers.IPlayerModifier;
+    var branchOffices2: playerModifiers.IPlayerModifier;
     var modifiersByUnlock: any;
     var allModifiers: any[];
 }

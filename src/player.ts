@@ -262,7 +262,12 @@ class Player
   }
   addMoney(initialAmount, incomeType?: string, daysPerTick?: number, date?)
   {
-    var amount = this.getIndexedProfit(incomeType, initialAmount);
+    var amount = initialAmount;
+    
+    if (["sell", "initial"].indexOf(incomeType) > 0)
+    {
+      amount = this.getIndexedProfit(incomeType, initialAmount);
+    }
 
     if (amount > 0 && incomeType !== "sell" && incomeType !== "initial")
     {
@@ -302,6 +307,15 @@ class Player
 
     return amount;
   }
+  subtractCost(amount: number)
+  {
+    if (!isFinite(amount)) throw new Error("Infinite amount of money subtracted");
+    this.money -= amount;
+    this.checkLockedModifiers("money");
+    this.updateElements();
+
+    return amount;
+  }
   addModifier(modifier, collection:string="modifiers", firstTime:boolean = true)
   {
     if (this[collection][modifier.type]) return;
@@ -311,7 +325,7 @@ class Player
 
       if (modifier.cost)
       {
-        this.addMoney(-modifier.cost);
+        this.subtractCost(modifier.cost);
       }
     }
 
@@ -583,10 +597,16 @@ class Player
       if (this.modifierEffects.profit[type])
       {
         amount += this.modifierEffects.profit[type].addedProfit;
-        amount *= this.modifierEffects.profit[type].multiplier;
+        if (amount > 0)
+        {
+          amount *= this.modifierEffects.profit[type].multiplier;
+        }
       }
     }
-    amount *= this.modifierEffects.profit["global"].multiplier;
+    if (amount > 0)
+    {
+      amount *= this.modifierEffects.profit["global"].multiplier;
+    }
 
     if (initialAmount > 0 && amount < 0) amount = 0;
 

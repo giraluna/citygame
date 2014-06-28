@@ -33,17 +33,17 @@ var actions;
         var blinkerId = blinkerTODO.idGenerator++;
 
         var onStartFN = function () {
-            player.ownedCellsAmount++;
             employee.active = false;
             employee.currAction = "buyCell";
-            player.addMoney(-price);
+            player.subtractCost(price);
+            player.ownedCellsAmount++;
         };
         var onCompleteFN = function () {
-            player.ownedCellsAmount--;
             employee.active = true;
             employee.currAction = undefined;
             employee.trainSkill("negotiation");
             player.addCell(cell);
+            player.ownedCellsAmount--;
 
             blinkerTODO.removeCells(blinkerId);
             eventManager.dispatchEvent({ type: "updateWorld", content: "" });
@@ -151,6 +151,7 @@ var actions;
 
         var baseCost = player.getBuildCost(buildingType);
         var adjustedCost = getActionCost([employee.skills["construction"]], baseCost).actual;
+        console.log(baseCost, adjustedCost);
 
         if (player.money < adjustedCost)
             return;
@@ -168,20 +169,20 @@ var actions;
                 buildArea[i].changeContent(cg.content.underConstruction, true);
             }
 
-            player.amountBuiltPerType[buildingType.type]++;
-            player.addMoney(-adjustedCost, "buildingCost");
+            player.subtractCost(adjustedCost);
             employee.active = false;
             employee.currentAction = "constructBuilding";
 
+            player.amountBuiltPerType[buildingType.type]++;
             eventManager.dispatchEvent({ type: "updateWorld", content: "" });
         };
         var constructBuildingCompleteFN = function () {
-            player.amountBuiltPerType[buildingType.type]--;
             employee.active = true;
             employee.currentAction = undefined;
             employee.trainSkill("construction");
             cell.changeContent(buildingType, true, player);
 
+            player.amountBuiltPerType[buildingType.type]--;
             blinkerTODO.removeCells(blinkerId);
             eventManager.dispatchEvent({ type: "updateWorld", content: "" });
 

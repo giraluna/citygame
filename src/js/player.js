@@ -211,7 +211,11 @@ var Player = (function () {
         this.addMoney(value, "sell");
     };
     Player.prototype.addMoney = function (initialAmount, incomeType, daysPerTick, date) {
-        var amount = this.getIndexedProfit(incomeType, initialAmount);
+        var amount = initialAmount;
+
+        if (["sell", "initial"].indexOf(incomeType) > 0) {
+            amount = this.getIndexedProfit(incomeType, initialAmount);
+        }
 
         if (amount > 0 && incomeType !== "sell" && incomeType !== "initial") {
             if (daysPerTick)
@@ -248,6 +252,15 @@ var Player = (function () {
 
         return amount;
     };
+    Player.prototype.subtractCost = function (amount) {
+        if (!isFinite(amount))
+            throw new Error("Infinite amount of money subtracted");
+        this.money -= amount;
+        this.checkLockedModifiers("money");
+        this.updateElements();
+
+        return amount;
+    };
     Player.prototype.addModifier = function (modifier, collection, firstTime) {
         if (typeof collection === "undefined") { collection = "modifiers"; }
         if (typeof firstTime === "undefined") { firstTime = true; }
@@ -258,7 +271,7 @@ var Player = (function () {
                 return;
 
             if (modifier.cost) {
-                this.addMoney(-modifier.cost);
+                this.subtractCost(modifier.cost);
             }
         }
 
@@ -467,10 +480,14 @@ var Player = (function () {
         if (type) {
             if (this.modifierEffects.profit[type]) {
                 amount += this.modifierEffects.profit[type].addedProfit;
-                amount *= this.modifierEffects.profit[type].multiplier;
+                if (amount > 0) {
+                    amount *= this.modifierEffects.profit[type].multiplier;
+                }
             }
         }
-        amount *= this.modifierEffects.profit["global"].multiplier;
+        if (amount > 0) {
+            amount *= this.modifierEffects.profit["global"].multiplier;
+        }
 
         if (initialAmount > 0 && amount < 0)
             amount = 0;

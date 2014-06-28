@@ -59,6 +59,7 @@ declare class Player {
     public removeContent(content: any): void;
     public sellContent(content: any): void;
     public addMoney(initialAmount: any, incomeType?: string, daysPerTick?: number, date?: any): any;
+    public subtractCost(amount: number): number;
     public addModifier(modifier: any, collection?: string, firstTime?: boolean): void;
     public addSpecialModifier(modifier: any): void;
     public addTimedModifier(modifier: any): void;

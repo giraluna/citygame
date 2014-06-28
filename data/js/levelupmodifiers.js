@@ -353,7 +353,7 @@ var levelUpModifiers;
     levelUpModifiers.clickFrenzy1 = {
         type: "clickFrenzy1",
         title: "Click frenzy",
-        description: "Clicking profits *7 for 2 minutes",
+        description: "Clicking profits *5 for 1 minutes",
         unlockConditions: [
             {
                 type: "level",
@@ -366,12 +366,12 @@ var levelUpModifiers;
                 player.addTimedModifier({
                     type: "clickFrenzy1",
                     title: "Click frenzy",
-                    description: "Clicking profits * 7 for 2 minutes",
-                    lifeTime: 1000 * 60 * 2,
+                    description: "Clicking profits * 5 for 1 minutes",
+                    lifeTime: 1000 * 60 * 1,
                     effects: [
                         {
                             targets: ["click"],
-                            multiplier: 1 + 7
+                            multiplier: 1 + 5
                         }
                     ]
                 });
@@ -451,33 +451,6 @@ var levelUpModifiers;
                         {
                             targets: ["global"],
                             multiplier: 1 + player.prestige * 0.005
-                        }
-                    ]
-                });
-            }
-        }
-    };
-
-    levelUpModifiers.branchOffices2 = {
-        type: "branchOffices2",
-        title: "Company headquarters",
-        description: "3% higher global profit per office building",
-        unlockConditions: [
-            {
-                type: "level",
-                value: 50
-            }
-        ],
-        dynamicEffect: {
-            "office": function (player) {
-                player.addSpecialModifier({
-                    type: "branchOffices2",
-                    title: "Company headquarters",
-                    description: "3% higher global profit per office building",
-                    effects: [
-                        {
-                            targets: ["global"],
-                            multiplier: 1 + player.amountBuiltPerCategory["office"] * 0.03
                         }
                     ]
                 });
@@ -593,6 +566,33 @@ var levelUpModifiers;
                         {
                             targets: ["hotel"],
                             multiplier: 1 + player.prestige * 0.02
+                        }
+                    ]
+                });
+            }
+        }
+    };
+
+    levelUpModifiers.branchOffices2 = {
+        type: "branchOffices2",
+        title: "Company headquarters",
+        description: "3% higher global profit per office building",
+        unlockConditions: [
+            {
+                type: "level",
+                value: 75
+            }
+        ],
+        dynamicEffect: {
+            "office": function (player) {
+                player.addSpecialModifier({
+                    type: "branchOffices2",
+                    title: "Company headquarters",
+                    description: "3% higher global profit per office building",
+                    effects: [
+                        {
+                            targets: ["global"],
+                            multiplier: 1 + player.amountBuiltPerCategory["office"] * 0.03
                         }
                     ]
                 });

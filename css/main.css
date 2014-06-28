@@ -215,10 +215,10 @@ progress::-webkit-progress-value {
   max-height: 350px;
   max-width: 450px;
   overflow-y: scroll;
+  cursor: auto;
 }
 .popup .popup-content > * {
   border: 1px solid #587982;
-  cursor: auto;
 }
 .popup .popup-content th {
   margin-bottom: 10px;
@@ -227,6 +227,7 @@ progress::-webkit-progress-value {
 }
 .popup .popup-content tr {
   text-align: center;
+  cursor: pointer;
 }
 .popup .popup-content td {
   padding: 0 5px;

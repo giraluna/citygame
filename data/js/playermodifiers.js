@@ -187,7 +187,7 @@ var playerModifiers;
         unlockConditions: [
             {
                 type: "parking",
-                value: 5
+                value: 3
             }
         ],
         effects: [
@@ -205,7 +205,7 @@ var playerModifiers;
         unlockConditions: [
             {
                 type: "parking",
-                value: 10
+                value: 5
             }
         ],
         effects: [
@@ -223,7 +223,7 @@ var playerModifiers;
         unlockConditions: [
             {
                 type: "parking",
-                value: 15
+                value: 10
             }
         ],
         effects: [
@@ -511,7 +511,7 @@ var playerModifiers;
         unlockConditions: [
             {
                 type: "office",
-                value: 5
+                value: 10
             }
         ],
         effects: [

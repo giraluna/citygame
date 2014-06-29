@@ -5,6 +5,7 @@
 ///
 /// <reference path="js/draggable.d.ts" />
 /// <reference path="js/splitmultilinetext.d.ts" />
+/// <reference path="js/modifierlist.d.ts" />
 /// 
 /// <reference path="js/list.d.ts" />
 
@@ -21,7 +22,7 @@ module UIComponents
 
     handleOk: function()
     {
-      var selected = this.refs.modifierList.state.selected;
+      var selected = this.refs.modifierList.refs.list.state.selected;
       if (!selected) return false;
 
       var closeAfter = this.props.onOk.call(null, selected);
@@ -63,42 +64,6 @@ module UIComponents
         onDrag: stopBubble
       }, this.props.closeBtnText || "Close");
 
-      var rows = [];
-      for (var i = 0; i < this.props.modifierList.length; i++)
-      {
-        var modifier = this.props.modifierList[i];
-        rows.push(
-        {
-          key: modifier.type,
-          data:
-          {
-            title: modifier.title,
-            cost:  modifier.cost || null,
-            costString: modifier.cost !== undefined ? beautify(modifier.cost) + "$" : null,
-            description: modifier.description,
-
-            modifier: modifier
-          }
-        });
-      }
-      var columns =
-      [
-        {
-          label: "Title",
-          key: "title"
-        },
-        {
-          label: "Cost",
-          key: "costString",
-          defaultOrder: "asc",
-          propToSortBy: "cost"
-        },
-        {
-          label: "Description",
-          key: "description",
-          notSortable: true
-        }
-      ];
 
       var text = this.splitMultilineText(this.props.text) || null;
 
@@ -115,21 +80,13 @@ module UIComponents
           onTouchStart: this.handleDragStart,
         },
           React.DOM.p( {className:"popup-text"}, text),
-          React.DOM.div( {className:"popup-content modifier-list",
+          React.DOM.div( {className:"popup-content",
               draggable: true, onDrag: stopBubble},
-            UIComponents.List(
+            UIComponents.ModifierList(
             {
-              // TODO fix declaration file and remove
-              // typescript qq without these
-              selected: null,
-              columns: null,
-              sortBy: null,
-              initialColumn: columns[1],
               ref: "modifierList",
               rowStylingFN: this.applyRowStyle,
-
-              listItems: rows,
-              initialColumns: columns
+              modifiers: this.props.modifierList
             })
           ),
           React.DOM.div( {className:"popup-buttons"},

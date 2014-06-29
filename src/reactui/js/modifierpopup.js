@@ -5,6 +5,7 @@
 ///
 /// <reference path="js/draggable.d.ts" />
 /// <reference path="js/splitmultilinetext.d.ts" />
+/// <reference path="js/modifierlist.d.ts" />
 ///
 /// <reference path="js/list.d.ts" />
 var UIComponents;
@@ -15,7 +16,7 @@ var UIComponents;
             this.props.onClose.call();
         },
         handleOk: function () {
-            var selected = this.refs.modifierList.state.selected;
+            var selected = this.refs.modifierList.refs.list.state.selected;
             if (!selected)
                 return false;
 
@@ -52,38 +53,6 @@ var UIComponents;
                 onDrag: stopBubble
             }, this.props.closeBtnText || "Close");
 
-            var rows = [];
-            for (var i = 0; i < this.props.modifierList.length; i++) {
-                var modifier = this.props.modifierList[i];
-                rows.push({
-                    key: modifier.type,
-                    data: {
-                        title: modifier.title,
-                        cost: modifier.cost || null,
-                        costString: modifier.cost !== undefined ? beautify(modifier.cost) + "$" : null,
-                        description: modifier.description,
-                        modifier: modifier
-                    }
-                });
-            }
-            var columns = [
-                {
-                    label: "Title",
-                    key: "title"
-                },
-                {
-                    label: "Cost",
-                    key: "costString",
-                    defaultOrder: "asc",
-                    propToSortBy: "cost"
-                },
-                {
-                    label: "Description",
-                    key: "description",
-                    notSortable: true
-                }
-            ];
-
             var text = this.splitMultilineText(this.props.text) || null;
 
             return (React.DOM.div({
@@ -95,18 +64,11 @@ var UIComponents;
                 onDragEnd: this.handleDragEnd,
                 onTouchStart: this.handleDragStart
             }, React.DOM.p({ className: "popup-text" }, text), React.DOM.div({
-                className: "popup-content modifier-list",
-                draggable: true, onDrag: stopBubble }, UIComponents.List({
-                // TODO fix declaration file and remove
-                // typescript qq without these
-                selected: null,
-                columns: null,
-                sortBy: null,
-                initialColumn: columns[1],
+                className: "popup-content",
+                draggable: true, onDrag: stopBubble }, UIComponents.ModifierList({
                 ref: "modifierList",
                 rowStylingFN: this.applyRowStyle,
-                listItems: rows,
-                initialColumns: columns
+                modifiers: this.props.modifierList
             })), React.DOM.div({ className: "popup-buttons" }, okBtn, closeBtn)));
         }
     });

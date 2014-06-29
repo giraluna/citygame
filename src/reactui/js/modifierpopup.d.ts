@@ -3,6 +3,7 @@
 /// <reference path="../../js/utility.d.ts" />
 /// <reference path="draggable.d.ts" />
 /// <reference path="splitmultilinetext.d.ts" />
+/// <reference path="modifierlist.d.ts" />
 /// <reference path="list.d.ts" />
 declare module UIComponents {
     var ModifierPopup: React.ReactComponentFactory<{}, React.ReactComponent<{}, {}>>;

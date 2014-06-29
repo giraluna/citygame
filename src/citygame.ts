@@ -47,7 +47,7 @@ class Sprite extends PIXI.Sprite
   constructor( template, frameIndex?: number )
   {
     var frame = isFinite(frameIndex) ? template.frame[frameIndex] : template.frame;
-    console.log(frame);
+    
     var _texture = PIXI.Texture.fromFrame(frame);
     super(_texture); //pixi caches and reuses the texture as needed
     

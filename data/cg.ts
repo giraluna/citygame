@@ -761,7 +761,7 @@ var cg: any =
         "cost": 25000,
         "buildTime": 14,
         "anchor": [0.5, 1],
-        "frame": ["hotel.png", "hotel.png"],
+        "frame": ["stretchystore_f0.png", "stretchystore_f1.png"],
         "icon": "stretchystore.png",
         "canNotBuildOn": ["water", "building", "road"],
         "effects":

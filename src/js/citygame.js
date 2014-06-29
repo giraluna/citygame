@@ -38,7 +38,7 @@ var Sprite = (function (_super) {
     __extends(Sprite, _super);
     function Sprite(template, frameIndex) {
         var frame = isFinite(frameIndex) ? template.frame[frameIndex] : template.frame;
-        console.log(frame);
+
         var _texture = PIXI.Texture.fromFrame(frame);
         _super.call(this, _texture); //pixi caches and reuses the texture as needed
 

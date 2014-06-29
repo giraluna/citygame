@@ -37,7 +37,7 @@ declare class Content {
     public baseType: string;
     public categoryType: string;
     public id: number;
-    public sprite: Sprite;
+    public sprites: Sprite[];
     public cells: Cell[];
     public baseCell: Cell;
     public size: number[];

@@ -47,7 +47,7 @@ class Sprite extends PIXI.Sprite
   constructor( template, frameIndex?: number )
   {
     var frame = isFinite(frameIndex) ? template.frame[frameIndex] : template.frame;
-    
+
     var _texture = PIXI.Texture.fromFrame(frame);
     super(_texture); //pixi caches and reuses the texture as needed
     
@@ -90,7 +90,7 @@ class Content
   baseType: string;
   categoryType: string;
   id: number;
-  sprite: Sprite;
+  sprites: Sprite[] = [];
   cells: Cell[];
   baseCell: Cell;
   size: number[];
@@ -159,7 +159,8 @@ class Content
     for (var i = 0; i < this.cells.length; i++)
     {
       var _cell = this.cells[i];
-      var _s = this.sprite = new ContentSprite( type, this, i );
+      var _s = new ContentSprite( type, this, i );
+      this.sprites.push(_s);
 
       _s.position = _cell.board.getCell(_cell.gridPos).sprite.position.clone();
 
@@ -202,11 +203,11 @@ class Content
       this.baseCell.removeAllPropagatedModifiers(this.type.translatedEffects);
     }
 
-    this.baseCell.board.removeSpriteFromLayer("content", this.sprite, this.baseCell.gridPos);
 
     for (var i = 0; i < this.cells.length; i++)
     {
       this.cells[i].content = undefined;
+      this.cells[i].board.removeSpriteFromLayer("content", this.sprites[i], this.cells[i].gridPos);
     }
   }
 }
@@ -362,7 +363,7 @@ class Cell
   {
     if (this.undergroundContent)
     {
-      this.board.removeSpriteFromLayer("undergroundContent", this.undergroundContent.sprite,
+      this.board.removeSpriteFromLayer("undergroundContent", this.undergroundContent.sprites[0],
         this.gridPos);
       this.undergroundContent = undefined;
     }
@@ -2575,7 +2576,7 @@ class UIDrawer
 
     var x = cellX;
     var y = (cell.content && pointing === "down")
-      ? cellY - cell.content.sprite.height * cell.content.sprite.worldTransform.a / 2
+      ? cellY - cell.content.sprites[0].height * cell.content.sprites[0].worldTransform.a / 2
       : cellY;
 
     var uiObj = this.active = new UIObject(this.layer)

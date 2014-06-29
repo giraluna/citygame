@@ -189,7 +189,6 @@ module actions
 
     var baseCost = player.getBuildCost(buildingType);
     var adjustedCost = getActionCost([employee.skills["construction"]], baseCost).actual;
-    console.log(baseCost, adjustedCost);
 
     if (player.money < adjustedCost) return;
 

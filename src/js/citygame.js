@@ -73,6 +73,7 @@ var ContentSprite = (function (_super) {
 
 var Content = (function () {
     function Content(props) {
+        this.sprites = [];
         this.baseProfit = 0;
         this.modifiers = {};
         this.modifiedProfit = 0;
@@ -114,7 +115,8 @@ var Content = (function () {
         if (typeof layer === "undefined") { layer = "content"; }
         for (var i = 0; i < this.cells.length; i++) {
             var _cell = this.cells[i];
-            var _s = this.sprite = new ContentSprite(type, this, i);
+            var _s = new ContentSprite(type, this, i);
+            this.sprites.push(_s);
 
             _s.position = _cell.board.getCell(_cell.gridPos).sprite.position.clone();
 
@@ -147,10 +149,9 @@ var Content = (function () {
             this.baseCell.removeAllPropagatedModifiers(this.type.translatedEffects);
         }
 
-        this.baseCell.board.removeSpriteFromLayer("content", this.sprite, this.baseCell.gridPos);
-
         for (var i = 0; i < this.cells.length; i++) {
             this.cells[i].content = undefined;
+            this.cells[i].board.removeSpriteFromLayer("content", this.sprites[i], this.cells[i].gridPos);
         }
     };
     return Content;
@@ -254,7 +255,7 @@ var Cell = (function () {
     Cell.prototype.changeUndergroundContent = function (type, update) {
         if (typeof update === "undefined") { update = true; }
         if (this.undergroundContent) {
-            this.board.removeSpriteFromLayer("undergroundContent", this.undergroundContent.sprite, this.gridPos);
+            this.board.removeSpriteFromLayer("undergroundContent", this.undergroundContent.sprites[0], this.gridPos);
             this.undergroundContent = undefined;
         }
 
@@ -2042,7 +2043,7 @@ var UIDrawer = (function () {
         var pointing = (screenY - textObject.height - 100 < 0) ? "up" : "down";
 
         var x = cellX;
-        var y = (cell.content && pointing === "down") ? cellY - cell.content.sprite.height * cell.content.sprite.worldTransform.a / 2 : cellY;
+        var y = (cell.content && pointing === "down") ? cellY - cell.content.sprites[0].height * cell.content.sprites[0].worldTransform.a / 2 : cellY;
 
         var uiObj = this.active = new UIObject(this.layer).delay(500).lifeTime(-1);
 

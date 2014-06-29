@@ -34,7 +34,7 @@ var Highlighter = (function () {
         for (var i = 0; i < cells.length; i++) {
             _sprites.push(cells[i].sprite);
             if (cells[i].content !== undefined) {
-                _sprites.push(cells[i].content.sprite);
+                _sprites = _sprites.concat(cells[i].content.sprites);
             }
         }
         this.tintSprites(_sprites, color, shouldGroup);

@@ -254,7 +254,7 @@ export var List = React.createClass({
       rowProps.key = item.key;
       rowProps.onClick = self.handleSelectRow.bind(null, item);
       rowProps.onTouchStart = self.handleSelectRow.bind(null, item);
-      if (self.state.selected.key === item.key)
+      if (self.state.selected && self.state.selected.key === item.key)
       {
         rowProps.className = "selected";
       }

@@ -1,6 +1,7 @@
 /// <reference path="../../lib/react.d.ts" />
 ///
 /// <reference path="js/sidemenu.d.ts" />
+/// <reference path="js/stats.d.ts" />
 var UIComponents;
 (function (UIComponents) {
     UIComponents.Stage = React.createClass({
@@ -26,7 +27,7 @@ var UIComponents;
                 onDragLeave: function (e) {
                     e.preventDefault();
                 }
-            }, popups), UIComponents.SideMenu({
+            }, popups), React.DOM.div(null, UIComponents.Stats({ player: this.props.player })), UIComponents.SideMenu({
                 player: this.props.player,
                 frameImages: this.props.frameImages,
                 // todo react definitions

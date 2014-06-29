@@ -1,6 +1,7 @@
 /// <reference path="../../lib/react.d.ts" />
 /// 
 /// <reference path="js/sidemenu.d.ts" />
+/// <reference path="js/stats.d.ts" />
 
 module UIComponents
 {
@@ -18,6 +19,7 @@ export var Stage = React.createClass(
     };
     return(
       React.DOM.div( {id:"react-wrapper"},
+        
         React.DOM.div(
           {
             id:"react-popups",
@@ -28,6 +30,10 @@ export var Stage = React.createClass(
           }, 
           popups
         ),
+
+        React.DOM.div(null, UIComponents.Stats({player: this.props.player})),
+
+
         UIComponents.SideMenu(
           {
             player: this.props.player,

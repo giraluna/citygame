@@ -170,12 +170,12 @@ progress::-webkit-progress-value {
     width: 70px;
   }
 }
-#bottom-menu #show-info {
+#bottom-menu .bottom-link {
   text-decoration: none;
   float: right;
   margin-left: 20px;
 }
-#bottom-menu #show-info:hover {
+#bottom-menu .bottom-link:hover {
   text-decoration: underline;
 }
 #react-container {
@@ -427,23 +427,55 @@ progress::-webkit-progress-value {
   flex: 0 0 auto;
   order: 5;
 }
-#info-container {
+.all-stats {
+  overflow-y: scroll;
+  max-height: 90%;
+}
+.stat-group {
+  border-bottom: 1px solid #b7b7b7;
+  padding: 8px 0;
+}
+.stat-header {
+  font-weight: bold;
+  font-size: 1.7em;
+  margin-bottom: 0.5em;
+}
+.stat-title {
+  font-weight: bold;
+  font-size: 0.9em;
+  margin-right: 0.5em;
+}
+.stat-subContent {
+  font-weight: lighter;
+  margin-left: 1em;
+}
+#stats-container {
   height: 100%;
   width: 100%;
-  z-index: 99;
+  z-index: 9998;
+  display: flex;
   position: absolute;
   top: 0;
   left: 0;
   background-color: rgba(0, 0, 0, 0.3);
   align-items: center;
   justify-content: center;
+  pointer-events: auto;
 }
-#info-container #info-window {
-  position: relative;
-  background-color: #dddddd;
-  padding: 25px;
+.fullscreen-popup {
+  height: 100%;
+  width: 100%;
+  z-index: 9998;
+  display: flex;
+  position: absolute;
+  bottom: 25px;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
 }
-#info-container #info-window #close-info {
+.fullscreen-popup .close-popup {
   margin: 7px;
   position: absolute;
   top: 0px;
@@ -451,6 +483,11 @@ progress::-webkit-progress-value {
   color: #444;
   text-decoration: none;
 }
-#info-container #info-window #close-info:hover {
+.fullscreen-popup .close-popup:hover {
   text-decoration: underline;
+}
+.fullscreen-popup > * {
+  position: relative;
+  background-color: #dddddd;
+  padding: 25px;
 }

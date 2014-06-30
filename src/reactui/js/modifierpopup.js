@@ -68,7 +68,8 @@ var UIComponents;
                 draggable: true, onDrag: stopBubble }, UIComponents.ModifierList({
                 ref: "modifierList",
                 rowStylingFN: this.applyRowStyle,
-                modifiers: this.props.modifierList
+                modifiers: this.props.modifierList,
+                excludeCost: this.props.excludeCost || false
             })), React.DOM.div({ className: "popup-buttons" }, okBtn, closeBtn)));
         }
     });

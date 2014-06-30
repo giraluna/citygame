@@ -74,6 +74,7 @@ var UIComponents;
                         "Select your bonus perk for level " + lowestLevel,
                         "You only get to pick one"],
                     modifierList: lowestModifierList,
+                    excludeCost: true,
                     okBtnText: "Select",
                     onOk: function (selected) {
                         var success = player.addLevelUpModifier(selected.data.modifier);

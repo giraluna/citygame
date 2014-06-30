@@ -218,6 +218,7 @@ class ReactUI
     onOk?: any;
     onClose?: any;
     okBtnText?: string;
+    excludeCost?: boolean;
   })
   {
     var onOk = props.onOk || function(selected)
@@ -234,6 +235,7 @@ class ReactUI
       player: props.player,
       text: props.text || null,
       modifierList: props.modifierList || props.player.unlockedModifiers,
+      excludeCost: props.excludeCost || false,
       onOk: onOk,
       onClose: props.onClose || null,
       okBtnText: props.okBtnText || "Buy"

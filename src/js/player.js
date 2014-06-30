@@ -33,6 +33,7 @@ var Player = (function () {
         this.timedModifiers = {};
         this.levelUpModifiers = {};
         this.specialModifiers = {};
+        this.defaultModifiers = {};
         this.modifierEffects = {
             profit: {},
             buildCost: {},
@@ -122,7 +123,7 @@ var Player = (function () {
         this.setExperienceToNextLevel();
         this.setInitialAvailableModifiers();
 
-        this.addModifier(playerModifiers.prestigeDefault);
+        this.addModifier(playerModifiers.prestigeDefault, "defaultModifiers");
     };
 
     Player.prototype.addEmployee = function (employee) {

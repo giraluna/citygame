@@ -57,6 +57,7 @@ declare class ReactUI {
         onOk?: any;
         onClose?: any;
         okBtnText?: string;
+        excludeCost?: boolean;
     }): void;
     public makeRecruitPopup(props: {
         player: Player;

@@ -1160,10 +1160,20 @@ var Game = (function () {
 
         //info
         addClickAndTouchEventListener(document.getElementById("show-info"), function () {
-            document.getElementById("info-container").style.display = "flex";
+            var _elStyle = document.getElementById("info-container").style;
+            if (_elStyle.display === "flex") {
+                _elStyle.display = "none";
+            } else {
+                _elStyle.display = "flex";
+            }
         });
         addClickAndTouchEventListener(document.getElementById("close-info"), function () {
             document.getElementById("info-container").style.display = "none";
+        });
+
+        //stats
+        addClickAndTouchEventListener(document.getElementById("show-stats"), function () {
+            eventManager.dispatchEvent({ type: "toggleStats", content: "" });
         });
 
         //renderer
@@ -1579,7 +1589,8 @@ var Game = (function () {
                 ],
                 modifierList: modifiersAvailableToPerm,
                 onOk: resetWithSelectedModifier,
-                okBtnText: "Reset"
+                okBtnText: "Reset",
+                excludeCost: true
             }
         });
     };

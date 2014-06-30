@@ -3,11 +3,27 @@
 /// <reference path="js/sidemenu.d.ts" />
 /// <reference path="js/stats.d.ts" />
 
+/// <reference path="../js/eventlistener.d.ts" />
+
 module UIComponents
 {
 
 export var Stage = React.createClass(
 {
+  getInitialState: function()
+  {
+    return {showStats:false};
+  },
+
+  componentDidMount: function()
+  {
+    var self = this;
+    eventManager.addEventListener("toggleStats", function()
+    {
+      self.setState({showStats: !self.state.showStats});
+    })
+  },
+
   render: function()
   {
     var self = this;
@@ -17,6 +33,12 @@ export var Stage = React.createClass(
       var popup = this.props.popups[_popup];
       popups.push( UIComponents[popup.type].call(null, popup.props) );
     };
+
+    var stats = this.state.showStats ?
+      React.DOM.div({id: "stats-container", className: "fullscreen-popup"},
+        UIComponents.Stats({player: this.props.player})) :
+        null;
+
     return(
       React.DOM.div( {id:"react-wrapper"},
         
@@ -31,7 +53,7 @@ export var Stage = React.createClass(
           popups
         ),
 
-        React.DOM.div(null, UIComponents.Stats({player: this.props.player})),
+        stats,
 
 
         UIComponents.SideMenu(

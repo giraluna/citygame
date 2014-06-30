@@ -43,6 +43,7 @@ class Player
   timedModifiers: any = {};
   levelUpModifiers: any = {};
   specialModifiers: any = {};
+  defaultModifiers: any = {};
 
   modifierEffects: any =
   {
@@ -164,7 +165,8 @@ class Player
     this.setExperienceToNextLevel();
     this.setInitialAvailableModifiers();
 
-    this.addModifier(playerModifiers.prestigeDefault);
+
+    this.addModifier(playerModifiers.prestigeDefault, "defaultModifiers");
   }
 
   addEmployee(employee: Employee)

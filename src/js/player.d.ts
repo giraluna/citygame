@@ -34,6 +34,7 @@ declare class Player {
     public timedModifiers: any;
     public levelUpModifiers: any;
     public specialModifiers: any;
+    public defaultModifiers: any;
     public modifierEffects: any;
     public unlockedModifiers: any[];
     public lockedModifiers: any[];

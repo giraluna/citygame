@@ -16,38 +16,48 @@ module UIComponents
       for (var i = 0; i < this.props.modifiers.length; i++)
       {
         var modifier = this.props.modifiers[i];
-        rows.push(
+        var item: any =
         {
           key: modifier.type,
           data:
           {
             title: modifier.title,
-            cost:  modifier.cost || null,
-            costString: modifier.cost !== undefined ? beautify(modifier.cost) + "$" : null,
             description: modifier.description,
 
             modifier: modifier
           }
-        });
-      }
-      var columns =
-      [
+        };
+        if (this.props.excludeCost !== true)
         {
-          label: "Title",
-          key: "title"
-        },
+          item.data.cost = modifier.cost || null;
+          item.data.costString = modifier.cost !== undefined ? beautify(modifier.cost) + "$" : null;
+        }
+
+        rows.push(item);
+      }
+      var columns = [];
+      columns.push(
+      {
+        label: "Title",
+        key: "title"
+      });
+
+      if (this.props.excludeCost !== true)
+      {
+        columns.push(
         {
           label: "Cost",
           key: "costString",
           defaultOrder: "asc",
           propToSortBy: "cost"
-        },
-        {
-          label: "Description",
-          key: "description",
-          notSortable: true
-        }
-      ];
+        });
+      }
+
+      columns.push(
+      {
+        label: "Description",
+        key: "description"
+      });
 
       return(
         UIComponents.List(

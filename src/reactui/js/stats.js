@@ -16,8 +16,12 @@ var UIComponents;
 (function (UIComponents) {
     UIComponents.Stats = React.createClass({
         mixins: [UIComponents.SplitMultilineText],
+        toggleSelf: function () {
+            eventManager.dispatchEvent({ type: "toggleStats", content: "" });
+        },
         render: function () {
             var player = this.props.player;
+            var allStats = [];
 
             var clicks = player.clicks;
 
@@ -32,55 +36,80 @@ var UIComponents;
                 },
                 {
                     title: "Prestige:",
-                    content: player.prestige,
-                    subContent: "for a total of " + (player.prestige * prestigeModifier) + "% " + "extra profit"
+                    content: player.prestige.toFixed(),
+                    subContent: "for a total of " + (player.prestige * prestigeModifier).toFixed(1) + "% " + "extra profit"
                 },
                 {
                     title: "Total experience across resets:",
-                    content: player.totalResetExperience
+                    content: player.totalResetExperience.toFixed()
                 }
             ];
             var prestigeStatList = UIComponents.StatList({
                 stats: prestigeStats,
-                header: "Prestige"
+                header: "Prestige",
+                key: "prestigeStatList"
             });
 
-            var permModifiers = [];
-            for (var i = 0; i < player.permanentLevelupUpgrades.length; i++) {
-                permModifiers.push(levelUpModifiers[player.permanentLevelupUpgrades[i]]);
+            allStats.push(prestigeStatList);
+
+            if (player.permanentLevelupUpgrades.length > 0) {
+                var permModifiers = [];
+                for (var i = 0; i < player.permanentLevelupUpgrades.length; i++) {
+                    permModifiers.push(levelUpModifiers[player.permanentLevelupUpgrades[i]]);
+                }
+                var permModifierList = UIComponents.ModifierList({
+                    ref: "permModifierList",
+                    modifiers: permModifiers,
+                    excludeCost: true
+                });
+
+                allStats.push(React.DOM.div({ className: "stat-group", key: "permModifierList" }, React.DOM.div({ className: "stat-header" }, "Permanent perks"), permModifierList));
             }
-            var permModifierList = UIComponents.ModifierList({
-                ref: "permModifierList",
-                modifiers: permModifiers
-            });
 
-            var perks = [];
-            for (var _mod in player.levelUpModifiers) {
-                if (player.permanentLevelupUpgrades.indexOf(_mod) > -1)
-                    continue;
-                else
-                    perks.push(player.levelUpModifiers[_mod]);
+            if (Object.keys(player.levelUpModifiers).length > 0) {
+                var perks = [];
+                for (var _mod in player.levelUpModifiers) {
+                    if (player.permanentLevelupUpgrades.indexOf(_mod) > -1)
+                        continue;
+                    else
+                        perks.push(player.levelUpModifiers[_mod]);
+                }
+                var perkList = UIComponents.ModifierList({
+                    ref: "perkList",
+                    modifiers: perks,
+                    excludeCost: true
+                });
+
+                allStats.push(React.DOM.div({ className: "stat-group", key: "perkList" }, React.DOM.div({ className: "stat-header" }, "Unlocked perks"), perkList));
             }
-            var perkList = UIComponents.ModifierList({
-                ref: "perkList",
-                modifiers: perks
-            });
 
-            var unlocks = [];
-            for (var _mod in player.modifiers) {
-                unlocks.push(player.modifiers[_mod]);
+            if (Object.keys(player.modifiers).length > 0) {
+                var unlocks = [];
+                for (var _mod in player.modifiers) {
+                    unlocks.push(player.modifiers[_mod]);
+                }
+                var unlockList = UIComponents.ModifierList({
+                    ref: "unlockList",
+                    modifiers: unlocks,
+                    excludeCost: true
+                });
+
+                allStats.push(React.DOM.div({ className: "stat-group", key: "unlockList" }, React.DOM.div({ className: "stat-header" }, "Upgrades"), unlockList));
             }
-            var unlockList = UIComponents.ModifierList({
-                ref: "unlockList",
-                modifiers: unlocks
-            });
+            if (Object.keys(player.employees).length > 0) {
+                var employeeList = UIComponents.EmployeeList({
+                    ref: "employeeList",
+                    employees: player.employees
+                });
 
-            var employeeList = UIComponents.EmployeeList({
-                ref: "employeeList",
-                employees: player.employees
-            });
+                allStats.push(React.DOM.div({ className: "stat-group", key: "employeeList" }, React.DOM.div({ className: "stat-header" }, "Employees"), employeeList));
+            }
 
-            return (React.DOM.div({ className: "all-stats" }, prestigeStatList, React.DOM.div({ className: "stat-group" }, React.DOM.div({ className: "stat-header" }, "Permanent perks"), permModifierList), React.DOM.div({ className: "stat-group" }, React.DOM.div({ className: "stat-header" }, "Unlocked perks"), perkList), React.DOM.div({ className: "stat-group" }, React.DOM.div({ className: "stat-header" }, "Upgrades"), unlockList), React.DOM.div({ className: "stat-group" }, React.DOM.div({ className: "stat-header" }, "Employees"), employeeList)));
+            return (React.DOM.div({ className: "all-stats" }, React.DOM.a({
+                id: "close-info", className: "close-popup", href: "#",
+                onClick: this.toggleSelf,
+                onTouchStart: this.toggleSelf
+            }, "X"), allStats));
         }
     });
 })(UIComponents || (UIComponents = {}));

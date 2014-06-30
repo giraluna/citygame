@@ -86,7 +86,8 @@ module UIComponents
             {
               ref: "modifierList",
               rowStylingFN: this.applyRowStyle,
-              modifiers: this.props.modifierList
+              modifiers: this.props.modifierList,
+              excludeCost: this.props.excludeCost || false
             })
           ),
           React.DOM.div( {className:"popup-buttons"},

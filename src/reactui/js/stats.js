@@ -25,6 +25,32 @@ var UIComponents;
 
             var clicks = player.clicks;
 
+            var generalStats = [
+                {
+                    title: "Money:",
+                    content: beautify(player.money) + "$"
+                },
+                {
+                    title: "Clicks:",
+                    content: player.clicks
+                },
+                {
+                    title: "Money from clicks:",
+                    content: beautify(player.incomePerType.click) + "$"
+                },
+                {
+                    title: "Owned plots:",
+                    content: player.ownedCellsAmount
+                }
+            ];
+            var generalStatList = UIComponents.StatList({
+                stats: generalStats,
+                header: "General",
+                key: "generalStatList"
+            });
+
+            allStats.push(generalStatList);
+
             var prestigeModifier = 1;
             if (player.levelUpModifiers.prestigeEffectIncrease1) {
                 prestigeModifier += 0.5;
@@ -40,8 +66,12 @@ var UIComponents;
                     subContent: "for a total of " + (player.prestige * prestigeModifier).toFixed(1) + "% " + "extra profit"
                 },
                 {
-                    title: "Total experience across resets:",
-                    content: player.totalResetExperience.toFixed()
+                    title: "Current experience:",
+                    content: beautify(player.experience)
+                },
+                {
+                    title: "Total experience:",
+                    content: beautify(player.totalResetExperience + player.experience)
                 }
             ];
             var prestigeStatList = UIComponents.StatList({

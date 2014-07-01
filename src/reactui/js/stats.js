@@ -36,7 +36,7 @@ var UIComponents;
                 },
                 {
                     title: "Money from clicks:",
-                    content: beautify(player.incomePerType.click) + "$"
+                    content: (player.incomePerType.click ? beautify(player.incomePerType.click) : 0) + "$"
                 },
                 {
                     title: "Owned plots:",

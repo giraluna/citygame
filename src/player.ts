@@ -66,6 +66,7 @@ class Player
   recentlyCheckedUnlockConditions: any = {};
 
   indexedProfits: any = {};
+  indexedProfitsWithoutGlobals: any = {};
 
   moneySpan: HTMLElement;
   incomeSpan: HTMLElement;
@@ -266,7 +267,7 @@ class Player
   {
     var amount = initialAmount;
 
-    if (["sell", "initial"].indexOf(incomeType) < 0)
+    if (incomeType && ["sell", "initial"].indexOf(incomeType) < 0)
     {
       amount = this.getIndexedProfit(incomeType, initialAmount, baseMultiplier);
     }
@@ -285,7 +286,6 @@ class Player
       {
         this.incomePerType[incomeType] = 0;
       }
-      
       this.incomePerType[incomeType] += amount;
     }
     if (date)
@@ -588,12 +588,16 @@ class Player
 
     return Math.floor( 100 * ( current / this.getExperienceForLevel(this.level) ) );
   }
-  getModifiedProfit(initialAmount: number, type?: string, baseMultiplier?: number)
+  getModifiedProfit(initialAmount: number, type?: string, baseMultiplier?: number,
+    includeGlobal:boolean=true)
   {
     var amount = initialAmount;
     var baseMultiplier = baseMultiplier || 1;
 
-    amount += this.modifierEffects.profit["global"].addedProfit * baseMultiplier;
+    if (includeGlobal)
+    {
+      amount += this.modifierEffects.profit["global"].addedProfit * baseMultiplier;
+    }
 
     if (type)
     {
@@ -606,7 +610,7 @@ class Player
         }
       }
     }
-    if (amount > 0)
+    if (includeGlobal && amount > 0)
     {
       amount *= this.modifierEffects.profit["global"].multiplier;
     }
@@ -625,6 +629,18 @@ class Player
     }
 
     return this.indexedProfits[type][amount];
+  }
+  getIndexedProfitWithoutGlobals(type, amount)
+  {
+    if (!this.indexedProfitsWithoutGlobals[type]) this.indexedProfitsWithoutGlobals[type] = {};
+
+    if (!this.indexedProfitsWithoutGlobals[type][amount])
+    {
+      this.indexedProfitsWithoutGlobals[type][amount] =
+        this.getModifiedProfit(amount, type, 1, false);
+    }
+
+    return this.indexedProfitsWithoutGlobals[type][amount];
   }
   clearIndexedProfits()
   {

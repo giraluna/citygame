@@ -3075,7 +3075,7 @@ class ClickTool extends Tool
     if (target.content && target.content.player &&
       target.content.player.id === player.id)
     {
-      baseAmount += player.getIndexedProfit(
+      baseAmount += player.getIndexedProfitWithoutGlobals(
         target.content.type.categoryType, target.content.modifiedProfit) * 0.25;
     }
 

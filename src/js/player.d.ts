@@ -45,6 +45,7 @@ declare class Player {
     public levelsAlreadyPicked: any;
     public recentlyCheckedUnlockConditions: any;
     public indexedProfits: any;
+    public indexedProfitsWithoutGlobals: any;
     public moneySpan: HTMLElement;
     public incomeSpan: HTMLElement;
     constructor(id: string, color?: number);
@@ -75,8 +76,9 @@ declare class Player {
     public getExperienceForLevel(level: any): number;
     public setExperienceToNextLevel(): void;
     public getExperiencePercentage(): number;
-    public getModifiedProfit(initialAmount: number, type?: string, baseMultiplier?: number): number;
+    public getModifiedProfit(initialAmount: number, type?: string, baseMultiplier?: number, includeGlobal?: boolean): number;
     public getIndexedProfit(type: any, amount: any, baseMultiplier: any): any;
+    public getIndexedProfitWithoutGlobals(type: any, amount: any): any;
     public clearIndexedProfits(): void;
     public getUnlockConditionVariable(conditionType: string): any;
     public checkIfUnlocked(modifier: playerModifiers.IPlayerModifier): boolean;

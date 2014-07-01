@@ -48,6 +48,7 @@ var Player = (function () {
         this.levelsAlreadyPicked = {};
         this.recentlyCheckedUnlockConditions = {};
         this.indexedProfits = {};
+        this.indexedProfitsWithoutGlobals = {};
         this.id = id;
         this.color = color;
         this.init();
@@ -214,7 +215,7 @@ var Player = (function () {
     Player.prototype.addMoney = function (initialAmount, incomeType, baseMultiplier, date) {
         var amount = initialAmount;
 
-        if (["sell", "initial"].indexOf(incomeType) < 0) {
+        if (incomeType && ["sell", "initial"].indexOf(incomeType) < 0) {
             amount = this.getIndexedProfit(incomeType, initialAmount, baseMultiplier);
         }
 
@@ -226,7 +227,6 @@ var Player = (function () {
             if (this.incomePerType[incomeType] === undefined) {
                 this.incomePerType[incomeType] = 0;
             }
-
             this.incomePerType[incomeType] += amount;
         }
         if (date) {
@@ -470,11 +470,14 @@ var Player = (function () {
 
         return Math.floor(100 * (current / this.getExperienceForLevel(this.level)));
     };
-    Player.prototype.getModifiedProfit = function (initialAmount, type, baseMultiplier) {
+    Player.prototype.getModifiedProfit = function (initialAmount, type, baseMultiplier, includeGlobal) {
+        if (typeof includeGlobal === "undefined") { includeGlobal = true; }
         var amount = initialAmount;
         var baseMultiplier = baseMultiplier || 1;
 
-        amount += this.modifierEffects.profit["global"].addedProfit * baseMultiplier;
+        if (includeGlobal) {
+            amount += this.modifierEffects.profit["global"].addedProfit * baseMultiplier;
+        }
 
         if (type) {
             if (this.modifierEffects.profit[type]) {
@@ -484,7 +487,7 @@ var Player = (function () {
                 }
             }
         }
-        if (amount > 0) {
+        if (includeGlobal && amount > 0) {
             amount *= this.modifierEffects.profit["global"].multiplier;
         }
 
@@ -502,6 +505,16 @@ var Player = (function () {
         }
 
         return this.indexedProfits[type][amount];
+    };
+    Player.prototype.getIndexedProfitWithoutGlobals = function (type, amount) {
+        if (!this.indexedProfitsWithoutGlobals[type])
+            this.indexedProfitsWithoutGlobals[type] = {};
+
+        if (!this.indexedProfitsWithoutGlobals[type][amount]) {
+            this.indexedProfitsWithoutGlobals[type][amount] = this.getModifiedProfit(amount, type, 1, false);
+        }
+
+        return this.indexedProfitsWithoutGlobals[type][amount];
     };
     Player.prototype.clearIndexedProfits = function () {
         this.indexedProfits = {};

@@ -2459,7 +2459,7 @@ var ClickTool = (function (_super) {
         var baseAmount = 0;
 
         if (target.content && target.content.player && target.content.player.id === player.id) {
-            baseAmount += player.getIndexedProfit(target.content.type.categoryType, target.content.modifiedProfit) * 0.25;
+            baseAmount += player.getIndexedProfitWithoutGlobals(target.content.type.categoryType, target.content.modifiedProfit) * 0.25;
         }
 
         var finalAmount = player.addMoney(baseAmount, "click");

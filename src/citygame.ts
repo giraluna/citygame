@@ -825,6 +825,11 @@ class Cell
     
     this.landValue = Math.round(
       (this.baseLandValue + totals.addedValue) * totals.multiplier );
+
+    if (this.landValue < this.baseLandValue * 0.25)
+    {
+      this.landValue = this.baseLandValue * 0.25;
+    }
   }
   addOverlay(color, depth:number = 1)
   {

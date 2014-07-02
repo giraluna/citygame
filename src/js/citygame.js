@@ -624,6 +624,10 @@ var Cell = (function () {
         }
 
         this.landValue = Math.round((this.baseLandValue + totals.addedValue) * totals.multiplier);
+
+        if (this.landValue < this.baseLandValue * 0.25) {
+            this.landValue = this.baseLandValue * 0.25;
+        }
     };
     Cell.prototype.addOverlay = function (color, depth) {
         if (typeof depth === "undefined") { depth = 1; }

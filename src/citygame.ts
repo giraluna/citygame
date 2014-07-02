@@ -1945,7 +1945,7 @@ class Game
       newPlayer.timesReset = player.timesReset + 1;
       newPlayer.totalResetExperience = player.totalResetExperience + player.experience;
       newPlayer.permanentLevelupUpgrades = player.permanentLevelupUpgrades.slice(0);
-      newPlayer.permanentLevelupUpgrades.push(toPerm.data.modifier.type);
+      if (toPerm) newPlayer.permanentLevelupUpgrades.push(toPerm.data.modifier.type);
 
       newPlayer.applyPermedModifiers();
       newPlayer.applyPrestige();

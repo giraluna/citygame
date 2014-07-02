@@ -23,7 +23,15 @@ module UIComponents
     handleOk: function()
     {
       var selected = this.refs.modifierList.refs.list.state.selected;
-      if (!selected) return false;
+      
+      if (!selected)
+      {
+        if (this.props.modifierList.length < 1)
+        {
+          this.handleClose();
+        }
+        else return false;
+      }
 
       var closeAfter = this.props.onOk.call(null, selected);
 

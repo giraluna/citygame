@@ -80,7 +80,8 @@ class Player
   }
   updateElements()
   {
-    var beautified = beautify(this.money) + "$";
+    var moneyBeautifyIndex = this.money > 999999 ? 3 : 0;
+    var beautified = beautify(this.money, moneyBeautifyIndex) + "$";
     var expBeautifyIndex = this.experienceToNextLevel > 999999 ? 2 : 0;
 
     var rolling = this.rollingIncome.reduce(function(a,b)
@@ -796,6 +797,14 @@ class Player
 
         toUnlock.push(toAdd[0]);
       }
+    }
+
+    if (toUnlock.length < 1)
+    {
+      this.unlockedLevelUpModifiers[level] = null;
+      delete this.unlockedLevelUpModifiers[level];
+
+      return;
     }
 
 

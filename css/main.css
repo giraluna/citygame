@@ -423,6 +423,9 @@ progress::-webkit-progress-value {
   margin: 0 auto;
   height: 30px;
 }
+.stat-string-wrapper > * {
+  overflow: hidden;
+}
 #side-menu-modifiers {
   flex: 0 0 auto;
   order: 5;

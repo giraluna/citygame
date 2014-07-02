@@ -56,7 +56,7 @@ var Player = (function () {
     }
     Player.prototype.updateElements = function () {
         var moneyBeautifyIndex = this.money > 999999 ? 3 : 0;
-        var beautified = beautify(this.money, moneyBeautifyIndex) + "$";
+        var beautified = "$" + beautify(this.money, moneyBeautifyIndex);
         var expBeautifyIndex = this.experienceToNextLevel > 999999 ? 2 : 0;
 
         var rolling = this.rollingIncome.reduce(function (a, b) {

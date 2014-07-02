@@ -1585,6 +1585,7 @@ var Game = (function () {
                     "You can start over from scratch in a new city",
                     "",
                     "You would gain an additional " + prestigeGained.toFixed(1) + " prestige",
+                    "for a total of " + newPrestige.toFixed(1) + " prestige",
                     "You can also permanently unlock one of the following upgrades:"
                 ],
                 modifierList: modifiersAvailableToPerm,

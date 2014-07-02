@@ -90,6 +90,7 @@ declare class Player {
     public unlockLevelUpModifiers(level: any): void;
     public addLevelUpModifier(modifier: any, preventMultiplePerLevel?: boolean, firstTime?: boolean): boolean;
     public applyPermedModifiers(firstTime?: boolean): void;
+    public getPrestige(exp: number): number;
     public applyPrestige(): void;
     public addToRollingIncome(amount: any, date: any): void;
 }

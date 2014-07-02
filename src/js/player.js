@@ -685,8 +685,12 @@ var Player = (function () {
             this.addLevelUpModifier(modifier, false, firstTime);
         }
     };
+    Player.prototype.getPrestige = function (exp) {
+        return Math.pow(exp / 1000000, 0.75);
+    };
     Player.prototype.applyPrestige = function () {
-        this.prestige = this.totalResetExperience / 1000000;
+        this.prestige = this.getPrestige(this.totalResetExperience);
+
         this.updateDynamicModifiers("prestige");
     };
     Player.prototype.addToRollingIncome = function (amount, date) {

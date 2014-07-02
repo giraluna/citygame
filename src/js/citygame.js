@@ -1528,8 +1528,6 @@ var Game = (function () {
         if (player.level < 100)
             return;
 
-        var prestigeGained = player.experience / 1000000;
-
         var resetWithSelectedModifier = function (toPerm) {
             var newPlayer = new Player(player.id);
 
@@ -1575,7 +1573,9 @@ var Game = (function () {
                 modifiersAvailableToPerm.push(modifier);
             }
         }
-        var newPrestige = player.prestige + prestigeGained;
+        var currPrestige = player.getPrestige(player.totalResetExperience);
+        var newPrestige = player.getPrestige(player.experience + player.totalResetExperience);
+        var prestigeGained = newPrestige - currPrestige;
 
         eventManager.dispatchEvent({
             type: "makeModifierPopup",

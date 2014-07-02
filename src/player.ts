@@ -838,9 +838,14 @@ class Player
       this.addLevelUpModifier(modifier, false, firstTime);
     }
   }
+  getPrestige(exp: number)
+  {
+    return Math.pow(exp / 1000000, 0.75);
+  }
   applyPrestige()
   {
-    this.prestige = this.totalResetExperience / 1000000;
+    this.prestige = this.getPrestige(this.totalResetExperience);
+
     this.updateDynamicModifiers("prestige");
   }
   addToRollingIncome(amount, date)

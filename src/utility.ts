@@ -561,7 +561,7 @@ function getReverseDir(dir: string)
 // https://github.com/Icehawk78/FrozenCookies/blob/master/fc_main.js#L132
 // license?: https://github.com/Icehawk78/FrozenCookies/issues/45
 
-function formatEveryThirdPower(notations): any
+function formatEveryThirdPower(notations,precision:number): any
 {
   return function (value) {
     var base = 0,
@@ -578,7 +578,7 @@ function formatEveryThirdPower(notations): any
         notationValue = notations[base];
       }
     }
-    return ( (Math.round(value * 1000) / 1000).toFixed(2) ) + notationValue;
+    return ( (Math.round(value * 1000) / 1000).toFixed(precision) ) + notationValue;
   };
 }
 
@@ -590,7 +590,7 @@ var numberFormatters = [
   rawFormatter,
   formatEveryThirdPower([
     '',
-    '',
+    ' million',
     ' billion',
     ' trillion',
     ' quadrillion',
@@ -600,7 +600,7 @@ var numberFormatters = [
     ' octillion',
     ' nonillion',
     ' decillion'
-  ]),
+  ], 2),
 
   formatEveryThirdPower([
     '',
@@ -614,7 +614,21 @@ var numberFormatters = [
     ' Oc',
     ' No',
     ' De'
-  ])
+  ],2),
+
+  formatEveryThirdPower([
+    '',
+    ' M',
+    ' B',
+    ' T',
+    ' Qa',
+    ' Qi',
+    ' Sx',
+    ' Sp',
+    ' Oc',
+    ' No',
+    ' De'
+  ],3)
 ];
 
 function beautify (value: number, formatterIndex:number = 0)

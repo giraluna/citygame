@@ -205,7 +205,7 @@ module cellModifiers
       landValue:
       {
         radius: 5,
-        multiplier: -0.1,
+        multiplier: -0.07,
         falloffFN: function(distance, invertedDistance, invertedDistanceRatio)
         {
           return invertedDistance * invertedDistanceRatio / 2;

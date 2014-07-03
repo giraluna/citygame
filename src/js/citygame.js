@@ -1526,7 +1526,7 @@ var Game = (function () {
             player.addModifier(playerModifiers[data.modifiers[_mod]], "modifiers", false);
         }
         for (var _mod in data.levelUpModifiers) {
-            player.addLevelUpModifier(levelUpModifiers[data.levelUpModifiers[_mod]], true, false);
+            player.addLevelUpModifier(levelUpModifiers[data.levelUpModifiers[_mod]], false, false);
         }
         player.levelsAlreadyPicked = data.levelsAlreadyPicked || {};
 

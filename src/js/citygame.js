@@ -425,28 +425,51 @@ var Cell = (function () {
         } else
             this.content.remove();
     };
-    Cell.prototype.addModifier = function (modifier) {
+    Cell.prototype.checkIfModifierApplies = function (modifier) {
+        if (this.content && (arrayLogic.or(modifier.targets, this.flags) || (this.content && arrayLogic.or(modifier.targets, this.content.flags)))) {
+            return true;
+        } else {
+            return false;
+        }
+    };
+    Cell.prototype.getModifierPolarity = function (modifier) {
+        if (!this.content)
+            return null;
+
+        if (arrayLogic.or(modifier.targets, this.content.flags)) {
+            var firstProp = modifier.effect[Object.keys(modifier.effect)[0]];
+            return firstProp > 0;
+        }
+
+        return null;
+    };
+    Cell.prototype.addModifier = function (modifier, source) {
         if (!this.modifiers[modifier.type]) {
             this.modifiers[modifier.type] = Object.create(modifier);
+            this.modifiers[modifier.type].sources = [];
         } else {
             this.modifiers[modifier.type].strength += modifier.strength;
         }
         ;
+        this.modifiers[modifier.type].sources.push(source);
 
         // check to see if modifiers need to be updated
-        if (this.content && (arrayLogic.or(modifier.targets, this.flags) || (this.content && arrayLogic.or(modifier.targets, this.content.flags)))) {
+        if (this.checkIfModifierApplies) {
             this.applyModifiersToContent();
         }
     };
-    Cell.prototype.removeModifier = function (modifier) {
+    Cell.prototype.removeModifier = function (modifier, source) {
         if (!this.modifiers[modifier.type])
             return;
         this.modifiers[modifier.type].strength -= modifier.strength;
+        this.modifiers[modifier.type].sources = this.modifiers[modifier.type].sources.filter(function (_source) {
+            return _source !== source;
+        });
         if (this.modifiers[modifier.type].strength <= 0) {
             delete this.modifiers[modifier.type];
         }
 
-        if (this.content && (arrayLogic.or(modifier.targets, this.flags) || (this.content && arrayLogic.or(modifier.targets, this.content.flags)))) {
+        if (this.checkIfModifierApplies) {
             this.applyModifiersToContent();
         }
     };
@@ -459,7 +482,7 @@ var Cell = (function () {
 
         for (var cell in effectedCells) {
             if (effectedCells[cell] !== this) {
-                effectedCells[cell].addModifier(modifier);
+                effectedCells[cell].addModifier(modifier, this);
             }
         }
         if (modifier.landValue)
@@ -478,7 +501,7 @@ var Cell = (function () {
         });
 
         for (var cell in effectedCells) {
-            effectedCells[cell].removeModifier(modifier);
+            effectedCells[cell].removeModifier(modifier, this);
         }
         if (modifier.landValue)
             this.removePropagatedLandValueModifier(modifier);
@@ -490,14 +513,16 @@ var Cell = (function () {
     };
 
     // todo: rework later to only update modifiers that have changed
-    Cell.prototype.getValidModifiers = function () {
-        if (!this.content)
+    Cell.prototype.getValidModifiers = function (contentType) {
+        if (typeof contentType === "undefined") { contentType = this.content.type; }
+        if (!contentType)
             return;
+        var flags = [contentType.baseType, contentType.categoryType];
 
         var validModifiers = {};
         for (var modifierType in this.modifiers) {
             var modifier = this.modifiers[modifierType];
-            if (arrayLogic.or(modifier.targets, this.flags) || (arrayLogic.or(modifier.targets, this.content.flags))) {
+            if (arrayLogic.or(modifier.targets, this.flags) || (arrayLogic.or(modifier.targets, flags))) {
                 validModifiers[modifierType] = modifier;
             }
         }
@@ -625,8 +650,8 @@ var Cell = (function () {
 
         this.landValue = Math.round((this.baseLandValue + totals.addedValue) * totals.multiplier);
 
-        if (this.landValue < this.baseLandValue * 0.25) {
-            this.landValue = this.baseLandValue * 0.25;
+        if (this.landValue < this.baseLandValue * 0.33) {
+            this.landValue = Math.round(this.baseLandValue * 0.33);
         }
     };
     Cell.prototype.addOverlay = function (color, depth) {
@@ -1814,6 +1839,7 @@ var MouseEventHandler = (function () {
             this.stashedAction = undefined;
             this.startPoint = undefined;
             this.scroller.end();
+            game.uiDrawer.clearAllObjects();
             game.highlighter.clearSprites();
             game.updateWorld();
         } else if (event.originalEvent.ctrlKey || event.originalEvent.metaKey || (event.originalEvent.button === 1 || event.originalEvent.button === 2)) {
@@ -1903,6 +1929,10 @@ var MouseEventHandler = (function () {
         if (game.activeTool.tintColor !== null) {
             game.highlighter.tintCells(this.selectedCells, game.activeTool.tintColor);
         }
+        if (game.activeTool.onHover) {
+            game.uiDrawer.clearAllObjects();
+            game.activeTool.onHover(this.selectedCells);
+        }
         game.updateWorld();
     };
     MouseEventHandler.prototype.worldMove = function (event) {
@@ -1922,6 +1952,10 @@ var MouseEventHandler = (function () {
             excludeStart: true
             });*/
             game.highlighter.clearSprites();
+            if (game.activeTool.onHover) {
+                game.uiDrawer.clearAllObjects();
+                game.activeTool.onHover(this.selectedCells);
+            }
             if (game.activeTool.tintColor !== null) {
                 game.highlighter.tintCells(this.selectedCells, game.activeTool.tintColor);
             }
@@ -1931,6 +1965,7 @@ var MouseEventHandler = (function () {
     MouseEventHandler.prototype.worldEnd = function (event) {
         game.activeTool.activate(this.selectedCells);
 
+        game.uiDrawer.clearAllObjects();
         game.highlighter.clearSprites();
         this.currAction = undefined;
         this.startCell = undefined;
@@ -1964,6 +1999,7 @@ var UIDrawer = (function () {
     function UIDrawer() {
         this.fonts = {};
         this.styles = {};
+        this.permanentUIObjects = [];
         this.layer = game.layers["tooltips"];
         this.init();
     }
@@ -1976,7 +2012,21 @@ var UIDrawer = (function () {
             },
             black: {
                 font: "bold 20pt Arial",
-                fill: "000000",
+                fill: "#000000",
+                align: "left"
+            },
+            green: {
+                font: "bold 20pt Arial",
+                fill: "#00FF00",
+                stroke: "#005500",
+                strokeThickness: 1,
+                align: "left"
+            },
+            red: {
+                font: "bold 20pt Arial",
+                fill: "#FF0000",
+                stroke: "#550000",
+                strokeThickness: 1,
                 align: "left"
             }
         };
@@ -1997,6 +2047,14 @@ var UIDrawer = (function () {
             this.active.remove();
             this.active = undefined;
         }
+    };
+    UIDrawer.prototype.clearAllObjects = function () {
+        for (var i = 0; i < this.permanentUIObjects.length; i++) {
+            this.permanentUIObjects[i].remove();
+        }
+        this.permanentUIObjects = [];
+
+        this.removeActive();
     };
 
     UIDrawer.prototype.makeCellTooltip = function (event, cell, container) {
@@ -2081,11 +2139,30 @@ var UIDrawer = (function () {
 
         return uiObj;
     };
-    UIDrawer.prototype.makeCellPopup = function (cell, text, container) {
+    UIDrawer.prototype.makeCellPopup = function (cell, text, container, fontName) {
+        if (typeof fontName === "undefined") { fontName = "black"; }
         var pos = cell.getScreenPos(container);
-        var content = new PIXI.Text(text, this.fonts["black"]);
+        var content = new PIXI.Text(text, this.fonts[fontName]);
 
         this.makeFadeyPopup([pos[0], pos[1]], [0, -20], 2000, content);
+    };
+    UIDrawer.prototype.makePermanentCellPopup = function (cell, text, container, fontName) {
+        if (typeof fontName === "undefined") { fontName = "black"; }
+        var pos = cell.getScreenPos(container);
+        var content = new PIXI.Text(text, this.fonts[fontName]);
+
+        var uiObj = new UIObject(this.layer);
+        uiObj.position.set(pos[0], pos[1]);
+
+        if (content.width) {
+            content.position.x -= content.width / 2;
+            content.position.y -= content.height / 2;
+        }
+
+        uiObj.addChild(content);
+        uiObj.start();
+
+        this.permanentUIObjects.push(uiObj);
     };
     UIDrawer.prototype.makeFadeyPopup = function (pos, drift, lifeTime, content, easing) {
         if (typeof easing === "undefined") { easing = TWEEN.Easing.Linear.None; }
@@ -2121,6 +2198,7 @@ var UIDrawer = (function () {
         uiObj.addChild(content);
 
         uiObj.start();
+        return uiObj;
     };
 
     UIDrawer.prototype.clearLayer = function () {
@@ -2152,6 +2230,8 @@ var Tool = (function () {
         }
     };
     Tool.prototype.onActivate = function (target) {
+    };
+    Tool.prototype.onHover = function (targets) {
     };
     return Tool;
 })();
@@ -2444,6 +2524,53 @@ var BuildTool = (function (_super) {
                         text: "You need to purchase that plot first"
                     }
                 });
+            }
+        }
+    };
+    BuildTool.prototype.onHover = function (targets) {
+        var baseCell = targets[0];
+        if (!baseCell)
+            return;
+
+        var effects = {
+            positive: [],
+            negative: []
+        };
+
+        for (var i = 0; i < this.selectedBuildingType.translatedEffects.length; i++) {
+            var modifier = this.selectedBuildingType.translatedEffects[i];
+            var categoryType = this.selectedBuildingType.categoryType;
+            var effectedCells = baseCell.getArea({
+                size: modifier.range,
+                centerSize: modifier.center,
+                excludeStart: true
+            });
+
+            for (var _cell in effectedCells) {
+                var cell = effectedCells[_cell];
+
+                var polarity = cell.getModifierPolarity(modifier);
+
+                if (polarity === null)
+                    continue;
+                else {
+                    var font = polarity === true ? "green" : "red";
+                    var text = polarity === true ? "+" : "-";
+                    game.uiDrawer.makePermanentCellPopup(cell, text, game.worldRenderer.worldSprite, font);
+                }
+            }
+        }
+        var currentModifiers = baseCell.getValidModifiers(this.selectedBuildingType);
+
+        for (var _mod in currentModifiers) {
+            var sources = currentModifiers[_mod].sources;
+            var _polarity = currentModifiers[_mod].effect[Object.keys(currentModifiers[_mod].effect)[0]] > 0;
+
+            var font = _polarity === true ? "green" : "red";
+            var text = _polarity === true ? "+" : "-";
+
+            for (var i = 0; i < sources.length; i++) {
+                game.uiDrawer.makePermanentCellPopup(sources[i], text, game.worldRenderer.worldSprite, font);
             }
         }
     };

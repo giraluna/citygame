@@ -44,7 +44,6 @@ class UIObject extends PIXI.DisplayObjectContainer
             function UIObjectRemoveFN()
             {
               self.remove.call(self);
-              self.fireCallbacks("complete");
             }, self._lifeTime)
         }
       }, self._delay)
@@ -87,6 +86,7 @@ class UIObject extends PIXI.DisplayObjectContainer
   }
   remove()
   {
+    this.fireCallbacks("complete");
     this.clearTimeouts();
     if (this.parent)
     {

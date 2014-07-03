@@ -677,7 +677,7 @@ var cg = {
                 "effects": [
                     {
                         "type": "shoppingCompetition",
-                        "range": 4,
+                        "range": 3,
                         "strength": 2
                     },
                     {
@@ -761,6 +761,11 @@ function findType(typeName, target) {
     for (var prop in target) {
         if (prop === "effects") {
             var newEffects = [];
+            var effectTargets = {
+                negative: {},
+                positive: {}
+            };
+
             for (var i = 0; i < target.effects.length; i++) {
                 var e = target.effects[i];
                 if (!cellModifiers[e.type])
@@ -775,10 +780,48 @@ function findType(typeName, target) {
                 };
 
                 newEffects.push(translated);
+
+                for (var effect in translated.effect) {
+                    var typeOfEffect = "positive";
+                    if (translated.effect[effect] < 0) {
+                        typeOfEffect = "negative";
+                    }
+                    for (var j = 0; j < translated.targets.length; j++) {
+                        effectTargets[typeOfEffect][translated.targets[j]] = true;
+                    }
+                }
             }
             target.translatedEffects = newEffects;
+            target.effectTargets = {
+                negative: Object.keys(effectTargets.negative),
+                positive: Object.keys(effectTargets.positive)
+            };
         } else if (typeof target[prop] === "object") {
             translateModifierEffects(target[prop]);
+        }
+    }
+}(cg));
+
+var effectSourcesIndex = {};
+
+(function getEffectSources(target) {
+    for (var prop in target) {
+        if (prop === "effectTargets") {
+            for (var polarity in target[prop]) {
+                var flags = target[prop][polarity];
+
+                for (var i = 0; i < flags.length; i++) {
+                    var flag = flags[i];
+                    if (!effectSourcesIndex[flag])
+                        effectSourcesIndex[flag] = {
+                            positive: {},
+                            negative: {}
+                        };
+                    effectSourcesIndex[flag][polarity][target.type] = true;
+                }
+            }
+        } else if (typeof target[prop] === "object") {
+            getEffectSources(target[prop]);
         }
     }
 }(cg));

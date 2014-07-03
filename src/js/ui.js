@@ -37,7 +37,6 @@ var UIObject = (function (_super) {
             if (self._lifeTime > 0) {
                 self._timeouts["remove"] = window.setTimeout(function UIObjectRemoveFN() {
                     self.remove.call(self);
-                    self.fireCallbacks("complete");
                 }, self._lifeTime);
             }
         }, self._delay);
@@ -72,6 +71,7 @@ var UIObject = (function (_super) {
         return this;
     };
     UIObject.prototype.remove = function () {
+        this.fireCallbacks("complete");
         this.clearTimeouts();
         if (this.parent) {
             this.parent.removeChild(this);

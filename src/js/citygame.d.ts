@@ -103,13 +103,15 @@ declare class Cell {
     public updateCell(): void;
     public addContent(type: any, cells: Cell[], player?: Player): Content;
     public removeContent(): void;
-    public addModifier(modifier: any): void;
-    public removeModifier(modifier: any): void;
+    public checkIfModifierApplies(modifier: any): boolean;
+    public getModifierPolarity(modifier: any): boolean;
+    public addModifier(modifier: any, source: any): void;
+    public removeModifier(modifier: any, source: any): void;
     public propagateModifier(modifier: any): void;
     public propagateAllModifiers(modifiers: any[]): void;
     public removePropagatedModifier(modifier: any): void;
     public removeAllPropagatedModifiers(modifiers: any[]): void;
-    public getValidModifiers(): any;
+    public getValidModifiers(contentType?: any): any;
     public applyModifiersToContent(): void;
     public propagateLandValueModifier(modifier: any): void;
     public removePropagatedLandValueModifier(modifier: any): void;
@@ -256,12 +258,15 @@ declare class UIDrawer {
     public fonts: any;
     public styles: any;
     public active: UIObject;
+    public permanentUIObjects: UIObject[];
     constructor();
     public init(): void;
     public removeActive(): void;
+    public clearAllObjects(): void;
     public makeCellTooltip(event: any, cell: Cell, container: PIXI.DisplayObjectContainer): UIObject;
-    public makeCellPopup(cell: Cell, text: string, container: PIXI.DisplayObjectContainer): void;
-    public makeFadeyPopup(pos: number[], drift: number[], lifeTime: number, content: any, easing?: (k: number) => number): void;
+    public makeCellPopup(cell: Cell, text: string, container: PIXI.DisplayObjectContainer, fontName?: string): void;
+    public makePermanentCellPopup(cell: Cell, text: string, container: PIXI.DisplayObjectContainer, fontName?: string): void;
+    public makeFadeyPopup(pos: number[], drift: number[], lifeTime: number, content: any, easing?: (k: number) => number): UIObject;
     public clearLayer(): void;
 }
 declare class Tool {
@@ -275,6 +280,7 @@ declare class Tool {
     public button: HTMLInputElement;
     public activate(target: Cell[]): void;
     public onActivate(target: Cell): void;
+    public onHover(targets: Cell[]): void;
 }
 declare class WaterTool extends Tool {
     constructor();
@@ -330,6 +336,7 @@ declare class BuildTool extends Tool {
     public setDefaults(): void;
     public changeBuilding(buildingType: any, continuous?: boolean): void;
     public activate(selectedCells: any[]): void;
+    public onHover(targets: Cell[]): void;
 }
 declare class ClickTool extends Tool {
     constructor();

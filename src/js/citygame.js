@@ -2560,17 +2560,23 @@ var BuildTool = (function (_super) {
                 }
             }
         }
-        var currentModifiers = baseCell.getValidModifiers(this.selectedBuildingType);
+        var _b = baseCell.gridPos;
+        var size = this.selectedBuildingType.size;
+        var buildArea = baseCell.board.getCells(rectSelect(_b, [_b[0] + size[0] - 1, _b[1] + size[1] - 1]));
 
-        for (var _mod in currentModifiers) {
-            var sources = currentModifiers[_mod].sources;
-            var _polarity = currentModifiers[_mod].effect[Object.keys(currentModifiers[_mod].effect)[0]] > 0;
+        for (var i = 0; i < buildArea.length; i++) {
+            var currentModifiers = buildArea[i].getValidModifiers(this.selectedBuildingType);
 
-            var font = _polarity === true ? "green" : "red";
-            var text = _polarity === true ? "+" : "-";
+            for (var _mod in currentModifiers) {
+                var sources = currentModifiers[_mod].sources;
+                var _polarity = currentModifiers[_mod].effect[Object.keys(currentModifiers[_mod].effect)[0]] > 0;
 
-            for (var i = 0; i < sources.length; i++) {
-                game.uiDrawer.makePermanentCellPopup(sources[i], text, game.worldRenderer.worldSprite, font);
+                var font = _polarity === true ? "green" : "red";
+                var text = _polarity === true ? "+" : "-";
+
+                for (var i = 0; i < sources.length; i++) {
+                    game.uiDrawer.makePermanentCellPopup(sources[i], text, game.worldRenderer.worldSprite, font);
+                }
             }
         }
     };

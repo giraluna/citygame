@@ -39,6 +39,10 @@ module UIComponents
       {
         this.handleClose();
       }
+      else
+      {
+        this.refs.modifierList.refs.list.shiftSelection(1);
+      }
     },
 
     applyRowStyle: function(item, rowProps)

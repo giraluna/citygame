@@ -2019,14 +2019,14 @@ var UIDrawer = (function () {
                 font: "bold 20pt Arial",
                 fill: "#00FF00",
                 stroke: "#005500",
-                strokeThickness: 1,
+                strokeThickness: 2,
                 align: "left"
             },
             red: {
                 font: "bold 20pt Arial",
                 fill: "#FF0000",
                 stroke: "#550000",
-                strokeThickness: 1,
+                strokeThickness: 2,
                 align: "left"
             }
         };
@@ -2152,7 +2152,7 @@ var UIDrawer = (function () {
         var content = new PIXI.Text(text, this.fonts[fontName]);
 
         var uiObj = new UIObject(this.layer);
-        uiObj.position.set(pos[0], pos[1]);
+        uiObj.position.set(pos[0], pos[1] - 10);
 
         if (content.width) {
             content.position.x -= content.width / 2;

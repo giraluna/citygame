@@ -5,6 +5,7 @@
 
 class UIObject extends PIXI.DisplayObjectContainer
 {
+  _destroyChildren: boolean;
   _timeouts: any = {};
   _callbacks: any =
   {
@@ -18,11 +19,12 @@ class UIObject extends PIXI.DisplayObjectContainer
 
   _parent: PIXI.DisplayObjectContainer;
 
-  constructor(parent)
+  constructor(parent, destroyChildren:boolean = true)
   {
     super();
     this.visible = false;
     this.setParent(parent);
+    this._destroyChildren = destroyChildren;
 
     return this
   }
@@ -92,7 +94,7 @@ class UIObject extends PIXI.DisplayObjectContainer
     {
       this.parent.removeChild(this);
     }
-    deepDestroy(this);
+    if (this._destroyChildren) deepDestroy(this);
   }
   onStart(callback)
   {

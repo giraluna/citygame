@@ -257,6 +257,7 @@ declare class UIDrawer {
     public layer: PIXI.DisplayObjectContainer;
     public fonts: any;
     public styles: any;
+    public textureCache: any;
     public active: UIObject;
     public permanentUIObjects: UIObject[];
     constructor();
@@ -265,7 +266,7 @@ declare class UIDrawer {
     public clearAllObjects(): void;
     public makeCellTooltip(event: any, cell: Cell, container: PIXI.DisplayObjectContainer): UIObject;
     public makeCellPopup(cell: Cell, text: string, container: PIXI.DisplayObjectContainer, fontName?: string): void;
-    public makePermanentCellPopup(cell: Cell, text: string, container: PIXI.DisplayObjectContainer, fontName?: string): void;
+    public makeBuildingPlacementTip(cell: Cell, type: string, container: PIXI.DisplayObjectContainer): void;
     public makeFadeyPopup(pos: number[], drift: number[], lifeTime: number, content: any, easing?: (k: number) => number): UIObject;
     public clearLayer(): void;
 }

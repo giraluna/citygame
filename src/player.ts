@@ -84,10 +84,13 @@ class Player
     var beautified = "$" + beautify(this.money, moneyBeautifyIndex);
     var expBeautifyIndex = this.experienceToNextLevel > 999999 ? 2 : 0;
 
+    /*
     var rolling = this.rollingIncome.reduce(function(a,b)
     {
       return a+b;
     }) / 3;
+    */
+    var rolling = this.rollingIncome[2];
 
     var money =
     {

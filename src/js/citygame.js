@@ -1999,6 +1999,7 @@ var UIDrawer = (function () {
     function UIDrawer() {
         this.fonts = {};
         this.styles = {};
+        this.textureCache = {};
         this.permanentUIObjects = [];
         this.layer = game.layers["tooltips"];
         this.init();
@@ -2039,6 +2040,13 @@ var UIDrawer = (function () {
             fillStyle: {
                 color: 0xE8FBFF,
                 alpha: 0.8
+            }
+        };
+
+        this.textureCache = {
+            buildingPlacement: {
+                positive1: PIXI.Texture.fromCanvas(new PIXI.Text("+", this.fonts["green"]).canvas),
+                negative1: PIXI.Texture.fromCanvas(new PIXI.Text("-", this.fonts["red"]).canvas)
             }
         };
     };
@@ -2146,20 +2154,19 @@ var UIDrawer = (function () {
 
         this.makeFadeyPopup([pos[0], pos[1]], [0, -20], 2000, content);
     };
-    UIDrawer.prototype.makePermanentCellPopup = function (cell, text, container, fontName) {
-        if (typeof fontName === "undefined") { fontName = "black"; }
+    UIDrawer.prototype.makeBuildingPlacementTip = function (cell, type, container) {
         var pos = cell.getScreenPos(container);
-        var content = new PIXI.Text(text, this.fonts[fontName]);
+        var content = new PIXI.Sprite(this.textureCache.buildingPlacement[type]);
 
-        var uiObj = new UIObject(this.layer);
+        var uiObj = new UIObject(this.layer, false);
         uiObj.position.set(pos[0], pos[1] - 10);
 
+        uiObj.addChild(content);
         if (content.width) {
             content.position.x -= content.width / 2;
             content.position.y -= content.height / 2;
         }
 
-        uiObj.addChild(content);
         uiObj.start();
 
         this.permanentUIObjects.push(uiObj);
@@ -2554,14 +2561,13 @@ var BuildTool = (function (_super) {
                 if (polarity === null)
                     continue;
                 else {
-                    var font = polarity === true ? "green" : "red";
-                    var text = polarity === true ? "+" : "-";
-                    game.uiDrawer.makePermanentCellPopup(cell, text, game.worldRenderer.worldSprite, font);
+                    var type = (polarity === true ? "positive1" : "negative1");
+                    game.uiDrawer.makeBuildingPlacementTip(cell, type, game.worldRenderer.worldSprite);
                 }
             }
         }
         var _b = baseCell.gridPos;
-        var size = this.selectedBuildingType.size;
+        var size = this.selectedBuildingType.size || [1, 1];
         var buildArea = baseCell.board.getCells(rectSelect(_b, [_b[0] + size[0] - 1, _b[1] + size[1] - 1]));
 
         for (var i = 0; i < buildArea.length; i++) {
@@ -2571,11 +2577,10 @@ var BuildTool = (function (_super) {
                 var sources = currentModifiers[_mod].sources;
                 var _polarity = currentModifiers[_mod].effect[Object.keys(currentModifiers[_mod].effect)[0]] > 0;
 
-                var font = _polarity === true ? "green" : "red";
-                var text = _polarity === true ? "+" : "-";
+                var type = (_polarity === true ? "positive1" : "negative1");
 
                 for (var i = 0; i < sources.length; i++) {
-                    game.uiDrawer.makePermanentCellPopup(sources[i], text, game.worldRenderer.worldSprite, font);
+                    game.uiDrawer.makeBuildingPlacementTip(sources[i], type, game.worldRenderer.worldSprite);
                 }
             }
         }

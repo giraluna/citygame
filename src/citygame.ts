@@ -2519,6 +2519,7 @@ class UIDrawer
   layer: PIXI.DisplayObjectContainer;
   fonts: any = {};
   styles: any = {};
+  textureCache: any = {};
   active: UIObject;
   permanentUIObjects: UIObject[] = [];
 
@@ -2572,6 +2573,17 @@ class UIDrawer
       {
         color: 0xE8FBFF,
         alpha: 0.8
+      }
+    };
+
+    this.textureCache =
+    {
+      buildingPlacement:
+      {
+        positive1: PIXI.Texture.fromCanvas(
+          new PIXI.Text("+", this.fonts["green"]).canvas),
+        negative1: PIXI.Texture.fromCanvas(
+          new PIXI.Text("-", this.fonts["red"]).canvas)
       }
     };
 
@@ -2697,22 +2709,21 @@ class UIDrawer
 
     this.makeFadeyPopup([pos[0], pos[1]], [0, -20], 2000, content);
   }
-  makePermanentCellPopup(cell: Cell, text: string, container: PIXI.DisplayObjectContainer,
-    fontName:string = "black")
+  makeBuildingPlacementTip(cell: Cell, type: string, container: PIXI.DisplayObjectContainer)
   {
     var pos = cell.getScreenPos(container);
-    var content = new PIXI.Text(text, this.fonts[fontName]);
+    var content = new PIXI.Sprite(this.textureCache.buildingPlacement[type]);
 
-    var uiObj = new UIObject(this.layer);
+    var uiObj = new UIObject(this.layer, false);
     uiObj.position.set(pos[0], pos[1] - 10);
 
+    uiObj.addChild(content);
     if (content.width)
     {
       content.position.x -= content.width / 2;
       content.position.y -= content.height / 2;
     }
 
-    uiObj.addChild(content);
     uiObj.start();
 
     this.permanentUIObjects.push(uiObj);
@@ -3179,15 +3190,14 @@ class BuildTool extends Tool
         if (polarity === null) continue;
         else
         {
-          var font = polarity === true ? "green" : "red";
-          var text = polarity === true ? "+" : "-";
-          game.uiDrawer.makePermanentCellPopup(cell, text,
-            game.worldRenderer.worldSprite, font);
+          var type = (polarity === true ? "positive1" : "negative1");
+          game.uiDrawer.makeBuildingPlacementTip(cell, type,
+            game.worldRenderer.worldSprite);
         }
       }
     }
     var _b = baseCell.gridPos
-    var size = this.selectedBuildingType.size;
+    var size = this.selectedBuildingType.size || [1,1];
     var buildArea = baseCell.board.getCells(
       rectSelect(_b, [_b[0]+size[0]-1,_b[1]+size[1]-1]));
 
@@ -3201,13 +3211,12 @@ class BuildTool extends Tool
         var _polarity = currentModifiers[_mod].effect[
           Object.keys(currentModifiers[_mod].effect)[0]] > 0;
 
-        var font = _polarity === true ? "green" : "red";
-        var text = _polarity === true ? "+" : "-";
+        var type = (_polarity === true ? "positive1" : "negative1");
 
         for (var i = 0; i < sources.length; i++)
         {
-          game.uiDrawer.makePermanentCellPopup(sources[i], text,
-            game.worldRenderer.worldSprite, font);
+          game.uiDrawer.makeBuildingPlacementTip(sources[i], type,
+            game.worldRenderer.worldSprite);
         }
       }
     }

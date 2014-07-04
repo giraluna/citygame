@@ -10,7 +10,8 @@ var __extends = this.__extends || function (d, b) {
 };
 var UIObject = (function (_super) {
     __extends(UIObject, _super);
-    function UIObject(parent) {
+    function UIObject(parent, destroyChildren) {
+        if (typeof destroyChildren === "undefined") { destroyChildren = true; }
         _super.call(this);
         this._timeouts = {};
         this._callbacks = {
@@ -22,6 +23,7 @@ var UIObject = (function (_super) {
         this._lifeTime = -1;
         this.visible = false;
         this.setParent(parent);
+        this._destroyChildren = destroyChildren;
 
         return this;
     }
@@ -76,7 +78,8 @@ var UIObject = (function (_super) {
         if (this.parent) {
             this.parent.removeChild(this);
         }
-        deepDestroy(this);
+        if (this._destroyChildren)
+            deepDestroy(this);
     };
     UIObject.prototype.onStart = function (callback) {
         this._callbacks["start"].push(callback);

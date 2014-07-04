@@ -2,12 +2,13 @@
 /// <reference path="../../lib/tween.js.d.ts" />
 /// <reference path="utility.d.ts" />
 declare class UIObject extends PIXI.DisplayObjectContainer {
+    public _destroyChildren: boolean;
     public _timeouts: any;
     public _callbacks: any;
     public _delay: number;
     public _lifeTime: number;
     public _parent: PIXI.DisplayObjectContainer;
-    constructor(parent: any);
+    constructor(parent: any, destroyChildren?: boolean);
     public start(): UIObject;
     public setParent(parent: PIXI.DisplayObjectContainer): UIObject;
     public delay(time: number): UIObject;

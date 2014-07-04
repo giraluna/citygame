@@ -989,7 +989,7 @@ var Game = (function () {
         this.systemsManager.addSystem("quarterlyProfitSystem", quarterlyProfitSystem);
         */
         this.systemsManager.addSystem("delayedAction", new DelayedActionSystem(1, this.systemsManager));
-        this.systemsManager.addSystem("autosave", new AutosaveSystem(60, this.systemsManager));
+        this.systemsManager.addSystem("autosave", new AutosaveSystem(180, this.systemsManager));
 
         var dateSystem = new DateSystem(1, this.systemsManager, document.getElementById("date"));
         this.systemsManager.addSystem("date", dateSystem);
@@ -1390,31 +1390,52 @@ var Game = (function () {
             data.name = board.name;
             data.cells = [];
 
+            var typeToKey = {};
+            var keyGen = 0;
+
             for (var i = 0; i < board.cells.length; i++) {
                 data.cells[i] = [];
                 for (var j = 0; j < board.cells[i].length; j++) {
                     var boardCell = board.cells[i][j];
                     var cell = data.cells[i][j] = {};
-                    cell.type = boardCell.type.type;
+
+                    if (!typeToKey[boardCell.type.type]) {
+                        typeToKey[boardCell.type.type] = ++keyGen;
+                    }
+                    cell.type = typeToKey[boardCell.type.type];
+
                     if (boardCell.player) {
                         cell.player = boardCell.player.id;
                     }
                     if (boardCell.content && boardCell.content.baseCell === boardCell) {
+                        var contentToAdd = boardCell.content.type.type;
+                        if (boardCell.content.type.baseType === "road") {
+                            contentToAdd = "road_nesw";
+                        }
+
+                        if (!typeToKey[contentToAdd]) {
+                            typeToKey[contentToAdd] = ++keyGen;
+                        }
                         cell.content = {
-                            type: boardCell.content.type.type,
+                            type: typeToKey[contentToAdd],
                             player: boardCell.content.player ? boardCell.content.player.id : null
                         };
-                        if (cell.content.type.baseType === "road") {
-                            cell.content.type = cg["content"]["roads"]["road_nesw"];
-                        }
                     }
                     if (boardCell.undergroundContent) {
                         cell.undergroundContent = true;
                     }
                 }
             }
-            savedBoards.push(data);
+            data.key = (function () {
+                var reverseIndex = {};
+                for (var i = 0; i < Object.keys(typeToKey).length; i++) {
+                    var prop = Object.keys(typeToKey)[i];
+                    reverseIndex[typeToKey[prop]] = prop;
+                }
+                return reverseIndex;
+            })();
         }
+        savedBoards.push(data);
 
         return savedBoards;
     };
@@ -1437,14 +1458,36 @@ var Game = (function () {
 
         for (var k = 0; k < boardsToLoad.length; k++) {
             var currToLoad = boardsToLoad[k];
+            var key = currToLoad.key;
 
-            for (var i = 0; i < currToLoad.cells.length; i++) {
-                for (var j = 0; j < currToLoad.cells[i].length; j++) {
-                    var cell = currToLoad.cells[i][j];
-                    if (cell.player) {
-                        cell.player = this.players[cell.player];
+            //legacy
+            if (!key) {
+                for (var i = 0; i < currToLoad.cells.length; i++) {
+                    for (var j = 0; j < currToLoad.cells[i].length; j++) {
+                        var cell = currToLoad.cells[i][j];
+                        if (cell.player) {
+                            cell.player = this.players[cell.player];
+                            if (cell.content) {
+                                cell.content.player = this.players[cell.content.player];
+                            }
+                        }
+                    }
+                }
+            } else {
+                for (var i = 0; i < currToLoad.cells.length; i++) {
+                    for (var j = 0; j < currToLoad.cells[i].length; j++) {
+                        var cell = currToLoad.cells[i][j];
+
+                        cell.type = key[cell.type];
+
                         if (cell.content) {
-                            cell.content.player = this.players[cell.content.player];
+                            cell.content.type = key[cell.content.type];
+                        }
+                        if (cell.player) {
+                            cell.player = this.players[cell.player];
+                            if (cell.content) {
+                                cell.content.player = this.players[cell.content.player];
+                            }
                         }
                     }
                 }
@@ -2140,7 +2183,7 @@ var UIDrawer = (function () {
             pointing: pointing,
             padding: [10, 10]
         }, textObject);
-        uiObj.position.set(x, y);
+        uiObj.position.set(Math.round(x), Math.round(y));
 
         uiObj.addChild(toolTip);
         uiObj.start();

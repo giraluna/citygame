@@ -36,7 +36,7 @@ module cellModifiers
       targets: ["apartment"],
       scaling: function(strength)
       {
-        if (strength >= 3)
+        if (strength >= 5)
         {
           return 1+Math.log(strength);
         }

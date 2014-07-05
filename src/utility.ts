@@ -639,3 +639,15 @@ function beautify (value: number, formatterIndex:number = 0)
   var output = formatter(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   return negative ? '-' + output : output;
 }
+
+function toggleDebugmode()
+{
+  var react = document.getElementById("react-side-menu");
+  var edit = document.getElementById("side-menu");
+  var speed = document.getElementById("speed");
+
+  [react, edit, speed].forEach(function(menu)
+  {
+    menu.classList.toggle("debug-hidden");
+  });
+}

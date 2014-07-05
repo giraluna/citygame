@@ -18,6 +18,9 @@
 .hidden {
   display: none;
 }
+.debug-hidden {
+  visibility: hidden !important;
+}
 .unselectable {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -103,7 +106,6 @@ progress::-webkit-progress-value {
   flex: 0 0 250px;
   position: relative;
   margin: 10px 0;
-  visibility: hidden;
 }
 @media (max-width: 600px) {
   #side-menu {
@@ -153,7 +155,6 @@ progress::-webkit-progress-value {
   margin: 0 10px;
 }
 #bottom-menu #speed {
-  visibility: hidden;
   display: flex;
   flex: 1;
   align-items: center;

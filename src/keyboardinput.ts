@@ -9,7 +9,7 @@ var keyboardStates =
       // space
       "32": function()
       {
-        eventManager.dispatchEvent({type: "togglePause", content:""});
+        //eventManager.dispatchEvent({type: "togglePause", content:""});
       },
       // numpad plus
       "107": function()

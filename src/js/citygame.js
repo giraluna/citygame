@@ -1309,10 +1309,10 @@ var Game = (function () {
             this.activeTool.button.classList.toggle("selected-tool");
         }
 
-        if (tool.mapmode) {
+        if (this.activeTool.mapmode) {
             eventManager.dispatchEvent({
                 type: "changeMapmode",
-                content: tool.mapmode
+                content: this.activeTool.mapmode
             });
         }
     };

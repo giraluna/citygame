@@ -754,7 +754,7 @@ var cg: any =
         "type": "stretchystore",
         "baseType": "building",
         "categoryType": "shopping",
-        "title": "Stretchy store",
+        "title": "Convenience store 2",
         "size": [2,1],
         "baseProfit": 60,
         "daysForProfitTick": 1,
@@ -769,12 +769,12 @@ var cg: any =
           {
             "type": "shoppingCompetition",
             "range": 3,
-            "strength": 2
+            "strength": 1
           },
           {
             "type": "nearbyShopping",
-            "range": 4,
-            "strength": 2
+            "range": 3,
+            "strength": 1
           }
         ]
       },
@@ -825,6 +825,35 @@ var cg: any =
             "range": 3,
             "strength": 1
           },
+        ]
+      },
+      "departmentStore":
+      {
+        "type": "departmentStore",
+        "baseType": "building",
+        "categoryType": "shopping",
+        "title": "Department store",
+        "size": [1,2],
+        "baseProfit": 60,
+        "daysForProfitTick": 1,
+        "cost": 25000,
+        "buildTime": 14,
+        "anchor": [0.5, 1],
+        "frame": ["departmentstore_f0.png", "departmentstore_f1.png"],
+        "icon": "departmentstore.png",
+        "canNotBuildOn": ["water", "building", "road"],
+        "effects":
+        [
+          {
+            "type": "shoppingCompetition",
+            "range": 3,
+            "strength": 2
+          },
+          {
+            "type": "nearbyShopping",
+            "range": 4,
+            "strength": 2
+          }
         ]
       }
     }
@@ -975,7 +1004,8 @@ var playerBuildableBuildings = [];
   "stretchystore",
   "house2",
   "factory",
-  "hotel"
+  "hotel",
+  "departmentStore"
 ].forEach(function(type){playerBuildableBuildings.push(findType(type))});
 
 // easier balancing
@@ -991,7 +1021,8 @@ var basevalues =
   [20000, 18],
   [50000, 25],
   [100000, 75],
-  [250000, 100]
+  [250000, 100],
+  [500000, 125]
 ];
 
 for (var i = 0; i < playerBuildableBuildings.length; i++)

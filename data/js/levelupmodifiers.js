@@ -116,7 +116,7 @@ var levelUpModifiers;
     }*/
     levelUpModifiers.shoppingCostReduction1 = {
         type: "shoppingCostReduction1",
-        title: "Supply chain",
+        title: "Franchising",
         description: "Shopping buildings 20% cheaper to build",
         unlockConditions: [
             {
@@ -383,6 +383,36 @@ var levelUpModifiers;
         }
     };
 
+    levelUpModifiers.shoppingProfitPerApartment = {
+        type: "shoppingProfitPerApartment",
+        title: "Targeted marketing",
+        description: "3% higher retail profit per owned apartment",
+        unlockConditions: [
+            {
+                type: "level",
+                value: 25
+            }
+        ],
+        dynamicEffect: {
+            "apartment": function (player) {
+                player.addSpecialModifier({
+                    type: "shoppingProfitPerApartment",
+                    title: "Targeted marketing",
+                    description: "3% higher retail profit per owned apartment",
+                    effects: [
+                        {
+                            targets: ["shopping"],
+                            multiplier: 1 + player.amountBuiltPerCategory["apartment"] * 0.03
+                        }
+                    ]
+                });
+            }
+        }
+    };
+
+    //////////////
+    // LEVEL 50 //
+    //////////////
     levelUpModifiers.branchOffices1 = {
         type: "branchOffices1",
         title: "Branch offices",
@@ -410,9 +440,6 @@ var levelUpModifiers;
         }
     };
 
-    //////////////
-    // LEVEL 50 //
-    //////////////
     levelUpModifiers.increasedRecruitQuality2 = {
         type: "increasedRecruitQuality2",
         title: "Talent scouts",
@@ -455,6 +482,34 @@ var levelUpModifiers;
                         {
                             targets: ["global"],
                             multiplier: 1 + player.prestige * 0.005
+                        }
+                    ]
+                });
+            }
+        }
+    };
+    levelUpModifiers.shoppingCostReductionPerFactory = {
+        type: "shoppingCostReductionPerFactory",
+        title: "Supply chain",
+        description: "Shopping buildings 2% cheaper per factory",
+        unlockConditions: [
+            {
+                type: "level",
+                value: 50
+            }
+        ],
+        dynamicEffect: {
+            "prestige": function (player) {
+                player.addSpecialModifier({
+                    type: "shoppingCostReductionPerFactory",
+                    title: "Supply chain",
+                    description: "Shopping buildings 2% cheaper per factory",
+                    effects: [
+                        {
+                            targets: ["shopping"],
+                            buildCost: {
+                                multiplier: 1 - player.amountBuiltPerCategory["factory"]
+                            }
                         }
                     ]
                 });

@@ -111,7 +111,8 @@ module UIComponents
         {
           label: "Name",
           key: "name",
-          sortingFunction: this.sortEmployees
+          sortingFunction: this.sortEmployees,
+          defaultOrder: "asc"
         },
         {
           label: "neg",

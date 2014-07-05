@@ -528,6 +528,8 @@ class Player
     var cost = type.cost;
     var alreadyBuilt = this.amountBuiltPerType[type.type];
 
+    var baseCost = cost * Math.pow(1.4, alreadyBuilt);
+
     cost += this.modifierEffects.buildCost[type.categoryType].addedCost;
     cost += this.modifierEffects.buildCost["global"].addedCost;
 
@@ -535,6 +537,12 @@ class Player
     cost *= this.modifierEffects.buildCost["global"].multiplier;
 
     cost *= Math.pow(1.4, alreadyBuilt);
+
+    if (cost < baseCost * 0.2)
+    {
+      cost = baseCost * 0.2;
+    }
+
 
     return Math.round(cost);
   }
@@ -649,6 +657,7 @@ class Player
   clearIndexedProfits()
   {
     this.indexedProfits = {};
+    this.indexedProfitsWithoutGlobals = {};
   }
   getUnlockConditionVariable(conditionType: string)
   {

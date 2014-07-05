@@ -236,7 +236,7 @@ var playerModifiers;
     playerModifiers.convenienceModifier1 = {
         type: "convenienceModifier1",
         title: "Newspaper stands",
-        description: "Convenience stores +0.5$ /s",
+        description: "Retail buildings +0.5$ /s",
         cost: 300,
         unlockConditions: [
             {
@@ -254,7 +254,7 @@ var playerModifiers;
     playerModifiers.convenienceModifier2 = {
         type: "convenienceModifier2",
         title: "Lottery tickets",
-        description: "Convenience stores +2$ /s",
+        description: "Retail buildings +2$ /s",
         cost: 1500,
         unlockConditions: [
             {
@@ -272,7 +272,7 @@ var playerModifiers;
     playerModifiers.convenienceModifier3 = {
         type: "convenienceModifier3",
         title: "Liquor license",
-        description: "Convenience store profits * 1.3",
+        description: "Retail profits * 1.3",
         cost: 5000,
         unlockConditions: [
             {
@@ -290,7 +290,7 @@ var playerModifiers;
     playerModifiers.convenienceModifier4 = {
         type: "convenienceModifier4",
         title: "Loss leaders",
-        description: "Shopping profits * 1.5",
+        description: "Retail profits * 1.5",
         cost: 25000,
         unlockConditions: [
             {

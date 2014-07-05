@@ -419,6 +419,8 @@ var Player = (function () {
         var cost = type.cost;
         var alreadyBuilt = this.amountBuiltPerType[type.type];
 
+        var baseCost = cost * Math.pow(1.4, alreadyBuilt);
+
         cost += this.modifierEffects.buildCost[type.categoryType].addedCost;
         cost += this.modifierEffects.buildCost["global"].addedCost;
 
@@ -426,6 +428,10 @@ var Player = (function () {
         cost *= this.modifierEffects.buildCost["global"].multiplier;
 
         cost *= Math.pow(1.4, alreadyBuilt);
+
+        if (cost < baseCost * 0.2) {
+            cost = baseCost * 0.2;
+        }
 
         return Math.round(cost);
     };
@@ -523,6 +529,7 @@ var Player = (function () {
     };
     Player.prototype.clearIndexedProfits = function () {
         this.indexedProfits = {};
+        this.indexedProfitsWithoutGlobals = {};
     };
     Player.prototype.getUnlockConditionVariable = function (conditionType) {
         if (["clicks", "money", "level", "prestige"].indexOf(conditionType) !== -1) {

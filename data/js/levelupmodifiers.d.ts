@@ -15,9 +15,11 @@ declare module levelUpModifiers {
     var buildCostReduction1: playerModifiers.IPlayerModifier;
     var buyRush1: playerModifiers.IPlayerModifier;
     var clickFrenzy1: playerModifiers.IPlayerModifier;
+    var shoppingProfitPerApartment: playerModifiers.IPlayerModifier;
     var branchOffices1: playerModifiers.IPlayerModifier;
     var increasedRecruitQuality2: playerModifiers.IPlayerModifier;
     var prestigeEffectIncrease1: playerModifiers.IPlayerModifier;
+    var shoppingCostReductionPerFactory: playerModifiers.IPlayerModifier;
     var hotelParking1: playerModifiers.IPlayerModifier;
     var hotelFastfood1: playerModifiers.IPlayerModifier;
     var factoryPerLevel1: playerModifiers.IPlayerModifier;

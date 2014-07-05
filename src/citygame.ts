@@ -3246,8 +3246,12 @@ class BuildTool extends Tool
         else
         {
           var type = (polarity === true ? "positive1" : "negative1");
-          game.uiDrawer.makeBuildingPlacementTip(cell, type,
-            game.worldRenderer.worldSprite);
+          var cells = cell.content ? cell.content.cells : cell;
+          for (var j = 0; j < cells.length; j++)
+          {
+            game.uiDrawer.makeBuildingPlacementTip(cells[j], type,
+              game.worldRenderer.worldSprite);
+          }
         }
       }
     }

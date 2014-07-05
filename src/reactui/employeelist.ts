@@ -28,7 +28,6 @@ module UIComponents
           colProps["className"] = "relevant-col";
         }
       }
-      colProps.title = colProps.key;
 
       return colProps;
     },
@@ -118,19 +117,22 @@ module UIComponents
           label: "neg",
           key: "negotiation",
           sortingFunction: this.sortEmployees,
-          defaultOrder: "desc"
+          defaultOrder: "desc",
+          title: "Negotiation\nGives a discount when buying new plots"
         },
         {
           label: "rec",
           key: "recruitment",
           sortingFunction: this.sortEmployees,
-          defaultOrder: "desc"
+          defaultOrder: "desc",
+          title: "Recruitment\nAble to find better new recruits"
         },
         {
           label: "con",
           key: "construction",
           sortingFunction: this.sortEmployees,
-          defaultOrder: "desc"
+          defaultOrder: "desc",
+          title: "Construction\nDecreases building cost and time"
         }
       ];
 

@@ -73,6 +73,7 @@ declare class ReactUI {
     public makeCellBuyPopup(props: {
         player: Player;
         cell: any;
+        onOk?: any;
     }): void;
     public makeConfirmPopup(props: {
         text: any;

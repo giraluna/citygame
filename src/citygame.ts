@@ -1271,7 +1271,7 @@ class Game
     */
 
     this.systemsManager.addSystem("delayedAction", new DelayedActionSystem(1, this.systemsManager));
-    this.systemsManager.addSystem("autosave", new AutosaveSystem(180, this.systemsManager));
+    this.systemsManager.addSystem("autosave", new AutosaveSystem(120, this.systemsManager));
 
     var dateSystem = new DateSystem(1, this.systemsManager,
       document.getElementById("date") );
@@ -3200,6 +3200,7 @@ class BuildTool extends Tool
     else if ( !selectedCells[0].player ||
       selectedCells[0].player.id !== game.players.player0.id)
     {
+      /*
       this.timesTriedToBuiltOnNonOwnedPlot++;
       if (this.timesTriedToBuiltOnNonOwnedPlot <= 3 )
       {
@@ -3211,6 +3212,18 @@ class BuildTool extends Tool
             text: "You need to purchase that plot first"
           }
         })
+      }
+      */
+      for (var i = 0; i < selectedCells.length; i++)
+      {
+        eventManager.dispatchEvent({type: "makeCellBuyPopup", content:
+          {
+            player: game.players["player0"],
+            cell: selectedCells[i],
+            onOk: ( this.continuous || this.tempContinuous ?
+              function(){return;} : this.setDefaults.bind(this) )
+          }
+        });
       }
     }
   }

@@ -219,6 +219,8 @@ var ReactUI = (function () {
 
         if (props.player.ownedCells[props.cell.gridPos])
             return;
+        if (props.cell.type.type === "water")
+            return;
 
         var buyCost = props.player.getCellBuyCost(props.cell);
 
@@ -242,6 +244,10 @@ var ReactUI = (function () {
                 playerId: props.player.id,
                 employeeId: selected.employee.id
             });
+
+            if (props.onOk)
+                props.onOk.call();
+            return true;
         };
         this.makeEmployeeActionPopup({
             player: props.player,
@@ -364,7 +370,9 @@ var ReactUI = (function () {
             return;
         }
 
-        React.renderComponent(UIComponents.Stage({ popups: this.popups, player: this.player, frameImages: this.frameImages }), document.getElementById("react-container"));
+        React.renderComponent(UIComponents.Stage({
+            popups: this.popups, player: this.player,
+            frameImages: this.frameImages, showStats: null }), document.getElementById("react-container"));
     };
     return ReactUI;
 })();

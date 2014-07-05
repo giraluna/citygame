@@ -316,6 +316,7 @@ class ReactUI
   {
     player: Player;
     cell: any;
+    onOk?: any;
   })
   {
     if (Object.keys(props.player.employees).length < 1)
@@ -325,6 +326,7 @@ class ReactUI
     }
 
     if (props.player.ownedCells[props.cell.gridPos]) return;
+    if (props.cell.type.type === "water") return;
 
     var buyCost = props.player.getCellBuyCost(props.cell);
 
@@ -354,6 +356,9 @@ class ReactUI
         playerId: props.player.id,
         employeeId: selected.employee.id,
       });
+
+      if (props.onOk) props.onOk.call();
+      return true;
     }
     this.makeEmployeeActionPopup(
     {
@@ -532,7 +537,8 @@ class ReactUI
     }
 
     React.renderComponent(
-      UIComponents.Stage( {popups: this.popups, player: this.player, frameImages: this.frameImages}),
+      UIComponents.Stage( {popups: this.popups, player: this.player,
+        frameImages: this.frameImages, showStats: null}),
       document.getElementById("react-container")
     );
   }

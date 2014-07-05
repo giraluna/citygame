@@ -46,7 +46,12 @@ module UIComponents
       {
         var buildingTemplate = this.props.buildingTemplates[type];
         var playerCanBuildBuilding = true;
-        var rowProps: any = {key: buildingTemplate.type};
+        var rowProps: any =
+        {
+          key: buildingTemplate.type,
+          title: buildingTemplate.translate + "\n" +
+            "Base profit: " + buildingTemplate.baseProfit
+        };
         var costProps = {className: "money"};
         var nameProps = {className: "building-title"};
 

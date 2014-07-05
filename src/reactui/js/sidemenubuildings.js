@@ -55,7 +55,11 @@ var UIComponents;
                 var canAfford = player.money >= buildCost;
                 var amountBuilt = player.amountBuiltPerType[building.type];
 
-                var divProps = { className: "side-building", key: building.type };
+                var divProps = {
+                    className: "side-building",
+                    key: building.type,
+                    title: building.title + "\n" + "Base profit: $" + building.baseProfit
+                };
 
                 var imageProps = { className: "building-image" };
                 var titleProps = { className: "building-title" };

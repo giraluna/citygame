@@ -73,7 +73,13 @@ export var SideMenuBuildings = React.createClass(
       var canAfford = player.money >= buildCost;
       var amountBuilt = player.amountBuiltPerType[building.type];
 
-      var divProps: any = {className: "side-building", key: building.type};
+      var divProps: any =
+      {
+        className: "side-building",
+        key: building.type,
+        title: building.title + "\n" +
+          "Base profit: $" + building.baseProfit
+      };
 
       var imageProps: any = {className: "building-image"};
       var titleProps: any = {className: "building-title"};

@@ -153,9 +153,6 @@ class Content
   }
   init( type, layer: string = "content" )
   {
-    // todo needs to be split into multiple sprites for
-    // large content z depth to be right
-    
     for (var i = 0; i < this.cells.length; i++)
     {
       var _cell = this.cells[i];
@@ -2364,6 +2361,11 @@ class MouseEventHandler
       this.currAction !== undefined &&
       targetType === "stage")
     {
+      if (game.activeTool.onFinish)
+      {
+        game.activeTool.onFinish()
+      }
+
       this.currAction = undefined;
       this.stashedAction = undefined;
       this.startPoint = undefined;
@@ -2535,6 +2537,11 @@ class MouseEventHandler
   worldEnd(event)
   {
     game.activeTool.activate(this.selectedCells);
+
+    if (game.activeTool.onFinish)
+    {
+      game.activeTool.onFinish()
+    }
 
     game.uiDrawer.clearAllObjects();
     game.highlighter.clearSprites();
@@ -2873,6 +2880,7 @@ class Tool
   }
   onActivate(target:Cell){}
   onHover(targets:Cell[]){}
+  onFinish(){}
 }
 
 
@@ -3106,6 +3114,11 @@ class BuildTool extends Tool
   mainCell: Cell;
   continuous: boolean;
   timesTriedToBuiltOnNonOwnedPlot: number = 0;
+  ghostSprites:
+  {
+    sprite: PIXI.Sprite;
+    pos: number[];
+  }[] = [];
 
   constructor()
   {
@@ -3226,11 +3239,58 @@ class BuildTool extends Tool
         });
       }
     }
+
+    this.onFinish();
   }
   onHover(targets: Cell[])
   {
     var baseCell = targets[0];
     if (!baseCell) return;
+
+    var _b = baseCell.gridPos
+    var size = this.selectedBuildingType.size || [1,1];
+    var buildArea = baseCell.board.getCells(
+      rectSelect(_b, [_b[0]+size[0]-1,_b[1]+size[1]-1]));
+    var belowBuildArea = getArea(
+    {
+      targetArray: baseCell.board.cells,
+      start: _b,
+      centerSize: size,
+      size: 2,
+      anchor: "nw"
+    });
+
+    this.clearEffects();
+
+    for (var i = 0; i < belowBuildArea.length; i++)
+    {
+      game.highlighter.alphaBuildings(belowBuildArea, 0.4);
+    }
+
+    if (!baseCell.content)
+    {
+      for (var i = 0; i < buildArea.length; i++)
+      {
+        var _cell = buildArea[i];
+        if (_cell.content)
+        {
+          this.clearGhostBuilding();
+          break;
+        }
+        var _s = new Sprite( this.selectedBuildingType, i );
+        _s.alpha = 0.6;
+        this.ghostSprites.push(
+        {
+          sprite: _s,
+          pos: _cell.gridPos
+        });
+
+        _s.position = _cell.board.getCell(_cell.gridPos).sprite.position.clone();
+
+        _cell.board.addSpriteToLayer("content", _s, _cell.gridPos);
+      }
+    }
+
 
     var effects: any =
     {
@@ -3268,10 +3328,6 @@ class BuildTool extends Tool
         }
       }
     }
-    var _b = baseCell.gridPos
-    var size = this.selectedBuildingType.size || [1,1];
-    var buildArea = baseCell.board.getCells(
-      rectSelect(_b, [_b[0]+size[0]-1,_b[1]+size[1]-1]));
 
     for (var i = 0; i < buildArea.length; i++)
     {
@@ -3292,6 +3348,26 @@ class BuildTool extends Tool
         }
       }
     }
+  }
+  onFinish()
+  {
+    this.clearEffects();
+    this.mainCell = undefined;
+  }
+  clearEffects()
+  {
+    game.highlighter.clearAlpha();
+    this.clearGhostBuilding();
+  }
+  clearGhostBuilding()
+  {
+    for (var i = 0; i < this.ghostSprites.length; i++)
+    {
+      var _s = this.ghostSprites[i].sprite;
+      var _pos = this.ghostSprites[i].pos;
+      this.mainCell.board.removeSpriteFromLayer("content", _s, _pos);
+    }
+    this.ghostSprites = [];
   }
 }
 

@@ -1878,6 +1878,10 @@ var MouseEventHandler = (function () {
     MouseEventHandler.prototype.mouseDown = function (event, targetType) {
         game.uiDrawer.removeActive();
         if (event.originalEvent.button === 2 && this.currAction !== undefined && targetType === "stage") {
+            if (game.activeTool.onFinish) {
+                game.activeTool.onFinish();
+            }
+
             this.currAction = undefined;
             this.stashedAction = undefined;
             this.startPoint = undefined;
@@ -2007,6 +2011,10 @@ var MouseEventHandler = (function () {
     };
     MouseEventHandler.prototype.worldEnd = function (event) {
         game.activeTool.activate(this.selectedCells);
+
+        if (game.activeTool.onFinish) {
+            game.activeTool.onFinish();
+        }
 
         game.uiDrawer.clearAllObjects();
         game.highlighter.clearSprites();
@@ -2283,6 +2291,8 @@ var Tool = (function () {
     };
     Tool.prototype.onHover = function (targets) {
     };
+    Tool.prototype.onFinish = function () {
+    };
     return Tool;
 })();
 
@@ -2492,6 +2502,7 @@ var BuildTool = (function (_super) {
     function BuildTool() {
         _super.call(this);
         this.timesTriedToBuiltOnNonOwnedPlot = 0;
+        this.ghostSprites = [];
         this.type = "build";
         this.mapmode = undefined;
         this.button = null;
@@ -2578,11 +2589,50 @@ var BuildTool = (function (_super) {
                 });
             }
         }
+
+        this.onFinish();
     };
     BuildTool.prototype.onHover = function (targets) {
         var baseCell = targets[0];
         if (!baseCell)
             return;
+
+        var _b = baseCell.gridPos;
+        var size = this.selectedBuildingType.size || [1, 1];
+        var buildArea = baseCell.board.getCells(rectSelect(_b, [_b[0] + size[0] - 1, _b[1] + size[1] - 1]));
+        var belowBuildArea = getArea({
+            targetArray: baseCell.board.cells,
+            start: _b,
+            centerSize: size,
+            size: 2,
+            anchor: "nw"
+        });
+
+        this.clearEffects();
+
+        for (var i = 0; i < belowBuildArea.length; i++) {
+            game.highlighter.alphaBuildings(belowBuildArea, 0.4);
+        }
+
+        if (!baseCell.content) {
+            for (var i = 0; i < buildArea.length; i++) {
+                var _cell = buildArea[i];
+                if (_cell.content) {
+                    this.clearGhostBuilding();
+                    break;
+                }
+                var _s = new Sprite(this.selectedBuildingType, i);
+                _s.alpha = 0.6;
+                this.ghostSprites.push({
+                    sprite: _s,
+                    pos: _cell.gridPos
+                });
+
+                _s.position = _cell.board.getCell(_cell.gridPos).sprite.position.clone();
+
+                _cell.board.addSpriteToLayer("content", _s, _cell.gridPos);
+            }
+        }
 
         var effects = {
             positive: [],
@@ -2614,9 +2664,6 @@ var BuildTool = (function (_super) {
                 }
             }
         }
-        var _b = baseCell.gridPos;
-        var size = this.selectedBuildingType.size || [1, 1];
-        var buildArea = baseCell.board.getCells(rectSelect(_b, [_b[0] + size[0] - 1, _b[1] + size[1] - 1]));
 
         for (var i = 0; i < buildArea.length; i++) {
             var currentModifiers = buildArea[i].getValidModifiers(this.selectedBuildingType);
@@ -2632,6 +2679,22 @@ var BuildTool = (function (_super) {
                 }
             }
         }
+    };
+    BuildTool.prototype.onFinish = function () {
+        this.clearEffects();
+        this.mainCell = undefined;
+    };
+    BuildTool.prototype.clearEffects = function () {
+        game.highlighter.clearAlpha();
+        this.clearGhostBuilding();
+    };
+    BuildTool.prototype.clearGhostBuilding = function () {
+        for (var i = 0; i < this.ghostSprites.length; i++) {
+            var _s = this.ghostSprites[i].sprite;
+            var _pos = this.ghostSprites[i].pos;
+            this.mainCell.board.removeSpriteFromLayer("content", _s, _pos);
+        }
+        this.ghostSprites = [];
     };
     return BuildTool;
 })(Tool);

@@ -282,6 +282,7 @@ declare class Tool {
     public activate(target: Cell[]): void;
     public onActivate(target: Cell): void;
     public onHover(targets: Cell[]): void;
+    public onFinish(): void;
 }
 declare class WaterTool extends Tool {
     constructor();
@@ -333,11 +334,18 @@ declare class BuildTool extends Tool {
     public mainCell: Cell;
     public continuous: boolean;
     public timesTriedToBuiltOnNonOwnedPlot: number;
+    public ghostSprites: {
+        sprite: PIXI.Sprite;
+        pos: number[];
+    }[];
     constructor();
     public setDefaults(): void;
     public changeBuilding(buildingType: any, continuous?: boolean): void;
     public activate(selectedCells: any[]): void;
     public onHover(targets: Cell[]): void;
+    public onFinish(): void;
+    public clearEffects(): void;
+    public clearGhostBuilding(): void;
 }
 declare class ClickTool extends Tool {
     constructor();

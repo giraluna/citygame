@@ -6,6 +6,7 @@
 class Highlighter
 {
   currHighlighted: PIXI.Sprite[] = [];
+  currTransparent: PIXI.Sprite[] = [];
 
   tintSprites(sprites: PIXI.Sprite[], color: number, shouldGroup: boolean = true)
   {
@@ -42,5 +43,30 @@ class Highlighter
       }
     }
     this.tintSprites(_sprites, color, shouldGroup);
+  }
+  alphaBuildings(cells: any[], value: number)
+  {
+    var _sprites = [];
+    for (var i = 0; i < cells.length; i++)
+    {
+      if (cells[i].content !== undefined)
+      {
+        var content = cells[i].content;
+        for (var j = 0; j < content.sprites.length; j++)
+        {
+          var sprite = content.sprites[j];
+          sprite.alpha = value;
+          this.currTransparent.push(sprite);
+        }
+      }
+    }
+  }
+  clearAlpha()
+  {
+    for (var i = 0; i < this.currTransparent.length; i++)
+    {
+      this.currTransparent[i].alpha = 1;
+    }
+    this.currTransparent = [];
   }
 }

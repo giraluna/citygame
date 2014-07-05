@@ -5,6 +5,7 @@
 var Highlighter = (function () {
     function Highlighter() {
         this.currHighlighted = [];
+        this.currTransparent = [];
     }
     Highlighter.prototype.tintSprites = function (sprites, color, shouldGroup) {
         if (typeof shouldGroup === "undefined") { shouldGroup = true; }
@@ -38,6 +39,25 @@ var Highlighter = (function () {
             }
         }
         this.tintSprites(_sprites, color, shouldGroup);
+    };
+    Highlighter.prototype.alphaBuildings = function (cells, value) {
+        var _sprites = [];
+        for (var i = 0; i < cells.length; i++) {
+            if (cells[i].content !== undefined) {
+                var content = cells[i].content;
+                for (var j = 0; j < content.sprites.length; j++) {
+                    var sprite = content.sprites[j];
+                    sprite.alpha = value;
+                    this.currTransparent.push(sprite);
+                }
+            }
+        }
+    };
+    Highlighter.prototype.clearAlpha = function () {
+        for (var i = 0; i < this.currTransparent.length; i++) {
+            this.currTransparent[i].alpha = 1;
+        }
+        this.currTransparent = [];
     };
     return Highlighter;
 })();

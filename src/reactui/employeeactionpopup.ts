@@ -71,7 +71,24 @@ export var EmployeeActionPopup = React.createClass({
 
   componentDidMount: function()
   {
-    this.refs.okBtn.getDOMNode().focus();
+    var self = this;
+    var okBtn = this.refs.okBtn.getDOMNode();
+    var closeBtn = this.refs.closeBtn.getDOMNode();
+    if (this.props.activationDelay)
+    {
+      okBtn.disabled = true;
+      closeBtn.disabled = true;
+      window.setTimeout(function()
+      {
+        okBtn.disabled = false;
+        closeBtn.disabled = false;
+        okBtn.focus();
+      }, self.props.activationDelay)
+    }
+    else
+    {
+      okBtn.focus();
+    }
   },
 
   render: function()
@@ -86,7 +103,9 @@ export var EmployeeActionPopup = React.createClass({
       ref            : "employeeAction",
       employees      : employees,
       relevantSkills : this.props.relevantSkills,
-      action         : this.props.action
+      action         : this.props.action,
+
+      selected: null
     }
     var stopBubble = function(e){e.stopPropagation();};
 
@@ -101,6 +120,7 @@ export var EmployeeActionPopup = React.createClass({
 
     var closeBtn = React.DOM.button(
     {
+      ref: "closeBtn",
       onClick: this.handleClose,
       onTouchStart: this.handleClose,
       draggable: true,

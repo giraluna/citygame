@@ -1138,7 +1138,8 @@ var Game = (function () {
                     eventManager.dispatchEvent({
                         type: "makeRecruitCompletePopup", content: {
                             player: self.players["player0"],
-                            employees: makeNewEmployees(randInt(4, 6), 2 * self.players["player0"].modifierEffects.recruitQuality)
+                            employees: makeNewEmployees(randInt(4, 6), 2 * self.players["player0"].modifierEffects.recruitQuality),
+                            delay: 0
                         }
                     });
                     window.setTimeout(function () {

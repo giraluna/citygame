@@ -196,6 +196,9 @@ var ReactUI = (function () {
             props.player.addEmployee(selected.employee);
         };
 
+        if (!isFinite(props.delay))
+            props.delay = 2000;
+
         var recruitCloseFN = function (selected) {
             if (props.recruitingEmployee) {
                 props.recruitingEmployee.active = true;
@@ -207,7 +210,8 @@ var ReactUI = (function () {
             text: props.text || "Choose employee to recruit",
             onOk: recruitConfirmFN,
             onClose: recruitCloseFN,
-            okBtnText: "Recruit"
+            okBtnText: "Recruit",
+            activationDelay: props.delay
         });
     };
 

@@ -69,6 +69,7 @@ declare class ReactUI {
         };
         player: Player;
         text?: any;
+        delay?: number;
     }): void;
     public makeCellBuyPopup(props: {
         player: Player;

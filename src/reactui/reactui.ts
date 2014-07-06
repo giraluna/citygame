@@ -244,7 +244,7 @@ class ReactUI
 
   makeRecruitPopup(props:
   {
-    player: Player
+    player: Player;
   })
   {
     var self = this;
@@ -285,14 +285,16 @@ class ReactUI
     employees: {[key:string]: Employee};
     player: Player;
     text?: any;
+    delay?: number;
   })
   {
     var self = this;
     var recruitConfirmFN = function(selected)
     {
-      
       props.player.addEmployee(selected.employee);
     };
+
+    if (!isFinite(props.delay)) props.delay = 2000;
 
     var recruitCloseFN = function(selected)
     {
@@ -308,7 +310,8 @@ class ReactUI
       text: props.text || "Choose employee to recruit",
       onOk: recruitConfirmFN,
       onClose: recruitCloseFN,
-      okBtnText: "Recruit"
+      okBtnText: "Recruit",
+      activationDelay: props.delay,
     });
   }
 

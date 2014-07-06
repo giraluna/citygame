@@ -499,7 +499,7 @@ var levelUpModifiers;
             }
         ],
         dynamicEffect: {
-            "prestige": function (player) {
+            "factory": function (player) {
                 player.addSpecialModifier({
                     type: "shoppingCostReductionPerFactory",
                     title: "Supply chain",

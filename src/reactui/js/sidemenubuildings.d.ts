@@ -11,8 +11,10 @@ declare module UIComponents {
     var SideMenuBuildings: React.ReactComponentFactory<{
         beautifyIndex: number;
         lastSelectedBuilding: any;
+        currentPopOver: any;
     }, React.ReactComponent<{
         beautifyIndex: number;
         lastSelectedBuilding: any;
+        currentPopOver: any;
     }, {}>>;
 }

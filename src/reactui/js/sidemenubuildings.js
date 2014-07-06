@@ -12,7 +12,27 @@ var UIComponents;
     */
     UIComponents.SideMenuBuildings = React.createClass({
         getInitialState: function () {
-            return { beautifyIndex: 0, lastSelectedBuilding: playerBuildableBuildings[0] };
+            return ({
+                beautifyIndex: 0,
+                lastSelectedBuilding: playerBuildableBuildings[0],
+                currentPopOver: null
+            });
+        },
+        drawPopOver: function (building, parentRef) {
+            var popOverNode = this.refs.popOver.getDOMNode();
+
+            popOverNode.classList.remove("hidden");
+
+            popOverNode.style.top = this.refs[parentRef].getDOMNode().getBoundingClientRect().top + "px";
+            console.log(popOverNode.style.top);
+            this.setState({ currentPopOver: building.type });
+        },
+        hidePopOver: function () {
+            if (!this.state.currentPopOver)
+                return;
+
+            this.refs.popOver.getDOMNode().classList.add("hidden");
+            this.setState({ currentPopOver: null });
         },
         handleBuildingSelect: function (building, e) {
             if (this.props.player.money < this.props.player.getBuildCost(building)) {
@@ -58,8 +78,25 @@ var UIComponents;
                 var divProps = {
                     className: "side-building",
                     key: building.type,
-                    title: building.title + "\n" + "Base profit: $" + building.baseProfit
+                    ref: building.type,
+                    title: building.title + "\n" + "Base profit: $" + building.baseProfit + "/d",
+                    onMouseLeave: this.hidePopOver
                 };
+
+                for (var polarity in building.effectTargets) {
+                    var targets = building.effectTargets[polarity];
+                    if (targets.length < 1)
+                        continue;
+                    else {
+                        var poleSign = (polarity === "negative") ? "-" : "+";
+                        divProps.title += "\n-----";
+                        divProps.title += "\n" + polarity + " effects:";
+
+                        for (var j = 0; j < targets.length; j++) {
+                            divProps.title += "\n" + targets[j] + " " + poleSign;
+                        }
+                    }
+                }
 
                 var imageProps = { className: "building-image" };
                 var titleProps = { className: "building-title" };
@@ -73,6 +110,7 @@ var UIComponents;
                     divProps.className += " interactive";
                     divProps.onClick = this.handleBuildingSelect.bind(null, building);
                     divProps.onTouchStart = this.handleBuildingSelect.bind(null, building);
+                    divProps.onMouseEnter = this.drawPopOver.bind(null, building, divProps.ref);
                 }
 
                 if (this.props.selectedTool && this.props.selectedTool === building.type) {
@@ -92,7 +130,12 @@ var UIComponents;
 
                 divs.push(div);
             }
-            return (React.DOM.div({ id: "side-menu-buildings", className: "grid-column" }, divs));
+
+            return (React.DOM.div({ id: "side-menu-buildings", className: "grid-column" }, divs, React.DOM.div({
+                id: "building-popover",
+                className: "hidden",
+                ref: "popOver"
+            }, "asdjhksadhja")));
         }
     });
 })(UIComponents || (UIComponents = {}));

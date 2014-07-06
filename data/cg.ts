@@ -934,8 +934,8 @@ function findType(typeName: string, target: any = cg)
       target.translatedEffects = newEffects;
       target.effectTargets =
       {
-        negative: Object.keys(effectTargets.negative),
-        positive: Object.keys(effectTargets.positive)
+        positive: Object.keys(effectTargets.positive),
+        negative: Object.keys(effectTargets.negative)
       }
     }
     else if (typeof target[prop] === "object")

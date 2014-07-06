@@ -383,6 +383,21 @@ progress::-webkit-progress-value {
 #side-menu-buildings .side-building .building-amount {
   flex: 0 0 30px;
 }
+#building-popover {
+  position: absolute;
+  right: 250px;
+  top: 0px;
+  width: 400px;
+  height: 200px;
+  background-color: white;
+  border: 1px solid red;
+  z-index: 9900;
+}
+@media (max-width: 600px) {
+  #building-popover {
+    right: 180px;
+  }
+}
 #side-menu-other-buttons {
   flex: 0 0 75px;
   order: 3;

@@ -17,7 +17,30 @@ export var SideMenuBuildings = React.createClass(
 {
   getInitialState: function()
   {
-    return {beautifyIndex: 0, lastSelectedBuilding: playerBuildableBuildings[0]};
+    return (
+    {
+      beautifyIndex: 0,
+      lastSelectedBuilding: playerBuildableBuildings[0],
+      currentPopOver: null
+    });
+  },
+  drawPopOver: function(building, parentRef)
+  {
+    var popOverNode = this.refs.popOver.getDOMNode();
+
+    popOverNode.classList.remove("hidden");
+
+    popOverNode.style.top = this.refs[parentRef].getDOMNode().
+      getBoundingClientRect().top + "px";
+    console.log(popOverNode.style.top);
+    this.setState({currentPopOver: building.type});
+  },
+  hidePopOver: function()
+  {
+    if (!this.state.currentPopOver) return;
+
+    this.refs.popOver.getDOMNode().classList.add("hidden");
+    this.setState({currentPopOver: null});
   },
   handleBuildingSelect: function(building, e?)
   {
@@ -77,9 +100,28 @@ export var SideMenuBuildings = React.createClass(
       {
         className: "side-building",
         key: building.type,
+        ref: building.type,
         title: building.title + "\n" +
-          "Base profit: $" + building.baseProfit
+          "Base profit: $" + building.baseProfit + "/d",
+        onMouseLeave: this.hidePopOver
       };
+
+      for (var polarity in building.effectTargets)
+      {
+        var targets = building.effectTargets[polarity];
+        if (targets.length < 1) continue;
+        else
+        {
+          var poleSign = (polarity === "negative") ? "-" : "+";
+          divProps.title += "\n-----";
+          divProps.title += "\n" + polarity + " effects:";
+          
+          for (var j = 0; j < targets.length; j++)
+          {
+            divProps.title += "\n" + targets[j] + " " + poleSign;
+          }
+        }
+      }
 
       var imageProps: any = {className: "building-image"};
       var titleProps: any = {className: "building-title"};
@@ -96,6 +138,7 @@ export var SideMenuBuildings = React.createClass(
         divProps.className += " interactive";
         divProps.onClick = this.handleBuildingSelect.bind(null, building);
         divProps.onTouchStart = this.handleBuildingSelect.bind(null, building);
+        divProps.onMouseEnter = this.drawPopOver.bind(null, building, divProps.ref);
       }
 
       
@@ -132,11 +175,19 @@ export var SideMenuBuildings = React.createClass(
       )
 
       divs.push(div);
-
     }
+
+
+
     return(
       React.DOM.div( {id:"side-menu-buildings", className:"grid-column"}, 
-        divs
+        divs,
+        React.DOM.div(
+        {
+          id:"building-popover",
+          className:"hidden",
+          ref: "popOver"
+        },"asdjhksadhja")
       )
     );
   }

@@ -2709,7 +2709,10 @@ class UIDrawer
       for (var modifier in cell.content.modifiers)
       {
         var _mod = cell.content.modifiers[modifier];
-        text += "Modifier: " + _mod.title +" "+ _mod.scaling(_mod.strength).toFixed(2) + "\n";
+        if (_mod.scaling(_mod.strength) > 0)
+        {
+          text += "Modifier: " + _mod.title +" "+ _mod.scaling(_mod.strength).toFixed(2) + "\n";
+        }
       }
       if (Object.keys(cell.content.modifiers).length > 0) text += "-------\n";
       text += "Final profit: " + finalAmount + "/d";

@@ -542,6 +542,22 @@ progress::-webkit-progress-value { background: #080; }
   }
 }
 
+#building-popover
+{
+  position: absolute;
+  right: @side-menu-width;
+  top: 0px;
+  @media(max-width: 600px)
+  {
+    right: @side-menu-width-small;
+  }
+  width: 400px;
+  height: 200px;
+  background-color: white;
+  border: 1px solid red;
+  z-index: 9900;
+}
+
 #side-menu-other-buttons
 {
   flex: 0 0 75px;

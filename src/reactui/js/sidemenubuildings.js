@@ -44,9 +44,10 @@ var UIComponents;
                         var effects = info.target[polarity];
 
                         content += "<div class='tooltip-modifiers " + "tooltip-modifiers-" + polarity + "'>";
-                        content += "<h5 class='tooltip-modifiers-header'>";
-                        content += capitalize(polarity);
-                        content += "</h5>";
+
+                        //content += "<h5 class='tooltip-modifiers-header'>";
+                        //  content += capitalize(polarity);
+                        //content += "</h5>";
                         content += "<ul>";
                         for (var i = 0; i < effects.length; i++) {
                             content += "<li>" + capitalize(effects[i]) + "</li>";

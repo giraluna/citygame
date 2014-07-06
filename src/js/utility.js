@@ -524,4 +524,8 @@ function toggleDebugmode() {
         menu.classList.toggle("debug-hidden");
     });
 }
+
+function capitalize(str) {
+    return str.substring(0, 1).toUpperCase() + str.substring(1);
+}
 //# sourceMappingURL=utility.js.map

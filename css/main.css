@@ -387,8 +387,8 @@ progress::-webkit-progress-value {
   position: absolute;
   right: 250px;
   top: 0px;
-  width: 400px;
-  height: 200px;
+  width: 250px;
+  max-height: 200px;
   background-color: white;
   border: 1px solid red;
   z-index: 9900;
@@ -397,6 +397,35 @@ progress::-webkit-progress-value {
   #building-popover {
     right: 180px;
   }
+}
+#building-popover ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+#building-popover h4 {
+  margin: 0;
+  padding: 0;
+}
+.tooltip-modifiers-container {
+  display: flex;
+  flex-flow: row;
+}
+.tooltip-modifiers {
+  display: flex;
+  flex-flow: column;
+  flex: 1;
+}
+.tooltip-modifiers li:before {
+  font-size: 1.25em;
+}
+#tooltip-modifiers-positive li:before {
+  content: "+";
+  color: green;
+}
+#tooltip-modifiers-negative li:before {
+  content: "-";
+  color: red;
 }
 #side-menu-other-buttons {
   flex: 0 0 75px;

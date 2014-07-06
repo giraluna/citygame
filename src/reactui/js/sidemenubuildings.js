@@ -21,16 +21,36 @@ var UIComponents;
         drawPopOver: function (building, parentRef) {
             var popOverNode = this.refs.popOver.getDOMNode();
 
-            popOverNode.classList.remove("hidden");
+            var content = "<div class='building-tooltip-content'>";
+            content += building.title;
+            content += "</div>";
 
+            content += "<div class='tooltip-modifiers-container'>";
+            for (var polarity in building.effectTargets) {
+                content += "<div class='tooltip-modifiers'" + "id='tooltip-modifiers-" + polarity + "'>";
+                content += "<h4 class='tooltip-modifiers-header'>";
+                content += capitalize(polarity);
+                content += "</h4>";
+                content += "<ul>";
+                for (var i = 0; i < building.effectTargets[polarity].length; i++) {
+                    content += "<li>" + capitalize(building.effectTargets[polarity][i]) + "</li>";
+                }
+                content += "</ul>";
+                content += "</div>";
+            }
+            content += "</div>";
+
+            popOverNode.innerHTML = content;
+
+            popOverNode.classList.remove("hidden");
             popOverNode.style.top = this.refs[parentRef].getDOMNode().getBoundingClientRect().top + "px";
-            console.log(popOverNode.style.top);
+
             this.setState({ currentPopOver: building.type });
         },
         hidePopOver: function () {
+            return;
             if (!this.state.currentPopOver)
                 return;
-
             this.refs.popOver.getDOMNode().classList.add("hidden");
             this.setState({ currentPopOver: null });
         },

@@ -74,3 +74,4 @@ declare function rawFormatter(value: any): number;
 declare var numberFormatters: any[];
 declare function beautify(value: number, formatterIndex?: number): any;
 declare function toggleDebugmode(): void;
+declare function capitalize(str: string): string;

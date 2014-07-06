@@ -19,28 +19,47 @@ var UIComponents;
             });
         },
         drawPopOver: function (building, parentRef) {
+            if (this.state.currentPopOver === building.type)
+                return;
             var popOverNode = this.refs.popOver.getDOMNode();
 
-            var content = "<div class='building-tooltip-content'>";
-            content += building.title;
-            content += "</div>";
+            var effectInfo = [
+                { title: "Affected by", target: effectSourcesIndex[building.categoryType] },
+                { title: "Affects", target: building.effectTargets }
+            ];
 
-            content += "<div class='tooltip-modifiers-container'>";
-            for (var polarity in building.effectTargets) {
-                content += "<div class='tooltip-modifiers'" + "id='tooltip-modifiers-" + polarity + "'>";
-                content += "<h4 class='tooltip-modifiers-header'>";
-                content += capitalize(polarity);
-                content += "</h4>";
-                content += "<ul>";
-                for (var i = 0; i < building.effectTargets[polarity].length; i++) {
-                    content += "<li>" + capitalize(building.effectTargets[polarity][i]) + "</li>";
-                }
-                content += "</ul>";
-                content += "</div>";
+            if (!this.indexedPopoverContent)
+                this.indexedPopoverContent = {};
+            if (!this.indexedPopoverContent[building.type]) {
+                var content = "";
+                content += "<div>Base profit $" + building.baseProfit + "/d</div>";
+
+                effectInfo.forEach(function (info) {
+                    if (!info.target || (info.target.positive.length < 1 && info.target.negative.length < 1)) {
+                        return;
+                    }
+                    content += "<h4>" + info.title + "</h4>";
+                    content += "<div class='tooltip-modifiers-container'>";
+                    for (var polarity in info.target) {
+                        var effects = info.target[polarity];
+
+                        content += "<div class='tooltip-modifiers " + "tooltip-modifiers-" + polarity + "'>";
+                        content += "<h5 class='tooltip-modifiers-header'>";
+                        content += capitalize(polarity);
+                        content += "</h5>";
+                        content += "<ul>";
+                        for (var i = 0; i < effects.length; i++) {
+                            content += "<li>" + capitalize(effects[i]) + "</li>";
+                        }
+                        content += "</ul>";
+                        content += "</div>";
+                    }
+                    content += "</div>";
+                });
+                this.indexedPopoverContent[building.type] = content;
             }
-            content += "</div>";
 
-            popOverNode.innerHTML = content;
+            popOverNode.innerHTML = this.indexedPopoverContent[building.type];
 
             popOverNode.classList.remove("hidden");
             popOverNode.style.top = this.refs[parentRef].getDOMNode().getBoundingClientRect().top + "px";
@@ -48,7 +67,6 @@ var UIComponents;
             this.setState({ currentPopOver: building.type });
         },
         hidePopOver: function () {
-            return;
             if (!this.state.currentPopOver)
                 return;
             this.refs.popOver.getDOMNode().classList.add("hidden");
@@ -103,21 +121,23 @@ var UIComponents;
                     onMouseLeave: this.hidePopOver
                 };
 
-                for (var polarity in building.effectTargets) {
-                    var targets = building.effectTargets[polarity];
-                    if (targets.length < 1)
-                        continue;
-                    else {
-                        var poleSign = (polarity === "negative") ? "-" : "+";
-                        divProps.title += "\n-----";
-                        divProps.title += "\n" + polarity + " effects:";
-
-                        for (var j = 0; j < targets.length; j++) {
-                            divProps.title += "\n" + targets[j] + " " + poleSign;
-                        }
-                    }
+                /*
+                for (var polarity in building.effectTargets)
+                {
+                var targets = building.effectTargets[polarity];
+                if (targets.length < 1) continue;
+                else
+                {
+                var poleSign = (polarity === "negative") ? "-" : "+";
+                divProps.title += "\n-----";
+                divProps.title += "\n" + polarity + " effects:";
+                
+                for (var j = 0; j < targets.length; j++)
+                {
+                divProps.title += "\n" + targets[j] + " " + poleSign;
                 }
-
+                }
+                }*/
                 var imageProps = { className: "building-image" };
                 var titleProps = { className: "building-title" };
                 var costProps = { className: "building-cost" };

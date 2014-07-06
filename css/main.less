@@ -551,11 +551,12 @@ progress::-webkit-progress-value { background: #080; }
   {
     right: @side-menu-width-small;
   }
-  width: 250px;
-  max-height: 200px;
+  width: 230px;
+  max-height: 290px;
   background-color: white;
-  border: 1px solid red;
+  border: 1px solid #888;
   z-index: 9900;
+  overflow-y: hidden;
 
   ul
   {
@@ -563,7 +564,11 @@ progress::-webkit-progress-value { background: #080; }
     padding: 0;
     list-style: none;
   }
-  h4
+  li
+  {
+    font-size: 0.8em;
+  }
+  h5, h4
   {
     margin: 0;
     padding: 0;
@@ -583,10 +588,11 @@ progress::-webkit-progress-value { background: #080; }
 
   li:before
   {
-    font-size: 1.25em;
+    font-size: 1.5em;
+    margin-right: 2px;
   }
 }
-#tooltip-modifiers-positive
+.tooltip-modifiers-positive
 {
   li:before
   {
@@ -594,7 +600,7 @@ progress::-webkit-progress-value { background: #080; }
     color: green;
   }
 }
-#tooltip-modifiers-negative
+.tooltip-modifiers-negative
 {
   li:before
   {

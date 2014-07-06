@@ -47,6 +47,8 @@ var Highlighter = (function () {
                 var content = cells[i].content;
                 for (var j = 0; j < content.sprites.length; j++) {
                     var sprite = content.sprites[j];
+                    if (sprite.height < 53)
+                        continue;
                     sprite.alpha = value;
                     this.currTransparent.push(sprite);
                 }

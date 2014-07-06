@@ -387,11 +387,12 @@ progress::-webkit-progress-value {
   position: absolute;
   right: 250px;
   top: 0px;
-  width: 250px;
-  max-height: 200px;
+  width: 230px;
+  max-height: 290px;
   background-color: white;
-  border: 1px solid red;
+  border: 1px solid #888;
   z-index: 9900;
+  overflow-y: hidden;
 }
 @media (max-width: 600px) {
   #building-popover {
@@ -403,6 +404,10 @@ progress::-webkit-progress-value {
   padding: 0;
   list-style: none;
 }
+#building-popover li {
+  font-size: 0.8em;
+}
+#building-popover h5,
 #building-popover h4 {
   margin: 0;
   padding: 0;
@@ -417,13 +422,14 @@ progress::-webkit-progress-value {
   flex: 1;
 }
 .tooltip-modifiers li:before {
-  font-size: 1.25em;
+  font-size: 1.5em;
+  margin-right: 2px;
 }
-#tooltip-modifiers-positive li:before {
+.tooltip-modifiers-positive li:before {
   content: "+";
   color: green;
 }
-#tooltip-modifiers-negative li:before {
+.tooltip-modifiers-negative li:before {
   content: "-";
   color: red;
 }

@@ -184,6 +184,7 @@ var cg: any =
       {
         "type": "road_h",
         "baseType": "road",
+        "categoryType": "road",
         "title": "Road",
         "anchor": [0.5, 1.0],
         "frame": ["road_h.png"],
@@ -200,6 +201,7 @@ var cg: any =
       {
         "type": "road_v",
         "baseType": "road",
+        "categoryType": "road",
         "title": "Road",
         "anchor": [0.5, 1.0],
         "frame": ["road_v.png"],
@@ -216,6 +218,7 @@ var cg: any =
       {
         "type": "road_ne",
         "baseType": "road",
+        "categoryType": "road",
         "title": "Road",
         "anchor": [0.5, 1.0],
         "frame": ["road_ne.png"],
@@ -232,6 +235,7 @@ var cg: any =
       {
         "type": "road_nw",
         "baseType": "road",
+        "categoryType": "road",
         "title": "Road",
         "anchor": [0.5, 1.0],
         "frame": ["road_nw.png"],
@@ -248,6 +252,7 @@ var cg: any =
       {
         "type": "road_sw",
         "baseType": "road",
+        "categoryType": "road",
         "title": "Road",
         "anchor": [0.5, 1.0],
         "frame": ["road_sw.png"],
@@ -264,6 +269,7 @@ var cg: any =
       {
         "type": "road_es",
         "baseType": "road",
+        "categoryType": "road",
         "title": "Road",
         "anchor": [0.5, 1.0],
         "frame": ["road_se.png"],
@@ -280,6 +286,7 @@ var cg: any =
       {
         "type": "road_nesw",
         "baseType": "road",
+        "categoryType": "road",
         "title": "Road",
         "anchor": [0.5, 1.0],
         "frame": ["road_news.png"],
@@ -296,6 +303,7 @@ var cg: any =
       {
         "type": "road_new",
         "baseType": "road",
+        "categoryType": "road",
         "title": "Road",
         "anchor": [0.5, 1.0],
         "frame": ["road_new.png"],
@@ -312,6 +320,7 @@ var cg: any =
       {
         "type": "road_nsw",
         "baseType": "road",
+        "categoryType": "road",
         "title": "Road",
         "anchor": [0.5, 1.0],
         "frame": ["road_nsw.png"],
@@ -328,6 +337,7 @@ var cg: any =
       {
         "type": "road_esw",
         "baseType": "road",
+        "categoryType": "road",
         "title": "Road",
         "anchor": [0.5, 1.0],
         "frame": ["road_sew.png"],
@@ -344,6 +354,7 @@ var cg: any =
       {
         "type": "road_nes",
         "baseType": "road",
+        "categoryType": "road",
         "title": "Road",
         "anchor": [0.5, 1.0],
         "frame": ["road_nse.png"],
@@ -962,10 +973,14 @@ var effectSourcesIndex: any = {};
           var flag = flags[i];
           if (!effectSourcesIndex[flag]) effectSourcesIndex[flag] =
           {
-            positive: {},
-            negative: {}
+            positive: [],
+            negative: []
           }
-          effectSourcesIndex[flag][polarity][target.type] = true;
+          var type = target.categoryType || "enviroment";
+          if (effectSourcesIndex[flag][polarity].indexOf(type) < 0)
+          {
+            effectSourcesIndex[flag][polarity].push(type);
+          }
         }
       }
     }

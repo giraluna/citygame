@@ -26,32 +26,52 @@ export var SideMenuBuildings = React.createClass(
   },
   drawPopOver: function(building, parentRef)
   {
+    if (this.state.currentPopOver === building.type) return;
     var popOverNode = this.refs.popOver.getDOMNode();
 
-    var content = "<div class='building-tooltip-content'>";
-      content += building.title;
-    content += "</div>";
+    var effectInfo = [
+      {title: "Affected by", target:effectSourcesIndex[building.categoryType]},
+      {title: "Affects", target:building.effectTargets}
+    ]
 
-    content += "<div class='tooltip-modifiers-container'>";
-      for (var polarity in building.effectTargets)
+    if (!this.indexedPopoverContent) this.indexedPopoverContent = {};
+    if (!this.indexedPopoverContent[building.type])
+    {
+      var content = "";
+      content += "<div>Base profit $" + building.baseProfit + "/d</div>"
+
+      effectInfo.forEach(function(info)
       {
-        content += "<div class='tooltip-modifiers'" +
-        "id='tooltip-modifiers-" + polarity + "'>";
-          content += "<h4 class='tooltip-modifiers-header'>";
-            content += capitalize(polarity);
-          content += "</h4>";
-          content += "<ul>";
-            for (var i = 0; i < building.effectTargets[polarity].length; i++)
-            {
-              content += "<li>" + capitalize(building.effectTargets[polarity][i]) + "</li>";
-            }
-          content += "</ul>";
+        if (!info.target || 
+          (info.target.positive.length < 1 && info.target.negative.length < 1))
+        {
+          return;
+        }
+        content += "<h4>"+ info.title +"</h4>";
+        content += "<div class='tooltip-modifiers-container'>";
+          for (var polarity in info.target)
+          {
+            var effects = info.target[polarity];
+      
+            content += "<div class='tooltip-modifiers " +
+              "tooltip-modifiers-" + polarity + "'>";
+              content += "<h5 class='tooltip-modifiers-header'>";
+                content += capitalize(polarity);
+              content += "</h5>";
+              content += "<ul>";
+                for (var i = 0; i < effects.length; i++)
+                {
+                  content += "<li>" + capitalize(effects[i]) + "</li>";
+                }
+              content += "</ul>";
+            content += "</div>";
+          }
         content += "</div>";
-      }
-    content += "</div>";
+      });
+      this.indexedPopoverContent[building.type] = content;
+    }
 
-
-    popOverNode.innerHTML = content;
+    popOverNode.innerHTML = this.indexedPopoverContent[building.type];
 
     popOverNode.classList.remove("hidden");
     popOverNode.style.top = this.refs[parentRef].getDOMNode().
@@ -61,7 +81,6 @@ export var SideMenuBuildings = React.createClass(
   },
   hidePopOver: function()
   {
-    return;
     if (!this.state.currentPopOver) return;
     this.refs.popOver.getDOMNode().classList.add("hidden");
     this.setState({currentPopOver: null});
@@ -129,7 +148,7 @@ export var SideMenuBuildings = React.createClass(
           "Base profit: $" + building.baseProfit + "/d",
         onMouseLeave: this.hidePopOver
       };
-
+      /*
       for (var polarity in building.effectTargets)
       {
         var targets = building.effectTargets[polarity];
@@ -145,7 +164,7 @@ export var SideMenuBuildings = React.createClass(
             divProps.title += "\n" + targets[j] + " " + poleSign;
           }
         }
-      }
+      }*/
 
       var imageProps: any = {className: "building-image"};
       var titleProps: any = {className: "building-title"};

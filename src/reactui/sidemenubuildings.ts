@@ -144,8 +144,6 @@ export var SideMenuBuildings = React.createClass(
         className: "side-building",
         key: building.type,
         ref: building.type,
-        title: building.title + "\n" +
-          "Base profit: $" + building.baseProfit + "/d",
         onMouseLeave: this.hidePopOver
       };
       /*

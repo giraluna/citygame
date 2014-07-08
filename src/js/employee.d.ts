@@ -17,7 +17,7 @@ declare class Employee {
     public growth: ISkillsObj;
     public skillTotal: number;
     public potential: number;
-    public traits: any;
+    public trait: playerModifiers.IPlayerModifier;
     public active: boolean;
     public currentAction: string;
     constructor(names: any, params?: {
@@ -38,5 +38,6 @@ declare class Employee {
     public setGrowthByLevel(growthLevel: any): ISkillsObj;
     public setSkillTotal(): void;
     public trainSkill(skill: string): void;
+    public addTrait(modifier: any): void;
 }
 declare function makeNewEmployees(employeeCount: number, recruitingSkill: number): any[];

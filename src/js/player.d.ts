@@ -52,6 +52,7 @@ declare class Player {
     public updateElements(): void;
     public init(): void;
     public addEmployee(employee: Employee): void;
+    public removeEmployee(employee: Employee): void;
     public getEmployees(): any[];
     public getActiveEmployees(): any[];
     public addCell(cell: any): void;
@@ -66,6 +67,7 @@ declare class Player {
     public addSpecialModifier(modifier: any): void;
     public addTimedModifier(modifier: any): void;
     public addDynamicModifier(sourceModifier: any): void;
+    public addEmployeeModifier(modifier: any): void;
     public applyModifier(modifier: any): void;
     public applyAllModifiers(): void;
     public removeModifier(modifier: any, collection?: string): void;

@@ -23,7 +23,7 @@ class Employee
   growth: ISkillsObj;
   skillTotal: number;
   potential: number;
-  traits: any = {};
+  trait: playerModifiers.IPlayerModifier;
   active: boolean = true;
   currentAction: string;
 
@@ -147,6 +147,15 @@ class Employee
         this.skills[skill]++;
         this.skillTotal++;
       }
+    }
+  }
+  addTrait(modifier)
+  {
+    this.trait = modifier;
+
+    if (this.player)
+    {
+      this.player.addEmployeeModifier(modifier);
     }
   }
 }

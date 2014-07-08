@@ -849,9 +849,9 @@ class Cell
     this.landValue = Math.round(
       (this.baseLandValue + totals.addedValue) * totals.multiplier );
 
-    if (this.landValue < this.baseLandValue * 0.33)
+    if (this.landValue < this.baseLandValue * 0.8)
     {
-      this.landValue = Math.round(this.baseLandValue * 0.33);
+      this.landValue = Math.round(this.baseLandValue * 0.8);
     }
   }
   addOverlay(color, depth:number = 1)
@@ -1283,6 +1283,8 @@ class Game
     this.resize();
     this.render();
     this.updateWorld();
+
+    window.setInterval(this.updateSystems.bind(this), 1000);
 
     /*
     game.uiDrawer.makeFadeyPopup(
@@ -2094,9 +2096,11 @@ class Game
 
     TWEEN.update();
 
-    this.systemsManager.update();
-
     requestAnimFrame( this.render.bind(this) );
+  }
+  updateSystems()
+  {
+    this.systemsManager.update();
   }
   resetLayers()
   {
@@ -3268,7 +3272,7 @@ class BuildTool extends Tool
 
     for (var i = 0; i < belowBuildArea.length; i++)
     {
-      game.highlighter.alphaBuildings(belowBuildArea, 0.4);
+      game.highlighter.alphaBuildings(belowBuildArea, 0.3);
     }
 
     if (!baseCell.content)

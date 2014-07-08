@@ -178,6 +178,28 @@ class Player
   {
     this.employees[employee.id] = employee;
     employee.player = this;
+    if (employee.trait)
+    {
+      this.addEmployeeModifier(employee.trait);
+    }
+  }
+  removeEmployee(employee: Employee)
+  {
+    if (employee.trait)
+    {
+      this.removeModifier(employee.trait, "employeeModifiers");
+      for (var _id in this.employees)
+      {
+        var _employee = this.employees[_id];
+
+        if (_employee.trait && _employee.trait.type === employee.trait.type)
+        {
+          this.addEmployeeModifier(_employee.trait);
+        }
+      }
+    }
+    this.employees[employee.id] = null;
+    delete this.employees[employee.id];
   }
   getEmployees()
   {
@@ -406,6 +428,10 @@ class Player
 
       this.updateDynamicModifiers(condition);
     }
+  }
+  addEmployeeModifier(modifier)
+  {
+    this.addModifier(modifier, "employeeModifiers");
   }
   applyModifier(modifier)
   {

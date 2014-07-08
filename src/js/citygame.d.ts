@@ -206,6 +206,7 @@ declare class Game {
     public loadPlayer(data: any): void;
     public prestigeReset(onReset: any): void;
     public render(): void;
+    public updateSystems(): void;
     public resetLayers(): void;
     public switchEditingMode(newMode: string): void;
 }

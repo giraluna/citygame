@@ -90,8 +90,7 @@ module UIComponents
                   text: "Are you sure you want to fire " + employee.name + "?",
                   onOk: function()
                   {
-                    player.employees[employee.id] = null;
-                    delete player.employees[employee.id];
+                    player.removeEmployee(employee);
                   }
                 }
               });

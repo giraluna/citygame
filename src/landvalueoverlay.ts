@@ -12,8 +12,8 @@ function makeLandValueOverlay(board)
   {
     var difference = maxValue - minValue;
     if (difference < 1) difference = 1;
-    // clamps to steps of difference / n
-    var threshhold = difference / 5;
+    // clamps to n different colors
+    var threshhold = difference / 6;
     if (threshhold < 1) threshhold = 1;
     var relative = (Math.round(val/threshhold) * threshhold - minValue) /
       (difference);
@@ -60,7 +60,7 @@ function makeLandValueOverlay(board)
       else if (relativeValue > 1) relativeValue = 1;
 
       var hue = 100 - 100 * relativeValue;
-      var saturation = 1 - 0.2 * relativeValue;
+      var saturation = 1 - 0.1 * relativeValue;
       var luminesence = 0.75 + 0.25 * relativeValue;
 
       colorIndexes[cell.value] =

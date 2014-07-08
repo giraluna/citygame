@@ -135,6 +135,23 @@ var Player = (function () {
     Player.prototype.addEmployee = function (employee) {
         this.employees[employee.id] = employee;
         employee.player = this;
+        if (employee.trait) {
+            this.addEmployeeModifier(employee.trait);
+        }
+    };
+    Player.prototype.removeEmployee = function (employee) {
+        if (employee.trait) {
+            this.removeModifier(employee.trait, "employeeModifiers");
+            for (var _id in this.employees) {
+                var _employee = this.employees[_id];
+
+                if (_employee.trait && _employee.trait.type === employee.trait.type) {
+                    this.addEmployeeModifier(_employee.trait);
+                }
+            }
+        }
+        this.employees[employee.id] = null;
+        delete this.employees[employee.id];
     };
     Player.prototype.getEmployees = function () {
         var employees = [];
@@ -333,6 +350,9 @@ var Player = (function () {
 
             this.updateDynamicModifiers(condition);
         }
+    };
+    Player.prototype.addEmployeeModifier = function (modifier) {
+        this.addModifier(modifier, "employeeModifiers");
     };
     Player.prototype.applyModifier = function (modifier) {
         for (var ii = 0; ii < modifier.effects.length; ii++) {

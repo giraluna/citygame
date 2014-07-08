@@ -7,7 +7,6 @@ idGenerator.employee = 0;
 
 var Employee = (function () {
     function Employee(names, params) {
-        this.traits = {};
         this.active = true;
         // lets us do cleaner || check instead of (params && param.x) ? x : y
         var _params = params || {};
@@ -95,6 +94,13 @@ var Employee = (function () {
                 this.skills[skill]++;
                 this.skillTotal++;
             }
+        }
+    };
+    Employee.prototype.addTrait = function (modifier) {
+        this.trait = modifier;
+
+        if (this.player) {
+            this.player.addEmployeeModifier(modifier);
         }
     };
     return Employee;

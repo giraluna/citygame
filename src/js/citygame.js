@@ -1614,6 +1614,7 @@ var Game = (function () {
             newPlayer.incomePerType = Object.create(player.incomePerType);
 
             newPlayer.timesReset = player.timesReset + 1;
+            newPlayer.clicks = player.clicks;
             newPlayer.totalResetExperience = player.totalResetExperience + player.experience;
             newPlayer.permanentLevelupUpgrades = player.permanentLevelupUpgrades.slice(0);
             if (toPerm)

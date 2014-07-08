@@ -69,9 +69,9 @@ class Employee
     this.setSkillTotal();
     if (params.id === undefined) //not first time
     {
-      var traitThreshold = isFinite(params.traitChance) ? params.traitChance : 0.5;
+      var traitThreshold = isFinite(params.traitChance) ? params.traitChance : 0.05;
       var rand = Math.random();
-      console.log(traitThreshold, rand);
+
       if (rand <= traitThreshold)
       {
         this.addRandomTrait();

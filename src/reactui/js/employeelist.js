@@ -124,7 +124,7 @@ var UIComponents;
                     key: "trait",
                     defaultOrder: "desc",
                     propToSortBy: "traitTitle",
-                    title: "Traits\nProvide various benefits"
+                    title: "Traits\nMouse over trait to see benefits. Traits do not stack."
                 }
             ];
 

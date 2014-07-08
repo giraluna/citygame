@@ -150,7 +150,7 @@ module UIComponents
           key: "trait",
           defaultOrder: "desc",
           propToSortBy: "traitTitle",
-          title: "Traits\nProvide various benefits. Traits do not stack."
+          title: "Traits\nMouse over trait to see benefits. Traits do not stack."
         }
       ];
 

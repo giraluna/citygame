@@ -1,6 +1,6 @@
 /// <reference path="js/utility.d.ts" />
 /// <reference path="../data/js/names.d.ts" />
-/// <reference path="../data/js/playermodifiers.d.ts" />
+/// <reference path="../data/js/employeemodifiers.d.ts" />
 ///
 var idGenerator = idGenerator || {};
 idGenerator.employee = 0;
@@ -8,27 +8,35 @@ idGenerator.employee = 0;
 var Employee = (function () {
     function Employee(names, params) {
         this.active = true;
-        // lets us do cleaner || check instead of (params && param.x) ? x : y
-        var _params = params || {};
+        this.id = params.id || "employee" + idGenerator.employee++;
 
-        this.id = _params.id || "employee" + idGenerator.employee++;
+        this.gender = params.gender || getRandomArrayItem(["male", "female"]);
+        this.ethnicity = params.ethnicity || getRandomKey(names);
+        this.name = params.name || this.getName(names, this.gender, this.ethnicity);
 
-        this.gender = _params.gender || getRandomArrayItem(["male", "female"]);
-        this.ethnicity = _params.ethnicity || getRandomKey(names);
-        this.name = _params.name || this.getName(names, this.gender, this.ethnicity);
-
-        var skillVariance = Math.round(_params.skillVariance) || 1;
+        var skillVariance = Math.round(params.skillVariance) || 1;
 
         // legacy
-        if (_params.skills && _params.skills["management"])
-            delete _params.skills["management"];
+        if (params.skills && params.skills["management"])
+            delete params.skills["management"];
 
-        this.skills = _params.skills || this.setSkillsByLevel(_params.skillLevel, skillVariance);
-        this.growth = _params.growth || this.setGrowthByLevel(_params.growthLevel);
-        this.potential = _params.potential || 60;
+        this.skills = params.skills || this.setSkillsByLevel(params.skillLevel, skillVariance);
+        this.growth = params.growth || this.setGrowthByLevel(params.growthLevel);
+        this.potential = params.potential || 60;
 
-        //40 * _params.skillLevel + 20 * Math.random();
+        //40 * params.skillLevel + 20 * Math.random();
+        if (params.trait)
+            this.addTrait(employeeModifiers[params.trait]);
+
         this.setSkillTotal();
+        if (params.id === undefined) {
+            var traitThreshold = isFinite(params.traitChance) ? params.traitChance : 0.5;
+            var rand = Math.random();
+            console.log(traitThreshold, rand);
+            if (rand <= traitThreshold) {
+                this.addRandomTrait();
+            }
+        }
     }
     Employee.prototype.getName = function (names, gender, ethnicity) {
         var first = getRandomArrayItem(names[ethnicity][gender]);
@@ -102,6 +110,22 @@ var Employee = (function () {
         if (this.player) {
             this.player.addEmployeeModifier(modifier);
         }
+    };
+    Employee.prototype.addRandomTrait = function () {
+        var toAdd = getRandomArrayItem(this.getAvailableTraits());
+        this.addTrait(toAdd);
+    };
+    Employee.prototype.getAvailableTraits = function () {
+        var available = [];
+        var byUnlock = employeeModifiers.modifiersByUnlock.skillTotal;
+
+        for (var _total in byUnlock) {
+            if (this.skillTotal >= parseInt(_total)) {
+                available = available.concat(byUnlock[_total]);
+            }
+        }
+
+        return available;
     };
     return Employee;
 })();

@@ -44,6 +44,7 @@ class Player
   levelUpModifiers: any = {};
   specialModifiers: any = {};
   defaultModifiers: any = {};
+  employeeModifiers: any = {};
 
   modifierEffects: any =
   {

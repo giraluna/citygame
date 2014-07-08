@@ -1,6 +1,6 @@
 /// <reference path="utility.d.ts" />
 /// <reference path="../../data/js/names.d.ts" />
-/// <reference path="../../data/js/playermodifiers.d.ts" />
+/// <reference path="../../data/js/employeemodifiers.d.ts" />
 declare var idGenerator: any;
 interface ISkillsObj {
     negotiation: number;
@@ -20,7 +20,7 @@ declare class Employee {
     public trait: playerModifiers.IPlayerModifier;
     public active: boolean;
     public currentAction: string;
-    constructor(names: any, params?: {
+    constructor(names: any, params: {
         id?: string;
         name?: string;
         gender?: string;
@@ -31,7 +31,8 @@ declare class Employee {
         growth?: ISkillsObj;
         potential?: number;
         skills?: ISkillsObj;
-        traits?: any;
+        trait?: string;
+        traitChance?: number;
     });
     public getName(names: any, gender: string, ethnicity: string): string;
     public setSkillsByLevel(skillLevel: any, variance: any): ISkillsObj;
@@ -39,5 +40,7 @@ declare class Employee {
     public setSkillTotal(): void;
     public trainSkill(skill: string): void;
     public addTrait(modifier: any): void;
+    public addRandomTrait(): void;
+    public getAvailableTraits(): any[];
 }
 declare function makeNewEmployees(employeeCount: number, recruitingSkill: number): any[];

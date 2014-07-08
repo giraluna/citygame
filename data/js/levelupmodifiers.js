@@ -508,7 +508,7 @@ var levelUpModifiers;
                         {
                             targets: ["shopping"],
                             buildCost: {
-                                multiplier: 1 - player.amountBuiltPerCategory["factory"]
+                                multiplier: 1 - 0.02 * player.amountBuiltPerCategory["factory"]
                             }
                         }
                     ]

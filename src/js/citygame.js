@@ -1527,7 +1527,11 @@ var Game = (function () {
         for (var _e in player.employees) {
             data.employees[_e] = {};
             for (var prop in player.employees[_e]) {
-                if (prop !== "player") {
+                if (prop === "trait") {
+                    if (player.employees[_e].trait) {
+                        data.employees[_e].trait = player.employees[_e].trait.type;
+                    }
+                } else if (prop !== "player") {
                     data.employees[_e][prop] = player.employees[_e][prop];
                 }
             }

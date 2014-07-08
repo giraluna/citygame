@@ -152,6 +152,16 @@ class ReactUI
         popupProps[prop] = props[prop];
       };
       popupProps.key = key;
+
+      var container = document.getElementById("react-popups")
+      {
+        
+      }
+      var basePos =
+      {
+        top: 0,
+        left: 0
+      }
       popupProps.initialStyle =
       {
         top: window.innerHeight / 3.5 - 60 + Object.keys(this.popups).length * 15,

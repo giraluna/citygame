@@ -25,7 +25,7 @@ var UIComponents;
         },
         applyCellStyle: function (item, column, cellProps) {
             if (this.props.relevantSkills && this.props.relevantSkills.length > 0) {
-                if (this.props.relevantSkills.indexOf(column.key) < 0 && column.key !== "name") {
+                if (this.props.relevantSkills.indexOf(column.key) < 0 && column.key !== "name" && column.key !== "trait") {
                     cellProps["className"] = "irrelevant-cell";
                 }
             }
@@ -58,8 +58,15 @@ var UIComponents;
                     negotiation: employee.skills.negotiation,
                     recruitment: employee.skills.recruitment,
                     construction: employee.skills.construction,
+                    trait: null,
+                    traitTitle: null,
                     employee: employee
                 };
+
+                if (employee.trait) {
+                    data.trait = React.DOM.span({ title: employee.trait.description }, employee.trait.title);
+                    data.traitTitle = employee.trait.title;
+                }
 
                 if (employee.player) {
                     hasDeleteButton = true;
@@ -111,6 +118,13 @@ var UIComponents;
                     sortingFunction: this.sortEmployees,
                     defaultOrder: "desc",
                     title: "Construction\nDecreases building cost and time"
+                },
+                {
+                    label: "trait",
+                    key: "trait",
+                    defaultOrder: "desc",
+                    propToSortBy: "traitTitle",
+                    title: "Traits\nProvide various benefits"
                 }
             ];
 

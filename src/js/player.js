@@ -34,6 +34,7 @@ var Player = (function () {
         this.levelUpModifiers = {};
         this.specialModifiers = {};
         this.defaultModifiers = {};
+        this.employeeModifiers = {};
         this.modifierEffects = {
             profit: {},
             buildCost: {},

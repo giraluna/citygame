@@ -84,7 +84,7 @@ module levelUpModifiers
   {
     type: "clicksPerLevel1",
     title: "Reverse carpal tunnel syndrome",
-    description: "Clicking profit * 1.02 per level",
+    description: "Clicking profit +2% per level",
     unlockConditions:
     [
       {
@@ -213,7 +213,7 @@ module levelUpModifiers
   {
     type: "america1",
     title: "The American way",
-    description: "Fast food profit * 1.1 per parking lot and vice versa",
+    description: "Fast food profit +10% per parking lot and vice versa",
     unlockConditions:
     [
       {
@@ -229,7 +229,7 @@ module levelUpModifiers
         {
           type: "america1_a",
           title: "The American way A",
-          description: "Fast food profit * 1.1 per parking",
+          description: "Fast food profit +10% per parking",
           effects:
           [
             {
@@ -245,7 +245,7 @@ module levelUpModifiers
         {
           type: "america1_b",
           title: "The American way B",
-          description: "Parking lot profit * 1.1 per fast food restaurant",
+          description: "Parking lot profit +10% per fast food restaurant",
           effects:
           [
             {
@@ -432,7 +432,7 @@ module levelUpModifiers
   {
     type: "clickFrenzy1",
     title: "Click frenzy",
-    description: "Clicking profits *5 for 1 minutes",
+    description: "Clicking profits * 5 for 1 minutes",
     unlockConditions:
     [
       {
@@ -636,7 +636,7 @@ module levelUpModifiers
   {
     type: "hotelParking1",
     title: "Valet service",
-    description: "Parking lot profits * 1.5 per hotel",
+    description: "Parking lot profits +50% per hotel",
     unlockConditions:
     [
       {
@@ -652,7 +652,7 @@ module levelUpModifiers
         {
           type: "hotelParking1",
           title: "Valet service",
-          description: "Parking lot profits * 1.5 per hotel",
+          description: "Parking lot profits +50% per hotel",
           effects:
           [
             {
@@ -668,8 +668,8 @@ module levelUpModifiers
   export var hotelFastfood1: playerModifiers.IPlayerModifier =
   {
     type: "hotelFastfood1",
-    title: "Food poisoning scare",
-    description: "Fast food profits * 1.5 per hotel",
+    title: "Local cuisine promotion",
+    description: "Fast food profits +33% per hotel",
     unlockConditions:
     [
       {
@@ -684,13 +684,13 @@ module levelUpModifiers
         player.addSpecialModifier(
         {
           type: "hotelFastfood1",
-          title: "Food poisoning scare",
-          description: "Fast food profits * 1.5 per hotel",
+          title: "Local cuisine promotion",
+          description: "Fast food profits +33% per hotel",
           effects:
           [
             {
               targets: ["fastfood"],
-              multiplier: 1 + player.amountBuiltPerCategory["hotel"] * 0.5
+              multiplier: 1 + player.amountBuiltPerCategory["hotel"] * 0.33
             }
           ]
         });
@@ -702,7 +702,7 @@ module levelUpModifiers
   {
     type: "factoryPerLevel1",
     title: "Experienced foremen",
-    description: "Factory profits * 1.02 per level",
+    description: "Factory profits +2% per level",
     unlockConditions:
     [
       {
@@ -718,7 +718,7 @@ module levelUpModifiers
         {
           type: "factoryPerLevel1",
           title: "Experienced foremen",
-          description: "Factory profits * 1.02 per level",
+          description: "Factory profits +2% per level",
           effects:
           [
             {
@@ -735,7 +735,7 @@ module levelUpModifiers
   {
     type: "prestigeHotel1",
     title: "Prestigious hotels",
-    description: "Hotel profits * 1.02 per prestige",
+    description: "Hotel profits +2% per prestige",
     unlockConditions:
     [
       {
@@ -755,7 +755,7 @@ module levelUpModifiers
         {
           type: "prestigeHotel1",
           title: "Prestigious hotels",
-          description: "Hotel profits * 1.02 per prestige",
+          description: "Hotel profits +2% per prestige",
           effects:
           [
             {

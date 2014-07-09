@@ -102,7 +102,7 @@ module playerModifiers
     [
       {
         type: "clicks",
-        value: 20
+        value: 100
       }
     ],
     effects:
@@ -117,13 +117,13 @@ module playerModifiers
   {
     type: "clickModifier3",
     title: "Rolled up sleeves",
-    description: "Clicking profit * 1.2",
+    description: "Clicking profit +20%",
     cost: 1000,
     unlockConditions:
     [
       {
         type: "clicks",
-        value: 100
+        value: 200
       },
       {
         type: "money",
@@ -142,7 +142,7 @@ module playerModifiers
   {
     type: "clickModifier4",
     title: "A little bit of elbow grease",
-    description: "Clicking profit * 1.2",
+    description: "Clicking profit +20%",
     cost: 5000,
     unlockConditions:
     [
@@ -167,7 +167,7 @@ module playerModifiers
   {
     type: "clickModifier5",
     title: "A lot more elbow grease",
-    description: "Clicking profit * 1.5",
+    description: "Clicking profit +50%",
     cost: 25000,
     unlockConditions:
     [
@@ -192,13 +192,13 @@ module playerModifiers
   {
     type: "clickModifier6",
     title: "Way too much elbow grease",
-    description: "Clicking profit * 2",
+    description: "Clicking profit +50%",
     cost: 100000,
     unlockConditions:
     [
       {
         type: "clicks",
-        value: 1500
+        value: 1200
       },
       {
         type: "money",
@@ -209,7 +209,7 @@ module playerModifiers
     [
       {
         targets: ["click"],
-        multiplier: 2
+        multiplier: 1.5
       }
     ]
   }
@@ -238,7 +238,7 @@ module playerModifiers
   {
     type: "parkingModifier2",
     title: "Parking space effeciency",
-    description: "Parking profits * 1.2",
+    description: "Parking profits +20%",
     cost: 500,
     unlockConditions:
     [
@@ -259,7 +259,7 @@ module playerModifiers
   {
     type: "parkingModifier3",
     title: "Parking elevators",
-    description: "Parking profits * 1.2",
+    description: "Parking profits +20%",
     cost: 2000,
     unlockConditions:
     [
@@ -280,7 +280,7 @@ module playerModifiers
   {
     type: "parkingModifier4",
     title: "Parking hyperspace efficiency",
-    description: "Parking profits * 1.5",
+    description: "Parking profits +50%",
     cost: 10000,
     unlockConditions:
     [
@@ -343,7 +343,7 @@ module playerModifiers
   {
     type: "convenienceModifier3",
     title: "Liquor license",
-    description: "Retail profits * 1.3",
+    description: "Retail profits +30%",
     cost: 5000,
     unlockConditions:
     [
@@ -364,7 +364,7 @@ module playerModifiers
   {
     type: "convenienceModifier4",
     title: "Loss leaders",
-    description: "Retail profits * 1.5",
+    description: "Retail profits + 50%",
     cost: 25000,
     unlockConditions:
     [
@@ -427,7 +427,7 @@ module playerModifiers
   {
     type: "fastFoodModifier3",
     title: "Jumbo-size diet soda cups",
-    description: "Fast food restaurant profits * 1.3",
+    description: "Fast food restaurant profits +30%",
     cost: 7500,
     unlockConditions:
     [
@@ -448,7 +448,7 @@ module playerModifiers
   {
     type: "fastFoodModifier4",
     title: "Jumbo-size set meals",
-    description: "Fast food restaurant profits * 1.5",
+    description: "Fast food restaurant profits + 50%",
     cost: 35000,
     unlockConditions:
     [
@@ -511,7 +511,7 @@ module playerModifiers
   {
     type: "apartmentModifier3",
     title: "Soundproof Walls",
-    description: "Apartment profits * 1.2",
+    description: "Apartment profits +20%",
     cost: 15000,
     unlockConditions:
     [
@@ -532,7 +532,7 @@ module playerModifiers
   {
     type: "apartmentModifier4",
     title: "Fitness center",
-    description: "Apartment profits * 1.5",
+    description: "Apartment profits + 50%",
     cost: 75000,
     unlockConditions:
     [
@@ -574,7 +574,7 @@ module playerModifiers
   {
     type: "officeModifier2",
     title: "Ass-resistant photocopiers",
-    description: "office profits * 1.2",
+    description: "office profits +20%",
     cost: 15000,
     unlockConditions:
     [
@@ -595,7 +595,7 @@ module playerModifiers
   {
     type: "officeModifier3",
     title: "Ass-seeking photocopiers",
-    description: "office profits * 1.5",
+    description: "office profits + 50%",
     cost: 50000,
     unlockConditions:
     [
@@ -616,7 +616,7 @@ module playerModifiers
   {
     type: "officeModifier4",
     title: "Middle management",
-    description: "office profits * 1.5",
+    description: "office profits + 50%",
     cost: 200000,
     unlockConditions:
     [
@@ -679,7 +679,7 @@ module playerModifiers
   {
     type: "factoryModifier3",
     title: "Baby animal powered factories",
-    description: "Factory profits * 1.5",
+    description: "Factory profits + 50%",
     cost: 350000,
     unlockConditions:
     [
@@ -700,7 +700,7 @@ module playerModifiers
   {
     type: "factoryModifier4",
     title: "Lubricated crankshafts",
-    description: "Factory profits * 1.5",
+    description: "Factory profits + 50%",
     cost: 600000,
     unlockConditions:
     [
@@ -766,7 +766,7 @@ module playerModifiers
   {
     type: "hotelModifier3",
     title: "Swim-up bar",
-    description: "hotel profits * 1.5",
+    description: "hotel profits + 50%",
     cost: 500000,
     unlockConditions:
     [
@@ -787,7 +787,7 @@ module playerModifiers
   {
     type: "hotelModifier4",
     title: "Guided tours",
-    description: "hotel profits * 1.5",
+    description: "hotel profits + 50%",
     cost: 1000000,
     unlockConditions:
     [

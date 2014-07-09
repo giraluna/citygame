@@ -266,6 +266,7 @@ class Player
     this.checkLockedModifiers(content.type.categoryType, -1);
     content.player = this;
     this.updateDynamicModifiers(content.type.type);
+    this.updateDynamicModifiers(content.type.categoryType);
   }
   removeContent( content )
   {
@@ -279,6 +280,7 @@ class Player
     this.amountBuiltPerCategory[content.type.categoryType]--;
 
     this.updateDynamicModifiers(content.type.type);
+    this.updateDynamicModifiers(content.type.categoryType);
   }
   sellContent( content )
   {

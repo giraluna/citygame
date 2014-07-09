@@ -1268,7 +1268,7 @@ class Game
     */
 
     this.systemsManager.addSystem("delayedAction", new DelayedActionSystem(1, this.systemsManager));
-    this.systemsManager.addSystem("autosave", new AutosaveSystem(120, this.systemsManager));
+    this.systemsManager.addSystem("autosave", new AutosaveSystem(60, this.systemsManager));
 
     var dateSystem = new DateSystem(1, this.systemsManager,
       document.getElementById("date") );
@@ -2034,7 +2034,6 @@ class Game
       newPlayer.incomePerType = Object.create(player.incomePerType);
 
       newPlayer.timesReset = player.timesReset + 1;
-      newPlayer.clicks = player.clicks;
       newPlayer.totalResetExperience = player.totalResetExperience + player.experience;
       newPlayer.permanentLevelupUpgrades = player.permanentLevelupUpgrades.slice(0);
       if (toPerm) newPlayer.permanentLevelupUpgrades.push(toPerm.data.modifier.type);

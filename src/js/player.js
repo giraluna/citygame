@@ -213,6 +213,7 @@ var Player = (function () {
         this.checkLockedModifiers(content.type.categoryType, -1);
         content.player = this;
         this.updateDynamicModifiers(content.type.type);
+        this.updateDynamicModifiers(content.type.categoryType);
     };
     Player.prototype.removeContent = function (content) {
         this.ownedContent[content.categoryType] = this.ownedContent[content.categoryType].filter(function (building) {
@@ -223,6 +224,7 @@ var Player = (function () {
         this.amountBuiltPerCategory[content.type.categoryType]--;
 
         this.updateDynamicModifiers(content.type.type);
+        this.updateDynamicModifiers(content.type.categoryType);
     };
     Player.prototype.sellContent = function (content) {
         var type = content.type;

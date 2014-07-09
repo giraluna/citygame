@@ -455,7 +455,7 @@ module levelUpModifiers
           [
             {
               targets: ["click"],
-              multiplier: 1 + 5
+              multiplier: 5
             }
           ]
         })

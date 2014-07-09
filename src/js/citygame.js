@@ -989,7 +989,7 @@ var Game = (function () {
         this.systemsManager.addSystem("quarterlyProfitSystem", quarterlyProfitSystem);
         */
         this.systemsManager.addSystem("delayedAction", new DelayedActionSystem(1, this.systemsManager));
-        this.systemsManager.addSystem("autosave", new AutosaveSystem(120, this.systemsManager));
+        this.systemsManager.addSystem("autosave", new AutosaveSystem(60, this.systemsManager));
 
         var dateSystem = new DateSystem(1, this.systemsManager, document.getElementById("date"));
         this.systemsManager.addSystem("date", dateSystem);
@@ -1614,7 +1614,6 @@ var Game = (function () {
             newPlayer.incomePerType = Object.create(player.incomePerType);
 
             newPlayer.timesReset = player.timesReset + 1;
-            newPlayer.clicks = player.clicks;
             newPlayer.totalResetExperience = player.totalResetExperience + player.experience;
             newPlayer.permanentLevelupUpgrades = player.permanentLevelupUpgrades.slice(0);
             if (toPerm)

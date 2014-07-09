@@ -2675,19 +2675,23 @@ var BuildTool = (function (_super) {
             }
         }
 
+        var toDrawOn = {};
+
         for (var i = 0; i < buildArea.length; i++) {
             var currentModifiers = buildArea[i].getValidModifiers(this.selectedBuildingType);
-
             for (var _mod in currentModifiers) {
                 var sources = currentModifiers[_mod].sources;
                 var _polarity = currentModifiers[_mod].effect[Object.keys(currentModifiers[_mod].effect)[0]] > 0;
 
                 var type = (_polarity === true ? "positive1" : "negative1");
 
-                for (var i = 0; i < sources.length; i++) {
-                    game.uiDrawer.makeBuildingPlacementTip(sources[i], type, game.worldRenderer.worldSprite);
+                for (var j = 0; j < sources.length; j++) {
+                    toDrawOn[sources[j].gridPos] = sources[j];
                 }
             }
+        }
+        for (var _cell in toDrawOn) {
+            game.uiDrawer.makeBuildingPlacementTip(toDrawOn[_cell], type, game.worldRenderer.worldSprite);
         }
     };
     BuildTool.prototype.onFinish = function () {

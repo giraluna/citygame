@@ -3344,10 +3344,11 @@ class BuildTool extends Tool
       }
     }
 
+    var toDrawOn: any = {};
+
     for (var i = 0; i < buildArea.length; i++)
     {
       var currentModifiers = buildArea[i].getValidModifiers(this.selectedBuildingType);
-
       for (var _mod in currentModifiers)
       {
         var sources = currentModifiers[_mod].sources;
@@ -3356,12 +3357,16 @@ class BuildTool extends Tool
 
         var type = (_polarity === true ? "positive1" : "negative1");
 
-        for (var i = 0; i < sources.length; i++)
+        for (var j = 0; j < sources.length; j++)
         {
-          game.uiDrawer.makeBuildingPlacementTip(sources[i], type,
-            game.worldRenderer.worldSprite);
+          toDrawOn[sources[j].gridPos] = sources[j];
         }
       }
+    }
+    for (var _cell in toDrawOn)
+    {
+      game.uiDrawer.makeBuildingPlacementTip(toDrawOn[_cell], type,
+        game.worldRenderer.worldSprite);
     }
   }
   onFinish()

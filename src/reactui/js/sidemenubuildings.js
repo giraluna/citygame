@@ -118,7 +118,9 @@ var UIComponents;
                     className: "side-building",
                     key: building.type,
                     ref: building.type,
-                    onMouseLeave: this.hidePopOver
+                    onMouseLeave: this.hidePopOver,
+                    onTouchStart: this.handleBuildingSelect.bind(null, building),
+                    onMouseEnter: this.drawPopOver.bind(null, building, building.type)
                 };
 
                 /*
@@ -149,8 +151,6 @@ var UIComponents;
                 } else {
                     divProps.className += " interactive";
                     divProps.onClick = this.handleBuildingSelect.bind(null, building);
-                    divProps.onTouchStart = this.handleBuildingSelect.bind(null, building);
-                    divProps.onMouseEnter = this.drawPopOver.bind(null, building, divProps.ref);
                 }
 
                 if (this.props.selectedTool && this.props.selectedTool === building.type) {

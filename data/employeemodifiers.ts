@@ -87,7 +87,7 @@ module employeeModifiers
     [
       {
         type: "skillTotal",
-        value: 40
+        value: 50
       }
     ],
     effects:
@@ -146,7 +146,7 @@ module employeeModifiers
     [
       {
         type: "skillTotal",
-        value: 40
+        value: 50
       }
     ],
     dynamicEffect:
@@ -182,7 +182,7 @@ module employeeModifiers
     [
       {
         type: "skillTotal",
-        value: 50
+        value: 57
       }
     ],
     dynamicEffect:
@@ -215,7 +215,7 @@ module employeeModifiers
     [
       {
         type: "skillTotal",
-        value: 50
+        value: 57
       }
     ],
     effects:

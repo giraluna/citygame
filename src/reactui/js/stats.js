@@ -51,9 +51,9 @@ var UIComponents;
 
             allStats.push(generalStatList);
 
-            var prestigeModifier = 1;
+            var prestigeModifier = 1 + player.prestige * 0.005;
             if (player.levelUpModifiers.prestigeEffectIncrease1) {
-                prestigeModifier += 0.5;
+                prestigeModifier *= (1 + player.prestige * 0.0025);
             }
             var prestigeStats = [
                 {
@@ -63,7 +63,7 @@ var UIComponents;
                 {
                     title: "Prestige:",
                     content: player.prestige.toFixed(),
-                    subContent: "for a total of " + (player.prestige * prestigeModifier).toFixed(1) + "% " + "extra profit"
+                    subContent: "for a total of " + ((prestigeModifier - 1) * 100).toFixed(1) + "% " + "extra profit"
                 },
                 {
                     title: "Current experience:",

@@ -25,11 +25,11 @@ var playerModifiers;
                 player.addSpecialModifier({
                     type: "prestigeDefault",
                     title: "Default prestige modifier",
-                    description: "1% total profit per prestige",
+                    description: "0.5% total profit per prestige",
                     effects: [
                         {
                             targets: ["global"],
-                            multiplier: 1 + player.prestige * 0.01
+                            multiplier: 1 + player.prestige * 0.005
                         }
                     ]
                 });
@@ -63,7 +63,7 @@ var playerModifiers;
         unlockConditions: [
             {
                 type: "clicks",
-                value: 100
+                value: 200
             }
         ],
         effects: [
@@ -81,7 +81,7 @@ var playerModifiers;
         unlockConditions: [
             {
                 type: "clicks",
-                value: 200
+                value: 400
             },
             {
                 type: "money",
@@ -103,7 +103,7 @@ var playerModifiers;
         unlockConditions: [
             {
                 type: "clicks",
-                value: 400
+                value: 600
             },
             {
                 type: "money",
@@ -125,7 +125,7 @@ var playerModifiers;
         unlockConditions: [
             {
                 type: "clicks",
-                value: 800
+                value: 900
             },
             {
                 type: "money",
@@ -233,6 +233,24 @@ var playerModifiers;
             }
         ]
     };
+    playerModifiers.parkingModifier5 = {
+        type: "parkingModifier5",
+        title: "Street parking meters",
+        description: "Parking profits +50%",
+        cost: 50000,
+        unlockConditions: [
+            {
+                type: "parking",
+                value: 15
+            }
+        ],
+        effects: [
+            {
+                targets: ["parking"],
+                multiplier: 1.5
+            }
+        ]
+    };
     playerModifiers.convenienceModifier1 = {
         type: "convenienceModifier1",
         title: "Newspaper stands",
@@ -291,7 +309,7 @@ var playerModifiers;
         type: "convenienceModifier4",
         title: "Loss leaders",
         description: "Retail profits + 50%",
-        cost: 25000,
+        cost: 50000,
         unlockConditions: [
             {
                 type: "shopping",
@@ -304,6 +322,39 @@ var playerModifiers;
                 multiplier: 1.5
             }
         ]
+    };
+    playerModifiers.convenienceModifier5 = {
+        type: "convenienceModifier5",
+        title: "Market saturation",
+        description: "Retail profits + 50% - 1% per retail building",
+        cost: 250000,
+        unlockConditions: [
+            {
+                type: "shopping",
+                value: 15
+            }
+        ],
+        effects: [
+            {
+                targets: ["shopping"],
+                multiplier: 1.5
+            }
+        ],
+        dynamicEffect: {
+            "shopping": function (player) {
+                player.addSpecialModifier({
+                    type: "convenienceModifier5",
+                    title: "Market saturation",
+                    description: "Retail profits + 50% - 1% per retail building",
+                    effects: [
+                        {
+                            targets: ["shopping"],
+                            multiplier: 1 - (player.amountBuiltPerCategory["shopping"] * 0.01)
+                        }
+                    ]
+                });
+            }
+        }
     };
     playerModifiers.fastFoodModifier1 = {
         type: "fastFoodModifier1",
@@ -377,6 +428,39 @@ var playerModifiers;
             }
         ]
     };
+    playerModifiers.fastFoodModifier5 = {
+        type: "fastFoodModifier5",
+        title: "Chocolate chip cookies",
+        description: "Fast food restaurant profits + 33%\nClicking profit +2% per restaurant",
+        cost: 150000,
+        unlockConditions: [
+            {
+                type: "fastfood",
+                value: 15
+            }
+        ],
+        effects: [
+            {
+                targets: ["fastfood"],
+                multiplier: 1.33
+            }
+        ],
+        dynamicEffect: {
+            "fastfood": function (player) {
+                player.addSpecialModifier({
+                    type: "fastFoodModifier5",
+                    title: "Chocolate chip cookies",
+                    description: "Fast food restaurant profits + 33%\nClicking profit +2% per restaurant",
+                    effects: [
+                        {
+                            targets: ["click"],
+                            multiplier: 1 + (player.amountBuiltPerCategory["fastfood"] * 0.02)
+                        }
+                    ]
+                });
+            }
+        }
+    };
     playerModifiers.apartmentModifier1 = {
         type: "apartmentModifier1",
         title: "Central heating",
@@ -433,7 +517,7 @@ var playerModifiers;
     };
     playerModifiers.apartmentModifier4 = {
         type: "apartmentModifier4",
-        title: "Fitness center",
+        title: "Fitness centers",
         description: "Apartment profits + 50%",
         cost: 75000,
         unlockConditions: [
@@ -446,6 +530,26 @@ var playerModifiers;
             {
                 targets: ["apartment"],
                 multiplier: 1.5
+            }
+        ]
+    };
+    playerModifiers.apartmentModifier5 = {
+        type: "apartmentModifier5",
+        title: "Modular apartment buildings",
+        description: "Apartment building cost -33%",
+        cost: 250000,
+        unlockConditions: [
+            {
+                type: "apartment",
+                value: 15
+            }
+        ],
+        effects: [
+            {
+                targets: ["apartment"],
+                buildCost: {
+                    multiplier: 0.67
+                }
             }
         ]
     };
@@ -470,7 +574,7 @@ var playerModifiers;
     playerModifiers.officeModifier2 = {
         type: "officeModifier2",
         title: "Ass-resistant photocopiers",
-        description: "office profits +20%",
+        description: "Office profits +20%",
         cost: 15000,
         unlockConditions: [
             {
@@ -488,7 +592,7 @@ var playerModifiers;
     playerModifiers.officeModifier3 = {
         type: "officeModifier3",
         title: "Ass-seeking photocopiers",
-        description: "office profits + 50%",
+        description: "Office profits + 50%",
         cost: 50000,
         unlockConditions: [
             {
@@ -506,7 +610,7 @@ var playerModifiers;
     playerModifiers.officeModifier4 = {
         type: "officeModifier4",
         title: "Middle management",
-        description: "office profits + 50%",
+        description: "Office profits + 50%",
         cost: 200000,
         unlockConditions: [
             {
@@ -520,6 +624,41 @@ var playerModifiers;
                 multiplier: 1.5
             }
         ]
+    };
+    playerModifiers.officeModifier5 = {
+        type: "officeModifier5",
+        title: "Corporate real estate",
+        description: "Office profits + 25%\nBuying plots 2% cheaper per office",
+        cost: 500000,
+        unlockConditions: [
+            {
+                type: "office",
+                value: 15
+            }
+        ],
+        effects: [
+            {
+                targets: ["office"],
+                multiplier: 1.25
+            }
+        ],
+        dynamicEffect: {
+            "office": function (player) {
+                player.addSpecialModifier({
+                    type: "officeModifier5",
+                    title: "Corporate real estate",
+                    description: "Office profits + 25%\nBuying plots 2% cheaper per office",
+                    effects: [
+                        {
+                            targets: ["global"],
+                            buyCost: {
+                                multiplier: 1 - player.amountBuiltPerCategory["office"] * 0.02
+                            }
+                        }
+                    ]
+                });
+            }
+        }
     };
     playerModifiers.factoryModifier1 = {
         type: "factoryModifier1",
@@ -593,6 +732,27 @@ var playerModifiers;
             }
         ]
     };
+    playerModifiers.factoryModifier5 = {
+        type: "factoryModifier5",
+        title: "OSHA regulations",
+        description: "Factory profits + 50%\nFactory build cost +15%",
+        cost: 1500000,
+        unlockConditions: [
+            {
+                type: "factory",
+                value: 12
+            }
+        ],
+        effects: [
+            {
+                targets: ["factory"],
+                multiplier: 1.5,
+                buildCost: {
+                    multiplier: 1.15
+                }
+            }
+        ]
+    };
     playerModifiers.hotelModifier1 = {
         type: "hotelModifier1",
         title: "Heated swimming pool",
@@ -634,7 +794,7 @@ var playerModifiers;
     playerModifiers.hotelModifier3 = {
         type: "hotelModifier3",
         title: "Swim-up bar",
-        description: "hotel profits + 50%",
+        description: "Hotel profits + 50%",
         cost: 500000,
         unlockConditions: [
             {
@@ -652,7 +812,7 @@ var playerModifiers;
     playerModifiers.hotelModifier4 = {
         type: "hotelModifier4",
         title: "Guided tours",
-        description: "hotel profits + 50%",
+        description: "Hotel profits + 50%",
         cost: 1000000,
         unlockConditions: [
             {
@@ -664,6 +824,28 @@ var playerModifiers;
             {
                 targets: ["hotel"],
                 multiplier: 1.5
+            }
+        ]
+    };
+    playerModifiers.hotelModifier5 = {
+        type: "hotelModifier5",
+        title: "Tourist pricing",
+        description: "Hotel profits + 50%\ŋGlobal profit -5%",
+        cost: 1000000,
+        unlockConditions: [
+            {
+                type: "hotel",
+                value: 12
+            }
+        ],
+        effects: [
+            {
+                targets: ["hotel"],
+                multiplier: 1.5
+            },
+            {
+                targets: ["global"],
+                multiplier: 0.95
             }
         ]
     };

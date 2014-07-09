@@ -29,7 +29,7 @@ module levelUpModifiers
   {
     type: "fundingBoost1",
     title: "Starting capital",
-    description: "+200$",
+    description: "+250$",
     unlockConditions:
     [
       {
@@ -42,7 +42,7 @@ module levelUpModifiers
       oneTime: true,
       effect: function(player)
       {
-        player.money += 200;
+        player.money += 250;
       }
     }
   }
@@ -139,7 +139,7 @@ module levelUpModifiers
   {
     type: "shoppingCostReduction1",
     title: "Franchising",
-    description: "Shopping buildings 20% cheaper to build",
+    description: "Shopping and fast food buildings 10% cheaper to build",
     unlockConditions:
     [
       {
@@ -150,10 +150,10 @@ module levelUpModifiers
     effects:
     [
       {
-        targets: ["shopping"],
+        targets: ["shopping", "fastfood"],
         buildCost:
         {
-          multiplier: 0.8
+          multiplier: 0.9
         }
       }
     ]
@@ -394,7 +394,7 @@ module levelUpModifiers
   {
     type: "buyRush1",
     title: "Land grab",
-    description: "Buying plots 50% cheaper for 2 minutes",
+    description: "Buying plots 66% cheaper for 2 minutes",
     unlockConditions:
     [
       {
@@ -411,7 +411,7 @@ module levelUpModifiers
         {
           type: "buildRush1",
           title: "Land grab",
-          description: "Buying plots 50% cheaper for 2 minutes",
+          description: "Buying plots 66% cheaper for 2 minutes",
           lifeTime: 1000 * 120,
           effects:
           [
@@ -419,7 +419,7 @@ module levelUpModifiers
               targets: ["global"],
               buyCost:
               {
-                multiplier: 0.5
+                multiplier: 0.33
               }
             }
           ]
@@ -560,7 +560,7 @@ module levelUpModifiers
   {
     type: "prestigeEffectIncrease1",
     title: "Increased prestige effect",
-    description: "0.5% additional profit per prestige",
+    description: "0.25% additional profit per prestige",
     unlockConditions:
     [
       {
@@ -580,12 +580,12 @@ module levelUpModifiers
         {
           type: "prestigeEffectIncrease1",
           title: "Increased prestige effect",
-          description: "0.5% additional profit per prestige",
+          description: "0.25% additional profit per prestige",
           effects:
           [
             {
               targets: ["global"],
-              multiplier: 1 + player.prestige * 0.005
+              multiplier: 1 + player.prestige * 0.0025
             }
           ]
         });

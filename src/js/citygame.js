@@ -2621,7 +2621,7 @@ var BuildTool = (function (_super) {
         this.clearEffects();
 
         for (var i = 0; i < belowBuildArea.length; i++) {
-            game.highlighter.alphaBuildings(belowBuildArea, 0.3);
+            game.highlighter.alphaBuildings(belowBuildArea, 0.2);
         }
 
         if (!baseCell.content) {

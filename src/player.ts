@@ -577,10 +577,16 @@ class Player
   }
   getCellBuyCost(cell)
   {
-    var adjusted = cell.landValue * Math.pow(1.1, this.ownedCellsAmount);
+    var base = cell.landValue * Math.pow(1.1, this.ownedCellsAmount);
+    var adjusted = base;
 
     adjusted += this.modifierEffects.buyCost["global"].addedCost;
     adjusted *= this.modifierEffects.buyCost["global"].multiplier;
+
+    if (adjusted < base * 0.2)
+    {
+      adjusted = base * 0.2;
+    }
 
     return adjusted;
   }
@@ -615,7 +621,7 @@ class Player
     if (level <= 0) return 0;
     else
     {
-      return Math.round( 100 * Math.pow(1.1, level-1) );
+      return Math.round( 100 * Math.pow(1.12, level-1) );
     }
   }
   setExperienceToNextLevel()
@@ -881,7 +887,7 @@ class Player
   }
   getPrestige(exp: number)
   {
-    return Math.pow(exp / 1000000, 0.75);
+    return Math.pow(exp / 1000000, 0.7);
   }
   applyPrestige()
   {

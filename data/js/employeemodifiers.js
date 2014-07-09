@@ -71,7 +71,7 @@ var employeeModifiers;
         unlockConditions: [
             {
                 type: "skillTotal",
-                value: 40
+                value: 50
             }
         ],
         effects: [
@@ -119,7 +119,7 @@ var employeeModifiers;
         unlockConditions: [
             {
                 type: "skillTotal",
-                value: 40
+                value: 50
             }
         ],
         dynamicEffect: {
@@ -148,7 +148,7 @@ var employeeModifiers;
         unlockConditions: [
             {
                 type: "skillTotal",
-                value: 50
+                value: 57
             }
         ],
         dynamicEffect: {
@@ -175,7 +175,7 @@ var employeeModifiers;
         unlockConditions: [
             {
                 type: "skillTotal",
-                value: 50
+                value: 57
             }
         ],
         effects: [

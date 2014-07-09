@@ -288,6 +288,12 @@ progress::-webkit-progress-value {
 .sortable-column:hover {
   cursor: pointer;
 }
+.employee-modifier-container {
+  font-size: 0.9em;
+}
+.employee-modifier-container small {
+  font-size: 0.8em;
+}
 #react-side-menu {
   display: flex;
   flex-flow: column;

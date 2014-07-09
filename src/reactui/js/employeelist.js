@@ -64,7 +64,7 @@ var UIComponents;
                 };
 
                 if (employee.trait) {
-                    data.trait = React.DOM.span({ title: employee.trait.description }, employee.trait.title);
+                    data.trait = React.DOM.div({ className: "employee-modifier-container" }, React.DOM.span(null, employee.trait.title), React.DOM.br(null), React.DOM.small(null, employee.trait.description));
                     data.traitTitle = employee.trait.title;
                 }
 

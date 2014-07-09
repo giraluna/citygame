@@ -60,7 +60,7 @@ var Board = (function () {
             coasts: coasts
         });
 
-        var rivers = this.mapGenInfo.rivers = mapGeneration.makeRivers(coasts, 0.5, {
+        var rivers = this.mapGenInfo.rivers = mapGeneration.makeRivers(coasts, 0.7, {
             width: this.width / 4,
             mapHeight: this.height,
             depth: this.height,

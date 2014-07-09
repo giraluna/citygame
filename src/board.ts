@@ -89,7 +89,7 @@ class Board
 
     var rivers = this.mapGenInfo.rivers = mapGeneration.makeRivers(
       coasts,
-      0.5,
+      0.7,
     {
       width: this.width / 4,
       mapHeight: this.height,

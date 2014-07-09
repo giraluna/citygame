@@ -60,7 +60,7 @@ function makeLandValueOverlay(board)
       else if (relativeValue > 1) relativeValue = 1;
 
       var hue = 100 - 100 * relativeValue;
-      var saturation = 1 - 0.1 * relativeValue;
+      var saturation = 1 - 0.2 * relativeValue;
       var luminesence = 0.75 + 0.25 * relativeValue;
 
       colorIndexes[cell.value] =

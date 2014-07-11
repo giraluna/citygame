@@ -505,6 +505,22 @@ progress::-webkit-progress-value {
   font-weight: lighter;
   margin-left: 1em;
 }
+#import-export-container {
+  display: flex;
+  flex-flow: row;
+}
+#import-export-container #import-export-buttons {
+  display: flex;
+  flex-flow: column;
+}
+#import-export-container #import-export-buttons button {
+  flex: 0 0 20;
+  margin-bottom: 10px;
+}
+#import-export-container #import-export-text {
+  margin-left: 10px;
+  min-width: 300px;
+}
 .fullscreen-popup {
   height: 100%;
   width: 100%;

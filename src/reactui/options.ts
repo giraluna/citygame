@@ -33,7 +33,6 @@ module UIComponents
 
       var encoded = LZString.compressToBase64(localStorage.getItem("tempImported"));
       this.refs.importTextArea.getDOMNode().value = encoded;
-      console.log(this.refs.importTextArea);
 
       localStorage.removeItem("tempImported");
     },
@@ -47,24 +46,22 @@ module UIComponents
       [
         {
           content: React.DOM.div({id:"import-export-container"},
-            React.DOM.form({id:"import-export-form", onSubmit: function(){}},
-              React.DOM.div({id:"import-export-buttons"},
-                React.DOM.button(
-                  {
-                    id:"import-button",
-                    onClick: this.handleImport,
-                    onTouchStart: this.handleImport
-                  }, "import"),
-                React.DOM.button(
-                  {
-                    id:"export-button",
-                    onClick: this.handleExport,
-                    onTouchStart: this.handleExport
-                  }, "export")
-              ),
-              React.DOM.textarea({id:"import-export-text", ref:"importTextArea"})
-              
-            )
+            React.DOM.div({id:"import-export-buttons"},
+              React.DOM.button(
+                {
+                  id:"import-button",
+                  onClick: this.handleImport,
+                  onTouchStart: this.handleImport
+                }, "Import"),
+              React.DOM.button(
+                {
+                  id:"export-button",
+                  onClick: this.handleExport,
+                  onTouchStart: this.handleExport
+                }, "Export")
+            ),
+            React.DOM.textarea({id:"import-export-text", ref:"importTextArea"})
+            
           )
         }
       ];

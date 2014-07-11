@@ -709,7 +709,29 @@ progress::-webkit-progress-value { background: #080; }
   margin-left: 1em;
 }
 
+// OPTIONS
 
+#import-export-container
+{
+  display: flex;
+  flex-flow: row;
+
+  #import-export-buttons
+  {
+    display: flex;
+    flex-flow: column;
+    button
+    {
+      flex: 0 0 20;
+      margin-bottom: 10px;
+    }
+  }
+  #import-export-text
+  {
+    margin-left: 10px;
+    min-width: 300px;
+  }
+}
 
 // INFO
 

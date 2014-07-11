@@ -686,11 +686,6 @@ progress::-webkit-progress-value { background: #080; }
 // STATS
 
 
-.all-stats
-{
-  overflow-y: scroll;
-  max-height: 90%;
-}
 .stat-group
 {
   border-bottom: 1px solid darken(@near-white, 15%);
@@ -714,20 +709,7 @@ progress::-webkit-progress-value { background: #080; }
   margin-left: 1em;
 }
 
-#stats-container
-{
-  height: 100%;
-  width: 100%;
-  z-index: 9998;
-  display: flex;
-  position: absolute;
-  top: 0;
-  left: 0;
-  background-color: rgba(0,0,0,0.3);
-  align-items: center;
-  justify-content: center;
-  pointer-events: auto;
-}
+
 
 // INFO
 
@@ -738,6 +720,7 @@ progress::-webkit-progress-value { background: #080; }
   z-index: 9998;
   display: flex;
   position: absolute;
+  top: 0;
   bottom: 25px;
   left: 0;
   background-color: rgba(0,0,0,0.3);
@@ -763,6 +746,7 @@ progress::-webkit-progress-value { background: #080; }
     position: relative;
     background-color: @near-white;
     padding: 25px;
+    overflow-y: scroll;
   }
 
 }

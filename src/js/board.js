@@ -45,7 +45,7 @@ var Board = (function () {
         var coasts = this.mapGenInfo.coasts = mapGeneration.generateCellNoise({
             width: this.width,
             mapHeight: this.height,
-            amountWeights: [1, 0.5, 0.4, 0.3],
+            amountWeights: [1, 0.5, 0.4, 0],
             variation: 0.5,
             yFalloff: 0.14,
             xCutoff: 0.3,

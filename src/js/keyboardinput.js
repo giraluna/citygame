@@ -103,7 +103,7 @@ var KeyboardEventHandler = (function () {
     };
     KeyboardEventHandler.prototype.handleKeydown = function (event) {
         if (this.statesObj[this.currState]["keydown"][event.keyCode]) {
-            if (event.target.tagName === "INPUT" && event.target.type === "text") {
+            if ((event.target.tagName === "INPUT" && event.target.type === "text") || event.target.tagName === "TEXTAREA") {
                 return;
             }
             event.preventDefault();

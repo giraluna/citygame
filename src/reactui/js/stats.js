@@ -17,7 +17,7 @@ var UIComponents;
     UIComponents.Stats = React.createClass({
         mixins: [UIComponents.SplitMultilineText],
         toggleSelf: function () {
-            eventManager.dispatchEvent({ type: "toggleStats", content: "" });
+            eventManager.dispatchEvent({ type: "toggleFullScreenPopup", content: null });
         },
         render: function () {
             var player = this.props.player;

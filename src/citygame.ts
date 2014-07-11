@@ -18,6 +18,8 @@
 /// <reference path="js/mapgeneration.d.ts" />
 /// <reference path="js/board.d.ts" />
 /// 
+/// <reference path="js/options.d.ts" />
+/// 
 /// <reference path="js/landvalueoverlay.d.ts" />
 /// 
 /// <reference path="js/utility.d.ts" />
@@ -32,8 +34,7 @@ var SCREEN_WIDTH = 720,
     WORLD_WIDTH = TILES * TILE_WIDTH,
     WORLD_HEIGHT = TILES * TILE_HEIGHT,
     ZOOM_LEVELS = [1],
-    AMT_OF_BOARDS = 1,
-    DRAW_CLICK_POPUPS = true;
+    AMT_OF_BOARDS = 1;
 
 var idGenerator = idGenerator || {};
 idGenerator.content = 0;
@@ -1526,7 +1527,7 @@ class Game
       addClickAndTouchEventListener(
       document.getElementById("show-stats"), function()
       {
-        eventManager.dispatchEvent({type:"toggleStats", content: ""});
+        eventManager.dispatchEvent({type:"toggleFullScreenPopup", content: "stats"});
       });
 
       //renderer
@@ -1587,12 +1588,20 @@ class Game
         self.prestigeReset(event.content);
       });
 
+      // options
+      addClickAndTouchEventListener(
+      document.getElementById("show-options"), function()
+      {
+        eventManager.dispatchEvent({type:"toggleFullScreenPopup", content: "options"});
+      });
+
       // options todo
+      /*
       var popupToggle = <HTMLInputElement> document.getElementById("draw-click-popups");
       popupToggle.addEventListener("change", function(e)
       {
         DRAW_CLICK_POPUPS = popupToggle.checked;
-      });
+      });*/
       
   }
   bindRenderer()
@@ -3417,7 +3426,7 @@ class ClickTool extends Tool
     var finalAmount = player.addMoney(baseAmount, "click");
     player.addClicks(1);
 
-    if (DRAW_CLICK_POPUPS)
+    if (Options.drawClickPopups)
     {
       game.uiDrawer.makeCellPopup(target, "" +
         finalAmount.toFixed(3), game.worldRenderer.worldSprite);

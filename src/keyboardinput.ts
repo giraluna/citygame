@@ -137,7 +137,8 @@ class KeyboardEventHandler
   {
     if (this.statesObj[this.currState]["keydown"][event.keyCode])
     {
-      if (event.target.tagName === "INPUT" && event.target.type === "text")
+      if ((event.target.tagName === "INPUT" && event.target.type === "text") ||
+        event.target.tagName === "TEXTAREA")
       {
         return;
       }

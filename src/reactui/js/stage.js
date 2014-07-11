@@ -2,17 +2,34 @@
 ///
 /// <reference path="js/sidemenu.d.ts" />
 /// <reference path="js/stats.d.ts" />
+/// <reference path="js/options.d.ts" />
 /// <reference path="../js/eventlistener.d.ts" />
 var UIComponents;
 (function (UIComponents) {
     UIComponents.Stage = React.createClass({
+        getDefaultProps: function () {
+            return ({
+                fullScreenPopups: {
+                    stats: function () {
+                        return (React.DOM.div({ id: "stats-container", className: "fullscreen-popup" }, UIComponents.Stats({ player: this.props.player })));
+                    },
+                    options: function () {
+                        return (React.DOM.div({ id: "options-container", className: "fullscreen-popup" }, UIComponents.OptionsPopup(null)));
+                    }
+                }
+            });
+        },
         getInitialState: function () {
-            return { showStats: false };
+            return { showFullScreenPopup: null };
         },
         componentDidMount: function () {
             var self = this;
-            eventManager.addEventListener("toggleStats", function () {
-                self.setState({ showStats: !self.state.showStats });
+            eventManager.addEventListener("toggleFullScreenPopup", function (event) {
+                if (event.content === self.state.showFullScreenPopup) {
+                    self.setState({ showFullScreenPopup: null });
+                } else {
+                    self.setState({ showFullScreenPopup: event.content });
+                }
             });
         },
         render: function () {
@@ -24,7 +41,7 @@ var UIComponents;
             }
             ;
 
-            var stats = this.state.showStats ? React.DOM.div({ id: "stats-container", className: "fullscreen-popup" }, UIComponents.Stats({ player: this.props.player })) : null;
+            var fullScreenPopup = this.state.showFullScreenPopup ? this.props.fullScreenPopups[this.state.showFullScreenPopup].call(this) : null;
 
             return (React.DOM.div({ id: "react-wrapper" }, React.DOM.div({
                 id: "react-popups",
@@ -40,7 +57,7 @@ var UIComponents;
                 onDragLeave: function (e) {
                     e.preventDefault();
                 }
-            }, popups), stats, UIComponents.SideMenu({
+            }, popups), fullScreenPopup, UIComponents.SideMenu({
                 player: this.props.player,
                 frameImages: this.props.frameImages,
                 // todo react definitions

@@ -21,7 +21,7 @@ module UIComponents
 
     toggleSelf: function()
     {
-      eventManager.dispatchEvent({type:"toggleStats", content:""});
+      eventManager.dispatchEvent({type:"toggleFullScreenPopup", content:null});
     },
 
     render: function()

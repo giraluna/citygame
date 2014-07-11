@@ -2,6 +2,7 @@
 /// 
 /// <reference path="js/sidemenu.d.ts" />
 /// <reference path="js/stats.d.ts" />
+/// <reference path="js/options.d.ts" />
 
 /// <reference path="../js/eventlistener.d.ts" />
 
@@ -10,17 +11,49 @@ module UIComponents
 
 export var Stage = React.createClass(
 {
+  getDefaultProps: function()
+  {
+    return(
+    {
+      fullScreenPopups:
+      {
+        stats: function()
+        {
+          return(
+            React.DOM.div({id: "stats-container", className: "fullscreen-popup"},
+              UIComponents.Stats({player: this.props.player})
+            )
+          )
+        },
+        options: function()
+        {
+          return(
+            React.DOM.div({id: "options-container", className: "fullscreen-popup"},
+              UIComponents.OptionsPopup(null)
+            )
+          )
+        }
+      }
+    });
+  },
   getInitialState: function()
   {
-    return {showStats:false};
+    return {showFullScreenPopup:null};
   },
 
   componentDidMount: function()
   {
     var self = this;
-    eventManager.addEventListener("toggleStats", function()
+    eventManager.addEventListener("toggleFullScreenPopup", function(event)
     {
-      self.setState({showStats: !self.state.showStats});
+      if (event.content === self.state.showFullScreenPopup)
+      {
+        self.setState({showFullScreenPopup: null});
+      }
+      else
+      {
+        self.setState({showFullScreenPopup: event.content});
+      }
     })
   },
 
@@ -34,10 +67,9 @@ export var Stage = React.createClass(
       popups.push( UIComponents[popup.type].call(null, popup.props) );
     };
 
-    var stats = this.state.showStats ?
-      React.DOM.div({id: "stats-container", className: "fullscreen-popup"},
-        UIComponents.Stats({player: this.props.player})) :
-        null;
+    var fullScreenPopup = this.state.showFullScreenPopup ?
+      this.props.fullScreenPopups[this.state.showFullScreenPopup].call(this) :
+      null;
 
     return(
       React.DOM.div( {id:"react-wrapper"},
@@ -53,7 +85,7 @@ export var Stage = React.createClass(
           popups
         ),
 
-        stats,
+        fullScreenPopup,
 
 
         UIComponents.SideMenu(

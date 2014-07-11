@@ -205,6 +205,8 @@ declare class Game {
     public loadBoards(data: any): void;
     public savePlayer(player: Player): any;
     public loadPlayer(data: any): void;
+    public saveOptions(): void;
+    public loadOptions(): void;
     public prestigeReset(onReset: any): void;
     public render(): void;
     public updateSystems(): void;

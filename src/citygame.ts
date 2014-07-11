@@ -1230,6 +1230,7 @@ class Game
     this.initContainers();
     this.initTools();
     this.bindElements();
+    this.loadOptions();
 
     for (var i = 0; i < AMT_OF_BOARDS; i++)
     {
@@ -1595,13 +1596,7 @@ class Game
         eventManager.dispatchEvent({type:"toggleFullScreenPopup", content: "options"});
       });
 
-      // options todo
-      /*
-      var popupToggle = <HTMLInputElement> document.getElementById("draw-click-popups");
-      popupToggle.addEventListener("change", function(e)
-      {
-        DRAW_CLICK_POPUPS = popupToggle.checked;
-      });*/
+      eventManager.addEventListener("saveOptions", self.saveOptions);
       
   }
   bindRenderer()
@@ -2028,6 +2023,19 @@ class Game
     this.reactUI.player = player;
     player.addExperience(0); // refresh
     player.updateElements();
+  }
+  saveOptions()
+  {
+    localStorage.setItem("options", JSON.stringify(Options));
+  }
+  loadOptions()
+  {
+    var parsed = JSON.parse(localStorage.getItem("options"));
+
+    for (var _prop in parsed)
+    {
+      Options[_prop] = parsed[_prop];
+    }
   }
   prestigeReset(onReset)
   {

@@ -6,5 +6,6 @@ module Options
   eventManager.addEventListener("toggleDrawClickPopups", function()
   {
     drawClickPopups = !drawClickPopups;
+    eventManager.dispatchEvent({type:"saveOptions", content:null});
   });
 }

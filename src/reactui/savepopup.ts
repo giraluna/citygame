@@ -95,6 +95,7 @@ module UIComponents
 
       for (var savedGame in localStorage)
       {
+        if (savedGame === "options") continue;
         var parsed = JSON.parse(localStorage[savedGame]);
         var date = new Date(parsed.date);
         var prettyDate = 

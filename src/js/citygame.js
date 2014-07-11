@@ -954,6 +954,7 @@ var Game = (function () {
         this.initContainers();
         this.initTools();
         this.bindElements();
+        this.loadOptions();
 
         for (var i = 0; i < AMT_OF_BOARDS; i++) {
             this.boards.push(new Board({ width: TILES }));
@@ -1264,13 +1265,8 @@ var Game = (function () {
         addClickAndTouchEventListener(document.getElementById("show-options"), function () {
             eventManager.dispatchEvent({ type: "toggleFullScreenPopup", content: "options" });
         });
-        // options todo
-        /*
-        var popupToggle = <HTMLInputElement> document.getElementById("draw-click-popups");
-        popupToggle.addEventListener("change", function(e)
-        {
-        DRAW_CLICK_POPUPS = popupToggle.checked;
-        });*/
+
+        eventManager.addEventListener("saveOptions", self.saveOptions);
     };
     Game.prototype.bindRenderer = function () {
         var _canvas = document.getElementById("pixi-container");
@@ -1608,6 +1604,16 @@ var Game = (function () {
         this.reactUI.player = player;
         player.addExperience(0); // refresh
         player.updateElements();
+    };
+    Game.prototype.saveOptions = function () {
+        localStorage.setItem("options", JSON.stringify(Options));
+    };
+    Game.prototype.loadOptions = function () {
+        var parsed = JSON.parse(localStorage.getItem("options"));
+
+        for (var _prop in parsed) {
+            Options[_prop] = parsed[_prop];
+        }
     };
     Game.prototype.prestigeReset = function (onReset) {
         var player = this.players["player0"];

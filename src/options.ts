@@ -8,4 +8,11 @@ module Options
     drawClickPopups = !drawClickPopups;
     eventManager.dispatchEvent({type:"saveOptions", content:null});
   });
+
+  export var autosaveLimit = 3;
+  eventManager.addEventListener("setAutosaveLimit", function(e)
+  {
+    autosaveLimit = e.content;
+    eventManager.dispatchEvent({type:"saveOptions", content:null});
+  });
 }

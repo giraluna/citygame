@@ -35,7 +35,7 @@ module UIComponents
       [
         {
           title: "Money:",
-          content: beautify(player.money) + "$"
+          content: "$" + beautify(player.money)
         },
         {
           title: "Clicks:",
@@ -43,7 +43,7 @@ module UIComponents
         },
         {
           title: "Money from clicks:",
-          content: (player.incomePerType.click ? beautify(player.incomePerType.click) : 0) + "$"
+          content: "$" + (player.incomePerType.click ? beautify(player.incomePerType.click) : 0)
         },
         {
           title: "Owned plots:",

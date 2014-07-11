@@ -1361,8 +1361,7 @@ var Game = (function () {
     };
     Game.prototype.autosave = function () {
         // TODO
-        var AUTOSAVELIMIT = 3;
-
+        var autosaveLimit = Options.autosaveLimit;
         var autosaves = [];
         for (var saveGame in localStorage) {
             if (saveGame.match(/autosave/)) {
@@ -1370,7 +1369,7 @@ var Game = (function () {
             }
         }
         autosaves.sort();
-        autosaves = autosaves.slice(0, AUTOSAVELIMIT - 1);
+        autosaves = autosaves.slice(0, autosaveLimit - 1);
         for (var i = autosaves.length - 1; i >= 0; i--) {
             localStorage.setItem("autosave" + (i + 2), localStorage.getItem(autosaves[i]));
         }

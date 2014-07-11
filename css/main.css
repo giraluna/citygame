@@ -505,6 +505,12 @@ progress::-webkit-progress-value {
   font-weight: lighter;
   margin-left: 1em;
 }
+#options-container label {
+  margin-left: 5px;
+}
+.small-number-input {
+  width: 40px;
+}
 #import-export-container {
   display: flex;
   flex-flow: row;

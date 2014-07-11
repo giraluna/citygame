@@ -927,6 +927,8 @@ var UIComponents;
             var savedGames = [];
 
             for (var savedGame in localStorage) {
+                if (savedGame === "options")
+                    continue;
                 var parsed = JSON.parse(localStorage[savedGame]);
                 var date = new Date(parsed.date);
                 var prettyDate = [
@@ -1105,6 +1107,8 @@ var UIComponents;
             var savedGames = [];
 
             for (var savedGame in localStorage) {
+                if (savedGame === "options")
+                    continue;
                 var parsed = JSON.parse(localStorage[savedGame]);
                 var date = new Date(parsed.date);
                 var prettyDate = [
@@ -1584,7 +1588,7 @@ var UIComponents;
     UIComponents.Stats = React.createClass({
         mixins: [UIComponents.SplitMultilineText],
         toggleSelf: function () {
-            eventManager.dispatchEvent({ type: "toggleStats", content: "" });
+            eventManager.dispatchEvent({ type: "toggleFullScreenPopup", content: null });
         },
         render: function () {
             var player = this.props.player;
@@ -1711,6 +1715,126 @@ var UIComponents;
     });
 })(UIComponents || (UIComponents = {}));
 //# sourceMappingURL=stats.js.map
+
+/// <reference path="../../lib/react.d.ts" />
+///
+/// <reference path="../js/eventlistener.d.ts" />
+/// <reference path="../js/utility.d.ts" />
+var UIComponents;
+(function (UIComponents) {
+    UIComponents.OptionList = React.createClass({
+        render: function () {
+            var rows = [];
+            for (var i = 0; i < this.props.options.length; i++) {
+                var option = this.props.options[i];
+
+                var div = React.DOM.div({
+                    className: "stat-container",
+                    key: "" + i
+                }, React.DOM.div({
+                    className: "stat-main"
+                }, option.content), option.subContent ? React.DOM.small({ className: "stat-subContent" }, option.subContent) : null);
+
+                rows.push(div);
+            }
+            ;
+
+            return (React.DOM.div({ className: "stat-group" }, React.DOM.div({ className: "stat-header" }, this.props.header), rows));
+        }
+    });
+})(UIComponents || (UIComponents = {}));
+//# sourceMappingURL=optionlist.js.map
+
+/// <reference path="../../lib/react.d.ts" />
+///
+/// <reference path="../js/eventlistener.d.ts" />
+/// <reference path="../js/utility.d.ts" />
+///
+/// <reference path="js/optionlist.d.ts" />
+///
+/// <reference path="../js/options.d.ts" />
+var UIComponents;
+(function (UIComponents) {
+    UIComponents.OptionsPopup = React.createClass({
+        toggleSelf: function () {
+            eventManager.dispatchEvent({ type: "toggleFullScreenPopup", content: null });
+        },
+        handleImport: function () {
+            var imported = this.refs.importTextArea.getDOMNode().value;
+            var decoded = LZString.decompressFromBase64(imported);
+
+            localStorage.setItem("tempImported", decoded);
+
+            eventManager.dispatchEvent({ type: "loadGame", content: "tempImported" });
+
+            localStorage.removeItem("tempImported");
+        },
+        handleExport: function () {
+            eventManager.dispatchEvent({ type: "saveGame", content: "tempImported" });
+
+            var encoded = LZString.compressToBase64(localStorage.getItem("tempImported"));
+            this.refs.importTextArea.getDOMNode().value = encoded;
+
+            localStorage.removeItem("tempImported");
+        },
+        render: function () {
+            var allOptions = [];
+
+            var importExport = [
+                {
+                    content: React.DOM.div({ id: "import-export-container" }, React.DOM.div({ id: "import-export-buttons" }, React.DOM.button({
+                        id: "import-button",
+                        onClick: this.handleImport,
+                        onTouchStart: this.handleImport
+                    }, "Import"), React.DOM.button({
+                        id: "export-button",
+                        onClick: this.handleExport,
+                        onTouchStart: this.handleExport
+                    }, "Export")), React.DOM.textarea({ id: "import-export-text", ref: "importTextArea" }))
+                }
+            ];
+            var importExportList = UIComponents.OptionList({
+                options: importExport,
+                header: "Import & Export",
+                key: "importExportList"
+            });
+
+            allOptions.push(importExportList);
+
+            var visualOptions = [
+                {
+                    content: React.DOM.div(null, React.DOM.input({
+                        type: "checkbox",
+                        id: "draw-click-popups",
+                        name: "draw-click-popups",
+                        defaultChecked: Options.drawClickPopups,
+                        onChange: function () {
+                            eventManager.dispatchEvent({
+                                type: "toggleDrawClickPopups", content: ""
+                            });
+                        }
+                    }), React.DOM.label({
+                        htmlFor: "draw-click-popups"
+                    }, "Draw click popups"))
+                }
+            ];
+            var visualOptionList = UIComponents.OptionList({
+                options: visualOptions,
+                header: "Visual & Performance",
+                key: "visualOptionList"
+            });
+
+            allOptions.push(visualOptionList);
+
+            return (React.DOM.div({ className: "all-options" }, React.DOM.a({
+                id: "close-info", className: "close-popup", href: "#",
+                onClick: this.toggleSelf,
+                onTouchStart: this.toggleSelf
+            }, "X"), allOptions));
+        }
+    });
+})(UIComponents || (UIComponents = {}));
+//# sourceMappingURL=options.js.map
 
 /// <reference path="../../lib/react.d.ts" />
 ///
@@ -2379,17 +2503,34 @@ var UIComponents;
 ///
 /// <reference path="js/sidemenu.d.ts" />
 /// <reference path="js/stats.d.ts" />
+/// <reference path="js/options.d.ts" />
 /// <reference path="../js/eventlistener.d.ts" />
 var UIComponents;
 (function (UIComponents) {
     UIComponents.Stage = React.createClass({
+        getDefaultProps: function () {
+            return ({
+                fullScreenPopups: {
+                    stats: function () {
+                        return (React.DOM.div({ id: "stats-container", className: "fullscreen-popup" }, UIComponents.Stats({ player: this.props.player })));
+                    },
+                    options: function () {
+                        return (React.DOM.div({ id: "options-container", className: "fullscreen-popup" }, UIComponents.OptionsPopup(null)));
+                    }
+                }
+            });
+        },
         getInitialState: function () {
-            return { showStats: false };
+            return { showFullScreenPopup: null };
         },
         componentDidMount: function () {
             var self = this;
-            eventManager.addEventListener("toggleStats", function () {
-                self.setState({ showStats: !self.state.showStats });
+            eventManager.addEventListener("toggleFullScreenPopup", function (event) {
+                if (event.content === self.state.showFullScreenPopup) {
+                    self.setState({ showFullScreenPopup: null });
+                } else {
+                    self.setState({ showFullScreenPopup: event.content });
+                }
             });
         },
         render: function () {
@@ -2401,7 +2542,7 @@ var UIComponents;
             }
             ;
 
-            var stats = this.state.showStats ? React.DOM.div({ id: "stats-container", className: "fullscreen-popup" }, UIComponents.Stats({ player: this.props.player })) : null;
+            var fullScreenPopup = this.state.showFullScreenPopup ? this.props.fullScreenPopups[this.state.showFullScreenPopup].call(this) : null;
 
             return (React.DOM.div({ id: "react-wrapper" }, React.DOM.div({
                 id: "react-popups",
@@ -2417,7 +2558,7 @@ var UIComponents;
                 onDragLeave: function (e) {
                     e.preventDefault();
                 }
-            }, popups), stats, UIComponents.SideMenu({
+            }, popups), fullScreenPopup, UIComponents.SideMenu({
                 player: this.props.player,
                 frameImages: this.props.frameImages,
                 // todo react definitions
@@ -7375,6 +7516,17 @@ function capitalize(str) {
 }
 //# sourceMappingURL=utility.js.map
 
+/// <reference path="js/eventlistener.d.ts" />
+var Options;
+(function (Options) {
+    Options.drawClickPopups = true;
+    eventManager.addEventListener("toggleDrawClickPopups", function () {
+        Options.drawClickPopups = !Options.drawClickPopups;
+        eventManager.dispatchEvent({ type: "saveOptions", content: null });
+    });
+})(Options || (Options = {}));
+//# sourceMappingURL=options.js.map
+
 var Strawb;
 (function (Strawb) {
     /**
@@ -8207,7 +8359,7 @@ var Board = (function () {
         var coasts = this.mapGenInfo.coasts = mapGeneration.generateCellNoise({
             width: this.width,
             mapHeight: this.height,
-            amountWeights: [1, 0.5, 0.4, 0.3],
+            amountWeights: [1, 0.5, 0.4, 0],
             variation: 0.5,
             yFalloff: 0.14,
             xCutoff: 0.3,
@@ -8703,7 +8855,7 @@ var KeyboardEventHandler = (function () {
     };
     KeyboardEventHandler.prototype.handleKeydown = function (event) {
         if (this.statesObj[this.currState]["keydown"][event.keyCode]) {
-            if (event.target.tagName === "INPUT" && event.target.type === "text") {
+            if ((event.target.tagName === "INPUT" && event.target.type === "text") || event.target.tagName === "TEXTAREA") {
                 return;
             }
             event.preventDefault();
@@ -10263,6 +10415,8 @@ var Loader = (function () {
 /// <reference path="js/mapgeneration.d.ts" />
 /// <reference path="js/board.d.ts" />
 ///
+/// <reference path="js/options.d.ts" />
+///
 /// <reference path="js/landvalueoverlay.d.ts" />
 ///
 /// <reference path="js/utility.d.ts" />
@@ -10273,7 +10427,7 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-var SCREEN_WIDTH = 720, SCREEN_HEIGHT = 480, TILE_WIDTH = 64, TILE_HEIGHT = 32, TILES = 32, WORLD_WIDTH = TILES * TILE_WIDTH, WORLD_HEIGHT = TILES * TILE_HEIGHT, ZOOM_LEVELS = [1], AMT_OF_BOARDS = 1, DRAW_CLICK_POPUPS = true;
+var SCREEN_WIDTH = 720, SCREEN_HEIGHT = 480, TILE_WIDTH = 64, TILE_HEIGHT = 32, TILES = 32, WORLD_WIDTH = TILES * TILE_WIDTH, WORLD_HEIGHT = TILES * TILE_HEIGHT, ZOOM_LEVELS = [1], AMT_OF_BOARDS = 1;
 
 var idGenerator = idGenerator || {};
 idGenerator.content = 0;
@@ -11197,6 +11351,7 @@ var Game = (function () {
         this.initContainers();
         this.initTools();
         this.bindElements();
+        this.loadOptions();
 
         for (var i = 0; i < AMT_OF_BOARDS; i++) {
             this.boards.push(new Board({ width: TILES }));
@@ -11450,7 +11605,7 @@ var Game = (function () {
 
         //stats
         addClickAndTouchEventListener(document.getElementById("show-stats"), function () {
-            eventManager.dispatchEvent({ type: "toggleStats", content: "" });
+            eventManager.dispatchEvent({ type: "toggleFullScreenPopup", content: "stats" });
         });
 
         //renderer
@@ -11503,11 +11658,12 @@ var Game = (function () {
             self.prestigeReset(event.content);
         });
 
-        // options todo
-        var popupToggle = document.getElementById("draw-click-popups");
-        popupToggle.addEventListener("change", function (e) {
-            DRAW_CLICK_POPUPS = popupToggle.checked;
+        // options
+        addClickAndTouchEventListener(document.getElementById("show-options"), function () {
+            eventManager.dispatchEvent({ type: "toggleFullScreenPopup", content: "options" });
         });
+
+        eventManager.addEventListener("saveOptions", self.saveOptions);
     };
     Game.prototype.bindRenderer = function () {
         var _canvas = document.getElementById("pixi-container");
@@ -11845,6 +12001,16 @@ var Game = (function () {
         this.reactUI.player = player;
         player.addExperience(0); // refresh
         player.updateElements();
+    };
+    Game.prototype.saveOptions = function () {
+        localStorage.setItem("options", JSON.stringify(Options));
+    };
+    Game.prototype.loadOptions = function () {
+        var parsed = JSON.parse(localStorage.getItem("options"));
+
+        for (var _prop in parsed) {
+            Options[_prop] = parsed[_prop];
+        }
     };
     Game.prototype.prestigeReset = function (onReset) {
         var player = this.players["player0"];
@@ -12979,7 +13145,7 @@ var ClickTool = (function (_super) {
         var finalAmount = player.addMoney(baseAmount, "click");
         player.addClicks(1);
 
-        if (DRAW_CLICK_POPUPS) {
+        if (Options.drawClickPopups) {
             game.uiDrawer.makeCellPopup(target, "" + finalAmount.toFixed(3), game.worldRenderer.worldSprite);
         }
     };

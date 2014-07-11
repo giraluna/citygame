@@ -106,6 +106,37 @@ module UIComponents
 
       allOptions.push(visualOptionList);
 
+      var otherOptions =
+      [
+        {
+          content: React.DOM.div(null,
+            React.DOM.input(
+            {
+              type: "number",
+              id: "autosave-limit",
+              className: "small-number-input",
+              defaultValue: Options.autosaveLimit,
+              step: 1,
+              min: 1,
+              max: 9
+            }),
+            React.DOM.label(
+            {
+              htmlFor: "autosave-limit"
+            }, "Autosave limit")
+          )
+          
+        }
+      ];
+      var otherOptionList = UIComponents.OptionList(
+      {
+        options: otherOptions,
+        header: "Other",
+        key: "otherOptionList"
+      });
+
+      allOptions.push(otherOptionList);
+
       return(
         React.DOM.div({className: "all-options"},
           React.DOM.a({id:"close-info", className:"close-popup", href:"#",

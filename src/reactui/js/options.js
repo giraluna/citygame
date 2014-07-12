@@ -88,7 +88,17 @@ var UIComponents;
                         defaultValue: Options.autosaveLimit,
                         step: 1,
                         min: 1,
-                        max: 9
+                        max: 9,
+                        onChange: function (e) {
+                            var _target = e.target;
+                            var value = _target.value;
+                            if (value === Options.autosaveLimit)
+                                return;
+                            eventManager.dispatchEvent({
+                                type: "setAutosaveLimit",
+                                content: value
+                            });
+                        }
                     }), React.DOM.label({
                         htmlFor: "autosave-limit"
                     }, "Autosave limit"))

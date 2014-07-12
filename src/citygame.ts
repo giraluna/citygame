@@ -1537,7 +1537,10 @@ class Game
       //resize
       window.addEventListener("resize", game.resize, false);
 
-      eventManager.addEventListener("autosave", this.autosave.bind(this));
+      eventManager.addEventListener("autosave", function(e)
+      {
+        self.autosave();
+      });
 
       //edit mode select
       var editmodeSelect = <HTMLInputElement> document.getElementById("editmode-select");

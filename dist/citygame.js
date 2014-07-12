@@ -1599,7 +1599,7 @@ var UIComponents;
             var generalStats = [
                 {
                     title: "Money:",
-                    content: beautify(player.money) + "$"
+                    content: "$" + beautify(player.money)
                 },
                 {
                     title: "Clicks:",
@@ -1607,7 +1607,7 @@ var UIComponents;
                 },
                 {
                     title: "Money from clicks:",
-                    content: (player.incomePerType.click ? beautify(player.incomePerType.click) : 0) + "$"
+                    content: "$" + (player.incomePerType.click ? beautify(player.incomePerType.click) : 0)
                 },
                 {
                     title: "Owned plots:",
@@ -1825,6 +1825,39 @@ var UIComponents;
             });
 
             allOptions.push(visualOptionList);
+
+            var otherOptions = [
+                {
+                    content: React.DOM.div(null, React.DOM.input({
+                        type: "number",
+                        id: "autosave-limit",
+                        className: "small-number-input",
+                        defaultValue: Options.autosaveLimit,
+                        step: 1,
+                        min: 1,
+                        max: 9,
+                        onChange: function (e) {
+                            var _target = e.target;
+                            var value = _target.value;
+                            if (value === Options.autosaveLimit)
+                                return;
+                            eventManager.dispatchEvent({
+                                type: "setAutosaveLimit",
+                                content: value
+                            });
+                        }
+                    }), React.DOM.label({
+                        htmlFor: "autosave-limit"
+                    }, "Autosave limit"))
+                }
+            ];
+            var otherOptionList = UIComponents.OptionList({
+                options: otherOptions,
+                header: "Other",
+                key: "otherOptionList"
+            });
+
+            allOptions.push(otherOptionList);
 
             return (React.DOM.div({ className: "all-options" }, React.DOM.a({
                 id: "close-info", className: "close-popup", href: "#",
@@ -7524,6 +7557,12 @@ var Options;
         Options.drawClickPopups = !Options.drawClickPopups;
         eventManager.dispatchEvent({ type: "saveOptions", content: null });
     });
+
+    Options.autosaveLimit = 3;
+    eventManager.addEventListener("setAutosaveLimit", function (e) {
+        Options.autosaveLimit = e.content;
+        eventManager.dispatchEvent({ type: "saveOptions", content: null });
+    });
 })(Options || (Options = {}));
 //# sourceMappingURL=options.js.map
 
@@ -11614,7 +11653,9 @@ var Game = (function () {
         //resize
         window.addEventListener("resize", game.resize, false);
 
-        eventManager.addEventListener("autosave", this.autosave.bind(this));
+        eventManager.addEventListener("autosave", function (e) {
+            self.autosave();
+        });
 
         //edit mode select
         var editmodeSelect = document.getElementById("editmode-select");
@@ -11758,8 +11799,7 @@ var Game = (function () {
     };
     Game.prototype.autosave = function () {
         // TODO
-        var AUTOSAVELIMIT = 3;
-
+        var autosaveLimit = Options.autosaveLimit;
         var autosaves = [];
         for (var saveGame in localStorage) {
             if (saveGame.match(/autosave/)) {
@@ -11767,7 +11807,7 @@ var Game = (function () {
             }
         }
         autosaves.sort();
-        autosaves = autosaves.slice(0, AUTOSAVELIMIT - 1);
+        autosaves = autosaves.slice(0, autosaveLimit - 1);
         for (var i = autosaves.length - 1; i >= 0; i--) {
             localStorage.setItem("autosave" + (i + 2), localStorage.getItem(autosaves[i]));
         }
@@ -12447,6 +12487,7 @@ var MouseEventHandler = (function () {
     MouseEventHandler.prototype.hover = function (event) {
         var pos = event.getLocalPosition(event.target);
         var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
+        var currCell = game.activeBoard.getCell(gridPos);
 
         // TEMPORARY
         if ((!gridPos) || (gridPos[0] >= TILES || gridPos[1] >= TILES) || (gridPos[0] < 0 || gridPos[1] < 0)) {
@@ -12459,7 +12500,9 @@ var MouseEventHandler = (function () {
         if (gridPos[0] !== this.hoverCell[0] || gridPos[1] !== this.hoverCell[1]) {
             this.hoverCell = gridPos;
             game.uiDrawer.removeActive();
-            game.uiDrawer.makeCellTooltip(event, game.activeBoard.getCell(gridPos), event.target);
+            game.uiDrawer.clearAllObjects();
+            game.uiDrawer.makeCellTooltip(event, currCell, event.target);
+            game.uiDrawer.makeBuildingTipsForCell(currCell);
         }
     };
     return MouseEventHandler;
@@ -12625,6 +12668,36 @@ var UIDrawer = (function () {
         var content = new PIXI.Text(text, this.fonts[fontName]);
 
         this.makeFadeyPopup([pos[0], pos[1]], [0, -20], 2000, content);
+    };
+    UIDrawer.prototype.makeBuildingTipsForCell = function (baseCell) {
+        if (!baseCell.content || !baseCell.content.player)
+            return;
+        this.makeBuildingTips(baseCell.content.cells, baseCell.content.type);
+    };
+    UIDrawer.prototype.makeBuildingTips = function (buildArea, buildingType) {
+        var toDrawOn = {
+            positive1: [],
+            negative1: []
+        };
+
+        for (var i = 0; i < buildArea.length; i++) {
+            var currentModifiers = buildArea[i].getValidModifiers(buildingType);
+            for (var _mod in currentModifiers) {
+                var sources = currentModifiers[_mod].sources;
+                var _polarity = currentModifiers[_mod].effect[Object.keys(currentModifiers[_mod].effect)[0]] > 0;
+
+                var type = (_polarity === true ? "positive1" : "negative1");
+
+                for (var j = 0; j < sources.length; j++) {
+                    toDrawOn[type][sources[j].gridPos] = sources[j];
+                }
+            }
+        }
+        for (var _type in toDrawOn) {
+            for (var _cell in toDrawOn[_type]) {
+                this.makeBuildingPlacementTip(toDrawOn[_type][_cell], _type, game.worldRenderer.worldSprite);
+            }
+        }
     };
     UIDrawer.prototype.makeBuildingPlacementTip = function (cell, type, container) {
         var pos = cell.getScreenPos(container);
@@ -13086,24 +13159,7 @@ var BuildTool = (function (_super) {
             }
         }
 
-        var toDrawOn = {};
-
-        for (var i = 0; i < buildArea.length; i++) {
-            var currentModifiers = buildArea[i].getValidModifiers(this.selectedBuildingType);
-            for (var _mod in currentModifiers) {
-                var sources = currentModifiers[_mod].sources;
-                var _polarity = currentModifiers[_mod].effect[Object.keys(currentModifiers[_mod].effect)[0]] > 0;
-
-                var type = (_polarity === true ? "positive1" : "negative1");
-
-                for (var j = 0; j < sources.length; j++) {
-                    toDrawOn[sources[j].gridPos] = sources[j];
-                }
-            }
-        }
-        for (var _cell in toDrawOn) {
-            game.uiDrawer.makeBuildingPlacementTip(toDrawOn[_cell], type, game.worldRenderer.worldSprite);
-        }
+        game.uiDrawer.makeBuildingTips(buildArea, this.selectedBuildingType);
     };
     BuildTool.prototype.onFinish = function () {
         this.clearEffects();

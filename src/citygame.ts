@@ -2826,6 +2826,7 @@ class UIDrawer
       var currentModifiers = buildArea[i].getValidModifiers(buildingType);
       for (var _mod in currentModifiers)
       {
+        if (currentModifiers[_mod].strength <= 0) continue;
         var sources = currentModifiers[_mod].sources;
         var _polarity = currentModifiers[_mod].effect[
           Object.keys(currentModifiers[_mod].effect)[0]] > 0;

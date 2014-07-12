@@ -2051,6 +2051,7 @@ var MouseEventHandler = (function () {
     MouseEventHandler.prototype.hover = function (event) {
         var pos = event.getLocalPosition(event.target);
         var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
+        var currCell = game.activeBoard.getCell(gridPos);
 
         // TEMPORARY
         if ((!gridPos) || (gridPos[0] >= TILES || gridPos[1] >= TILES) || (gridPos[0] < 0 || gridPos[1] < 0)) {
@@ -2063,7 +2064,9 @@ var MouseEventHandler = (function () {
         if (gridPos[0] !== this.hoverCell[0] || gridPos[1] !== this.hoverCell[1]) {
             this.hoverCell = gridPos;
             game.uiDrawer.removeActive();
-            game.uiDrawer.makeCellTooltip(event, game.activeBoard.getCell(gridPos), event.target);
+            game.uiDrawer.clearAllObjects();
+            game.uiDrawer.makeCellTooltip(event, currCell, event.target);
+            game.uiDrawer.makeBuildingTipsForCell(currCell);
         }
     };
     return MouseEventHandler;
@@ -2229,6 +2232,36 @@ var UIDrawer = (function () {
         var content = new PIXI.Text(text, this.fonts[fontName]);
 
         this.makeFadeyPopup([pos[0], pos[1]], [0, -20], 2000, content);
+    };
+    UIDrawer.prototype.makeBuildingTipsForCell = function (baseCell) {
+        if (!baseCell.content || !baseCell.content.player)
+            return;
+        this.makeBuildingTips(baseCell.content.cells, baseCell.content.type);
+    };
+    UIDrawer.prototype.makeBuildingTips = function (buildArea, buildingType) {
+        var toDrawOn = {
+            positive1: [],
+            negative1: []
+        };
+
+        for (var i = 0; i < buildArea.length; i++) {
+            var currentModifiers = buildArea[i].getValidModifiers(buildingType);
+            for (var _mod in currentModifiers) {
+                var sources = currentModifiers[_mod].sources;
+                var _polarity = currentModifiers[_mod].effect[Object.keys(currentModifiers[_mod].effect)[0]] > 0;
+
+                var type = (_polarity === true ? "positive1" : "negative1");
+
+                for (var j = 0; j < sources.length; j++) {
+                    toDrawOn[type][sources[j].gridPos] = sources[j];
+                }
+            }
+        }
+        for (var _type in toDrawOn) {
+            for (var _cell in toDrawOn[_type]) {
+                this.makeBuildingPlacementTip(toDrawOn[_type][_cell], _type, game.worldRenderer.worldSprite);
+            }
+        }
     };
     UIDrawer.prototype.makeBuildingPlacementTip = function (cell, type, container) {
         var pos = cell.getScreenPos(container);
@@ -2690,24 +2723,7 @@ var BuildTool = (function (_super) {
             }
         }
 
-        var toDrawOn = {};
-
-        for (var i = 0; i < buildArea.length; i++) {
-            var currentModifiers = buildArea[i].getValidModifiers(this.selectedBuildingType);
-            for (var _mod in currentModifiers) {
-                var sources = currentModifiers[_mod].sources;
-                var _polarity = currentModifiers[_mod].effect[Object.keys(currentModifiers[_mod].effect)[0]] > 0;
-
-                var type = (_polarity === true ? "positive1" : "negative1");
-
-                for (var j = 0; j < sources.length; j++) {
-                    toDrawOn[sources[j].gridPos] = sources[j];
-                }
-            }
-        }
-        for (var _cell in toDrawOn) {
-            game.uiDrawer.makeBuildingPlacementTip(toDrawOn[_cell], type, game.worldRenderer.worldSprite);
-        }
+        game.uiDrawer.makeBuildingTips(buildArea, this.selectedBuildingType);
     };
     BuildTool.prototype.onFinish = function () {
         this.clearEffects();

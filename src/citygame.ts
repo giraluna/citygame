@@ -2587,6 +2587,7 @@ class MouseEventHandler
   {
     var pos = event.getLocalPosition(event.target);
     var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
+    var currCell = game.activeBoard.getCell(gridPos);
     // TEMPORARY
     if ( (!gridPos) ||
       (gridPos[0] >= TILES || gridPos[1] >= TILES) || 
@@ -2601,7 +2602,9 @@ class MouseEventHandler
     {
       this.hoverCell = gridPos;
       game.uiDrawer.removeActive();
-      game.uiDrawer.makeCellTooltip(event, game.activeBoard.getCell(gridPos), event.target);
+      game.uiDrawer.clearAllObjects();
+      game.uiDrawer.makeCellTooltip(event, currCell, event.target);
+      game.uiDrawer.makeBuildingTipsForCell(currCell)
     }
   }
 
@@ -2804,6 +2807,45 @@ class UIDrawer
     var content = new PIXI.Text(text, this.fonts[fontName]);
 
     this.makeFadeyPopup([pos[0], pos[1]], [0, -20], 2000, content);
+  }
+  makeBuildingTipsForCell(baseCell: Cell)
+  {
+    if (!baseCell.content || !baseCell.content.player) return
+    this.makeBuildingTips(baseCell.content.cells, baseCell.content.type);
+  }
+  makeBuildingTips(buildArea: Cell[], buildingType: any)
+  {
+    var toDrawOn: any =
+    {
+      positive1: [],
+      negative1: []
+    }
+
+    for (var i = 0; i < buildArea.length; i++)
+    {
+      var currentModifiers = buildArea[i].getValidModifiers(buildingType);
+      for (var _mod in currentModifiers)
+      {
+        var sources = currentModifiers[_mod].sources;
+        var _polarity = currentModifiers[_mod].effect[
+          Object.keys(currentModifiers[_mod].effect)[0]] > 0;
+
+        var type = (_polarity === true ? "positive1" : "negative1");
+
+        for (var j = 0; j < sources.length; j++)
+        {
+          toDrawOn[type][sources[j].gridPos] = sources[j];
+        }
+      }
+    }
+    for (var _type in toDrawOn)
+    {
+      for (var _cell in toDrawOn[_type])
+      {
+        this.makeBuildingPlacementTip(toDrawOn[_type][_cell], _type,
+          game.worldRenderer.worldSprite);
+      }
+    }
   }
   makeBuildingPlacementTip(cell: Cell, type: string, container: PIXI.DisplayObjectContainer)
   {
@@ -3363,30 +3405,7 @@ class BuildTool extends Tool
       }
     }
 
-    var toDrawOn: any = {};
-
-    for (var i = 0; i < buildArea.length; i++)
-    {
-      var currentModifiers = buildArea[i].getValidModifiers(this.selectedBuildingType);
-      for (var _mod in currentModifiers)
-      {
-        var sources = currentModifiers[_mod].sources;
-        var _polarity = currentModifiers[_mod].effect[
-          Object.keys(currentModifiers[_mod].effect)[0]] > 0;
-
-        var type = (_polarity === true ? "positive1" : "negative1");
-
-        for (var j = 0; j < sources.length; j++)
-        {
-          toDrawOn[sources[j].gridPos] = sources[j];
-        }
-      }
-    }
-    for (var _cell in toDrawOn)
-    {
-      game.uiDrawer.makeBuildingPlacementTip(toDrawOn[_cell], type,
-        game.worldRenderer.worldSprite);
-    }
+    game.uiDrawer.makeBuildingTips(buildArea, this.selectedBuildingType);
   }
   onFinish()
   {

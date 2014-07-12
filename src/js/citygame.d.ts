@@ -270,6 +270,8 @@ declare class UIDrawer {
     public clearAllObjects(): void;
     public makeCellTooltip(event: any, cell: Cell, container: PIXI.DisplayObjectContainer): UIObject;
     public makeCellPopup(cell: Cell, text: string, container: PIXI.DisplayObjectContainer, fontName?: string): void;
+    public makeBuildingTipsForCell(baseCell: Cell): void;
+    public makeBuildingTips(buildArea: Cell[], buildingType: any): void;
     public makeBuildingPlacementTip(cell: Cell, type: string, container: PIXI.DisplayObjectContainer): void;
     public makeFadeyPopup(pos: number[], drift: number[], lifeTime: number, content: any, easing?: (k: number) => number): UIObject;
     public clearLayer(): void;

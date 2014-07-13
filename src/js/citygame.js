@@ -1399,6 +1399,7 @@ var Game = (function () {
             data.population = board.population;
             data.name = board.name;
             data.cells = [];
+            data.id = board.id;
 
             var typeToKey = {};
             var keyGen = 0;
@@ -1903,11 +1904,13 @@ var MouseEventHandler = (function () {
             if (e.target.localName !== "canvas")
                 return;
             self.scroller.deltaZoom(-e.detail, 0.05);
+            game.uiDrawer.clearAllObjects();
         });
         _canvas.addEventListener("mousewheel", function (e) {
             if (e.target.localName !== "canvas")
                 return;
             self.scroller.deltaZoom(e.wheelDelta / 40, 0.05);
+            game.uiDrawer.clearAllObjects();
         });
         _canvas.addEventListener("mouseout", function (e) {
             if (e.target.localName !== "canvas")
@@ -1971,12 +1974,14 @@ var MouseEventHandler = (function () {
         this.currAction = "scroll";
         this.startPoint = [event.global.x, event.global.y];
         this.scroller.startScroll(this.startPoint);
+        game.uiDrawer.clearAllObjects();
     };
     MouseEventHandler.prototype.startZoom = function (event) {
         if (this.currAction === "cellAction")
             this.stashedAction = "cellAction";
         this.currAction = "zoom";
         this.startPoint = this.currPoint = [event.global.x, event.global.y];
+        game.uiDrawer.clearAllObjects();
     };
     MouseEventHandler.prototype.stageMove = function (event) {
         if (this.currAction === "scroll") {

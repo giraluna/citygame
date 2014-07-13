@@ -769,6 +769,30 @@ var cg = {
                         "strength": 2
                     }
                 ]
+            },
+            "soccerStadium": {
+                "type": "soccerStadium",
+                "baseType": "building",
+                "categoryType": "stadium",
+                "title": "soccer stadium",
+                "size": [2, 2],
+                "baseProfit": 60,
+                "daysForProfitTick": 1,
+                "cost": 25000,
+                "buildTime": 14,
+                "anchor": [0.5, 1],
+                "frame": [
+                    "soccerstadium_f0.png", "soccerstadium_f2.png",
+                    "soccerstadium_f1.png", "soccerstadium_f3.png"],
+                "icon": "departmentstore.png",
+                "canNotBuildOn": ["water", "building", "road"],
+                "effects": [
+                    {
+                        "type": "nearbyShopping",
+                        "range": 4,
+                        "strength": 2
+                    }
+                ]
             }
         }
     }
@@ -890,7 +914,8 @@ var playerBuildableBuildings = [];
     "house2",
     "factory",
     "hotel",
-    "departmentStore"
+    "departmentStore",
+    "soccerStadium"
 ].forEach(function (type) {
     playerBuildableBuildings.push(findType(type));
 });
@@ -907,7 +932,8 @@ var basevalues = [
     [50000, 20],
     [100000, 50],
     [250000, 75],
-    [750000, 90]
+    [750000, 90],
+    [1, 1]
 ];
 
 for (var i = 0; i < playerBuildableBuildings.length; i++) {

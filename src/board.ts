@@ -25,9 +25,10 @@ class Board
     height?: number;
     savedCells?: any[][];
     population?: number;
+    id?: number;
   })
   {
-    this.id = idGenerator.board++;
+    this.id = props.id !== undefined ? props.id : idGenerator.board++;
     this.name = "City " + this.id;
 
     this.width = props.width;

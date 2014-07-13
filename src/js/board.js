@@ -11,7 +11,7 @@ var Board = (function () {
     function Board(props) {
         this.mapGenInfo = {};
         this.layers = {};
-        this.id = idGenerator.board++;
+        this.id = props.id !== undefined ? props.id : idGenerator.board++;
         this.name = "City " + this.id;
 
         this.width = props.width;

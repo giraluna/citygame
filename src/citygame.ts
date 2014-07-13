@@ -1767,6 +1767,7 @@ class Game
       data.population = board.population;
       data.name = board.name;
       data.cells = [];
+      data.id = board.id;
 
       var typeToKey: any = {};
       var keyGen = 0;
@@ -2391,11 +2392,13 @@ class MouseEventHandler
     {
       if (e.target.localName !== "canvas") return;
       self.scroller.deltaZoom(-e.detail, 0.05);
+      game.uiDrawer.clearAllObjects();
     });
     _canvas.addEventListener("mousewheel", function(e: any)
     {
       if (e.target.localName !== "canvas") return;
       self.scroller.deltaZoom(e.wheelDelta / 40, 0.05);
+      game.uiDrawer.clearAllObjects();
     });
     _canvas.addEventListener("mouseout", function(e: any)
     {
@@ -2491,12 +2494,14 @@ class MouseEventHandler
     this.currAction = "scroll";
     this.startPoint = [event.global.x, event.global.y];
     this.scroller.startScroll(this.startPoint);
+    game.uiDrawer.clearAllObjects();
   }
   startZoom(event)
   {
     if (this.currAction === "cellAction") this.stashedAction = "cellAction";
     this.currAction = "zoom";
     this.startPoint = this.currPoint = [event.global.x, event.global.y];
+    game.uiDrawer.clearAllObjects();
   }
   stageMove(event)
   {

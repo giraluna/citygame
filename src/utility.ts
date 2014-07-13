@@ -656,3 +656,13 @@ function capitalize(str: string)
 {
   return str.substring(0,1).toUpperCase() + str.substring(1);
 }
+
+function cloneObject(toClone: any)
+{
+  var result: any = {};
+  for (var prop in toClone)
+  {
+    result[prop] = toClone[prop];
+  }
+  return result;
+}

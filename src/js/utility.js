@@ -528,4 +528,12 @@ function toggleDebugmode() {
 function capitalize(str) {
     return str.substring(0, 1).toUpperCase() + str.substring(1);
 }
+
+function cloneObject(toClone) {
+    var result = {};
+    for (var prop in toClone) {
+        result[prop] = toClone[prop];
+    }
+    return result;
+}
 //# sourceMappingURL=utility.js.map

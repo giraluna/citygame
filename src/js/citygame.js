@@ -1357,7 +1357,8 @@ var Game = (function () {
             player: this.savePlayer(this.players["player0"]),
             boards: this.saveBoards(this.boards),
             date: new Date(),
-            gameDate: this.systemsManager.systems.date.getDate()
+            gameDate: this.systemsManager.systems.date.getDate(),
+            pendingActions: this.saveActions(this.systemsManager.systems.delayedAction)
         };
         localStorage.setItem(name, JSON.stringify(toSave));
     };
@@ -1381,6 +1382,7 @@ var Game = (function () {
         var parsed = JSON.parse(localStorage.getItem(name));
         this.loadPlayer(parsed.player);
         this.loadBoards(parsed);
+        this.loadActions(parsed.pendingActions);
 
         // legacy
         if (parsed.gameDate)
@@ -1614,6 +1616,29 @@ var Game = (function () {
 
         for (var _prop in parsed) {
             Options[_prop] = parsed[_prop];
+        }
+    };
+    Game.prototype.saveActions = function (system) {
+        var toSave = [];
+
+        for (var _tick in system.callbacks) {
+            var _actions = system.callbacks[_tick];
+            for (var i = 0; i < _actions.length; i++) {
+                toSave.push({
+                    type: _actions[i].type,
+                    data: _actions[i].data });
+            }
+        }
+
+        return toSave;
+    };
+    Game.prototype.loadActions = function (toLoad) {
+        if (!toLoad || toLoad.length < 1)
+            return;
+        for (var i = 0; i < toLoad.length; i++) {
+            var currAction = toLoad[i];
+
+            actions[currAction.type].call(null, currAction.data);
         }
     };
     Game.prototype.prestigeReset = function (onReset) {

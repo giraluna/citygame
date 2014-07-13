@@ -30,7 +30,7 @@ module actions
     if (!cell || !player) throw new Error();
 
     var employee = player.employees[props.employeeId];
-    var data: any = Object.create(props);
+    var data: any = cloneObject(props);
 
     if (data.finishedOn === undefined)
     {
@@ -97,11 +97,11 @@ module actions
     var _: any = window;
     var game = _.game;
 
-    var player = game.players[props.playerId]
-    if (!player) throw new Error();
+    var player = game.players[props.playerId];
+    if (!player) throw new Error("No player with that id found");
     var employee = player.employees[props.employeeId];
 
-    var data: any = Object.create(props);
+    var data: any = cloneObject(props);
     if (data.finishedOn === undefined)
     {
       data.time = getActionTime([employee.skills["recruitment"]], 14).approximate;
@@ -181,7 +181,7 @@ module actions
     var employee = player.employees[props.employeeId];
     var buildingType = findType(props.buildingType);
 
-    var data: any = Object.create(props);
+    var data: any = cloneObject(props);
     if (data.finishedOn === undefined)
     {
       data.time = getActionTime([employee.skills["construction"]], buildingType.buildTime).approximate;

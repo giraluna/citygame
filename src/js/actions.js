@@ -21,7 +21,7 @@ var actions;
             throw new Error();
 
         var employee = player.employees[props.employeeId];
-        var data = Object.create(props);
+        var data = cloneObject(props);
 
         if (data.finishedOn === undefined) {
             data.time = getActionTime([employee.skills["negotiation"]], 14).approximate;
@@ -78,10 +78,10 @@ var actions;
 
         var player = game.players[props.playerId];
         if (!player)
-            throw new Error();
+            throw new Error("No player with that id found");
         var employee = player.employees[props.employeeId];
 
-        var data = Object.create(props);
+        var data = cloneObject(props);
         if (data.finishedOn === undefined) {
             data.time = getActionTime([employee.skills["recruitment"]], 14).approximate;
         }
@@ -145,7 +145,7 @@ var actions;
         var employee = player.employees[props.employeeId];
         var buildingType = findType(props.buildingType);
 
-        var data = Object.create(props);
+        var data = cloneObject(props);
         if (data.finishedOn === undefined) {
             data.time = getActionTime([employee.skills["construction"]], buildingType.buildTime).approximate;
         }

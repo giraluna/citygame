@@ -1718,7 +1718,8 @@ class Game
       player: this.savePlayer(this.players["player0"]),
       boards: this.saveBoards(this.boards),
       date: new Date(),
-      gameDate: this.systemsManager.systems.date.getDate()
+      gameDate: this.systemsManager.systems.date.getDate(),
+      pendingActions: this.saveActions(this.systemsManager.systems.delayedAction)
     }
     localStorage.setItem(name, JSON.stringify(toSave));
   }
@@ -1748,6 +1749,7 @@ class Game
     var parsed = JSON.parse(localStorage.getItem(name));
     this.loadPlayer(parsed.player);
     this.loadBoards(parsed);
+    this.loadActions(parsed.pendingActions);
 
     // legacy
     if (parsed.gameDate) this.systemsManager.systems.date.setDate(parsed.gameDate);
@@ -2037,6 +2039,32 @@ class Game
     for (var _prop in parsed)
     {
       Options[_prop] = parsed[_prop];
+    }
+  }
+  saveActions(system: DelayedActionSystem)
+  {
+    var toSave = [];
+
+    for (var _tick in system.callbacks)
+    {
+      var _actions = system.callbacks[_tick];
+      for (var i = 0; i < _actions.length; i++)
+      {
+        toSave.push({type: _actions[i].type,
+          data: _actions[i].data});
+      }
+    }
+
+    return toSave;
+  }
+  loadActions(toLoad: any[])
+  {
+    if (!toLoad || toLoad.length < 1) return;
+    for (var i = 0; i < toLoad.length; i++)
+    {
+      var currAction = toLoad[i];
+
+      actions[currAction.type].call(null, currAction.data);
     }
   }
   prestigeReset(onReset)

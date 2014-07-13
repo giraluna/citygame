@@ -207,6 +207,8 @@ declare class Game {
     public loadPlayer(data: any): void;
     public saveOptions(): void;
     public loadOptions(): void;
+    public saveActions(system: DelayedActionSystem): any[];
+    public loadActions(toLoad: any[]): void;
     public prestigeReset(onReset: any): void;
     public render(): void;
     public updateSystems(): void;

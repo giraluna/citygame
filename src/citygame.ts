@@ -1506,24 +1506,8 @@ class Game
       });
 
       //info
-      addClickAndTouchEventListener(
-      document.getElementById("show-info"), function()
-      {
-        var _elStyle = document.getElementById("info-container").style;
-        if (_elStyle.display === "flex")
-        {
-          _elStyle.display = "none";
-        }
-        else
-        {
-          _elStyle.display = "flex";
-        }
-      });
-      addClickAndTouchEventListener(
-      document.getElementById("close-info"), function()
-      {
-        document.getElementById("info-container").style.display="none";
-      });
+      // under loader.ts
+      
       //stats
       addClickAndTouchEventListener(
       document.getElementById("show-stats"), function()
@@ -2988,7 +2972,7 @@ class Tool
       this.onActivate(target[i]);
     }
   }
-  onActivate(target:Cell){}
+  onActivate(target:Cell, props?: any){}
   onHover(targets:Cell[]){}
   onFinish(){}
 }
@@ -3090,16 +3074,34 @@ class SellTool extends Tool
     this.tintColor = 0xFF5555;
     this.mapmode = undefined;
     this.button = null;
-  } 
-  onActivate(target: Cell)
+  }
+  activate(selectedCells: any[])
   {
+    var onlySellBuildings = false;
+
+    for (var i = 0; i < selectedCells.length; i++)
+    {
+      if (selectedCells[i].content && selectedCells[i].player)
+      {
+        onlySellBuildings = true;
+      }
+    }
+
+    for (var i = 0; i < selectedCells.length; i++)
+    {
+      this.onActivate(selectedCells[i], {onlySellBuildings: onlySellBuildings});
+    }
+  }
+  onActivate(target: Cell, props?: any)
+  {
+    var onlySellBuildings = props.onlySellBuildings;
     var playerOwnsCell = (target.player && target.player.id === game.players.player0.id);
-    if (target.content && playerOwnsCell)
+    if (onlySellBuildings && target.content && playerOwnsCell)
     {
       game.players.player0.sellContent(target.content);
       target.changeContent("none");
     }
-    else if (playerOwnsCell)
+    else if (!onlySellBuildings && playerOwnsCell)
     {
       game.players.player0.sellCell(target);
     }

@@ -288,7 +288,7 @@ declare class Tool {
     public tempContinuous: boolean;
     public button: HTMLInputElement;
     public activate(target: Cell[]): void;
-    public onActivate(target: Cell): void;
+    public onActivate(target: Cell, props?: any): void;
     public onHover(targets: Cell[]): void;
     public onFinish(): void;
 }
@@ -314,7 +314,8 @@ declare class RemoveTool extends Tool {
 }
 declare class SellTool extends Tool {
     constructor();
-    public onActivate(target: Cell): void;
+    public activate(selectedCells: any[]): void;
+    public onActivate(target: Cell, props?: any): void;
 }
 declare class PlantTool extends Tool {
     constructor();

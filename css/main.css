@@ -557,4 +557,5 @@ progress::-webkit-progress-value {
   background-color: #dddddd;
   padding: 25px;
   overflow-y: scroll;
+  max-height: 90%;
 }

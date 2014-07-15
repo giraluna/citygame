@@ -10,14 +10,29 @@ var Loader = (function () {
             dom: false
         };
         var self = this;
-        this.startTime = window.performance.now();
         this.game = game;
         document.addEventListener('DOMContentLoaded', function () {
             self.loaded.dom = true;
+
+            //info
+            addClickAndTouchEventListener(document.getElementById("show-info"), function () {
+                var _elStyle = document.getElementById("info-container").style;
+                if (_elStyle.display === "flex") {
+                    _elStyle.display = "none";
+                } else {
+                    _elStyle.display = "flex";
+                }
+            });
+            addClickAndTouchEventListener(document.getElementById("close-info"), function () {
+                document.getElementById("info-container").style.display = "none";
+            });
+
             self.checkLoaded();
         });
 
         //PIXI.scaleModes.DEFAULT = PIXI.scaleModes.NEAREST;
+        this.startTime = window.performance ? window.performance.now() : Date.now();
+
         this.loadFonts();
         this.loadSprites();
     }
@@ -63,7 +78,8 @@ var Loader = (function () {
         }
         this.game.frameImages = this.spriteImages;
         this.game.init();
-        var elapsed = window.performance.now() - this.startTime;
+        var finishTime = window.performance ? window.performance.now() : Date.now();
+        var elapsed = finishTime - this.startTime;
         console.log("loaded in " + Math.round(elapsed) + " ms");
     };
     return Loader;

@@ -40,7 +40,7 @@ var Board = (function () {
         }
     }
     Board.prototype.generateMap = function () {
-        var startTime = window.performance.now();
+        var startTime = window.performance ? window.performance.now() : Date.now();
 
         var coasts = this.mapGenInfo.coasts = mapGeneration.generateCellNoise({
             width: this.width,
@@ -90,7 +90,8 @@ var Board = (function () {
 
         mapGeneration.convertCells(this.cells, this, false);
 
-        var elapsed = window.performance.now() - startTime;
+        var finishTime = window.performance ? window.performance.now() : Date.now();
+        var elapsed = finishTime - startTime;
         console.log("map gen in " + Math.round(elapsed) + " ms");
     };
 

@@ -595,7 +595,7 @@ var cg = {
                 "baseProfit": 8,
                 "daysForProfitTick": 1,
                 "cost": 1000,
-                "buildTime": 14,
+                "buildTime": 10,
                 "anchor": [0.5, 1],
                 "frame": ["conveniencestore.png"],
                 "canNotBuildOn": ["water", "building", "road"],
@@ -659,7 +659,7 @@ var cg = {
                 "baseProfit": 1,
                 "daysForProfitTick": 1,
                 "cost": 25,
-                "buildTime": 14,
+                "buildTime": 7,
                 "anchor": [0.5, 1],
                 "frame": ["parkinglot.png"],
                 "canNotBuildOn": ["water", "building", "road"],
@@ -752,7 +752,7 @@ var cg = {
                 "baseProfit": 60,
                 "daysForProfitTick": 1,
                 "cost": 25000,
-                "buildTime": 14,
+                "buildTime": 21,
                 "anchor": [0.5, 1],
                 "frame": ["departmentstore_f0.png", "departmentstore_f1.png"],
                 "icon": "departmentstore.png",
@@ -774,17 +774,17 @@ var cg = {
                 "type": "soccerStadium",
                 "baseType": "building",
                 "categoryType": "stadium",
-                "title": "soccer stadium",
+                "title": "Soccer stadium",
                 "size": [2, 2],
                 "baseProfit": 60,
                 "daysForProfitTick": 1,
                 "cost": 25000,
-                "buildTime": 14,
+                "buildTime": 30,
                 "anchor": [0.5, 1],
                 "frame": [
                     "soccerstadium_f0.png", "soccerstadium_f2.png",
                     "soccerstadium_f1.png", "soccerstadium_f3.png"],
-                "icon": "departmentstore.png",
+                "icon": "soccerstadium.png",
                 "canNotBuildOn": ["water", "building", "road"],
                 "effects": [
                     {
@@ -919,8 +919,7 @@ var playerBuildableBuildings = [];
     "house2",
     "factory",
     "hotel",
-    "departmentStore",
-    "soccerStadium"
+    "departmentStore"
 ].forEach(function (type) {
     playerBuildableBuildings.push(findType(type));
 });

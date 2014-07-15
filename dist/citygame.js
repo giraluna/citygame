@@ -5059,7 +5059,7 @@ var cellModifiers;
             strength: strength,
             targets: [
                 "fastfood", "shopping", "office",
-                "apartment", "parking", "hotel"],
+                "apartment", "parking", "hotel", "stadium"],
             effect: {
                 addedProfit: 0.25,
                 multiplier: 0.25
@@ -5183,6 +5183,34 @@ var cellModifiers;
         });
     }
     cellModifiers.hotelCompetition = hotelCompetition;
+    function nearbyStadium(range, strength) {
+        if (typeof strength === "undefined") { strength = 1; }
+        return ({
+            type: "nearbyStadium",
+            title: "Nearby stadium",
+            range: range,
+            strength: strength,
+            targets: ["parking"],
+            effect: {
+                multiplier: 0.2
+            }
+        });
+    }
+    cellModifiers.nearbyStadium = nearbyStadium;
+    function stadiumCompetition(range, strength) {
+        if (typeof strength === "undefined") { strength = 1; }
+        return ({
+            type: "stadiumCompetition",
+            title: "Competing stadiums",
+            range: range,
+            strength: strength,
+            targets: ["stadium"],
+            effect: {
+                multiplier: -0.25
+            }
+        });
+    }
+    cellModifiers.stadiumCompetition = stadiumCompetition;
 })(cellModifiers || (cellModifiers = {}));
 //# sourceMappingURL=cellmodifiers.js.map
 
@@ -5783,7 +5811,7 @@ var cg = {
                 "baseProfit": 8,
                 "daysForProfitTick": 1,
                 "cost": 1000,
-                "buildTime": 14,
+                "buildTime": 10,
                 "anchor": [0.5, 1],
                 "frame": ["conveniencestore.png"],
                 "canNotBuildOn": ["water", "building", "road"],
@@ -5847,7 +5875,7 @@ var cg = {
                 "baseProfit": 1,
                 "daysForProfitTick": 1,
                 "cost": 25,
-                "buildTime": 14,
+                "buildTime": 7,
                 "anchor": [0.5, 1],
                 "frame": ["parkinglot.png"],
                 "canNotBuildOn": ["water", "building", "road"],
@@ -5940,7 +5968,7 @@ var cg = {
                 "baseProfit": 60,
                 "daysForProfitTick": 1,
                 "cost": 25000,
-                "buildTime": 14,
+                "buildTime": 21,
                 "anchor": [0.5, 1],
                 "frame": ["departmentstore_f0.png", "departmentstore_f1.png"],
                 "icon": "departmentstore.png",
@@ -5955,6 +5983,35 @@ var cg = {
                         "type": "nearbyShopping",
                         "range": 4,
                         "strength": 2
+                    }
+                ]
+            },
+            "soccerStadium": {
+                "type": "soccerStadium",
+                "baseType": "building",
+                "categoryType": "stadium",
+                "title": "Soccer stadium",
+                "size": [2, 2],
+                "baseProfit": 60,
+                "daysForProfitTick": 1,
+                "cost": 25000,
+                "buildTime": 30,
+                "anchor": [0.5, 1],
+                "frame": [
+                    "soccerstadium_f0.png", "soccerstadium_f2.png",
+                    "soccerstadium_f1.png", "soccerstadium_f3.png"],
+                "icon": "soccerstadium.png",
+                "canNotBuildOn": ["water", "building", "road"],
+                "effects": [
+                    {
+                        "type": "stadiumCompetition",
+                        "range": 3,
+                        "strength": 1
+                    },
+                    {
+                        "type": "nearbyStadium",
+                        "range": 2,
+                        "strength": 1
                     }
                 ]
             }
@@ -6095,7 +6152,8 @@ var basevalues = [
     [50000, 20],
     [100000, 50],
     [250000, 75],
-    [750000, 90]
+    [750000, 90],
+    [1250000, 120]
 ];
 
 for (var i = 0; i < playerBuildableBuildings.length; i++) {
@@ -7547,6 +7605,14 @@ function toggleDebugmode() {
 function capitalize(str) {
     return str.substring(0, 1).toUpperCase() + str.substring(1);
 }
+
+function cloneObject(toClone) {
+    var result = {};
+    for (var prop in toClone) {
+        result[prop] = toClone[prop];
+    }
+    return result;
+}
 //# sourceMappingURL=utility.js.map
 
 /// <reference path="js/eventlistener.d.ts" />
@@ -8364,7 +8430,7 @@ var Board = (function () {
     function Board(props) {
         this.mapGenInfo = {};
         this.layers = {};
-        this.id = idGenerator.board++;
+        this.id = props.id !== undefined ? props.id : idGenerator.board++;
         this.name = "City " + this.id;
 
         this.width = props.width;
@@ -8393,7 +8459,7 @@ var Board = (function () {
         }
     }
     Board.prototype.generateMap = function () {
-        var startTime = window.performance.now();
+        var startTime = window.performance ? window.performance.now() : Date.now();
 
         var coasts = this.mapGenInfo.coasts = mapGeneration.generateCellNoise({
             width: this.width,
@@ -8443,7 +8509,8 @@ var Board = (function () {
 
         mapGeneration.convertCells(this.cells, this, false);
 
-        var elapsed = window.performance.now() - startTime;
+        var finishTime = window.performance ? window.performance.now() : Date.now();
+        var elapsed = finishTime - startTime;
         console.log("map gen in " + Math.round(elapsed) + " ms");
     };
 
@@ -9835,7 +9902,7 @@ var actions;
             throw new Error();
 
         var employee = player.employees[props.employeeId];
-        var data = Object.create(props);
+        var data = cloneObject(props);
 
         if (data.finishedOn === undefined) {
             data.time = getActionTime([employee.skills["negotiation"]], 14).approximate;
@@ -9892,10 +9959,10 @@ var actions;
 
         var player = game.players[props.playerId];
         if (!player)
-            throw new Error();
+            throw new Error("No player with that id found");
         var employee = player.employees[props.employeeId];
 
-        var data = Object.create(props);
+        var data = cloneObject(props);
         if (data.finishedOn === undefined) {
             data.time = getActionTime([employee.skills["recruitment"]], 14).approximate;
         }
@@ -9959,7 +10026,7 @@ var actions;
         var employee = player.employees[props.employeeId];
         var buildingType = findType(props.buildingType);
 
-        var data = Object.create(props);
+        var data = cloneObject(props);
         if (data.finishedOn === undefined) {
             data.time = getActionTime([employee.skills["construction"]], buildingType.buildTime).approximate;
         }
@@ -10343,6 +10410,10 @@ var DelayedActionSystem = (function (_super) {
             delete this.callbacks[currTick];
         }
     };
+
+    DelayedActionSystem.prototype.reset = function () {
+        this.callbacks = {};
+    };
     return DelayedActionSystem;
 })(System);
 
@@ -10374,14 +10445,29 @@ var Loader = (function () {
             dom: false
         };
         var self = this;
-        this.startTime = window.performance.now();
         this.game = game;
         document.addEventListener('DOMContentLoaded', function () {
             self.loaded.dom = true;
+
+            //info
+            addClickAndTouchEventListener(document.getElementById("show-info"), function () {
+                var _elStyle = document.getElementById("info-container").style;
+                if (_elStyle.display === "flex") {
+                    _elStyle.display = "none";
+                } else {
+                    _elStyle.display = "flex";
+                }
+            });
+            addClickAndTouchEventListener(document.getElementById("close-info"), function () {
+                document.getElementById("info-container").style.display = "none";
+            });
+
             self.checkLoaded();
         });
 
         //PIXI.scaleModes.DEFAULT = PIXI.scaleModes.NEAREST;
+        this.startTime = window.performance ? window.performance.now() : Date.now();
+
         this.loadFonts();
         this.loadSprites();
     }
@@ -10427,7 +10513,8 @@ var Loader = (function () {
         }
         this.game.frameImages = this.spriteImages;
         this.game.init();
-        var elapsed = window.performance.now() - this.startTime;
+        var finishTime = window.performance ? window.performance.now() : Date.now();
+        var elapsed = finishTime - this.startTime;
         console.log("loaded in " + Math.round(elapsed) + " ms");
     };
     return Loader;
@@ -11630,18 +11717,7 @@ var Game = (function () {
         });
 
         //info
-        addClickAndTouchEventListener(document.getElementById("show-info"), function () {
-            var _elStyle = document.getElementById("info-container").style;
-            if (_elStyle.display === "flex") {
-                _elStyle.display = "none";
-            } else {
-                _elStyle.display = "flex";
-            }
-        });
-        addClickAndTouchEventListener(document.getElementById("close-info"), function () {
-            document.getElementById("info-container").style.display = "none";
-        });
-
+        // under loader.ts
         //stats
         addClickAndTouchEventListener(document.getElementById("show-stats"), function () {
             eventManager.dispatchEvent({ type: "toggleFullScreenPopup", content: "stats" });
@@ -11793,7 +11869,9 @@ var Game = (function () {
             player: this.savePlayer(this.players["player0"]),
             boards: this.saveBoards(this.boards),
             date: new Date(),
-            gameDate: this.systemsManager.systems.date.getDate()
+            gameDate: this.systemsManager.systems.date.getDate(),
+            gameTick: this.systemsManager.tickNumber,
+            pendingActions: this.saveActions(this.systemsManager.systems.delayedAction)
         };
         localStorage.setItem(name, JSON.stringify(toSave));
     };
@@ -11815,8 +11893,14 @@ var Game = (function () {
     };
     Game.prototype.load = function (name) {
         var parsed = JSON.parse(localStorage.getItem(name));
+        this.activeBoard = null;
         this.loadPlayer(parsed.player);
         this.loadBoards(parsed);
+        this.loadActions(parsed.pendingActions);
+
+        if (parsed.gameTick)
+            this.systemsManager.tickNumber = parsed.gameTick;
+        game.systemsManager.systems.delayedAction.reset();
 
         // legacy
         if (parsed.gameDate)
@@ -11833,6 +11917,7 @@ var Game = (function () {
             data.population = board.population;
             data.name = board.name;
             data.cells = [];
+            data.id = board.id;
 
             var typeToKey = {};
             var keyGen = 0;
@@ -12050,6 +12135,29 @@ var Game = (function () {
 
         for (var _prop in parsed) {
             Options[_prop] = parsed[_prop];
+        }
+    };
+    Game.prototype.saveActions = function (system) {
+        var toSave = [];
+
+        for (var _tick in system.callbacks) {
+            var _actions = system.callbacks[_tick];
+            for (var i = 0; i < _actions.length; i++) {
+                toSave.push({
+                    type: _actions[i].type,
+                    data: _actions[i].data });
+            }
+        }
+
+        return toSave;
+    };
+    Game.prototype.loadActions = function (toLoad) {
+        if (!toLoad || toLoad.length < 1)
+            return;
+        for (var i = 0; i < toLoad.length; i++) {
+            var currAction = toLoad[i];
+
+            actions[currAction.type].call(null, currAction.data);
         }
     };
     Game.prototype.prestigeReset = function (onReset) {
@@ -12314,11 +12422,13 @@ var MouseEventHandler = (function () {
             if (e.target.localName !== "canvas")
                 return;
             self.scroller.deltaZoom(-e.detail, 0.05);
+            game.uiDrawer.clearAllObjects();
         });
         _canvas.addEventListener("mousewheel", function (e) {
             if (e.target.localName !== "canvas")
                 return;
             self.scroller.deltaZoom(e.wheelDelta / 40, 0.05);
+            game.uiDrawer.clearAllObjects();
         });
         _canvas.addEventListener("mouseout", function (e) {
             if (e.target.localName !== "canvas")
@@ -12382,12 +12492,14 @@ var MouseEventHandler = (function () {
         this.currAction = "scroll";
         this.startPoint = [event.global.x, event.global.y];
         this.scroller.startScroll(this.startPoint);
+        game.uiDrawer.clearAllObjects();
     };
     MouseEventHandler.prototype.startZoom = function (event) {
         if (this.currAction === "cellAction")
             this.stashedAction = "cellAction";
         this.currAction = "zoom";
         this.startPoint = this.currPoint = [event.global.x, event.global.y];
+        game.uiDrawer.clearAllObjects();
     };
     MouseEventHandler.prototype.stageMove = function (event) {
         if (this.currAction === "scroll") {
@@ -12683,6 +12795,8 @@ var UIDrawer = (function () {
         for (var i = 0; i < buildArea.length; i++) {
             var currentModifiers = buildArea[i].getValidModifiers(buildingType);
             for (var _mod in currentModifiers) {
+                if (currentModifiers[_mod].strength <= 0)
+                    continue;
                 var sources = currentModifiers[_mod].sources;
                 var _polarity = currentModifiers[_mod].effect[Object.keys(currentModifiers[_mod].effect)[0]] > 0;
 
@@ -12781,7 +12895,7 @@ var Tool = (function () {
             this.onActivate(target[i]);
         }
     };
-    Tool.prototype.onActivate = function (target) {
+    Tool.prototype.onActivate = function (target, props) {
     };
     Tool.prototype.onHover = function (targets) {
     };
@@ -12878,12 +12992,26 @@ var SellTool = (function (_super) {
         this.mapmode = undefined;
         this.button = null;
     }
-    SellTool.prototype.onActivate = function (target) {
+    SellTool.prototype.activate = function (selectedCells) {
+        var onlySellBuildings = false;
+
+        for (var i = 0; i < selectedCells.length; i++) {
+            if (selectedCells[i].content && selectedCells[i].player) {
+                onlySellBuildings = true;
+            }
+        }
+
+        for (var i = 0; i < selectedCells.length; i++) {
+            this.onActivate(selectedCells[i], { onlySellBuildings: onlySellBuildings });
+        }
+    };
+    SellTool.prototype.onActivate = function (target, props) {
+        var onlySellBuildings = props.onlySellBuildings;
         var playerOwnsCell = (target.player && target.player.id === game.players.player0.id);
-        if (target.content && playerOwnsCell) {
+        if (onlySellBuildings && target.content && playerOwnsCell) {
             game.players.player0.sellContent(target.content);
             target.changeContent("none");
-        } else if (playerOwnsCell) {
+        } else if (!onlySellBuildings && playerOwnsCell) {
             game.players.player0.sellCell(target);
         }
 

@@ -92,6 +92,7 @@ declare class DelayedActionSystem extends System {
     public addEventListeners(): void;
     public addAction(action: any): void;
     public activate(currTick: number): void;
+    public reset(): void;
 }
 declare class AutosaveSystem extends System {
     constructor(activationRate: number, systemsManager: SystemsManager);

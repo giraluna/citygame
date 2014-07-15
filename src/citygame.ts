@@ -1703,6 +1703,7 @@ class Game
       boards: this.saveBoards(this.boards),
       date: new Date(),
       gameDate: this.systemsManager.systems.date.getDate(),
+      gameTick: this.systemsManager.tickNumber,
       pendingActions: this.saveActions(this.systemsManager.systems.delayedAction)
     }
     localStorage.setItem(name, JSON.stringify(toSave));
@@ -1731,9 +1732,13 @@ class Game
   load(name: string)
   {
     var parsed = JSON.parse(localStorage.getItem(name));
+    this.activeBoard = null;
     this.loadPlayer(parsed.player);
     this.loadBoards(parsed);
     this.loadActions(parsed.pendingActions);
+
+    if (parsed.gameTick) this.systemsManager.tickNumber = parsed.gameTick;
+    game.systemsManager.systems.delayedAction.reset();
 
     // legacy
     if (parsed.gameDate) this.systemsManager.systems.date.setDate(parsed.gameDate);

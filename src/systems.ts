@@ -367,6 +367,11 @@ class DelayedActionSystem extends System
       delete this.callbacks[currTick];
     }
   }
+
+  reset()
+  {
+    this.callbacks = {};
+  }
 }
 
 // This is a seperate system, because even though it should be easier

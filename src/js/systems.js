@@ -292,6 +292,10 @@ var DelayedActionSystem = (function (_super) {
             delete this.callbacks[currTick];
         }
     };
+
+    DelayedActionSystem.prototype.reset = function () {
+        this.callbacks = {};
+    };
     return DelayedActionSystem;
 })(System);
 

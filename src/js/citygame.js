@@ -1347,6 +1347,7 @@ var Game = (function () {
             boards: this.saveBoards(this.boards),
             date: new Date(),
             gameDate: this.systemsManager.systems.date.getDate(),
+            gameTick: this.systemsManager.tickNumber,
             pendingActions: this.saveActions(this.systemsManager.systems.delayedAction)
         };
         localStorage.setItem(name, JSON.stringify(toSave));
@@ -1369,9 +1370,14 @@ var Game = (function () {
     };
     Game.prototype.load = function (name) {
         var parsed = JSON.parse(localStorage.getItem(name));
+        this.activeBoard = null;
         this.loadPlayer(parsed.player);
         this.loadBoards(parsed);
         this.loadActions(parsed.pendingActions);
+
+        if (parsed.gameTick)
+            this.systemsManager.tickNumber = parsed.gameTick;
+        game.systemsManager.systems.delayedAction.reset();
 
         // legacy
         if (parsed.gameDate)

@@ -1069,7 +1069,7 @@ var basevalues =
   [100000, 50],
   [250000, 75],
   [750000, 90],
-  [1, 1]
+  [1250000, 120]
 ];
 
 for (var i = 0; i < playerBuildableBuildings.length; i++)

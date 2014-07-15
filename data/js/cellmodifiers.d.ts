@@ -163,4 +163,24 @@ declare module cellModifiers {
             multiplier: number;
         };
     };
+    function nearbyStadium(range: number, strength?: number): {
+        type: string;
+        title: string;
+        range: number;
+        strength: number;
+        targets: string[];
+        effect: {
+            multiplier: number;
+        };
+    };
+    function stadiumCompetition(range: number, strength?: number): {
+        type: string;
+        title: string;
+        range: number;
+        strength: number;
+        targets: string[];
+        effect: {
+            multiplier: number;
+        };
+    };
 }

@@ -788,9 +788,14 @@ var cg = {
                 "canNotBuildOn": ["water", "building", "road"],
                 "effects": [
                     {
-                        "type": "nearbyShopping",
-                        "range": 4,
-                        "strength": 2
+                        "type": "stadiumCompetition",
+                        "range": 3,
+                        "strength": 1
+                    },
+                    {
+                        "type": "nearbyStadium",
+                        "range": 2,
+                        "strength": 1
                     }
                 ]
             }

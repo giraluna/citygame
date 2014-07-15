@@ -124,7 +124,7 @@ var cellModifiers;
             strength: strength,
             targets: [
                 "fastfood", "shopping", "office",
-                "apartment", "parking", "hotel"],
+                "apartment", "parking", "hotel", "stadium"],
             effect: {
                 addedProfit: 0.25,
                 multiplier: 0.25
@@ -248,5 +248,33 @@ var cellModifiers;
         });
     }
     cellModifiers.hotelCompetition = hotelCompetition;
+    function nearbyStadium(range, strength) {
+        if (typeof strength === "undefined") { strength = 1; }
+        return ({
+            type: "nearbyStadium",
+            title: "Nearby stadium",
+            range: range,
+            strength: strength,
+            targets: ["parking"],
+            effect: {
+                multiplier: 0.2
+            }
+        });
+    }
+    cellModifiers.nearbyStadium = nearbyStadium;
+    function stadiumCompetition(range, strength) {
+        if (typeof strength === "undefined") { strength = 1; }
+        return ({
+            type: "stadiumCompetition",
+            title: "Competing stadiums",
+            range: range,
+            strength: strength,
+            targets: ["stadium"],
+            effect: {
+                multiplier: -0.25
+            }
+        });
+    }
+    cellModifiers.stadiumCompetition = stadiumCompetition;
 })(cellModifiers || (cellModifiers = {}));
 //# sourceMappingURL=cellmodifiers.js.map

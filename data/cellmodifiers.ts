@@ -137,7 +137,7 @@ module cellModifiers
       range: range,
       strength: strength,
       targets: ["fastfood", "shopping", "office",
-        "apartment", "parking", "hotel"],
+        "apartment", "parking", "hotel", "stadium"],
       effect:
       {
         addedProfit: 0.25,
@@ -271,6 +271,36 @@ module cellModifiers
       effect:
       {
         multiplier: -0.2,
+      }
+    });
+  }
+  export function nearbyStadium(range: number, strength: number = 1)
+  {
+    return(
+    {
+      type: "nearbyStadium",
+      title: "Nearby stadium",
+      range: range,
+      strength: strength,
+      targets: ["parking"],
+      effect:
+      {
+        multiplier: 0.2,
+      }
+    });
+  }
+  export function stadiumCompetition(range: number, strength: number = 1)
+  {
+    return(
+    {
+      type: "stadiumCompetition",
+      title: "Competing stadiums",
+      range: range,
+      strength: strength,
+      targets: ["stadium"],
+      effect:
+      {
+        multiplier: -0.25,
       }
     });
   }

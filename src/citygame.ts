@@ -1738,7 +1738,6 @@ class Game
     this.loadActions(parsed.pendingActions);
 
     if (parsed.gameTick) this.systemsManager.tickNumber = parsed.gameTick;
-    game.systemsManager.systems.delayedAction.reset();
 
     // legacy
     if (parsed.gameDate) this.systemsManager.systems.date.setDate(parsed.gameDate);
@@ -2049,6 +2048,7 @@ class Game
   }
   loadActions(toLoad: any[])
   {
+    game.systemsManager.systems.delayedAction.reset();
     if (!toLoad || toLoad.length < 1) return;
     for (var i = 0; i < toLoad.length; i++)
     {

@@ -1377,7 +1377,6 @@ var Game = (function () {
 
         if (parsed.gameTick)
             this.systemsManager.tickNumber = parsed.gameTick;
-        game.systemsManager.systems.delayedAction.reset();
 
         // legacy
         if (parsed.gameDate)
@@ -1629,6 +1628,7 @@ var Game = (function () {
         return toSave;
     };
     Game.prototype.loadActions = function (toLoad) {
+        game.systemsManager.systems.delayedAction.reset();
         if (!toLoad || toLoad.length < 1)
             return;
         for (var i = 0; i < toLoad.length; i++) {

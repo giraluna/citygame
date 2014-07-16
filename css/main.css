@@ -80,6 +80,14 @@ progress::-webkit-progress-bar {
 progress::-webkit-progress-value {
   background: #080;
 }
+th {
+  margin-bottom: 10px;
+  min-width: 40px;
+  font-weight: lighter;
+}
+td {
+  padding: 0 5px;
+}
 #main {
   position: relative;
   order: 1;
@@ -222,17 +230,9 @@ progress::-webkit-progress-value {
 .popup .popup-content > * {
   border: 1px solid #587982;
 }
-.popup .popup-content th {
-  margin-bottom: 10px;
-  min-width: 40px;
-  font-weight: lighter;
-}
 .popup .popup-content tr {
   text-align: center;
   cursor: pointer;
-}
-.popup .popup-content td {
-  padding: 0 5px;
 }
 .popup .popup-content tbody tr:hover {
   background-color: #9db6bd;
@@ -527,25 +527,38 @@ progress::-webkit-progress-value {
   margin-left: 10px;
   min-width: 300px;
 }
-.fullscreen-popup {
+.fullscreen-popup-wrapper {
   height: 100%;
-  width: 100%;
   z-index: 9998;
-  display: flex;
-  position: absolute;
   top: 0;
-  bottom: 25px;
   left: 0;
+  bottom: 25px;
+  right: 250px;
+  position: absolute;
+  display: flex;
   background-color: rgba(0, 0, 0, 0.3);
   align-items: center;
   justify-content: center;
+}
+@media (max-width: 600px) {
+  .fullscreen-popup-wrapper {
+    right: 180px;
+  }
+}
+.fullscreen-popup {
+  display: flex;
+  justify-content: center;
   pointer-events: auto;
+  position: relative;
+  background-color: #dddddd;
+  max-height: 95%;
+  max-width: 95%;
 }
 .fullscreen-popup .close-popup {
-  margin: 7px;
+  margin: 14px;
   position: absolute;
   top: 0px;
-  right: 0px;
+  right: 7px;
   color: #444;
   text-decoration: none;
 }
@@ -553,9 +566,6 @@ progress::-webkit-progress-value {
   text-decoration: underline;
 }
 .fullscreen-popup > * {
-  position: relative;
-  background-color: #dddddd;
-  padding: 25px;
   overflow-y: scroll;
-  max-height: 90%;
+  padding: 25px;
 }

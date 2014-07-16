@@ -132,6 +132,17 @@ progress::-moz-progress-bar { background: #080; }
 progress::-webkit-progress-bar { background: #888; }
 progress::-webkit-progress-value { background: #080; }
 
+th
+{
+  margin-bottom: 10px;
+  min-width: 40px;
+  font-weight: lighter;
+}
+td
+{
+  padding: 0 5px;
+}
+
 #main
 {
   position: relative;
@@ -321,20 +332,10 @@ progress::-webkit-progress-value { background: #080; }
     {
       border: 1px solid @dark-blue;
     }
-    th
-    {
-      margin-bottom: 10px;
-      min-width: 40px;
-      font-weight: lighter;
-    }
     tr
     {
       text-align: center;
       cursor: pointer;
-    }
-    td
-    {
-      padding: 0 5px;
     }
     tbody tr:hover
     {
@@ -749,27 +750,47 @@ progress::-webkit-progress-value { background: #080; }
 
 // INFO
 
-.fullscreen-popup
+.fullscreen-popup-wrapper
 {
   height: 100%;
-  width: 100%;
   z-index: 9998;
-  display: flex;
-  position: absolute;
   top: 0;
-  bottom: 25px;
   left: 0;
+  bottom: 25px;
+  right: @side-menu-width;
+  position: absolute;
+  display: flex;
+
+  @media(max-width: 600px)
+  {
+    right: @side-menu-width-small;
+  }
+
   background-color: rgba(0,0,0,0.3);
   align-items: center;
   justify-content: center;
+}
+
+.fullscreen-popup
+{
+  position: relative;
+  display: flex;
+  
+  justify-content: center;
   pointer-events: auto;
+
+  position: relative;
+  background-color: @near-white;
+  max-height: 95%;
+  max-width: 95%;
+  
 
   .close-popup
   {
-    margin: 7px;
+    margin: 14px;
     position: absolute;
     top: 0px;
-    right: 0px;
+    right: 7px;
     color: #444;
     text-decoration: none;
   }
@@ -779,11 +800,8 @@ progress::-webkit-progress-value { background: #080; }
   }
   >*
   {
-    position: relative;
-    background-color: @near-white;
-    padding: 25px;
     overflow-y: scroll;
-    max-height: 90%;
+    padding: 25px;
   }
 
 }

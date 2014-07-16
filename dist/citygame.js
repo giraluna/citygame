@@ -2545,10 +2545,10 @@ var UIComponents;
             return ({
                 fullScreenPopups: {
                     stats: function () {
-                        return (React.DOM.div({ id: "stats-container", className: "fullscreen-popup" }, UIComponents.Stats({ player: this.props.player })));
+                        return (React.DOM.div({ className: "fullscreen-popup-wrapper" }, React.DOM.div({ id: "stats-container", className: "fullscreen-popup" }, UIComponents.Stats({ player: this.props.player }))));
                     },
                     options: function () {
-                        return (React.DOM.div({ id: "options-container", className: "fullscreen-popup" }, UIComponents.OptionsPopup(null)));
+                        return (React.DOM.div({ className: "fullscreen-popup-wrapper" }, React.DOM.div({ id: "options-container", className: "fullscreen-popup" }, UIComponents.OptionsPopup(null))));
                     }
                 }
             });
@@ -11900,7 +11900,6 @@ var Game = (function () {
 
         if (parsed.gameTick)
             this.systemsManager.tickNumber = parsed.gameTick;
-        game.systemsManager.systems.delayedAction.reset();
 
         // legacy
         if (parsed.gameDate)
@@ -12152,6 +12151,7 @@ var Game = (function () {
         return toSave;
     };
     Game.prototype.loadActions = function (toLoad) {
+        game.systemsManager.systems.delayedAction.reset();
         if (!toLoad || toLoad.length < 1)
             return;
         for (var i = 0; i < toLoad.length; i++) {

@@ -188,8 +188,8 @@ class ReactUI
       }
       popupProps.initialStyle =
       {
-        top: window.innerHeight / 3.5 - 60 + Object.keys(this.popups).length * 15,
-        left: window.innerWidth / 3.5 - 60 + Object.keys(this.popups).length * 15,
+        top: window.innerHeight / 3.5 - 120 + Object.keys(this.popups).length * 15,
+        left: window.innerWidth / 3.5 - 120 + Object.keys(this.popups).length * 15,
         zIndex: zIndex
       };
       popupProps.incrementZIndex = this.incrementZIndex.bind(this, key);

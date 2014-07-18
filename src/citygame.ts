@@ -1618,8 +1618,8 @@ class Game
   {
     var container = window.getComputedStyle(
       document.getElementById("pixi-container"), null );
-    SCREEN_WIDTH = parseInt(container.width) / window.devicePixelRatio;
-    SCREEN_HEIGHT = parseInt(container.height) / window.devicePixelRatio;
+    SCREEN_WIDTH = parseInt(container.width);
+    SCREEN_HEIGHT = parseInt(container.height);
     if (game.renderer)
     {
       game.renderer.resize(SCREEN_WIDTH, SCREEN_HEIGHT);

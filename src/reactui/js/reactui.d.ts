@@ -21,6 +21,7 @@ declare class ReactUI {
             zIndex: number;
         };
     };
+    public notifications: any[];
     public topZIndex: number;
     public stage: any;
     public frameImages: {
@@ -101,6 +102,13 @@ declare class ReactUI {
         onClose: any;
         closeBtnText?: string;
     }): void;
+    public makeNotification(props: {
+        onOk: any;
+        timeout?: number;
+        id?: number;
+        onClose?: any;
+    }): void;
+    public removeNotification(id: any): void;
     public incrementZIndex(key?: any): number;
     public destroyPopup(key: any, callback?: any): void;
     public closeTopPopup(): void;

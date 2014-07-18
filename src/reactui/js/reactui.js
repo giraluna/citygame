@@ -19,6 +19,7 @@ var ReactUI = (function () {
     function ReactUI(player, frameImages) {
         this.idGenerator = 0;
         this.popups = {};
+        this.notifications = [];
         this.topZIndex = 15;
         this.player = player;
         this.frameImages = frameImages;
@@ -43,7 +44,9 @@ var ReactUI = (function () {
             self.makeRecruitPopup(event.content);
         });
         eventManager.addEventListener("makeRecruitCompletePopup", function (event) {
-            self.makeRecruitCompletePopup(event.content);
+            self.makeNotification({
+                onOk: self.makeRecruitCompletePopup.bind(self, event.content)
+            });
         });
         eventManager.addEventListener("makeCellBuyPopup", function (event) {
             self.makeCellBuyPopup(event.content);
@@ -75,6 +78,9 @@ var ReactUI = (function () {
         eventManager.addEventListener("makeModifierPopup", function (event) {
             self.makeModifierPopup(event.content);
         });
+        eventManager.addEventListener("makeNotification", function (event) {
+            self.makeNotification(event.content);
+        });
         eventManager.addEventListener("closeTopPopup", function (event) {
             self.closeTopPopup();
         });
@@ -99,6 +105,14 @@ var ReactUI = (function () {
         }
         ;
         popupProps.key = key;
+
+        var container = document.getElementById("react-popups");
+         {
+        }
+        var basePos = {
+            top: 0,
+            left: 0
+        };
         popupProps.initialStyle = {
             top: window.innerHeight / 3.5 - 60 + Object.keys(this.popups).length * 15,
             left: window.innerWidth / 3.5 - 60 + Object.keys(this.popups).length * 15,
@@ -333,6 +347,27 @@ var ReactUI = (function () {
         this.makePopup("InputPopup", props);
     };
 
+    ///// /////
+    ReactUI.prototype.makeNotification = function (props) {
+        props.id = this.idGenerator++;
+
+        props.onClose = function () {
+            props.onOk.call();
+            this.removeNotification(props.id);
+        }.bind(this);
+
+        this.notifications.push(props);
+
+        this.updateReact();
+    };
+    ReactUI.prototype.removeNotification = function (id) {
+        this.notifications = this.notifications.filter(function (item) {
+            return item.id !== id;
+        });
+
+        this.updateReact();
+    };
+
     ///// OTHER METHODS /////
     ReactUI.prototype.incrementZIndex = function (key) {
         var newZIndex = this.topZIndex++;
@@ -375,8 +410,13 @@ var ReactUI = (function () {
         }
 
         React.renderComponent(UIComponents.Stage({
-            popups: this.popups, player: this.player,
-            frameImages: this.frameImages, showStats: null }), document.getElementById("react-container"));
+            popups: this.popups,
+            notifications: this.notifications,
+            player: this.player,
+            frameImages: this.frameImages,
+            showStats: null,
+            fullScreenPopups: null
+        }), document.getElementById("react-container"));
     };
     return ReactUI;
 })();

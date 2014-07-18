@@ -27,6 +27,7 @@ module.exports = function(grunt) {
     "src/reactui/js/stats.js",
     "src/reactui/js/optionlist.js",
     "src/reactui/js/options.js",
+    "src/reactui/js/notifications.js",
     
     "src/reactui/js/sidemenumodifierbutton.js",
     "src/reactui/js/sidemenutools.js",

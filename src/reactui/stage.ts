@@ -3,6 +3,7 @@
 /// <reference path="js/sidemenu.d.ts" />
 /// <reference path="js/stats.d.ts" />
 /// <reference path="js/options.d.ts" />
+/// <reference path="js/notifications.d.ts" />
 
 /// <reference path="../js/eventlistener.d.ts" />
 
@@ -86,7 +87,11 @@ export var Stage = React.createClass(
             onDrop: function(e){e.preventDefault()},
             onDragLeave: function(e){e.preventDefault()}
           }, 
-          popups
+          popups,
+          UIComponents.Notifications(
+          {
+            notifications: this.props.notifications
+          })
         ),
 
         fullScreenPopup,

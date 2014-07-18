@@ -3,6 +3,7 @@
 /// <reference path="js/sidemenu.d.ts" />
 /// <reference path="js/stats.d.ts" />
 /// <reference path="js/options.d.ts" />
+/// <reference path="js/notifications.d.ts" />
 /// <reference path="../js/eventlistener.d.ts" />
 var UIComponents;
 (function (UIComponents) {
@@ -57,7 +58,9 @@ var UIComponents;
                 onDragLeave: function (e) {
                     e.preventDefault();
                 }
-            }, popups), fullScreenPopup, UIComponents.SideMenu({
+            }, popups, UIComponents.Notifications({
+                notifications: this.props.notifications
+            })), fullScreenPopup, UIComponents.SideMenu({
                 player: this.props.player,
                 frameImages: this.props.frameImages,
                 // todo react definitions

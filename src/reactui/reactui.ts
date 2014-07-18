@@ -28,6 +28,7 @@ class ReactUI
       zIndex: number;
     }
   } = {};
+  notifications: any[] = [];
   topZIndex: number = 15;
   stage: any;
   frameImages: {[id: string]: HTMLImageElement;}
@@ -66,7 +67,10 @@ class ReactUI
     });
     eventManager.addEventListener("makeRecruitCompletePopup", function(event)
     {
-      self.makeRecruitCompletePopup(event.content)
+      self.makeNotification(
+      {
+        onOk: self.makeRecruitCompletePopup.bind(self, event.content)
+      });
     });
     eventManager.addEventListener("makeCellBuyPopup", function(event)
     {
@@ -107,6 +111,10 @@ class ReactUI
     eventManager.addEventListener("makeModifierPopup", function(event)
     {
       self.makeModifierPopup(event.content);
+    });
+    eventManager.addEventListener("makeNotification", function(event)
+    {
+      self.makeNotification(event.content);
     });
     eventManager.addEventListener("closeTopPopup", function(event)
     {
@@ -499,6 +507,39 @@ class ReactUI
     this.makePopup("InputPopup", props);
   }
 
+  ///// /////
+
+  makeNotification(props:
+  {
+    onOk: any;
+    timeout?: number;
+
+    id?: number;
+    onClose?: any;
+  })
+  {
+    props.id = this.idGenerator++;
+
+    props.onClose = function()
+    {
+      props.onOk.call();
+      this.removeNotification(props.id)
+    }.bind(this);
+
+    this.notifications.push(props);
+
+    this.updateReact();
+  }
+  removeNotification(id)
+  {
+    this.notifications = this.notifications.filter(function(item)
+    {
+      return item.id !== id;
+    });
+
+    this.updateReact();
+  }
+
   ///// OTHER METHODS /////
 
   incrementZIndex(key?)
@@ -550,8 +591,16 @@ class ReactUI
     }
 
     React.renderComponent(
-      UIComponents.Stage( {popups: this.popups, player: this.player,
-        frameImages: this.frameImages, showStats: null}),
+      UIComponents.Stage(
+      {
+        popups: this.popups,
+        notifications: this.notifications,
+        player: this.player,
+        frameImages: this.frameImages,
+
+        showStats: null,
+        fullScreenPopups: null
+      }),
       document.getElementById("react-container")
     );
   }

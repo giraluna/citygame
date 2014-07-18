@@ -132,7 +132,7 @@ module actions
       var newEmployees = makeNewEmployees(employeeCount.actual, adjustedSkill);
       eventManager.dispatchEvent(
       {
-        type: "makeRecruitCompletePopup",
+        type: "makeRecruitCompleteNotification",
         content:
         {
           player: player,

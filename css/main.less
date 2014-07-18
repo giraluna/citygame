@@ -439,11 +439,9 @@ td
 #react-notifications
 {
   width: 100%;
-  height: 40px;
   position: absolute;
   bottom: 0;
   left: 0;
-  border: 1px solid red;
   display: flex;
   flex-flow: row;
   justify-content: flex-start;
@@ -453,15 +451,17 @@ td
 .react-notification
 {
   .unselectable;
-  
-  height: 100%;
+
+  bottom: 0px;
   width: 40px;
-  background-color: white;
-  border: 1px solid blue;
+  height: 40px;
+  background: linear-gradient(-60deg, #ccc, #888);
+  border: 1px ridge #ccc;
+  box-shadow: 2px 2px 6px #333;
   cursor: pointer;
   pointer-events: auto;
 
-  margin: 0 10px;
+  margin: 5px 10px;
 }
 
 // SIDE MENU START

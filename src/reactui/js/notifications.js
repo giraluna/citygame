@@ -12,7 +12,7 @@ var UIComponents;
                     key: "" + i,
                     className: "react-notification",
                     onClick: current.onClose
-                }, "A");
+                }, React.DOM.img({ src: "img/Uusi kansio/user_add.png" }));
 
                 allNotifications.push(newNotification);
             }

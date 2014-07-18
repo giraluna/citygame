@@ -44,6 +44,10 @@ var ReactUI = (function () {
             self.makeRecruitPopup(event.content);
         });
         eventManager.addEventListener("makeRecruitCompletePopup", function (event) {
+            self.makeRecruitCompletePopup(event.content);
+        });
+        eventManager.addEventListener("makeRecruitCompleteNotification", function (event) {
+            event.content.delay = 0;
             self.makeNotification({
                 onOk: self.makeRecruitCompletePopup.bind(self, event.content)
             });

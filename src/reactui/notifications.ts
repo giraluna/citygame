@@ -20,7 +20,7 @@ module UIComponents
           className: "react-notification",
           onClick: current.onClose
         },
-          React.DOM.img({src:"img/Uusi kansio/user_add.png"})
+          React.DOM.img({src:current.icon})
         )
 
         allNotifications.push(newNotification);

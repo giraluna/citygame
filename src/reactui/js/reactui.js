@@ -21,6 +21,7 @@ var ReactUI = (function () {
         this.popups = {};
         this.notifications = [];
         this.topZIndex = 15;
+        this.icons = {};
         this.player = player;
         this.frameImages = frameImages;
         this.init();
@@ -28,6 +29,10 @@ var ReactUI = (function () {
     ReactUI.prototype.init = function () {
         React.initializeTouchEvents(true);
         this.addEventListeners();
+
+        this.icons = {
+            newEmployee: "img/icons/newemployee.png"
+        };
 
         this.updateReact();
 
@@ -49,6 +54,7 @@ var ReactUI = (function () {
         eventManager.addEventListener("makeRecruitCompleteNotification", function (event) {
             event.content.delay = 0;
             self.makeNotification({
+                icon: self.icons.newEmployee,
                 onOk: self.makeRecruitCompletePopup.bind(self, event.content)
             });
         });

@@ -27,6 +27,7 @@ declare class ReactUI {
     public frameImages: {
         [id: string]: HTMLImageElement;
     };
+    public icons: any;
     public player: Player;
     public updateInterval: any;
     constructor(player: Player, frameImages: {
@@ -104,6 +105,7 @@ declare class ReactUI {
     }): void;
     public makeNotification(props: {
         onOk: any;
+        icon: string;
         timeout?: number;
         id?: number;
         onClose?: any;

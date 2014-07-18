@@ -32,6 +32,7 @@ class ReactUI
   topZIndex: number = 15;
   stage: any;
   frameImages: {[id: string]: HTMLImageElement;}
+  icons: any = {};
 
   player: Player;
 
@@ -47,6 +48,11 @@ class ReactUI
   {
     React.initializeTouchEvents(true);
     this.addEventListeners();
+
+    this.icons =
+    {
+      newEmployee: "img/icons/newemployee.png"
+    };
 
     this.updateReact();
 
@@ -74,6 +80,7 @@ class ReactUI
       event.content.delay = 0;
       self.makeNotification(
       {
+        icon: self.icons.newEmployee,
         onOk: self.makeRecruitCompletePopup.bind(self, event.content)
       });
     });
@@ -521,6 +528,7 @@ class ReactUI
   makeNotification(props:
   {
     onOk: any;
+    icon: string;
     timeout?: number;
 
     id?: number;

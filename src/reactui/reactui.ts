@@ -598,8 +598,8 @@ class ReactUI
         player: this.player,
         frameImages: this.frameImages,
 
-        showStats: null,
-        fullScreenPopups: null
+        showStats: undefined,
+        fullScreenPopups: undefined
       }),
       document.getElementById("react-container")
     );

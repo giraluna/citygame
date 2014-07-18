@@ -72,6 +72,7 @@ export var Stage = React.createClass(
       popups.push( UIComponents[popup.type].call(null, popup.props) );
     };
 
+    
     var fullScreenPopup = this.state.showFullScreenPopup ?
       this.props.fullScreenPopups[this.state.showFullScreenPopup].call(this) :
       null;

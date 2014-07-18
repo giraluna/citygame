@@ -1378,6 +1378,8 @@ var Game = (function () {
         if (parsed.gameTick)
             this.systemsManager.tickNumber = parsed.gameTick;
 
+        eventManager.dispatchEvent({ type: "clearReact", content: "" });
+
         // legacy
         if (parsed.gameDate)
             this.systemsManager.systems.date.setDate(parsed.gameDate);
@@ -1674,6 +1676,7 @@ var Game = (function () {
             this.changeActiveBoard(0);
 
             eventManager.dispatchEvent({ type: "updateWorld", content: { clear: true } });
+            eventManager.dispatchEvent({ type: "clearReact", content: "" });
             this.updateBoardSelect();
 
             if (onReset)

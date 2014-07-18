@@ -88,6 +88,9 @@ var ReactUI = (function () {
         eventManager.addEventListener("closeTopPopup", function (event) {
             self.closeTopPopup();
         });
+        eventManager.addEventListener("clearReact", function (event) {
+            self.clear();
+        });
         eventManager.addEventListener("updateReact", function (event) {
             self.updateReact();
         });
@@ -403,6 +406,14 @@ var ReactUI = (function () {
             }
             this.destroyPopup(key);
         }
+    };
+
+    ReactUI.prototype.clear = function () {
+        this.clearNotifications();
+        this.clearAllPopups();
+    };
+    ReactUI.prototype.clearNotifications = function () {
+        this.notifications = [];
     };
     ReactUI.prototype.clearAllPopups = function () {
         this.popups = {};

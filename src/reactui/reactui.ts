@@ -125,6 +125,10 @@ class ReactUI
     {
       self.closeTopPopup()
     });
+    eventManager.addEventListener("clearReact", function(event)
+    {
+      self.clear();
+    });
     eventManager.addEventListener("updateReact", function(event)
     {
       self.updateReact()
@@ -582,6 +586,16 @@ class ReactUI
       }
       this.destroyPopup(key);
     }
+  }
+
+  clear()
+  {
+    this.clearNotifications();
+    this.clearAllPopups();
+  }
+  clearNotifications()
+  {
+    this.notifications = [];
   }
   clearAllPopups()
   {

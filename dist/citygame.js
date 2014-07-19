@@ -1870,6 +1870,31 @@ var UIComponents;
 //# sourceMappingURL=options.js.map
 
 /// <reference path="../../lib/react.d.ts" />
+var UIComponents;
+(function (UIComponents) {
+    UIComponents.Notifications = React.createClass({
+        render: function () {
+            var allNotifications = [];
+
+            for (var i = 0; i < this.props.notifications.length; i++) {
+                var current = this.props.notifications[i];
+
+                var newNotification = React.DOM.div({
+                    key: "" + i,
+                    className: "react-notification",
+                    onClick: current.onClose
+                }, React.DOM.img({ src: current.icon }));
+
+                allNotifications.push(newNotification);
+            }
+
+            return (React.DOM.div({ id: "react-notifications" }, allNotifications));
+        }
+    });
+})(UIComponents || (UIComponents = {}));
+//# sourceMappingURL=notifications.js.map
+
+/// <reference path="../../lib/react.d.ts" />
 ///
 /// <reference path="../js/eventlistener.d.ts" />
 var UIComponents;
@@ -2537,6 +2562,7 @@ var UIComponents;
 /// <reference path="js/sidemenu.d.ts" />
 /// <reference path="js/stats.d.ts" />
 /// <reference path="js/options.d.ts" />
+/// <reference path="js/notifications.d.ts" />
 /// <reference path="../js/eventlistener.d.ts" />
 var UIComponents;
 (function (UIComponents) {
@@ -2591,7 +2617,9 @@ var UIComponents;
                 onDragLeave: function (e) {
                     e.preventDefault();
                 }
-            }, popups), fullScreenPopup, UIComponents.SideMenu({
+            }, popups, UIComponents.Notifications({
+                notifications: this.props.notifications
+            })), fullScreenPopup, UIComponents.SideMenu({
                 player: this.props.player,
                 frameImages: this.props.frameImages,
                 // todo react definitions
@@ -2623,7 +2651,9 @@ var ReactUI = (function () {
     function ReactUI(player, frameImages) {
         this.idGenerator = 0;
         this.popups = {};
+        this.notifications = [];
         this.topZIndex = 15;
+        this.icons = {};
         this.player = player;
         this.frameImages = frameImages;
         this.init();
@@ -2631,6 +2661,10 @@ var ReactUI = (function () {
     ReactUI.prototype.init = function () {
         React.initializeTouchEvents(true);
         this.addEventListeners();
+
+        this.icons = {
+            newEmployee: "img/icons/newemployee.png"
+        };
 
         this.updateReact();
 
@@ -2648,6 +2682,13 @@ var ReactUI = (function () {
         });
         eventManager.addEventListener("makeRecruitCompletePopup", function (event) {
             self.makeRecruitCompletePopup(event.content);
+        });
+        eventManager.addEventListener("makeRecruitCompleteNotification", function (event) {
+            event.content.delay = 0;
+            self.makeNotification({
+                icon: self.icons.newEmployee,
+                onOk: self.makeRecruitCompletePopup.bind(self, event.content)
+            });
         });
         eventManager.addEventListener("makeCellBuyPopup", function (event) {
             self.makeCellBuyPopup(event.content);
@@ -2679,8 +2720,14 @@ var ReactUI = (function () {
         eventManager.addEventListener("makeModifierPopup", function (event) {
             self.makeModifierPopup(event.content);
         });
+        eventManager.addEventListener("makeNotification", function (event) {
+            self.makeNotification(event.content);
+        });
         eventManager.addEventListener("closeTopPopup", function (event) {
             self.closeTopPopup();
+        });
+        eventManager.addEventListener("clearReact", function (event) {
+            self.clear();
         });
         eventManager.addEventListener("updateReact", function (event) {
             self.updateReact();
@@ -2703,9 +2750,17 @@ var ReactUI = (function () {
         }
         ;
         popupProps.key = key;
+
+        var container = document.getElementById("react-popups");
+         {
+        }
+        var basePos = {
+            top: 0,
+            left: 0
+        };
         popupProps.initialStyle = {
-            top: window.innerHeight / 3.5 - 60 + Object.keys(this.popups).length * 15,
-            left: window.innerWidth / 3.5 - 60 + Object.keys(this.popups).length * 15,
+            top: window.innerHeight / 3.5 - 120 + Object.keys(this.popups).length * 15,
+            left: window.innerWidth / 3.5 - 120 + Object.keys(this.popups).length * 15,
             zIndex: zIndex
         };
         popupProps.incrementZIndex = this.incrementZIndex.bind(this, key);
@@ -2937,6 +2992,27 @@ var ReactUI = (function () {
         this.makePopup("InputPopup", props);
     };
 
+    ///// /////
+    ReactUI.prototype.makeNotification = function (props) {
+        props.id = this.idGenerator++;
+
+        props.onClose = function () {
+            props.onOk.call();
+            this.removeNotification(props.id);
+        }.bind(this);
+
+        this.notifications.push(props);
+
+        this.updateReact();
+    };
+    ReactUI.prototype.removeNotification = function (id) {
+        this.notifications = this.notifications.filter(function (item) {
+            return item.id !== id;
+        });
+
+        this.updateReact();
+    };
+
     ///// OTHER METHODS /////
     ReactUI.prototype.incrementZIndex = function (key) {
         var newZIndex = this.topZIndex++;
@@ -2969,6 +3045,14 @@ var ReactUI = (function () {
             this.destroyPopup(key);
         }
     };
+
+    ReactUI.prototype.clear = function () {
+        this.clearNotifications();
+        this.clearAllPopups();
+    };
+    ReactUI.prototype.clearNotifications = function () {
+        this.notifications = [];
+    };
     ReactUI.prototype.clearAllPopups = function () {
         this.popups = {};
     };
@@ -2979,8 +3063,13 @@ var ReactUI = (function () {
         }
 
         React.renderComponent(UIComponents.Stage({
-            popups: this.popups, player: this.player,
-            frameImages: this.frameImages, showStats: null }), document.getElementById("react-container"));
+            popups: this.popups,
+            notifications: this.notifications,
+            player: this.player,
+            frameImages: this.frameImages,
+            showStats: undefined,
+            fullScreenPopups: undefined
+        }), document.getElementById("react-container"));
     };
     return ReactUI;
 })();
@@ -5220,7 +5309,7 @@ var cg = {
         "grass": {
             "type": "grass",
             "anchor": [0.5, 1],
-            "frame": "grass.png",
+            "frame": "grass2.png",
             "interactive": true,
             "hitArea": [[0, -32], [32, -16], [0, 0], [-32, -16]],
             "flags": ["ground", "grass"]
@@ -8642,6 +8731,7 @@ function makeLandValueOverlay(board) {
 
         var _s = PIXI.Sprite.fromFrame("blank.png");
         _s.position = cell.sprite.position.clone();
+        _s.position.y -= 7;
         _s.anchor = cell.sprite.anchor.clone();
         _s.tint = color;
 
@@ -9987,7 +10077,7 @@ var actions;
 
             var newEmployees = makeNewEmployees(employeeCount.actual, adjustedSkill);
             eventManager.dispatchEvent({
-                type: "makeRecruitCompletePopup",
+                type: "makeRecruitCompleteNotification",
                 content: {
                     player: player,
                     employees: newEmployees,
@@ -10644,6 +10734,7 @@ var Content = (function () {
             this.sprites.push(_s);
 
             _s.position = _cell.board.getCell(_cell.gridPos).sprite.position.clone();
+            _s.position.y -= 7;
 
             _cell.board.addSpriteToLayer(layer, _s, _cell.gridPos);
         }
@@ -11226,6 +11317,7 @@ var Cell = (function () {
         }
 
         gfx.position = this.sprite.position.clone();
+        gfx.position.y -= 7;
         this.board.addSpriteToLayer("cellOverlay", gfx, this.gridPos);
 
         this.overlay = gfx;
@@ -11807,8 +11899,8 @@ var Game = (function () {
     };
     Game.prototype.resize = function () {
         var container = window.getComputedStyle(document.getElementById("pixi-container"), null);
-        SCREEN_WIDTH = parseInt(container.width) / window.devicePixelRatio;
-        SCREEN_HEIGHT = parseInt(container.height) / window.devicePixelRatio;
+        SCREEN_WIDTH = parseInt(container.width);
+        SCREEN_HEIGHT = parseInt(container.height);
         if (game.renderer) {
             game.renderer.resize(SCREEN_WIDTH, SCREEN_HEIGHT);
         }
@@ -11900,6 +11992,8 @@ var Game = (function () {
 
         if (parsed.gameTick)
             this.systemsManager.tickNumber = parsed.gameTick;
+
+        eventManager.dispatchEvent({ type: "clearReact", content: "" });
 
         // legacy
         if (parsed.gameDate)
@@ -12197,6 +12291,7 @@ var Game = (function () {
             this.changeActiveBoard(0);
 
             eventManager.dispatchEvent({ type: "updateWorld", content: { clear: true } });
+            eventManager.dispatchEvent({ type: "clearReact", content: "" });
             this.updateBoardSelect();
 
             if (onReset)
@@ -12529,7 +12624,7 @@ var MouseEventHandler = (function () {
     // (that have hit masks) to support slopes / variable height
     MouseEventHandler.prototype.startCellAction = function (event) {
         var pos = event.getLocalPosition(event.target);
-        var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
+        var gridPos = getOrthoCoord([pos.x, pos.y + 7], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
 
         if (event.originalEvent.shiftKey) {
             game.activeTool.tempContinuous = true;
@@ -12555,7 +12650,7 @@ var MouseEventHandler = (function () {
     };
     MouseEventHandler.prototype.worldMove = function (event) {
         var pos = event.getLocalPosition(event.target);
-        var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
+        var gridPos = getOrthoCoord([pos.x, pos.y + 7], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
 
         if (!this.currCell || gridPos[0] !== this.currCell[0] || gridPos[1] !== this.currCell[1]) {
             this.currCell = gridPos;
@@ -12598,7 +12693,7 @@ var MouseEventHandler = (function () {
     };
     MouseEventHandler.prototype.hover = function (event) {
         var pos = event.getLocalPosition(event.target);
-        var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
+        var gridPos = getOrthoCoord([pos.x, pos.y + 7], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
         var currCell = game.activeBoard.getCell(gridPos);
 
         // TEMPORARY

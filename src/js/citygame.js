@@ -704,6 +704,7 @@ var Cell = (function () {
         }
 
         gfx.position = this.sprite.position.clone();
+        gfx.position.y -= 7;
         this.board.addSpriteToLayer("cellOverlay", gfx, this.gridPos);
 
         this.overlay = gfx;

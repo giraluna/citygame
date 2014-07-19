@@ -121,6 +121,7 @@ var Content = (function () {
             this.sprites.push(_s);
 
             _s.position = _cell.board.getCell(_cell.gridPos).sprite.position.clone();
+            _s.position.y -= 7;
 
             _cell.board.addSpriteToLayer(layer, _s, _cell.gridPos);
         }
@@ -2009,7 +2010,7 @@ var MouseEventHandler = (function () {
     // (that have hit masks) to support slopes / variable height
     MouseEventHandler.prototype.startCellAction = function (event) {
         var pos = event.getLocalPosition(event.target);
-        var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
+        var gridPos = getOrthoCoord([pos.x, pos.y + 7], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
 
         if (event.originalEvent.shiftKey) {
             game.activeTool.tempContinuous = true;
@@ -2035,7 +2036,7 @@ var MouseEventHandler = (function () {
     };
     MouseEventHandler.prototype.worldMove = function (event) {
         var pos = event.getLocalPosition(event.target);
-        var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
+        var gridPos = getOrthoCoord([pos.x, pos.y + 7], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
 
         if (!this.currCell || gridPos[0] !== this.currCell[0] || gridPos[1] !== this.currCell[1]) {
             this.currCell = gridPos;
@@ -2078,7 +2079,7 @@ var MouseEventHandler = (function () {
     };
     MouseEventHandler.prototype.hover = function (event) {
         var pos = event.getLocalPosition(event.target);
-        var gridPos = getOrthoCoord([pos.x, pos.y], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
+        var gridPos = getOrthoCoord([pos.x, pos.y + 7], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
         var currCell = game.activeBoard.getCell(gridPos);
 
         // TEMPORARY

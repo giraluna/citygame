@@ -4,7 +4,7 @@ var cg = {
         "grass": {
             "type": "grass",
             "anchor": [0.5, 1],
-            "frame": "grass.png",
+            "frame": "grass2.png",
             "interactive": true,
             "hitArea": [[0, -32], [32, -16], [0, 0], [-32, -16]],
             "flags": ["ground", "grass"]

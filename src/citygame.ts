@@ -1649,6 +1649,10 @@ class Game
     {
       this.activeTool.button.classList.toggle("selected-tool");
     }
+    if (this.activeTool.onChange)
+    {
+      this.activeTool.onChange();
+    }
 
     if (this.activeTool.mapmode)
     {
@@ -2645,6 +2649,7 @@ class UIDrawer
   textureCache: any = {};
   active: UIObject;
   permanentUIObjects: UIObject[] = [];
+  buildingTipTimeOut: any;
 
   constructor()
   {
@@ -2820,7 +2825,7 @@ class UIDrawer
       }, 
       textObject
       );
-    uiObj.position.set(Math.round(x), Math.round(y));
+    uiObj.position.set(Math.round(x), Math.round(y - 7));
 
     uiObj.addChild(toolTip);
     uiObj.start();
@@ -2835,10 +2840,20 @@ class UIDrawer
 
     this.makeFadeyPopup([pos[0], pos[1]], [0, -20], 2000, content);
   }
-  makeBuildingTipsForCell(baseCell: Cell)
+  makeBuildingTipsForCell(baseCell: Cell, delay:number = 500)
   {
+    if (this.buildingTipTimeOut)
+    {
+      window.clearTimeout(this.buildingTipTimeOut);
+    }
+
     if (!baseCell.content || !baseCell.content.player) return
-    this.makeBuildingTips(baseCell.content.cells, baseCell.content.type);
+
+    var self = this;
+    this.buildingTipTimeOut = window.setTimeout(function()
+    {
+      self.makeBuildingTips(baseCell.content.cells, baseCell.content.type);
+    }, delay)
   }
   makeBuildingTips(buildArea: Cell[], buildingType: any)
   {
@@ -2982,6 +2997,7 @@ class Tool
       this.onActivate(target[i]);
     }
   }
+  onChange(){}
   onActivate(target:Cell, props?: any){}
   onHover(targets:Cell[]){}
   onFinish(){}
@@ -3485,6 +3501,25 @@ class ClickTool extends Tool
     this.tintColor = null;
     this.mapmode = undefined;
     this.button = null;
+  }
+  onChange()
+  {
+    if (game.players.player0.money < 1)
+    {
+      game.uiDrawer.makeFadeyPopup(
+        [SCREEN_WIDTH / 2, SCREEN_HEIGHT/2],
+        [0, 0],
+        5000,
+        new PIXI.Text("Click here!",{
+          font: "bold 50px Arial",
+          fill: "#FFFFFF",
+          stroke: "#000000",
+          strokeThickness: 6,
+          align: "center"
+        }),
+        TWEEN.Easing.Quartic.In
+      )
+    }
   }
   onActivate(target: Cell)
   {

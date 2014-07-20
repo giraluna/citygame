@@ -266,13 +266,14 @@ declare class UIDrawer {
     public textureCache: any;
     public active: UIObject;
     public permanentUIObjects: UIObject[];
+    public buildingTipTimeOut: any;
     constructor();
     public init(): void;
     public removeActive(): void;
     public clearAllObjects(): void;
     public makeCellTooltip(event: any, cell: Cell, container: PIXI.DisplayObjectContainer): UIObject;
     public makeCellPopup(cell: Cell, text: string, container: PIXI.DisplayObjectContainer, fontName?: string): void;
-    public makeBuildingTipsForCell(baseCell: Cell): void;
+    public makeBuildingTipsForCell(baseCell: Cell, delay?: number): void;
     public makeBuildingTips(buildArea: Cell[], buildingType: any): void;
     public makeBuildingPlacementTip(cell: Cell, type: string, container: PIXI.DisplayObjectContainer): void;
     public makeFadeyPopup(pos: number[], drift: number[], lifeTime: number, content: any, easing?: (k: number) => number): UIObject;
@@ -288,6 +289,7 @@ declare class Tool {
     public tempContinuous: boolean;
     public button: HTMLInputElement;
     public activate(target: Cell[]): void;
+    public onChange(): void;
     public onActivate(target: Cell, props?: any): void;
     public onHover(targets: Cell[]): void;
     public onFinish(): void;
@@ -358,6 +360,7 @@ declare class BuildTool extends Tool {
 }
 declare class ClickTool extends Tool {
     constructor();
+    public onChange(): void;
     public onActivate(target: Cell): void;
 }
 declare class NothingTool extends Tool {

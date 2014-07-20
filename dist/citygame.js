@@ -11921,6 +11921,9 @@ var Game = (function () {
         if (this.activeTool.button) {
             this.activeTool.button.classList.toggle("selected-tool");
         }
+        if (this.activeTool.onChange) {
+            this.activeTool.onChange();
+        }
 
         if (this.activeTool.mapmode) {
             eventManager.dispatchEvent({
@@ -12862,7 +12865,7 @@ var UIDrawer = (function () {
             pointing: pointing,
             padding: [10, 10]
         }, textObject);
-        uiObj.position.set(Math.round(x), Math.round(y));
+        uiObj.position.set(Math.round(x), Math.round(y - 7));
 
         uiObj.addChild(toolTip);
         uiObj.start();
@@ -12876,10 +12879,19 @@ var UIDrawer = (function () {
 
         this.makeFadeyPopup([pos[0], pos[1]], [0, -20], 2000, content);
     };
-    UIDrawer.prototype.makeBuildingTipsForCell = function (baseCell) {
+    UIDrawer.prototype.makeBuildingTipsForCell = function (baseCell, delay) {
+        if (typeof delay === "undefined") { delay = 500; }
+        if (this.buildingTipTimeOut) {
+            window.clearTimeout(this.buildingTipTimeOut);
+        }
+
         if (!baseCell.content || !baseCell.content.player)
             return;
-        this.makeBuildingTips(baseCell.content.cells, baseCell.content.type);
+
+        var self = this;
+        this.buildingTipTimeOut = window.setTimeout(function () {
+            self.makeBuildingTips(baseCell.content.cells, baseCell.content.type);
+        }, delay);
     };
     UIDrawer.prototype.makeBuildingTips = function (buildArea, buildingType) {
         var toDrawOn = {
@@ -12989,6 +13001,8 @@ var Tool = (function () {
         for (var i = 0; i < target.length; i++) {
             this.onActivate(target[i]);
         }
+    };
+    Tool.prototype.onChange = function () {
     };
     Tool.prototype.onActivate = function (target, props) {
     };
@@ -13413,6 +13427,17 @@ var ClickTool = (function (_super) {
         this.mapmode = undefined;
         this.button = null;
     }
+    ClickTool.prototype.onChange = function () {
+        if (game.players.player0.money < 1) {
+            game.uiDrawer.makeFadeyPopup([SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2], [0, 0], 5000, new PIXI.Text("Click here!", {
+                font: "bold 50px Arial",
+                fill: "#FFFFFF",
+                stroke: "#000000",
+                strokeThickness: 6,
+                align: "center"
+            }), TWEEN.Easing.Quartic.In);
+        }
+    };
     ClickTool.prototype.onActivate = function (target) {
         var player = game.players.player0;
         var baseAmount = 0;

@@ -1897,6 +1897,64 @@ var UIComponents;
 /// <reference path="../../lib/react.d.ts" />
 ///
 /// <reference path="../js/eventlistener.d.ts" />
+/// <reference path="../js/utility.d.ts" />
+///
+/// <reference path="js/optionlist.d.ts" />
+/// <reference path="js/splitmultilinetext.d.ts" />
+var UIComponents;
+(function (UIComponents) {
+    UIComponents.Changelog = React.createClass({
+        mixins: [UIComponents.SplitMultilineText],
+        toggleSelf: function () {
+            eventManager.dispatchEvent({ type: "toggleFullScreenPopup", content: null });
+        },
+        getInitialState: function () {
+            return { changelog: null };
+        },
+        componentDidMount: function () {
+            var self = this;
+
+            var request = new XMLHttpRequest();
+            request.overrideMimeType("application/json");
+            request.open("GET", "changelog.json", true);
+            request.responseType = "json";
+            request.onload = function () {
+                self.setState({ changelog: request.response });
+            };
+            request.send();
+        },
+        render: function () {
+            var allChanges = [];
+
+            if (this.state.changelog) {
+                for (var date in this.state.changelog) {
+                    var _changelog = this.state.changelog[date];
+                    var changelogList = [];
+                    for (var i = 0; i < _changelog.length; i++) {
+                        changelogList.push({ content: _changelog[i] });
+                    }
+
+                    allChanges.push(UIComponents.OptionList({
+                        options: changelogList,
+                        header: date,
+                        key: date
+                    }));
+                }
+            }
+
+            return (React.DOM.div({ className: "all-changes" }, React.DOM.a({
+                id: "close-info", className: "close-popup", href: "#",
+                onClick: this.toggleSelf,
+                onTouchStart: this.toggleSelf
+            }, "X"), allChanges));
+        }
+    });
+})(UIComponents || (UIComponents = {}));
+//# sourceMappingURL=changelog.js.map
+
+/// <reference path="../../lib/react.d.ts" />
+///
+/// <reference path="../js/eventlistener.d.ts" />
 var UIComponents;
 (function (UIComponents) {
     UIComponents.SideMenuModifierButton = React.createClass({
@@ -2563,6 +2621,7 @@ var UIComponents;
 /// <reference path="js/stats.d.ts" />
 /// <reference path="js/options.d.ts" />
 /// <reference path="js/notifications.d.ts" />
+/// <reference path="js/changelog.d.ts" />
 /// <reference path="../js/eventlistener.d.ts" />
 var UIComponents;
 (function (UIComponents) {
@@ -2575,6 +2634,9 @@ var UIComponents;
                     },
                     options: function () {
                         return (React.DOM.div({ className: "fullscreen-popup-wrapper" }, React.DOM.div({ id: "options-container", className: "fullscreen-popup" }, UIComponents.OptionsPopup(null))));
+                    },
+                    changelog: function () {
+                        return (React.DOM.div({ className: "fullscreen-popup-wrapper" }, React.DOM.div({ id: "changelog-container", className: "fullscreen-popup" }, UIComponents.Changelog(null))));
                     }
                 }
             });
@@ -8731,7 +8793,7 @@ function makeLandValueOverlay(board) {
 
         var _s = PIXI.Sprite.fromFrame("blank.png");
         _s.position = cell.sprite.position.clone();
-        _s.position.y -= 7;
+        _s.position.y -= cell.sprite.height - 31;
         _s.anchor = cell.sprite.anchor.clone();
         _s.tint = color;
 
@@ -10643,7 +10705,7 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-var SCREEN_WIDTH = 720, SCREEN_HEIGHT = 480, TILE_WIDTH = 64, TILE_HEIGHT = 32, TILES = 32, WORLD_WIDTH = TILES * TILE_WIDTH, WORLD_HEIGHT = TILES * TILE_HEIGHT, ZOOM_LEVELS = [1], AMT_OF_BOARDS = 1;
+var SCREEN_WIDTH = 720, SCREEN_HEIGHT = 480, TILE_WIDTH = 64, TILE_HEIGHT = 32, SPRITE_HEIGHT = 31, TILES = 32, WORLD_WIDTH = TILES * TILE_WIDTH, WORLD_HEIGHT = TILES * TILE_HEIGHT, ZOOM_LEVELS = [1], AMT_OF_BOARDS = 1;
 
 var idGenerator = idGenerator || {};
 idGenerator.content = 0;
@@ -10734,7 +10796,11 @@ var Content = (function () {
             this.sprites.push(_s);
 
             _s.position = _cell.board.getCell(_cell.gridPos).sprite.position.clone();
-            _s.position.y -= 7;
+            if (_cell.type.type === "water") {
+                _s.position.y -= 7;
+            } else {
+                _s.position.y -= (_cell.sprite.height - SPRITE_HEIGHT);
+            }
 
             _cell.board.addSpriteToLayer(layer, _s, _cell.gridPos);
         }
@@ -11317,7 +11383,7 @@ var Cell = (function () {
         }
 
         gfx.position = this.sprite.position.clone();
-        gfx.position.y -= 7;
+        gfx.position.y -= (this.sprite.height - SPRITE_HEIGHT);
         this.board.addSpriteToLayer("cellOverlay", gfx, this.gridPos);
 
         this.overlay = gfx;
@@ -11808,13 +11874,6 @@ var Game = (function () {
                 self.tools[e.content.type].continuous = true;
         });
 
-        //info
-        // under loader.ts
-        //stats
-        addClickAndTouchEventListener(document.getElementById("show-stats"), function () {
-            eventManager.dispatchEvent({ type: "toggleFullScreenPopup", content: "stats" });
-        });
-
         //renderer
         this.bindRenderer();
 
@@ -11865,6 +11924,18 @@ var Game = (function () {
         // prestige
         eventManager.addEventListener("prestigeReset", function (event) {
             self.prestigeReset(event.content);
+        });
+
+        //info
+        // under loader.ts
+        //stats
+        addClickAndTouchEventListener(document.getElementById("show-stats"), function () {
+            eventManager.dispatchEvent({ type: "toggleFullScreenPopup", content: "stats" });
+        });
+
+        // changelog
+        addClickAndTouchEventListener(document.getElementById("show-changelog"), function () {
+            eventManager.dispatchEvent({ type: "toggleFullScreenPopup", content: "changelog" });
         });
 
         // options
@@ -12865,7 +12936,7 @@ var UIDrawer = (function () {
             pointing: pointing,
             padding: [10, 10]
         }, textObject);
-        uiObj.position.set(Math.round(x), Math.round(y - 7));
+        uiObj.position.set(Math.round(x), Math.round(y - (cell.sprite.height - SPRITE_HEIGHT)));
 
         uiObj.addChild(toolTip);
         uiObj.start();
@@ -13429,7 +13500,7 @@ var ClickTool = (function (_super) {
     }
     ClickTool.prototype.onChange = function () {
         if (game.players.player0.money < 1) {
-            game.uiDrawer.makeFadeyPopup([SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2], [0, 0], 5000, new PIXI.Text("Click here!", {
+            game.uiDrawer.makeFadeyPopup([SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2], [0, 0], 3000, new PIXI.Text("Click here!", {
                 font: "bold 50px Arial",
                 fill: "#FFFFFF",
                 stroke: "#000000",

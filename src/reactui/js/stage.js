@@ -4,6 +4,7 @@
 /// <reference path="js/stats.d.ts" />
 /// <reference path="js/options.d.ts" />
 /// <reference path="js/notifications.d.ts" />
+/// <reference path="js/changelog.d.ts" />
 /// <reference path="../js/eventlistener.d.ts" />
 var UIComponents;
 (function (UIComponents) {
@@ -16,6 +17,9 @@ var UIComponents;
                     },
                     options: function () {
                         return (React.DOM.div({ className: "fullscreen-popup-wrapper" }, React.DOM.div({ id: "options-container", className: "fullscreen-popup" }, UIComponents.OptionsPopup(null))));
+                    },
+                    changelog: function () {
+                        return (React.DOM.div({ className: "fullscreen-popup-wrapper" }, React.DOM.div({ id: "changelog-container", className: "fullscreen-popup" }, UIComponents.Changelog(null))));
                     }
                 }
             });

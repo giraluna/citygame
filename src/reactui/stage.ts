@@ -4,6 +4,7 @@
 /// <reference path="js/stats.d.ts" />
 /// <reference path="js/options.d.ts" />
 /// <reference path="js/notifications.d.ts" />
+/// <reference path="js/changelog.d.ts" />
 
 /// <reference path="../js/eventlistener.d.ts" />
 
@@ -37,7 +38,17 @@ export var Stage = React.createClass(
               )
             )
           )
-        }
+        },
+        changelog: function()
+        {
+          return(
+            React.DOM.div({className: "fullscreen-popup-wrapper"},
+              React.DOM.div({id: "changelog-container", className: "fullscreen-popup"},
+                UIComponents.Changelog(null)
+              )
+            )
+          )
+        },
       }
     });
   },

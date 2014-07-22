@@ -48,6 +48,18 @@ module UIComponents
         {
           title: "Owned plots:",
           content: player.ownedCellsAmount
+        },
+        {
+          title: "Owned buildings:",
+          content: (function(player)
+          {
+            var amount = 0;
+            for (var category in player.ownedContent)
+            {
+              amount += player.ownedContent[category].length;
+            }
+            return amount;
+          }(player))
         }
       ];
       var generalStatList = UIComponents.StatList(

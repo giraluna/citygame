@@ -595,5 +595,6 @@ td {
 }
 .fullscreen-popup > * {
   overflow-y: scroll;
-  padding: 25px;
+  padding: 0 25px;
+  margin: 15px 0;
 }

@@ -71,7 +71,7 @@ function makeLandValueOverlay(board)
 
     var _s = PIXI.Sprite.fromFrame("blank.png");
     _s.position = cell.sprite.position.clone();
-    _s.position.y -= 7;
+    _s.position.y -= cell.sprite.height - 31;
     _s.anchor = cell.sprite.anchor.clone();
     _s.tint = color;
 

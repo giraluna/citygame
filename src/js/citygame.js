@@ -30,7 +30,7 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-var SCREEN_WIDTH = 720, SCREEN_HEIGHT = 480, TILE_WIDTH = 64, TILE_HEIGHT = 32, TILES = 32, WORLD_WIDTH = TILES * TILE_WIDTH, WORLD_HEIGHT = TILES * TILE_HEIGHT, ZOOM_LEVELS = [1], AMT_OF_BOARDS = 1;
+var SCREEN_WIDTH = 720, SCREEN_HEIGHT = 480, TILE_WIDTH = 64, TILE_HEIGHT = 32, SPRITE_HEIGHT = 31, TILES = 32, WORLD_WIDTH = TILES * TILE_WIDTH, WORLD_HEIGHT = TILES * TILE_HEIGHT, ZOOM_LEVELS = [1], AMT_OF_BOARDS = 1;
 
 var idGenerator = idGenerator || {};
 idGenerator.content = 0;
@@ -121,7 +121,11 @@ var Content = (function () {
             this.sprites.push(_s);
 
             _s.position = _cell.board.getCell(_cell.gridPos).sprite.position.clone();
-            _s.position.y -= 7;
+            if (_cell.type.type === "water") {
+                _s.position.y -= 7;
+            } else {
+                _s.position.y -= (_cell.sprite.height - SPRITE_HEIGHT);
+            }
 
             _cell.board.addSpriteToLayer(layer, _s, _cell.gridPos);
         }
@@ -704,7 +708,7 @@ var Cell = (function () {
         }
 
         gfx.position = this.sprite.position.clone();
-        gfx.position.y -= 7;
+        gfx.position.y -= (this.sprite.height - SPRITE_HEIGHT);
         this.board.addSpriteToLayer("cellOverlay", gfx, this.gridPos);
 
         this.overlay = gfx;
@@ -1195,13 +1199,6 @@ var Game = (function () {
                 self.tools[e.content.type].continuous = true;
         });
 
-        //info
-        // under loader.ts
-        //stats
-        addClickAndTouchEventListener(document.getElementById("show-stats"), function () {
-            eventManager.dispatchEvent({ type: "toggleFullScreenPopup", content: "stats" });
-        });
-
         //renderer
         this.bindRenderer();
 
@@ -1252,6 +1249,18 @@ var Game = (function () {
         // prestige
         eventManager.addEventListener("prestigeReset", function (event) {
             self.prestigeReset(event.content);
+        });
+
+        //info
+        // under loader.ts
+        //stats
+        addClickAndTouchEventListener(document.getElementById("show-stats"), function () {
+            eventManager.dispatchEvent({ type: "toggleFullScreenPopup", content: "stats" });
+        });
+
+        // changelog
+        addClickAndTouchEventListener(document.getElementById("show-changelog"), function () {
+            eventManager.dispatchEvent({ type: "toggleFullScreenPopup", content: "changelog" });
         });
 
         // options
@@ -2252,7 +2261,7 @@ var UIDrawer = (function () {
             pointing: pointing,
             padding: [10, 10]
         }, textObject);
-        uiObj.position.set(Math.round(x), Math.round(y - 7));
+        uiObj.position.set(Math.round(x), Math.round(y - (cell.sprite.height - SPRITE_HEIGHT)));
 
         uiObj.addChild(toolTip);
         uiObj.start();
@@ -2816,7 +2825,7 @@ var ClickTool = (function (_super) {
     }
     ClickTool.prototype.onChange = function () {
         if (game.players.player0.money < 1) {
-            game.uiDrawer.makeFadeyPopup([SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2], [0, 0], 5000, new PIXI.Text("Click here!", {
+            game.uiDrawer.makeFadeyPopup([SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2], [0, 0], 3000, new PIXI.Text("Click here!", {
                 font: "bold 50px Arial",
                 fill: "#FFFFFF",
                 stroke: "#000000",

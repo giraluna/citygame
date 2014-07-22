@@ -30,6 +30,7 @@ var SCREEN_WIDTH = 720,
     SCREEN_HEIGHT = 480,
     TILE_WIDTH = 64,
     TILE_HEIGHT = 32,
+    SPRITE_HEIGHT = 31,
     TILES = 32,
     WORLD_WIDTH = TILES * TILE_WIDTH,
     WORLD_HEIGHT = TILES * TILE_HEIGHT,
@@ -161,7 +162,14 @@ class Content
       this.sprites.push(_s);
 
       _s.position = _cell.board.getCell(_cell.gridPos).sprite.position.clone();
-      _s.position.y -= 7;
+      if (_cell.type.type === "water")
+      {
+        _s.position.y -= 7;
+      }
+      else
+      {
+        _s.position.y -= (_cell.sprite.height - SPRITE_HEIGHT);
+      }
 
       _cell.board.addSpriteToLayer(layer, _s, _cell.gridPos);
     }
@@ -911,7 +919,7 @@ class Cell
     }
 
     gfx.position = this.sprite.position.clone();
-    gfx.position.y -= 7;
+    gfx.position.y -= (this.sprite.height - SPRITE_HEIGHT);
     this.board.addSpriteToLayer("cellOverlay", gfx, this.gridPos);
 
     this.overlay = gfx;
@@ -1507,16 +1515,6 @@ class Game
         else self.tools[e.content.type].continuous = true;
       });
 
-      //info
-      // under loader.ts
-      
-      //stats
-      addClickAndTouchEventListener(
-      document.getElementById("show-stats"), function()
-      {
-        eventManager.dispatchEvent({type:"toggleFullScreenPopup", content: "stats"});
-      });
-
       //renderer
       this.bindRenderer();
 
@@ -1576,6 +1574,23 @@ class Game
       eventManager.addEventListener("prestigeReset", function(event)
       {
         self.prestigeReset(event.content);
+      });
+
+      //info
+      // under loader.ts
+      
+      //stats
+      addClickAndTouchEventListener(
+      document.getElementById("show-stats"), function()
+      {
+        eventManager.dispatchEvent({type:"toggleFullScreenPopup", content: "stats"});
+      });
+
+      // changelog
+      addClickAndTouchEventListener(
+      document.getElementById("show-changelog"), function()
+      {
+        eventManager.dispatchEvent({type:"toggleFullScreenPopup", content: "changelog"});
       });
 
       // options
@@ -2825,7 +2840,7 @@ class UIDrawer
       }, 
       textObject
       );
-    uiObj.position.set(Math.round(x), Math.round(y - 7));
+    uiObj.position.set(Math.round(x), Math.round(y - (cell.sprite.height - SPRITE_HEIGHT)));
 
     uiObj.addChild(toolTip);
     uiObj.start();
@@ -3509,7 +3524,7 @@ class ClickTool extends Tool
       game.uiDrawer.makeFadeyPopup(
         [SCREEN_WIDTH / 2, SCREEN_HEIGHT/2],
         [0, 0],
-        5000,
+        3000,
         new PIXI.Text("Click here!",{
           font: "bold 50px Arial",
           fill: "#FFFFFF",

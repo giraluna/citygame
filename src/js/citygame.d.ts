@@ -18,7 +18,7 @@
 /// <reference path="landvalueoverlay.d.ts" />
 /// <reference path="utility.d.ts" />
 /// <reference path="arraylogic.d.ts" />
-declare var SCREEN_WIDTH: number, SCREEN_HEIGHT: number, TILE_WIDTH: number, TILE_HEIGHT: number, TILES: number, WORLD_WIDTH: number, WORLD_HEIGHT: number, ZOOM_LEVELS: number[], AMT_OF_BOARDS: number;
+declare var SCREEN_WIDTH: number, SCREEN_HEIGHT: number, TILE_WIDTH: number, TILE_HEIGHT: number, SPRITE_HEIGHT: number, TILES: number, WORLD_WIDTH: number, WORLD_HEIGHT: number, ZOOM_LEVELS: number[], AMT_OF_BOARDS: number;
 declare var idGenerator: any;
 declare class Sprite extends PIXI.Sprite {
     public type: string;

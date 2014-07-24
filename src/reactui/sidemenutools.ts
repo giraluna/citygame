@@ -106,7 +106,7 @@ export var SideMenuTools = React.createClass(
     return(
       React.DOM.div( {id:"side-menu-tools", className:"grid-column"},
         React.DOM.div( {className:"grid-row"},
-          React.DOM.div(props.click, "click"),
+          React.DOM.div(props.click, React.DOM.u(null, "c"), "lick"),
           React.DOM.div(props.recruit, React.DOM.u(null, "r"), "ecruit")
         ),
         React.DOM.div( {className:"grid-row"},

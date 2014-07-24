@@ -1,8 +1,9 @@
 module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-autoprefixer');
   
-  grunt.registerTask('default', ['concat', 'uglify']);
+  grunt.registerTask('default', ['concat', 'uglify', 'autoprefixer']);
 
   var srcFiles =
   [
@@ -92,6 +93,18 @@ module.exports = function(grunt) {
           "dist/citygame.min.js": ['<%= concat.dist.dest %>']
         }
       }
-    }
+    },
+    autoprefixer:
+    {
+      options:
+      {
+        // Task-specific options go here.
+      },
+      single_file:
+      {
+        src: "css/main.css",
+        dest: "dist/main.css"
+      },
+    },
   });
 }

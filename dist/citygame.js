@@ -1612,6 +1612,16 @@ var UIComponents;
                 {
                     title: "Owned plots:",
                     content: player.ownedCellsAmount
+                },
+                {
+                    title: "Owned buildings:",
+                    content: (function (player) {
+                        var amount = 0;
+                        for (var category in player.ownedContent) {
+                            amount += player.ownedContent[category].length;
+                        }
+                        return amount;
+                    }(player))
                 }
             ];
             var generalStatList = UIComponents.StatList({
@@ -2094,7 +2104,7 @@ var UIComponents;
                 props[selectedTool].className += " selected-tool";
             }
 
-            return (React.DOM.div({ id: "side-menu-tools", className: "grid-column" }, React.DOM.div({ className: "grid-row" }, React.DOM.div(props.click, "click"), React.DOM.div(props.recruit, React.DOM.u(null, "r"), "ecruit")), React.DOM.div({ className: "grid-row" }, React.DOM.div(props.buy, "b", React.DOM.u(null, "u"), "y plot"), React.DOM.div(props.sell, React.DOM.u(null, "s"), "ell"))));
+            return (React.DOM.div({ id: "side-menu-tools", className: "grid-column" }, React.DOM.div({ className: "grid-row" }, React.DOM.div(props.click, React.DOM.u(null, "c"), "lick"), React.DOM.div(props.recruit, React.DOM.u(null, "r"), "ecruit")), React.DOM.div({ className: "grid-row" }, React.DOM.div(props.buy, "b", React.DOM.u(null, "u"), "y plot"), React.DOM.div(props.sell, React.DOM.u(null, "s"), "ell"))));
         }
     });
 })(UIComponents || (UIComponents = {}));
@@ -10866,7 +10876,7 @@ var Cell = (function () {
     }
     Cell.prototype.init = function () {
         var _s = this.sprite = new GroundSprite(this.type, this);
-        _s.position = arrayToPoint(getIsoCoord(this.gridPos[0], this.gridPos[1], TILE_WIDTH, TILE_HEIGHT, [WORLD_WIDTH / 2, TILE_HEIGHT]));
+        _s.position = arrayToPoint(getIsoCoord(this.gridPos[0], this.gridPos[1], TILE_WIDTH, TILE_HEIGHT, [WORLD_WIDTH / 2, SPRITE_HEIGHT]));
         this.board.addSpriteToLayer("ground", _s);
 
         if (this.type.effects) {
@@ -12924,7 +12934,7 @@ var UIDrawer = (function () {
         var x = cellX;
         var y = (cell.content && pointing === "down") ? cellY - cell.content.sprites[0].height * cell.content.sprites[0].worldTransform.a / 2 : cellY;
 
-        var uiObj = this.active = new UIObject(this.layer).delay(500).lifeTime(-1);
+        var uiObj = this.active = new UIObject(this.layer).delay(1000).lifeTime(-1);
 
         var toolTip = makeToolTip({
             style: this.styles["base"],
@@ -12951,7 +12961,7 @@ var UIDrawer = (function () {
         this.makeFadeyPopup([pos[0], pos[1]], [0, -20], 2000, content);
     };
     UIDrawer.prototype.makeBuildingTipsForCell = function (baseCell, delay) {
-        if (typeof delay === "undefined") { delay = 500; }
+        if (typeof delay === "undefined") { delay = 0; }
         if (this.buildingTipTimeOut) {
             window.clearTimeout(this.buildingTipTimeOut);
         }
@@ -12973,21 +12983,25 @@ var UIDrawer = (function () {
         for (var i = 0; i < buildArea.length; i++) {
             var currentModifiers = buildArea[i].getValidModifiers(buildingType);
             for (var _mod in currentModifiers) {
-                if (currentModifiers[_mod].strength <= 0)
+                if (currentModifiers[_mod].scaling(currentModifiers[_mod].strength) <= 0)
                     continue;
                 var sources = currentModifiers[_mod].sources;
                 var _polarity = currentModifiers[_mod].effect[Object.keys(currentModifiers[_mod].effect)[0]] > 0;
 
                 var type = (_polarity === true ? "positive1" : "negative1");
-
                 for (var j = 0; j < sources.length; j++) {
-                    toDrawOn[type][sources[j].gridPos] = sources[j];
+                    //toDrawOn[type][sources[j].gridPos] = sources[j];
+                    if (sources[j].content) {
+                        toDrawOn[type] = toDrawOn[type].concat(sources[j].content.cells);
+                    } else {
+                        toDrawOn[type].push(sources[j]);
+                    }
                 }
             }
         }
         for (var _type in toDrawOn) {
-            for (var _cell in toDrawOn[_type]) {
-                this.makeBuildingPlacementTip(toDrawOn[_type][_cell], _type, game.worldRenderer.worldSprite);
+            for (var i = 0; i < toDrawOn[_type].length; i++) {
+                this.makeBuildingPlacementTip(toDrawOn[_type][i], _type, game.worldRenderer.worldSprite);
             }
         }
     };

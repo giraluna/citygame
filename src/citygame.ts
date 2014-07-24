@@ -276,7 +276,7 @@ class Cell
     var _s = this.sprite = new GroundSprite( this.type, this );
     _s.position = arrayToPoint( getIsoCoord(this.gridPos[0], this.gridPos[1],
       TILE_WIDTH, TILE_HEIGHT,
-      [WORLD_WIDTH/2, TILE_HEIGHT]) );
+      [WORLD_WIDTH/2, SPRITE_HEIGHT]) );
     this.board.addSpriteToLayer("ground", _s);
 
     if (this.type.effects)

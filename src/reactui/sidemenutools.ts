@@ -94,6 +94,7 @@ export var SideMenuTools = React.createClass(
     {
       props.recruit.className += " new-modifier";
 
+      props.click.className = "grid-cell disabled";
       props.buy.className = "grid-cell disabled";
       props.sell.className = "grid-cell disabled";
     }

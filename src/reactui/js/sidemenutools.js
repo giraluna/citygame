@@ -74,6 +74,7 @@ var UIComponents;
             if (Object.keys(this.props.player.employees).length < 1) {
                 props.recruit.className += " new-modifier";
 
+                props.click.className = "grid-cell disabled";
                 props.buy.className = "grid-cell disabled";
                 props.sell.className = "grid-cell disabled";
             } else if (selectedTool && props[selectedTool]) {

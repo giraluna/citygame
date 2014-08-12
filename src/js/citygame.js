@@ -2761,6 +2761,10 @@ var BuildTool = (function (_super) {
 
                 _s.position = _cell.board.getCell(_cell.gridPos).sprite.position.clone();
 
+                if (_cell.type.type !== "water") {
+                    _s.position.y -= (_cell.sprite.height - SPRITE_HEIGHT);
+                }
+
                 _cell.board.addSpriteToLayer("content", _s, _cell.gridPos);
             }
         }

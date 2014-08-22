@@ -3543,7 +3543,7 @@ var playerModifiers;
         type: "convenienceModifier4",
         title: "Loss leaders",
         description: "Retail profits + 50%",
-        cost: 500000,
+        cost: 1000000,
         unlockConditions: [
             {
                 type: "shopping",
@@ -3561,7 +3561,7 @@ var playerModifiers;
         type: "convenienceModifier5",
         title: "Market saturation",
         description: "Retail profits + 50% - 1% per retail building",
-        cost: 2500000,
+        cost: 5000000,
         unlockConditions: [
             {
                 type: "shopping",
@@ -3827,7 +3827,7 @@ var playerModifiers;
         type: "officeModifier3",
         title: "Ass-seeking photocopiers",
         description: "Office profits + 50%",
-        cost: 50000,
+        cost: 100000,
         unlockConditions: [
             {
                 type: "office",
@@ -3845,7 +3845,7 @@ var playerModifiers;
         type: "officeModifier4",
         title: "Middle management",
         description: "Office profits + 50%",
-        cost: 250000,
+        cost: 500000,
         unlockConditions: [
             {
                 type: "office",
@@ -3863,7 +3863,7 @@ var playerModifiers;
         type: "officeModifier5",
         title: "Corporate real estate",
         description: "Office profits + 25%\nBuying plots 2% cheaper per office",
-        cost: 750000,
+        cost: 1000000,
         unlockConditions: [
             {
                 type: "office",
@@ -6373,7 +6373,7 @@ var playerBuildableBuildings = [];
     { type: "fastfood", cost: 700, baseProfit: 1.5 },
     { type: "house1", cost: 1500, baseProfit: 3 },
     { type: "smalloffice", cost: 5000, baseProfit: 10 },
-    //{type: "stretchystore",    cost: 20000,   baseProfit: 13 },
+    { type: "stretchystore", cost: 20000, baseProfit: 13 },
     { type: "house2", cost: 50000, baseProfit: 20 },
     { type: "factory", cost: 100000, baseProfit: 50 },
     { type: "office2", cost: 250000, baseProfit: 75 },
@@ -13020,6 +13020,7 @@ var UIDrawer = (function () {
     UIDrawer.prototype.makeCellPopup = function (cell, text, container, fontName) {
         if (typeof fontName === "undefined") { fontName = "black"; }
         var pos = cell.getScreenPos(container);
+        pos[1] -= 32;
         var content = new PIXI.Text(text, this.fonts[fontName]);
 
         this.makeFadeyPopup([pos[0], pos[1]], [0, -20], 2000, content);

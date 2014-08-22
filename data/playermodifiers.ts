@@ -721,7 +721,7 @@ module playerModifiers
     type: "officeModifier3",
     title: "Ass-seeking photocopiers",
     description: "Office profits + 50%",
-    cost: 50000,
+    cost: 100000,
     unlockConditions:
     [
       {
@@ -742,7 +742,7 @@ module playerModifiers
     type: "officeModifier4",
     title: "Middle management",
     description: "Office profits + 50%",
-    cost: 250000,
+    cost: 500000,
     unlockConditions:
     [
       {
@@ -763,7 +763,7 @@ module playerModifiers
     type: "officeModifier5",
     title: "Corporate real estate",
     description: "Office profits + 25%\nBuying plots 2% cheaper per office",
-    cost: 750000,
+    cost: 1000000,
     unlockConditions:
     [
       {

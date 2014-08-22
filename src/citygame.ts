@@ -2851,6 +2851,7 @@ class UIDrawer
     fontName:string = "black")
   {
     var pos = cell.getScreenPos(container);
+    pos[1] -= 32;
     var content = new PIXI.Text(text, this.fonts[fontName]);
 
     this.makeFadeyPopup([pos[0], pos[1]], [0, -20], 2000, content);

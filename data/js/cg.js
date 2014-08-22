@@ -616,19 +616,39 @@ var cg = {
                 "type": "smalloffice",
                 "baseType": "building",
                 "categoryType": "office",
-                "title": "Small office",
+                "title": "Office 1",
                 "baseProfit": 40,
                 "daysForProfitTick": 1,
                 "cost": 10000,
                 "buildTime": 21,
                 "anchor": [0.5, 1],
-                "frame": ["smalloffice.png"],
+                "frame": ["office1.png"],
                 "canNotBuildOn": ["water", "building", "road"],
                 "effects": [
                     {
                         "type": "population",
                         "range": 3,
                         "strength": 1
+                    }
+                ]
+            },
+            "office2": {
+                "type": "office2",
+                "baseType": "building",
+                "categoryType": "office",
+                "title": "Office 2",
+                "baseProfit": 40,
+                "daysForProfitTick": 1,
+                "cost": 10000,
+                "buildTime": 21,
+                "anchor": [0.5, 1],
+                "frame": ["office2.png"],
+                "canNotBuildOn": ["water", "building", "road"],
+                "effects": [
+                    {
+                        "type": "population",
+                        "range": 3,
+                        "strength": 2
                     }
                 ]
             },
@@ -908,42 +928,26 @@ var effectSourcesIndex = {};
     }
 }(cg));
 
+// easier balancing
 var playerBuildableBuildings = [];
 [
-    "parkinglot",
-    "conveniencestore",
-    "fastfood",
-    "house1",
-    "smalloffice",
-    "stretchystore",
-    "house2",
-    "factory",
-    "hotel",
-    "departmentStore"
-].forEach(function (type) {
-    playerBuildableBuildings.push(findType(type));
+    { type: "parkinglot", cost: 25, baseProfit: 0.3 },
+    { type: "conveniencestore", cost: 300, baseProfit: 0.7 },
+    { type: "fastfood", cost: 700, baseProfit: 1.5 },
+    { type: "house1", cost: 1500, baseProfit: 3 },
+    { type: "smalloffice", cost: 5000, baseProfit: 10 },
+    { type: "stretchystore", cost: 20000, baseProfit: 13 },
+    { type: "house2", cost: 50000, baseProfit: 20 },
+    { type: "factory", cost: 100000, baseProfit: 50 },
+    { type: "office2", cost: 250000, baseProfit: 75 },
+    { type: "hotel", cost: 750000, baseProfit: 90 },
+    { type: "departmentStore", cost: 1250000, baseProfit: 120 },
+    { type: "soccerStadium", cost: 2000000, baseProfit: 200 }
+].forEach(function (building) {
+    var template = findType(building.type);
+    template.cost = building.cost;
+    template.baseProfit = building.baseProfit;
+
+    playerBuildableBuildings.push(template);
 });
-
-// easier balancing
-// cost, base profit
-var basevalues = [
-    [25, 0.3],
-    [300, 0.7],
-    [700, 1.5],
-    [1500, 3],
-    [5000, 10],
-    [20000, 13],
-    [50000, 20],
-    [100000, 50],
-    [250000, 75],
-    [750000, 90],
-    [1250000, 120]
-];
-
-for (var i = 0; i < playerBuildableBuildings.length; i++) {
-    var type = playerBuildableBuildings[i];
-
-    type.cost = basevalues[i][0];
-    type.baseProfit = basevalues[i][1];
-}
 //# sourceMappingURL=cg.js.map

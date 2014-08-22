@@ -1,4 +1,11 @@
 {
+  "2014/08/22":
+  [
+    "Fix ghost building positioning",
+    "Grey out click button until player gets a recruit",
+    "Add office 2 building",
+    "Add soccer stadium building"
+  ],
   "2014/07/22":
   [
     "Add changelogs"

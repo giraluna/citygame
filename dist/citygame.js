@@ -3525,7 +3525,7 @@ var playerModifiers;
         type: "convenienceModifier3",
         title: "Liquor license",
         description: "Retail profits +30%",
-        cost: 5000,
+        cost: 10000,
         unlockConditions: [
             {
                 type: "shopping",
@@ -3543,7 +3543,7 @@ var playerModifiers;
         type: "convenienceModifier4",
         title: "Loss leaders",
         description: "Retail profits + 50%",
-        cost: 50000,
+        cost: 500000,
         unlockConditions: [
             {
                 type: "shopping",
@@ -3561,7 +3561,7 @@ var playerModifiers;
         type: "convenienceModifier5",
         title: "Market saturation",
         description: "Retail profits + 50% - 1% per retail building",
-        cost: 250000,
+        cost: 2500000,
         unlockConditions: [
             {
                 type: "shopping",
@@ -3845,7 +3845,7 @@ var playerModifiers;
         type: "officeModifier4",
         title: "Middle management",
         description: "Office profits + 50%",
-        cost: 200000,
+        cost: 250000,
         unlockConditions: [
             {
                 type: "office",
@@ -3863,7 +3863,7 @@ var playerModifiers;
         type: "officeModifier5",
         title: "Corporate real estate",
         description: "Office profits + 25%\nBuying plots 2% cheaper per office",
-        cost: 500000,
+        cost: 750000,
         unlockConditions: [
             {
                 type: "office",
@@ -3991,7 +3991,7 @@ var playerModifiers;
         type: "hotelModifier1",
         title: "Heated swimming pool",
         description: "Hotels +30$ /s",
-        cost: 200000,
+        cost: 750000,
         unlockConditions: [
             {
                 type: "hotel",
@@ -4009,7 +4009,7 @@ var playerModifiers;
         type: "hotelModifier2",
         title: "Imported cleaning staff",
         description: "Building hotels is 15% cheaper",
-        cost: 400000,
+        cost: 1500000,
         unlockConditions: [
             {
                 type: "hotel",
@@ -4028,8 +4028,8 @@ var playerModifiers;
     playerModifiers.hotelModifier3 = {
         type: "hotelModifier3",
         title: "Swim-up bar",
-        description: "Hotel profits + 50%",
-        cost: 500000,
+        description: "Hotel profits +33%",
+        cost: 3000000,
         unlockConditions: [
             {
                 type: "hotel",
@@ -4039,15 +4039,15 @@ var playerModifiers;
         effects: [
             {
                 targets: ["hotel"],
-                multiplier: 1.5
+                multiplier: 1.33
             }
         ]
     };
     playerModifiers.hotelModifier4 = {
         type: "hotelModifier4",
         title: "Guided tours",
-        description: "Hotel profits + 50%",
-        cost: 1000000,
+        description: "Hotel profits +50%",
+        cost: 6000000,
         unlockConditions: [
             {
                 type: "hotel",
@@ -4064,8 +4064,8 @@ var playerModifiers;
     playerModifiers.hotelModifier5 = {
         type: "hotelModifier5",
         title: "Tourist pricing",
-        description: "Hotel profits + 50%\ŋGlobal profit -5%",
-        cost: 1000000,
+        description: "Hotel profits +50%\ŋGlobal profit -5%",
+        cost: 12000000,
         unlockConditions: [
             {
                 type: "hotel",
@@ -4080,6 +4080,65 @@ var playerModifiers;
             {
                 targets: ["global"],
                 multiplier: 0.95
+            }
+        ]
+    };
+
+    playerModifiers.stadiumModifier1 = {
+        type: "stadiumModifier1",
+        title: "Expanded seating",
+        description: "Stadiums +100$ /s",
+        cost: 2000000,
+        unlockConditions: [
+            {
+                type: "stadium",
+                value: 1
+            }
+        ],
+        effects: [
+            {
+                targets: ["stadium"],
+                addedProfit: 100
+            }
+        ]
+    };
+    playerModifiers.stadiumModifier2 = {
+        type: "stadiumModifier2",
+        title: "VIP boxes",
+        description: "Stadium profits +33%",
+        cost: 4000000,
+        unlockConditions: [
+            {
+                type: "stadium",
+                value: 3
+            }
+        ],
+        effects: [
+            {
+                targets: ["stadium"],
+                multiplier: 1.33
+            }
+        ]
+    };
+    playerModifiers.stadiumModifier3 = {
+        type: "stadiumModifier3",
+        title: "Team merchandise",
+        description: "Stadium profits +50%\nShopping profits +20%",
+        cost: 8000000,
+        unlockConditions: [
+            {
+                type: "stadium",
+                value: 5
+            }
+        ],
+        effects: [
+            {
+                targets: ["stadium"],
+                multiplier: 1.5
+            },
+            {
+                targets: ["shopping"],
+                multiplier: 1.2
             }
         ]
     };
@@ -6075,9 +6134,9 @@ var cg = {
                 "categoryType": "shopping",
                 "title": "Convenience store 2",
                 "size": [2, 1],
-                "baseProfit": 60,
+                "baseProfit": 13,
                 "daysForProfitTick": 1,
-                "cost": 25000,
+                "cost": 20000,
                 "buildTime": 14,
                 "anchor": [0.5, 1],
                 "frame": ["stretchystore_f0.png", "stretchystore_f1.png"],
@@ -6314,13 +6373,13 @@ var playerBuildableBuildings = [];
     { type: "fastfood", cost: 700, baseProfit: 1.5 },
     { type: "house1", cost: 1500, baseProfit: 3 },
     { type: "smalloffice", cost: 5000, baseProfit: 10 },
-    { type: "stretchystore", cost: 20000, baseProfit: 13 },
+    //{type: "stretchystore",    cost: 20000,   baseProfit: 13 },
     { type: "house2", cost: 50000, baseProfit: 20 },
     { type: "factory", cost: 100000, baseProfit: 50 },
     { type: "office2", cost: 250000, baseProfit: 75 },
     { type: "hotel", cost: 750000, baseProfit: 90 },
     { type: "departmentStore", cost: 1250000, baseProfit: 120 },
-    { type: "soccerStadium", cost: 2000000, baseProfit: 200 }
+    { type: "soccerStadium", cost: 2000000, baseProfit: 250 }
 ].forEach(function (building) {
     var template = findType(building.type);
     template.cost = building.cost;
@@ -13522,14 +13581,30 @@ var ClickTool = (function (_super) {
         this.button = null;
     }
     ClickTool.prototype.onChange = function () {
-        if (game.players.player0.money < 1) {
-            game.uiDrawer.makeFadeyPopup([SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2], [0, 0], 3000, new PIXI.Text("Click here!", {
+        if (game.players.player0.clicks < 1) {
+            var textContainer = new PIXI.DisplayObjectContainer();
+            var bigText = new PIXI.Text("Click here!", {
                 font: "bold 50px Arial",
                 fill: "#FFFFFF",
                 stroke: "#000000",
                 strokeThickness: 6,
                 align: "center"
-            }), TWEEN.Easing.Quartic.In);
+            });
+            var smallText = new PIXI.Text("Click on buildings you own for extra income", {
+                font: "bold 30px Arial",
+                fill: "#FFFFFF",
+                stroke: "#000000",
+                strokeThickness: 4,
+                align: "center"
+            });
+            textContainer.addChild(bigText);
+            bigText.position.x -= bigText.width / 2;
+            textContainer.addChild(smallText);
+            smallText.position.x -= smallText.width / 2;
+            smallText.position.y += bigText.height;
+            textContainer.position.y -= bigText.height;
+
+            game.uiDrawer.makeFadeyPopup([SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2], [0, 0], 3000, textContainer, TWEEN.Easing.Quartic.In);
         }
     };
     ClickTool.prototype.onActivate = function (target) {

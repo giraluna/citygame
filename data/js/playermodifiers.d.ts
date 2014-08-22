@@ -64,6 +64,9 @@ declare module playerModifiers {
     var hotelModifier3: IPlayerModifier;
     var hotelModifier4: IPlayerModifier;
     var hotelModifier5: IPlayerModifier;
+    var stadiumModifier1: IPlayerModifier;
+    var stadiumModifier2: IPlayerModifier;
+    var stadiumModifier3: IPlayerModifier;
     /**
     * unlockConditions:
     * [

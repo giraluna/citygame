@@ -697,9 +697,9 @@ var cg = {
                 "categoryType": "shopping",
                 "title": "Convenience store 2",
                 "size": [2, 1],
-                "baseProfit": 60,
+                "baseProfit": 13,
                 "daysForProfitTick": 1,
-                "cost": 25000,
+                "cost": 20000,
                 "buildTime": 14,
                 "anchor": [0.5, 1],
                 "frame": ["stretchystore_f0.png", "stretchystore_f1.png"],
@@ -942,7 +942,7 @@ var playerBuildableBuildings = [];
     { type: "office2", cost: 250000, baseProfit: 75 },
     { type: "hotel", cost: 750000, baseProfit: 90 },
     { type: "departmentStore", cost: 1250000, baseProfit: 120 },
-    { type: "soccerStadium", cost: 2000000, baseProfit: 200 }
+    { type: "soccerStadium", cost: 2000000, baseProfit: 250 }
 ].forEach(function (building) {
     var template = findType(building.type);
     template.cost = building.cost;

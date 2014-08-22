@@ -365,7 +365,7 @@ module playerModifiers
     type: "convenienceModifier3",
     title: "Liquor license",
     description: "Retail profits +30%",
-    cost: 5000,
+    cost: 10000,
     unlockConditions:
     [
       {
@@ -386,7 +386,7 @@ module playerModifiers
     type: "convenienceModifier4",
     title: "Loss leaders",
     description: "Retail profits + 50%",
-    cost: 50000,
+    cost: 1000000,
     unlockConditions:
     [
       {
@@ -407,7 +407,7 @@ module playerModifiers
     type: "convenienceModifier5",
     title: "Market saturation",
     description: "Retail profits + 50% - 1% per retail building",
-    cost: 250000,
+    cost: 5000000,
     unlockConditions:
     [
       {
@@ -742,7 +742,7 @@ module playerModifiers
     type: "officeModifier4",
     title: "Middle management",
     description: "Office profits + 50%",
-    cost: 200000,
+    cost: 250000,
     unlockConditions:
     [
       {
@@ -763,7 +763,7 @@ module playerModifiers
     type: "officeModifier5",
     title: "Corporate real estate",
     description: "Office profits + 25%\nBuying plots 2% cheaper per office",
-    cost: 500000,
+    cost: 750000,
     unlockConditions:
     [
       {
@@ -915,7 +915,7 @@ module playerModifiers
     type: "hotelModifier1",
     title: "Heated swimming pool",
     description: "Hotels +30$ /s",
-    cost: 200000,
+    cost: 750000,
     unlockConditions:
     [
       {
@@ -936,7 +936,7 @@ module playerModifiers
     type: "hotelModifier2",
     title: "Imported cleaning staff",
     description: "Building hotels is 15% cheaper",
-    cost: 400000,
+    cost: 1500000,
     unlockConditions:
     [
       {
@@ -959,8 +959,8 @@ module playerModifiers
   {
     type: "hotelModifier3",
     title: "Swim-up bar",
-    description: "Hotel profits + 50%",
-    cost: 500000,
+    description: "Hotel profits +33%",
+    cost: 3000000,
     unlockConditions:
     [
       {
@@ -972,7 +972,7 @@ module playerModifiers
     [
       {
         targets: ["hotel"],
-        multiplier: 1.5
+        multiplier: 1.33
       }
     ]
   }
@@ -980,8 +980,8 @@ module playerModifiers
   {
     type: "hotelModifier4",
     title: "Guided tours",
-    description: "Hotel profits + 50%",
-    cost: 1000000,
+    description: "Hotel profits +50%",
+    cost: 6000000,
     unlockConditions:
     [
       {
@@ -1001,8 +1001,8 @@ module playerModifiers
   {
     type: "hotelModifier5",
     title: "Tourist pricing",
-    description: "Hotel profits + 50%\ŋGlobal profit -5%",
-    cost: 1000000,
+    description: "Hotel profits +50%\ŋGlobal profit -5%",
+    cost: 12000000,
     unlockConditions:
     [
       {
@@ -1019,6 +1019,74 @@ module playerModifiers
       {
         targets: ["global"],
         multiplier: 0.95
+      }
+    ]
+  }
+
+  export var stadiumModifier1: IPlayerModifier =
+  {
+    type: "stadiumModifier1",
+    title: "Expanded seating",
+    description: "Stadiums +100$ /s",
+    cost: 2000000,
+    unlockConditions:
+    [
+      {
+        type: "stadium",
+        value: 1
+      }
+    ],
+    effects:
+    [
+      {
+        targets: ["stadium"],
+        addedProfit: 100
+      }
+    ]
+  }
+  export var stadiumModifier2: IPlayerModifier =
+  {
+    type: "stadiumModifier2",
+    title: "VIP boxes",
+    description: "Stadium profits +33%",
+    cost: 4000000,
+    unlockConditions:
+    [
+      {
+        type: "stadium",
+        value: 3
+      }
+    ],
+    effects:
+    [
+      {
+        targets: ["stadium"],
+        multiplier: 1.33
+      }
+    ]
+  }
+  export var stadiumModifier3: IPlayerModifier =
+  {
+    type: "stadiumModifier3",
+    title: "Team merchandise",
+    description: "Stadium profits +50%\nShopping profits +20%",
+    cost: 8000000,
+    unlockConditions:
+    [
+      {
+        type: "stadium",
+        value: 5
+      }
+    ],
+    effects:
+    [
+      {
+        targets: ["stadium"],
+        multiplier: 1.5
+      },
+      {
+        targets: ["shopping"],
+        multiplier: 1.2
       }
     ]
   }

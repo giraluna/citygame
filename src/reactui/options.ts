@@ -19,6 +19,7 @@ module UIComponents
     handleImport: function()
     {
       var imported = this.refs.importTextArea.getDOMNode().value;
+      if (!imported) return;
       var decoded = LZString.decompressFromBase64(imported);
 
       localStorage.setItem("tempImported", decoded);

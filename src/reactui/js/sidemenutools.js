@@ -77,6 +77,9 @@ var UIComponents;
                 props.click.className = "grid-cell disabled";
                 props.buy.className = "grid-cell disabled";
                 props.sell.className = "grid-cell disabled";
+            } else if (this.props.player.clicks <= 0) {
+                props.buy.className = "grid-cell disabled";
+                props.sell.className = "grid-cell disabled";
             } else if (selectedTool && props[selectedTool]) {
                 props[selectedTool].className += " selected-tool";
             }

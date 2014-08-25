@@ -1,4 +1,9 @@
 {
+  "2014/08/25":
+  [
+    "Add small sign for plots currently being purchased",
+    "Disable buying & selling before the player has clicked once"
+  ],
   "2014/08/22":
   [
     "Fix ghost building positioning",

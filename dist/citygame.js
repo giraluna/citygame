@@ -2957,6 +2957,8 @@ var ReactUI = (function () {
             return;
         if (props.cell.type.type === "water")
             return;
+        if (props.cell.content)
+            return;
 
         var buyCost = props.player.getCellBuyCost(props.cell);
 
@@ -5484,6 +5486,12 @@ var cg = {
             "baseType": "underConstruction",
             "anchor": [0.5, 1],
             "frame": ["underconstruction.png"]
+        },
+        "underPurchase": {
+            "type": "underPurchase",
+            "baseType": "underPurchase",
+            "anchor": [0.5, 1],
+            "frame": ["underpurchase.png"]
         },
         "plants": {
             "grass": {
@@ -10140,12 +10148,21 @@ var actions;
         var blinkerId = blinkerTODO.idGenerator++;
 
         var onStartFN = function () {
+            if (!cell.content)
+                cell.changeContent(cg.content.underPurchase, true);
+
             employee.active = false;
             employee.currAction = "buyCell";
             player.subtractCost(price);
             player.ownedCellsAmount++;
+
+            eventManager.dispatchEvent({ type: "updateWorld", content: "" });
         };
         var onCompleteFN = function () {
+            if (cell.content && cell.content.type.type === "underPurchase") {
+                cell.removeContent();
+            }
+
             employee.active = true;
             employee.currAction = undefined;
             employee.trainSkill("negotiation");

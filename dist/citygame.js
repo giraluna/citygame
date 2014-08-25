@@ -3968,7 +3968,7 @@ var playerModifiers;
     };
     playerModifiers.factoryModifier5 = {
         type: "factoryModifier5",
-        title: "OSHA regulations",
+        title: "Safety regulations",
         description: "Factory profits + 50%\nFactory build cost +15%",
         cost: 1500000,
         unlockConditions: [

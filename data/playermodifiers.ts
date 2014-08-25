@@ -888,7 +888,7 @@ module playerModifiers
   export var factoryModifier5: IPlayerModifier =
   {
     type: "factoryModifier5",
-    title: "OSHA regulations",
+    title: "Safety regulations",
     description: "Factory profits + 50%\nFactory build cost +15%",
     cost: 1500000,
     unlockConditions:

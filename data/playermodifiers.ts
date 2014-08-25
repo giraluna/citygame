@@ -1069,7 +1069,7 @@ module playerModifiers
   {
     type: "stadiumModifier3",
     title: "Team merchandise",
-    description: "Stadium profits +50%\nShopping profits +20%",
+    description: "Stadium profits +50%\nShopping profits +15%",
     cost: 8000000,
     unlockConditions:
     [
@@ -1086,7 +1086,7 @@ module playerModifiers
       },
       {
         targets: ["shopping"],
-        multiplier: 1.2
+        multiplier: 1.15
       }
     ]
   }

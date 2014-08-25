@@ -252,6 +252,8 @@ var ReactUI = (function () {
             return;
         if (props.cell.type.type === "water")
             return;
+        if (props.cell.content)
+            return;
 
         var buyCost = props.player.getCellBuyCost(props.cell);
 

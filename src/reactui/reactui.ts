@@ -364,6 +364,7 @@ class ReactUI
 
     if (props.player.ownedCells[props.cell.gridPos]) return;
     if (props.cell.type.type === "water") return;
+    if (props.cell.content) return;
 
     var buyCost = props.player.getCellBuyCost(props.cell);
 

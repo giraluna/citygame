@@ -45,13 +45,22 @@ module actions
 
     var onStartFN = function()
     {
+      if (!cell.content) cell.changeContent(cg.content.underPurchase, true);
+
       employee.active = false;
       employee.currAction = "buyCell";
       player.subtractCost(price);
       player.ownedCellsAmount++;
+
+      eventManager.dispatchEvent({type: "updateWorld", content: ""});
     }
     var onCompleteFN = function()
     {
+      if (cell.content && cell.content.type.type === "underPurchase")
+      {
+        cell.removeContent();
+      }
+      
       employee.active = true;
       employee.currAction = undefined;
       employee.trainSkill("negotiation");

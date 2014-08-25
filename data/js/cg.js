@@ -48,6 +48,12 @@ var cg = {
             "anchor": [0.5, 1],
             "frame": ["underconstruction.png"]
         },
+        "underPurchase": {
+            "type": "underPurchase",
+            "baseType": "underPurchase",
+            "anchor": [0.5, 1],
+            "frame": ["underpurchase.png"]
+        },
         "plants": {
             "grass": {
                 "tree1": {

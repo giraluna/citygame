@@ -12,5 +12,11 @@ var Options;
         Options.autosaveLimit = e.content;
         eventManager.dispatchEvent({ type: "saveOptions", content: null });
     });
+
+    Options.autoSwitchTools = false;
+    eventManager.addEventListener("toggleAutoSwitchTools", function (e) {
+        Options.autoSwitchTools = !Options.autoSwitchTools;
+        eventManager.dispatchEvent({ type: "saveOptions", content: null });
+    });
 })(Options || (Options = {}));
 //# sourceMappingURL=options.js.map

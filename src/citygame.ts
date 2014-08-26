@@ -1508,11 +1508,17 @@ class Game
       eventManager.addEventListener("changeTool", function(e)
       {
         self.changeTool(e.content.type);
-        if (e.content.continuous === false)
+        var continuous;
+        if (Options.autoSwitchTools)
         {
-          self.tools[e.content.type].continuous = false;
+          continuous = e.content.continuous || false;
         }
-        else self.tools[e.content.type].continuous = true;
+        else
+        {
+          continuous = !e.content.continuous || true;
+        }
+
+        self.tools[e.content.type].continuous = continuous;
       });
 
       //renderer
@@ -3306,7 +3312,12 @@ class BuildTool extends Tool
   }
   changeBuilding(buildingType, continuous:boolean = false)
   {
-    this.continuous = continuous;
+    if (Options.autoSwitchTools)
+    {
+      this.continuous = continuous || false;
+    }
+    else this.continuous = !continuous || true;
+
     if (this.selectedBuildingType === buildingType) return;
 
     this.selectedBuildingType = buildingType;

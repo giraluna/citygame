@@ -2,7 +2,8 @@
   "2014/08/26":
   [
     "Fix bug allowing some upgrades to be bought several times",
-    "Fix logic error in window.performance fallback affecting Safari"
+    "Fix logic error in window.performance fallback affecting Safari",
+    "Add option for auto switching to clicking after an action. Default changed to off"
   ],
   "2014/08/25":
   [

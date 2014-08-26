@@ -1840,7 +1840,9 @@ var UIComponents;
 
             var otherOptions = [
                 {
-                    content: React.DOM.div(null, React.DOM.input({
+                    content: React.DOM.div({
+                        title: "Amount of rolling autosaves to keep"
+                    }, React.DOM.input({
                         type: "number",
                         id: "autosave-limit",
                         className: "small-number-input",
@@ -1861,6 +1863,23 @@ var UIComponents;
                     }), React.DOM.label({
                         htmlFor: "autosave-limit"
                     }, "Autosave limit"))
+                },
+                {
+                    content: React.DOM.div({
+                        title: "Automatically switch back to clicking after performing an action\n" + "Can be overridden by holding shift key"
+                    }, React.DOM.input({
+                        type: "checkbox",
+                        id: "auto-switch-tools",
+                        name: "auto-switch-tools",
+                        defaultChecked: Options.autoSwitchTools,
+                        onChange: function () {
+                            eventManager.dispatchEvent({
+                                type: "toggleAutoSwitchTools", content: ""
+                            });
+                        }
+                    }), React.DOM.label({
+                        htmlFor: "auto-switch-tools"
+                    }, "Automatically switch to clicking"))
                 }
             ];
             var otherOptionList = UIComponents.OptionList({
@@ -7867,6 +7886,12 @@ var Options;
         Options.autosaveLimit = e.content;
         eventManager.dispatchEvent({ type: "saveOptions", content: null });
     });
+
+    Options.autoSwitchTools = false;
+    eventManager.addEventListener("toggleAutoSwitchTools", function (e) {
+        Options.autoSwitchTools = !Options.autoSwitchTools;
+        eventManager.dispatchEvent({ type: "saveOptions", content: null });
+    });
 })(Options || (Options = {}));
 //# sourceMappingURL=options.js.map
 
@@ -7892,18 +7917,14 @@ var Strawb;
             this.autoStart = autoStart;
             this.runningTime = 0;
             this.running = false;
-            // sets the getTime mehtod to use highest resolution timing available
-            this.getTime = Date.now;
-            var performance = window.performance;
-            if (!performance) {
-                if (performance.now) {
-                    this.getTime = function getTimeFn() {
-                        return performance.now();
-                    };
-                }
+            if (window.performance && window.performance.now) {
+                this.getTime = function getTimeFn() {
+                    return window.performance.now();
+                };
+            } else {
+                this.getTime = Date.now;
             }
 
-            // autostart
             if (autoStart !== false) {
                 this.start();
             }
@@ -11964,10 +11985,15 @@ var Game = (function () {
 
         eventManager.addEventListener("changeTool", function (e) {
             self.changeTool(e.content.type);
-            if (e.content.continuous === false) {
-                self.tools[e.content.type].continuous = false;
-            } else
-                self.tools[e.content.type].continuous = true;
+            var continuous;
+
+            if (Options.autoSwitchTools) {
+                continuous = e.content.continuous;
+            } else {
+                continuous = !e.content.continuous;
+            }
+
+            self.tools[e.content.type].continuous = continuous;
         });
 
         //renderer
@@ -13426,7 +13452,11 @@ var BuildTool = (function (_super) {
     };
     BuildTool.prototype.changeBuilding = function (buildingType, continuous) {
         if (typeof continuous === "undefined") { continuous = false; }
-        this.continuous = continuous;
+        if (Options.autoSwitchTools) {
+            this.continuous = continuous;
+        } else
+            this.continuous = !continuous;
+
         if (this.selectedBuildingType === buildingType)
             return;
 

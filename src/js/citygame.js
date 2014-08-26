@@ -1193,10 +1193,15 @@ var Game = (function () {
 
         eventManager.addEventListener("changeTool", function (e) {
             self.changeTool(e.content.type);
-            if (e.content.continuous === false) {
-                self.tools[e.content.type].continuous = false;
-            } else
-                self.tools[e.content.type].continuous = true;
+            var continuous;
+
+            if (Options.autoSwitchTools) {
+                continuous = e.content.continuous;
+            } else {
+                continuous = !e.content.continuous;
+            }
+
+            self.tools[e.content.type].continuous = continuous;
         });
 
         //renderer
@@ -2655,7 +2660,11 @@ var BuildTool = (function (_super) {
     };
     BuildTool.prototype.changeBuilding = function (buildingType, continuous) {
         if (typeof continuous === "undefined") { continuous = false; }
-        this.continuous = continuous;
+        if (Options.autoSwitchTools) {
+            this.continuous = continuous;
+        } else
+            this.continuous = !continuous;
+
         if (this.selectedBuildingType === buildingType)
             return;
 

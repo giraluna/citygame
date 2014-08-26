@@ -15,4 +15,11 @@ module Options
     autosaveLimit = e.content;
     eventManager.dispatchEvent({type:"saveOptions", content:null});
   });
+
+  export var autoSwitchTools = false;
+  eventManager.addEventListener("toggleAutoSwitchTools", function(e)
+  {
+    autoSwitchTools = !autoSwitchTools;
+    eventManager.dispatchEvent({type:"saveOptions", content:null});
+  });
 }

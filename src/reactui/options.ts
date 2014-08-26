@@ -110,7 +110,10 @@ module UIComponents
       var otherOptions =
       [
         {
-          content: React.DOM.div(null,
+          content: React.DOM.div(
+            {
+              title: "Amount of rolling autosaves to keep"
+            },
             React.DOM.input(
             {
               type: "number",
@@ -137,7 +140,30 @@ module UIComponents
               htmlFor: "autosave-limit"
             }, "Autosave limit")
           )
-          
+        },
+        {
+          content: React.DOM.div(
+            {
+              title: "Automatically switch back to clicking after performing an action\n"+
+              "Can be overridden by holding shift key"
+            },
+            React.DOM.input(
+              {
+                type: "checkbox",
+                id:"auto-switch-tools",
+                name:"auto-switch-tools",
+                defaultChecked: Options.autoSwitchTools,
+                onChange: function(){eventManager.dispatchEvent(
+                {
+                  type: "toggleAutoSwitchTools", content: ""
+                })}
+              }
+            ),
+            React.DOM.label(
+            {
+              htmlFor: "auto-switch-tools"
+            }, "Automatically switch to clicking")
+          )
         }
       ];
       var otherOptionList = UIComponents.OptionList(

@@ -1,4 +1,9 @@
 {
+  "2014/08/26":
+  [
+    "Fix bug allowing some upgrades to be bought several times",
+    "Fix logic error in window.performance fallback affecting Safari"
+  ],
   "2014/08/25":
   [
     "Add small sign for plots currently being purchased",

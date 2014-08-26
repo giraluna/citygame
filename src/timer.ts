@@ -32,21 +32,19 @@ module Strawb
 
     constructor(public autoStart?)
     {
-      // sets the getTime mehtod to use highest resolution timing available
-      this.getTime = Date.now;
-      var performance = window.performance;
-      if (!performance)
+      if (window.performance && window.performance.now)
       {
-        if (performance.now)
+        this.getTime = function getTimeFn()
         {
-          this.getTime = function getTimeFn()
-          {
-            return performance.now();
-          };
-        }
+          return window.performance.now();
+        };
+      }
+      else
+      {
+        this.getTime = Date.now;
       }
 
-      // autostart
+
       if (autoStart !== false)
       {
         this.start();

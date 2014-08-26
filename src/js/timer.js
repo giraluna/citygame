@@ -20,18 +20,14 @@ var Strawb;
             this.autoStart = autoStart;
             this.runningTime = 0;
             this.running = false;
-            // sets the getTime mehtod to use highest resolution timing available
-            this.getTime = Date.now;
-            var performance = window.performance;
-            if (!performance) {
-                if (performance.now) {
-                    this.getTime = function getTimeFn() {
-                        return performance.now();
-                    };
-                }
+            if (window.performance && window.performance.now) {
+                this.getTime = function getTimeFn() {
+                    return window.performance.now();
+                };
+            } else {
+                this.getTime = Date.now;
             }
 
-            // autostart
             if (autoStart !== false) {
                 this.start();
             }

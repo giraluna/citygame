@@ -1194,10 +1194,11 @@ var Game = (function () {
         eventManager.addEventListener("changeTool", function (e) {
             self.changeTool(e.content.type);
             var continuous;
+
             if (Options.autoSwitchTools) {
-                continuous = e.content.continuous || false;
+                continuous = e.content.continuous;
             } else {
-                continuous = !e.content.continuous || true;
+                continuous = !e.content.continuous;
             }
 
             self.tools[e.content.type].continuous = continuous;
@@ -2660,9 +2661,9 @@ var BuildTool = (function (_super) {
     BuildTool.prototype.changeBuilding = function (buildingType, continuous) {
         if (typeof continuous === "undefined") { continuous = false; }
         if (Options.autoSwitchTools) {
-            this.continuous = continuous || false;
+            this.continuous = continuous;
         } else
-            this.continuous = !continuous || true;
+            this.continuous = !continuous;
 
         if (this.selectedBuildingType === buildingType)
             return;

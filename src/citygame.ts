@@ -1509,13 +1509,14 @@ class Game
       {
         self.changeTool(e.content.type);
         var continuous;
+
         if (Options.autoSwitchTools)
         {
-          continuous = e.content.continuous || false;
+          continuous = e.content.continuous;
         }
         else
         {
-          continuous = !e.content.continuous || true;
+          continuous = !e.content.continuous;
         }
 
         self.tools[e.content.type].continuous = continuous;
@@ -3314,9 +3315,9 @@ class BuildTool extends Tool
   {
     if (Options.autoSwitchTools)
     {
-      this.continuous = continuous || false;
+      this.continuous = continuous;
     }
-    else this.continuous = !continuous || true;
+    else this.continuous = !continuous;
 
     if (this.selectedBuildingType === buildingType) return;
 

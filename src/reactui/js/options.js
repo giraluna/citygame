@@ -109,7 +109,7 @@ var UIComponents;
                 },
                 {
                     content: React.DOM.div({
-                        title: "Automatically switch back to clicking after performing an action\n" + "Can be overridden with shift key"
+                        title: "Automatically switch back to clicking after performing an action\n" + "Can be overridden by holding shift key"
                     }, React.DOM.input({
                         type: "checkbox",
                         id: "auto-switch-tools",

@@ -56,7 +56,7 @@ module playerModifiers
       {
         player.addSpecialModifier(
         {
-          type: "prestigeDefault",
+          type: "prestigeDefaultDynamic",
           title: "Default prestige modifier",
           description: "0.5% total profit per prestige",
           effects:
@@ -428,7 +428,7 @@ module playerModifiers
       {
         player.addSpecialModifier(
         {
-          type: "convenienceModifier5",
+          type: "convenienceModifier5Dynamic",
           title: "Market saturation",
           description: "Retail profits + 50% - 1% per retail building",
           effects:
@@ -552,7 +552,7 @@ module playerModifiers
       {
         player.addSpecialModifier(
         {
-          type: "fastFoodModifier5",
+          type: "fastFoodModifier5Dynamic",
           title: "Chocolate chip cookies",
           description: "Fast food restaurant profits + 33%\nClicking profit +2% per restaurant",
           effects:
@@ -784,7 +784,7 @@ module playerModifiers
       {
         player.addSpecialModifier(
         {
-          type: "officeModifier5",
+          type: "officeModifier5Dynamic",
           title: "Corporate real estate",
           description: "Office profits + 25%\nBuying plots 2% cheaper per office",
           effects:

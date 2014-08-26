@@ -23,7 +23,7 @@ var playerModifiers;
         dynamicEffect: {
             "prestige": function (player) {
                 player.addSpecialModifier({
-                    type: "prestigeDefault",
+                    type: "prestigeDefaultDynamic",
                     title: "Default prestige modifier",
                     description: "0.5% total profit per prestige",
                     effects: [
@@ -343,7 +343,7 @@ var playerModifiers;
         dynamicEffect: {
             "shopping": function (player) {
                 player.addSpecialModifier({
-                    type: "convenienceModifier5",
+                    type: "convenienceModifier5Dynamic",
                     title: "Market saturation",
                     description: "Retail profits + 50% - 1% per retail building",
                     effects: [
@@ -448,7 +448,7 @@ var playerModifiers;
         dynamicEffect: {
             "fastfood": function (player) {
                 player.addSpecialModifier({
-                    type: "fastFoodModifier5",
+                    type: "fastFoodModifier5Dynamic",
                     title: "Chocolate chip cookies",
                     description: "Fast food restaurant profits + 33%\nClicking profit +2% per restaurant",
                     effects: [
@@ -645,7 +645,7 @@ var playerModifiers;
         dynamicEffect: {
             "office": function (player) {
                 player.addSpecialModifier({
-                    type: "officeModifier5",
+                    type: "officeModifier5Dynamic",
                     title: "Corporate real estate",
                     description: "Office profits + 25%\nBuying plots 2% cheaper per office",
                     effects: [
@@ -889,7 +889,7 @@ var playerModifiers;
     playerModifiers.stadiumModifier3 = {
         type: "stadiumModifier3",
         title: "Team merchandise",
-        description: "Stadium profits +50%\nShopping profits +20%",
+        description: "Stadium profits +50%\nShopping profits +15%",
         cost: 8000000,
         unlockConditions: [
             {
@@ -904,7 +904,7 @@ var playerModifiers;
             },
             {
                 targets: ["shopping"],
-                multiplier: 1.2
+                multiplier: 1.15
             }
         ]
     };

@@ -1,27 +1,30 @@
 /// <reference path="../../lib/react.d.ts" />
 
-module UIComponents
+module CityGame
 {
-
-export var SplitMultilineText =
-{
-  splitMultilineText: function(text: any)
+  export module UIComponents
   {
-    if (Array.isArray(text))
+  
+  export var SplitMultilineText =
+  {
+    splitMultilineText: function(text: any)
     {
-      var returnArr = [];
-      for (var i = 0; i < text.length; i++)
+      if (Array.isArray(text))
       {
-        returnArr.push(text[i]);
-        returnArr.push(React.DOM.br(null));
+        var returnArr = [];
+        for (var i = 0; i < text.length; i++)
+        {
+          returnArr.push(text[i]);
+          returnArr.push(React.DOM.br(null));
+        }
+        return returnArr;
       }
-      return returnArr;
-    }
-    else
-    {
-      return text;
+      else
+      {
+        return text;
+      }
     }
   }
-}
-
+  
+  }
 }

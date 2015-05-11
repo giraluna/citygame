@@ -2,48 +2,52 @@
 /// 
 /// <reference path="../eventmanager.ts" />
 
-module UIComponents
+module CityGame
 {
-
-export var SideMenuMapmode = React.createClass(
-{
-  handleMapmodeChange: function(event)
+  
+  export module UIComponents
   {
-    var target = <HTMLInputElement> event.target;
-
-    eventManager.dispatchEvent({type: "changeMapmode", content:target.value});
-  },
-
-  render: function()
+  
+  export var SideMenuMapmode = React.createClass(
   {
-    var options = [];
-
-    ["terrain", "landValue", "underground"].forEach(function(type)
+    handleMapmodeChange: function(event)
     {
-      var props =
+      var target = <HTMLInputElement> event.target;
+  
+      eventManager.dispatchEvent({type: "changeMapmode", content:target.value});
+    },
+  
+    render: function()
+    {
+      var options = [];
+  
+      ["terrain", "landValue", "underground"].forEach(function(type)
       {
-        key: type,
-        value: type
-      };
-
-      var title = type === "landValue" ? "land value" : type;
-      options.push( React.DOM.option(props, title) );
-    });
-
-    return(
-      React.DOM.select(
+        var props =
         {
-          id: "side-menu-mapmode-select",
-          className: "grid-row",
-          defaultValue: "landValue",
-          title: "Map mode",
-          onChange: this.handleMapmodeChange
-        },
-        options
-      )
-    );
+          key: type,
+          value: type
+        };
+  
+        var title = type === "landValue" ? "land value" : type;
+        options.push( React.DOM.option(props, title) );
+      });
+  
+      return(
+        React.DOM.select(
+          {
+            id: "side-menu-mapmode-select",
+            className: "grid-row",
+            defaultValue: "landValue",
+            title: "Map mode",
+            onChange: this.handleMapmodeChange
+          },
+          options
+        )
+      );
+    }
+  
+  });
+  
   }
-
-});
-
 }

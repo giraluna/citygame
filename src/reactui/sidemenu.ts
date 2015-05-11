@@ -8,69 +8,73 @@
 /// <reference path="sidemenutools.ts" />
 /// <reference path="sidemenumodifierbutton.ts" />
 
-module UIComponents
+module CityGame
 {
-
-export var SideMenu = React.createClass(
-{
-  getInitialState: function()
+  
+  export module UIComponents
   {
-    return {selectedTool: null};
-  },
-  setSelectedTool: function(type)
+  
+  export var SideMenu = React.createClass(
   {
-    this.setState({selectedTool: type});
-  },
-  render: function()
-  {
-
-    return(
-      React.DOM.div( {id:"react-side-menu"},
-        UIComponents.SideMenuTools(
-          {
-            player: this.props.player,
-            setSelectedTool: this.setSelectedTool,
-            selectedTool: this.state.selectedTool
-          }
-        ),
-        UIComponents.SideMenuBuildings(
-          {
-            player: this.props.player,
-            frameImages: this.props.frameImages,
-            setSelectedTool: this.setSelectedTool,
-            selectedTool: this.state.selectedTool,
-            // Todo react definitions
-            beautifyIndex: null,
-            lastSelectedBuilding: null
-          }
-        ),
-
-        React.DOM.div( {id:"side-menu-other-buttons", className:"grid-column"}, 
-          UIComponents.SideMenuSave(),
-          UIComponents.SideMenuMapmode(),
-          UIComponents.SideMenuZoom()
-
-        ),
-        UIComponents.SideMenuStats(
-          {
-            player: this.props.player,
-            // Todo react definitions
-            hasLevelUpUpgrade: null,
-            lastModifierCount: null
-          }
-        ),
-        UIComponents.SideMenuModifierButton(
-          {
-            player: this.props.player,
-            // Todo react definitions
-            hasNewModifier: null,
-            lastModifierCount: null
-          }
+    getInitialState: function()
+    {
+      return {selectedTool: null};
+    },
+    setSelectedTool: function(type)
+    {
+      this.setState({selectedTool: type});
+    },
+    render: function()
+    {
+  
+      return(
+        React.DOM.div( {id:"react-side-menu"},
+          UIComponents.SideMenuTools(
+            {
+              player: this.props.player,
+              setSelectedTool: this.setSelectedTool,
+              selectedTool: this.state.selectedTool
+            }
+          ),
+          UIComponents.SideMenuBuildings(
+            {
+              player: this.props.player,
+              frameImages: this.props.frameImages,
+              setSelectedTool: this.setSelectedTool,
+              selectedTool: this.state.selectedTool,
+              // Todo react definitions
+              beautifyIndex: null,
+              lastSelectedBuilding: null
+            }
+          ),
+  
+          React.DOM.div( {id:"side-menu-other-buttons", className:"grid-column"}, 
+            UIComponents.SideMenuSave(),
+            UIComponents.SideMenuMapmode(),
+            UIComponents.SideMenuZoom()
+  
+          ),
+          UIComponents.SideMenuStats(
+            {
+              player: this.props.player,
+              // Todo react definitions
+              hasLevelUpUpgrade: null,
+              lastModifierCount: null
+            }
+          ),
+          UIComponents.SideMenuModifierButton(
+            {
+              player: this.props.player,
+              // Todo react definitions
+              hasNewModifier: null,
+              lastModifierCount: null
+            }
+          )
+  
         )
-
-      )
-    );
+      );
+    }
+  });
+  
   }
-});
-
 }

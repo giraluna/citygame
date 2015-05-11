@@ -1,59 +1,63 @@
 /// <reference path="../../lib/react.d.ts" />
 
-module UIComponents
+module CityGame
 {
-
-export var Employee = React.createClass({
-  getDefaultProps: function()
+  export module UIComponents
   {
-    var defs =
+  
+  export var Employee = React.createClass({
+    getDefaultProps: function()
     {
-      employee:
+      var defs =
       {
-        name: "UNDEFINED",
-        skills:
+        employee:
         {
-          "neg": 0,
-          "rec": 0,
-          "con": 0
+          name: "UNDEFINED",
+          skills:
+          {
+            "neg": 0,
+            "rec": 0,
+            "con": 0
+          }
         }
-      }
-    };
-
-    return defs;
-  },
-
-
-  render: function()
-  {
-    var name = this.props.employee.name;
-    var skillCells = [];
-
-    for (var skill in this.props.employee.skills)
+      };
+  
+      return defs;
+    },
+  
+  
+    render: function()
     {
-      var colProps: any = {key: skill};
-      if (this.props.relevantSkills && this.props.relevantSkills.length > 0)
+      var name = this.props.employee.name;
+      var skillCells = [];
+  
+      for (var skill in this.props.employee.skills)
       {
-        if (this.props.relevantSkills.indexOf(skill) === -1)
+        var colProps: any = {key: skill};
+        if (this.props.relevantSkills && this.props.relevantSkills.length > 0)
         {
-          colProps["className"] = "irrelevant-cell"
-        };
+          if (this.props.relevantSkills.indexOf(skill) === -1)
+          {
+            colProps["className"] = "irrelevant-cell"
+          };
+        }
+  
+        skillCells.push(
+          React.DOM.td(colProps, this.props.employee.skills[skill])
+        );
       }
-
-      skillCells.push(
-        React.DOM.td(colProps, this.props.employee.skills[skill])
+  
+      return(
+  
+        React.DOM.tr(this.props.rowProps, 
+          React.DOM.td({className: "employee-name"}, name),
+  
+          skillCells
+        )
       );
     }
-
-    return(
-
-      React.DOM.tr(this.props.rowProps, 
-        React.DOM.td({className: "employee-name"}, name),
-
-        skillCells
-      )
-    );
+  });
+  
   }
-});
 
 }

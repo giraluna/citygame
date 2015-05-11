@@ -1,338 +1,307 @@
-module CityGame
+/// <reference path="../src/js/arraylogic.d.ts" />
+
+module cellModifiers
 {
-  export interface ICellModifier
+
+  export function niceEnviroment(range: number, strength: number = 1)
   {
-    (range: number, strength: number): ICellModifierData;
+    return(
+    {
+      type: "niceEnviroment",
+      title: "Nice enviroment",
+      range: range,
+      strength: strength,
+      targets: ["apartment", "office", "hotel"],
+      effect:
+      {
+        multiplier: 0.3
+      },
+      landValue:
+      {
+        radius: 4,
+        multiplier: 0.1,
+        scalingFN: function(strength){ return 1+Math.log(strength/2); },
+      }
+    });
   }
-  export interface ICellModifierData
+
+  export function crowded(range: number, strength: number = 1)
   {
-    type: string;
-    title: string;
-    range: number;
-    strength: number;
-    targets: string[];
-    scaling?: (number) => number;
-    effect?:
+    return(
     {
-      multiplier?: number;
-      addedProfit?: number;
-    }
-    landValue?:
-    {
-      radius: number;
-      multiplier: number;
-      scalingFN?: (strength: number) => number;
-      falloffFN?: (dist: number, invertedDist: number) => number;
-    }
+      type: "crowded",
+      title: "Crowded",
+      range: range,
+      strength: strength,
+      targets: ["apartment"],
+      scaling: function(strength)
+      {
+        if (strength >= 5)
+        {
+          return 1+Math.log(strength);
+        }
+        else
+        {
+          return 0;
+        }
+      },
+      effect:
+      {
+        multiplier: -0.1
+      }
+    });
   }
-  export interface ICellModifierDescription
+
+  export function population(range: number, strength: number = 1)
   {
-    type: ICellModifier;
-    range: number;
-    strength: number;
+    return(
+    {
+      type: "population",
+      title: "Nearby customers",
+      range: range,
+      strength: strength,
+      targets: ["fastfood", "shopping"],
+      effect:
+      {
+        addedProfit: 0.3,
+        multiplier: 0.2
+      },
+      scaling: function(strength)
+      {
+        return strength;
+      },
+      landValue:
+      {
+        radius: 4,
+        multiplier: 0.01
+      }
+    });
   }
-  export module cellModifiers
+
+  export function fastfoodCompetition(range: number, strength: number = 1)
   {
-    export var niceEnviroment: ICellModifier = function(range: number, strength: number = 1)
+    return(
     {
-      return(
+      type: "fastfoodCompetition",
+      title: "Competing restaurants",
+      range: range,
+      strength: strength,
+      targets: ["fastfood"],
+      effect:
       {
-        type: "niceEnviroment",
-        title: "Nice enviroment",
-        range: range,
-        strength: strength,
-        targets: ["apartment", "office", "hotel"],
-        effect:
-        {
-          multiplier: 0.3
-        },
-        landValue:
-        {
-          radius: 4,
-          multiplier: 0.1,
-          scalingFN: function(strength){ return 1+Math.log(strength/2); },
-        }
-      });
-    }
+        addedProfit: -0.25,
+        multiplier: -0.3,
+      }
+    });
+  }
 
-    export var crowded: ICellModifier = function(range: number, strength: number = 1)
+  export function shoppingCompetition(range: number, strength: number = 1)
+  {
+    return(
     {
-      return(
+      type: "shoppingCompetition",
+      title: "Competing stores",
+      range: range,
+      strength: strength,
+      targets: ["shopping"],
+      effect:
       {
-        type: "crowded",
-        title: "Crowded",
-        range: range,
-        strength: strength,
-        targets: ["apartment"],
-        scaling: function(strength)
-        {
-          if (strength >= 5)
-          {
-            return 1+Math.log(strength);
-          }
-          else
-          {
-            return 0;
-          }
-        },
-        effect:
-        {
-          multiplier: -0.1
-        }
-      });
-    }
+        addedProfit: -0.2,
+        multiplier: -0.2,
+      }
+    });
+  }
 
-    export var population: ICellModifier = function(range: number, strength: number = 1)
+  export function nearbyShopping(range: number, strength: number = 1)
+  {
+    return(
     {
-      return(
+      type: "nearbyShopping",
+      title: "Nearby stores",
+      range: range,
+      strength: strength,
+      targets: ["fastfood", "parking"],
+      effect:
       {
-        type: "population",
-        title: "Nearby customers",
-        range: range,
-        strength: strength,
-        targets: ["fastfood", "shopping"],
-        effect:
-        {
-          addedProfit: 0.3,
-          multiplier: 0.2
-        },
-        scaling: function(strength)
-        {
-          return strength;
-        },
-        landValue:
-        {
-          radius: 4,
-          multiplier: 0.01
-        }
-      });
-    }
+        multiplier: 0.2
+      }
+    });
+  }
 
-    export var fastfoodCompetition: ICellModifier = function(range: number, strength: number = 1)
+  export function nearbyStation(range: number, strength: number = 1)
+  {
+    return(
     {
-      return(
+      type: "nearbyStation",
+      title: "Nearby station",
+      range: range,
+      strength: strength,
+      targets: ["fastfood", "shopping", "office",
+        "apartment", "parking", "hotel", "stadium"],
+      effect:
       {
-        type: "fastfoodCompetition",
-        title: "Competing restaurants",
-        range: range,
-        strength: strength,
-        targets: ["fastfood"],
-        effect:
+        addedProfit: 0.25,
+        multiplier: 0.25
+      },
+      landValue:
+      {
+        radius: 20,
+        multiplier: 0.05,
+        falloffFN: function(distance, invertedDistance, invertedDistanceRatio)
         {
-          addedProfit: -0.25,
-          multiplier: -0.3,
+          return invertedDistance * invertedDistanceRatio;
         }
-      });
-    }
+      }
+    });
+  }
 
-    export var shoppingCompetition: ICellModifier = function(range: number, strength: number = 1)
+  export function parkingCompetition(range: number, strength: number = 1)
+  {
+    return(
     {
-      return(
+      type: "parkingCompetition",
+      title: "Competing parking lots",
+      range: range,
+      strength: strength,
+      targets: ["parking"],
+      effect:
       {
-        type: "shoppingCompetition",
-        title: "Competing stores",
-        range: range,
-        strength: strength,
-        targets: ["shopping"],
-        effect:
-        {
-          addedProfit: -0.2,
-          multiplier: -0.2,
-        }
-      });
-    }
+        addedProfit: -0.2,
+        multiplier: -0.2,
+      }
+    });
+  }
 
-    export var nearbyShopping: ICellModifier = function(range: number, strength: number = 1)
+  export function nearbyParking(range: number, strength: number = 1)
+  {
+    return(
     {
-      return(
+      type: "nearbyParking",
+      title: "Nearby parking",
+      range: range,
+      strength: strength,
+      targets: ["fastfood", "shopping"],
+      effect:
       {
-        type: "nearbyShopping",
-        title: "Nearby stores",
-        range: range,
-        strength: strength,
-        targets: ["fastfood", "parking"],
-        effect:
-        {
-          multiplier: 0.2
-        }
-      });
-    }
+        addedProfit: 0.25,
+        multiplier: 0.1
+      }
+    });
+  }
 
-    export var nearbyStation: ICellModifier = function(range: number, strength: number = 1)
+  export function nearbyFactory(range: number, strength: number = 1)
+  {
+    return(
     {
-      return(
+      type: "nearbyFactory",
+      title: "Nearby Factory",
+      range: range,
+      strength: strength,
+      targets: ["fastfood", "shopping", "apartment", "office", "hotel"],
+      effect:
       {
-        type: "nearbyStation",
-        title: "Nearby station",
-        range: range,
-        strength: strength,
-        targets: ["fastfood", "shopping", "office",
-          "apartment", "parking", "hotel", "stadium"],
-        effect:
+        multiplier: -0.15
+      },
+      landValue:
+      {
+        radius: 5,
+        multiplier: -0.07,
+        falloffFN: function(distance, invertedDistance, invertedDistanceRatio)
         {
-          addedProfit: 0.25,
-          multiplier: 0.25
-        },
-        landValue:
-        {
-          radius: 20,
-          multiplier: 0.05,
-          falloffFN: function(distance, invertedDistance, invertedDistanceRatio)
-          {
-            return invertedDistance * invertedDistanceRatio;
-          }
+          return invertedDistance * invertedDistanceRatio / 2;
         }
-      });
-    }
+      }
+    });
+  }
 
-    export var parkingCompetition: ICellModifier = function(range: number, strength: number = 1)
+  export function nearbyRoad(range: number, strength: number = 1)
+  {
+    return(
     {
-      return(
+      type: "nearbyRoad",
+      title: "Nearby Road",
+      range: range,
+      strength: strength,
+      targets: ["parking"],
+      effect:
       {
-        type: "parkingCompetition",
-        title: "Competing parking lots",
-        range: range,
-        strength: strength,
-        targets: ["parking"],
-        effect:
-        {
-          addedProfit: -0.2,
-          multiplier: -0.2,
-        }
-      });
-    }
+        multiplier: 0.15
+      },
+      scaling: function(strength)
+      {
+        return 1;
+      }
+    });
+  }
 
-    export var nearbyParking: ICellModifier = function(range: number, strength: number = 1)
+  export function nearbyHotel(range: number, strength: number = 1)
+  {
+    return(
     {
-      return(
+      type: "nearbyHotel",
+      title: "Nearby Hotel",
+      range: range,
+      strength: strength,
+      targets: ["office"],
+      effect:
       {
-        type: "nearbyParking",
-        title: "Nearby parking",
-        range: range,
-        strength: strength,
-        targets: ["fastfood", "shopping"],
-        effect:
+        multiplier: 0.33
+      },
+      landValue:
+      {
+        radius: 6,
+        multiplier: 0.05,
+        falloffFN: function(distance, invertedDistance, invertedDistanceRatio)
         {
-          addedProfit: 0.25,
-          multiplier: 0.1
+          return invertedDistance * invertedDistanceRatio / 2;
         }
-      });
-    }
+      }
+    });
+  }
 
-    export var nearbyFactory: ICellModifier = function(range: number, strength: number = 1)
+  export function hotelCompetition(range: number, strength: number = 1)
+  {
+    return(
     {
-      return(
+      type: "hotelCompetition",
+      title: "Competing hotels",
+      range: range,
+      strength: strength,
+      targets: ["hotel"],
+      effect:
       {
-        type: "nearbyFactory",
-        title: "Nearby Factory",
-        range: range,
-        strength: strength,
-        targets: ["fastfood", "shopping", "apartment", "office", "hotel"],
-        effect:
-        {
-          multiplier: -0.15
-        },
-        landValue:
-        {
-          radius: 5,
-          multiplier: -0.07,
-          falloffFN: function(distance, invertedDistance, invertedDistanceRatio)
-          {
-            return invertedDistance * invertedDistanceRatio / 2;
-          }
-        }
-      });
-    }
-
-    export var nearbyRoad: ICellModifier = function(range: number, strength: number = 1)
+        multiplier: -0.2,
+      }
+    });
+  }
+  export function nearbyStadium(range: number, strength: number = 1)
+  {
+    return(
     {
-      return(
+      type: "nearbyStadium",
+      title: "Nearby stadium",
+      range: range,
+      strength: strength,
+      targets: ["parking"],
+      effect:
       {
-        type: "nearbyRoad",
-        title: "Nearby Road",
-        range: range,
-        strength: strength,
-        targets: ["parking"],
-        effect:
-        {
-          multiplier: 0.15
-        },
-        scaling: function(strength)
-        {
-          return 1;
-        }
-      });
-    }
-
-    export var nearbyHotel: ICellModifier = function(range: number, strength: number = 1)
+        multiplier: 0.2,
+      }
+    });
+  }
+  export function stadiumCompetition(range: number, strength: number = 1)
+  {
+    return(
     {
-      return(
+      type: "stadiumCompetition",
+      title: "Competing stadiums",
+      range: range,
+      strength: strength,
+      targets: ["stadium"],
+      effect:
       {
-        type: "nearbyHotel",
-        title: "Nearby Hotel",
-        range: range,
-        strength: strength,
-        targets: ["office"],
-        effect:
-        {
-          multiplier: 0.33
-        },
-        landValue:
-        {
-          radius: 6,
-          multiplier: 0.05,
-          falloffFN: function(distance, invertedDistance, invertedDistanceRatio)
-          {
-            return invertedDistance * invertedDistanceRatio / 2;
-          }
-        }
-      });
-    }
-
-    export var hotelCompetition: ICellModifier = function(range: number, strength: number = 1)
-    {
-      return(
-      {
-        type: "hotelCompetition",
-        title: "Competing hotels",
-        range: range,
-        strength: strength,
-        targets: ["hotel"],
-        effect:
-        {
-          multiplier: -0.2,
-        }
-      });
-    }
-    export var nearbyStadium: ICellModifier = function(range: number, strength: number = 1)
-    {
-      return(
-      {
-        type: "nearbyStadium",
-        title: "Nearby stadium",
-        range: range,
-        strength: strength,
-        targets: ["parking"],
-        effect:
-        {
-          multiplier: 0.2,
-        }
-      });
-    }
-    export var stadiumCompetition: ICellModifier = function(range: number, strength: number = 1)
-    {
-      return(
-      {
-        type: "stadiumCompetition",
-        title: "Competing stadiums",
-        range: range,
-        strength: strength,
-        targets: ["stadium"],
-        effect:
-        {
-          multiplier: -0.25,
-        }
-      });
-    }
+        multiplier: -0.25,
+      }
+    });
   }
 }

@@ -1,5 +1,5 @@
 /// <reference path="../../lib/react.d.ts" />
-/// <reference path="js/splitmultilinetext.d.ts" />
+/// <reference path="splitmultilinetext.ts" />
 
 module UIComponents
 {

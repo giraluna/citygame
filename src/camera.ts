@@ -1,3 +1,5 @@
+/// <reference path="../lib/pixi.d.ts" />
+
 module CityGame
 {
   export class Camera
@@ -11,7 +13,7 @@ module CityGame
     currZoom: number = 1;
     zoomField: any;
 
-    constructor( container:PIXI.DisplayObjectContainer, bound)
+    constructor(container: PIXI.DisplayObjectContainer, bound)
     {
       this.container = container;
       this.bounds.min = bound;  // sets clamp limit to percentage of screen from 0.0 to 1.0
@@ -59,32 +61,11 @@ module CityGame
     }
     zoom( zoomAmount: number)
     {
-      if (zoomAmount > 1)
-      {
-        //zoomAmount = 1;
-      }
-
       var container = this.container;
       var oldZoom = this.currZoom;
-      /*
-      if (oldZoom <= 0.5 && zoomAmount > 0.5)
-      {
-
-      }
-      else if ( oldZoom <= 1.5 && oldZoom >= 0.5)
-      {
-        if (zoomAmount < 0.5) 
-        else if (zoomAmount > 1.5)
-      }
-      else if (oldZoom >= 1.5 && zoomAmount < 1.5)
-      {
-      }*/
-      
 
       var zoomDelta = oldZoom - zoomAmount;
       var rect = container.getLocalBounds();
-      //var centerX = SCREEN_WIDTH / 2 - rect.width / 2 * zoomAmount;
-      //var centerY = SCREEN_HEIGHT / 2 - rect.height / 2 * zoomAmount;
 
       //these 2 get position of screen center in relation to the container
       //0: far left 1: far right
@@ -106,7 +87,6 @@ module CityGame
       {
         return;
       }
-      //var scaledDelta = absDelta + scale / absDelta;
       var direction = delta < 0 ? "out" : "in";
       var adjDelta = 1 + Math.abs(delta) * scale
       if (direction === "out")
@@ -146,8 +126,6 @@ module CityGame
       {
         y = this.bounds.yMax;
       }
-
-      
 
       this.container.position.set(x, y)
     }

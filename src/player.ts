@@ -634,11 +634,10 @@ module CityGame
 
       return Math.floor( 100 * ( current / this.getExperienceForLevel(this.level) ) );
     }
-    getModifiedProfit(initialAmount: number, type?: string, baseMultiplier?: number,
-      includeGlobal:boolean=true)
+    getModifiedProfit(initialAmount: number, type?: string, baseMultiplier: number = 1,
+      includeGlobal: boolean = true)
     {
       var amount = initialAmount;
-      var baseMultiplier = baseMultiplier || 1;
 
       if (includeGlobal)
       {
@@ -665,7 +664,7 @@ module CityGame
 
       return amount;
     }
-    getIndexedProfit(type, amount, baseMultiplier)
+    getIndexedProfit(type, amount: number, baseMultiplier: number = 1)
     {
       if (!this.indexedProfits[type]) this.indexedProfits[type] = {};
 

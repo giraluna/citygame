@@ -1,11 +1,11 @@
 /// <reference path="../../lib/react.d.ts" />
 /// 
-/// <reference path="../js/eventlistener.d.ts" />
-/// <reference path="../js/utility.d.ts" />
+/// <reference path="../eventmanager.ts" />
+/// <reference path="../utility.ts" />
 /// 
-/// <reference path="js/optionlist.d.ts" />
+/// <reference path="optionlist.ts" />
 /// 
-/// <reference path="../js/options.d.ts" />
+/// <reference path="../options.ts" />
 
 module UIComponents
 {

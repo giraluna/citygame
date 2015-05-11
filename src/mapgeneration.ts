@@ -24,7 +24,7 @@ module CityGame
     {
       width: number;
       height?: number;
-    })
+    }): string[][]
     {
       props.height = props.height || props.width;
 
@@ -42,25 +42,31 @@ module CityGame
       return cells;
     }
 
-    export function convertCells(cells: any[][], board, autoInit: boolean)
+    export function convertCells(cellTypes: string[][], board: Board, autoInit: boolean): Cell[][]
     {
-      for (var i = 0; i < cells.length; i++)
+      var resultCells: Cell[][] = [];
+
+      for (var i = 0; i < cellTypes.length; i++)
       {
-        for (var j = 0; j < cells[i].length; j++)
+        resultCells.push[i] = [];
+
+        for (var j = 0; j < cellTypes[i].length; j++)
         {
-          cells[i][j] = new Cell([i, j], getIndexedType(cells[i][j]), board, autoInit);
+          resultCells[i][j] = new Cell([i, j], getIndexedType(cellTypes[i][j]), board, autoInit);
         }
       }
       if (autoInit !== true)
       {
-        for (var i = 0; i < cells.length; i++)
+        for (var i = 0; i < resultCells.length; i++)
         {
-          for (var j = 0; j < cells[i].length; j++)
+          for (var j = 0; j < resultCells[i].length; j++)
           {
-            cells[i][j].init();
+            resultCells[i][j].init();
           }
         }
       }
+
+      return resultCells;
     }
 
     export function readSavedMap(props:

@@ -1,9 +1,9 @@
-module Strawb
+module CityGame
 {
   /**
     * @class Timer
     * @classdesc Timing module
-    * @memberof Strawb
+    * @memberof CityGame
     *
     * @param    autostart      {boolean}    
     *
@@ -17,9 +17,9 @@ module Strawb
     */
   export class Timer
   {
-    startTime  : number;
-    totalTime  : number;
-    deltaTime  : number;
+    startTime: number;
+    totalTime: number;
+    deltaTime: number;
     runningTime: number = 0;
 
     private _runStartTime: number;
@@ -56,7 +56,7 @@ module Strawb
   /////////////
 
     /**
-     * @method Strawb.Timer#start
+     * @method CityGame.Timer#start
      */
     start()
     {
@@ -75,7 +75,7 @@ module Strawb
     }
 
     /**
-     * @method Strawb.Timer#stop
+     * @method CityGame.Timer#stop
      */
     stop()
     {
@@ -84,7 +84,7 @@ module Strawb
     }
 
     /**
-     * @method Strawb.Timer#getTotalTime
+     * @method CityGame.Timer#getTotalTime
      */
     getTotalTime()
     {
@@ -93,7 +93,7 @@ module Strawb
     }
 
     /**
-     * @method Strawb.Timer#getRunningTime
+     * @method CityGame.Timer#getRunningTime
      */
     getRunningTime()
     {
@@ -108,7 +108,7 @@ module Strawb
     }
 
     /**
-     * @method Strawb.Timer#getDelta
+     * @method CityGame.Timer#getDelta
      */
     getDelta()
     {

@@ -1,3 +1,7 @@
+/// <reference path="camera.ts" />
+/// <reference path="cell.ts" />
+/// <reference path="options.ts" />
+
 module CityGame
 {
   export class MouseEventHandler
@@ -75,7 +79,7 @@ module CityGame
         this.startPoint = undefined;
         this.camera.end();
         game.uiDrawer.clearAllObjects();
-        game.highlighter.clearSprites();
+        game.spriteHighlighter.clearSprites();
         game.updateWorld();
       }
       else if (event.originalEvent.ctrlKey ||
@@ -200,10 +204,10 @@ module CityGame
       this.selectedCells = game.activeBoard.getCells(
           game.activeTool.selectType(this.startCell, this.currCell));
 
-      game.highlighter.clearSprites();
+      game.spriteHighlighter.clearSprites();
       if (game.activeTool.tintColor !== null)
       {
-        game.highlighter.tintCells(this.selectedCells, game.activeTool.tintColor);
+        game.spriteHighlighter.tintCells(this.selectedCells, game.activeTool.tintColor);
       }
       if (game.activeTool.onHover)
       {
@@ -230,7 +234,7 @@ module CityGame
           centerSize: [4, 5],
           excludeStart: true
         });*/
-        game.highlighter.clearSprites();
+        game.spriteHighlighter.clearSprites();
         if (game.activeTool.onHover)
         {
           game.uiDrawer.clearAllObjects();
@@ -238,7 +242,7 @@ module CityGame
         }
         if (game.activeTool.tintColor !== null)
         {
-          game.highlighter.tintCells(this.selectedCells, game.activeTool.tintColor);
+          game.spriteHighlighter.tintCells(this.selectedCells, game.activeTool.tintColor);
         }
         game.updateWorld();
      }
@@ -253,7 +257,7 @@ module CityGame
       }
 
       game.uiDrawer.clearAllObjects();
-      game.highlighter.clearSprites();
+      game.spriteHighlighter.clearSprites();
       this.currAction = undefined;
       this.startCell = undefined;
       this.currCell = undefined;

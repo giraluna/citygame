@@ -110,19 +110,19 @@ var CityGame;
     }
     CityGame.setDeepProperties = setDeepProperties;
 
-    function deepDestroy(object) {
-        if (object.texture) {
-            if (object.texture.baseTexture.source._pixiId) {
-                PIXI.Texture.removeTextureFromCache(object.texture.baseTexture.source._pixiId);
+    function deepDestroy(toDestroy) {
+        if (toDestroy.texture) {
+            if (toDestroy.texture.baseTexture.source._pixiId) {
+                PIXI.Texture.removeTextureFromCache(toDestroy.texture.baseTexture.source._pixiId);
             }
-            object.texture.destroy(true);
+            toDestroy.texture.destroy(true);
         }
 
-        if (!object.children || object.children.length <= 0) {
+        if (!toDestroy.children || toDestroy.children.length <= 0) {
             return;
         } else {
-            for (var i = 0; i < object.children.length; i++) {
-                deepDestroy(object.children[i]);
+            for (var i = 0; i < toDestroy.children.length; i++) {
+                deepDestroy(toDestroy.children[i]);
             }
         }
     }
@@ -420,7 +420,7 @@ var CityGame;
         if (excludeStart) {
             rect = rect.filter(function (pos) {
                 if (pos[0] < start[0] && pos[0] > end[0] && pos[1] < start[1] && pos[1] > end[1]) {
-                    return pos;
+                    return true;
                 }
             });
         }
@@ -5431,9 +5431,9 @@ var CityGame;
             return Math.floor(100 * (current / this.getExperienceForLevel(this.level)));
         };
         Player.prototype.getModifiedProfit = function (initialAmount, type, baseMultiplier, includeGlobal) {
+            if (typeof baseMultiplier === "undefined") { baseMultiplier = 1; }
             if (typeof includeGlobal === "undefined") { includeGlobal = true; }
             var amount = initialAmount;
-            var baseMultiplier = baseMultiplier || 1;
 
             if (includeGlobal) {
                 amount += this.modifierEffects.profit["global"].addedProfit * baseMultiplier;
@@ -5457,6 +5457,7 @@ var CityGame;
             return amount;
         };
         Player.prototype.getIndexedProfit = function (type, amount, baseMultiplier) {
+            if (typeof baseMultiplier === "undefined") { baseMultiplier = 1; }
             if (!this.indexedProfits[type])
                 this.indexedProfits[type] = {};
 
@@ -5721,7 +5722,7 @@ var CityGame;
                 if (_cell.type.type === "water") {
                     _s.position.y -= 7;
                 } else {
-                    _s.position.y -= (_cell.sprite.height - SPRITE_HEIGHT);
+                    _s.position.y -= (_cell.sprite.height - CityGame.SPRITE_HEIGHT);
                 }
 
                 _cell.board.addSpriteToLayer(layer, _s, _cell.gridPos);
@@ -5797,7 +5798,7 @@ var CityGame;
         }
         Cell.prototype.init = function () {
             var _s = this.sprite = new CityGame.GroundSprite(this.type, this);
-            _s.position = CityGame.arrayToPoint(CityGame.getIsoCoord(this.gridPos[0], this.gridPos[1], TILE_WIDTH, TILE_HEIGHT, [WORLD_WIDTH / 2, SPRITE_HEIGHT]));
+            _s.position = CityGame.arrayToPoint(CityGame.getIsoCoord(this.gridPos[0], this.gridPos[1], CityGame.TILE_WIDTH, CityGame.TILE_HEIGHT, [CityGame.WORLD_WIDTH / 2, CityGame.SPRITE_HEIGHT]));
             this.board.addSpriteToLayer("ground", _s);
 
             if (this.type.effects) {
@@ -5807,9 +5808,9 @@ var CityGame;
         Cell.prototype.getScreenPos = function (container) {
             var wt = container.worldTransform;
             var zoom = wt.a;
-            var offset = [wt.tx + WORLD_WIDTH / 2 * zoom, wt.ty + TILE_HEIGHT / 2 * zoom];
+            var offset = [wt.tx + CityGame.WORLD_WIDTH / 2 * zoom, wt.ty + CityGame.TILE_HEIGHT / 2 * zoom];
 
-            return CityGame.getIsoCoord(this.gridPos[0], this.gridPos[1], TILE_WIDTH * zoom, TILE_HEIGHT * zoom, offset);
+            return CityGame.getIsoCoord(this.gridPos[0], this.gridPos[1], CityGame.TILE_WIDTH * zoom, CityGame.TILE_HEIGHT * zoom, offset);
         };
         Cell.prototype.getNeighbors = function (diagonal) {
             if (typeof diagonal === "undefined") { diagonal = false; }
@@ -6198,7 +6199,7 @@ var CityGame;
 
                 cell.updateLandValue();
             }
-            if (game.activeBoard && game.activeBoard.id === this.board.id) {
+            if (CityGame.game.activeBoard && CityGame.game.activeBoard.id === this.board.id) {
                 eventManager.dispatchEvent({ type: "updateLandValueMapmode", content: "" });
             }
         };
@@ -6232,7 +6233,7 @@ var CityGame;
 
                 cell.updateLandValue();
             }
-            if (game.activeBoard && game.activeBoard.id === this.board.id) {
+            if (CityGame.game.activeBoard && CityGame.game.activeBoard.id === this.board.id) {
                 eventManager.dispatchEvent({ type: "updateLandValueMapmode", content: "" });
             }
         };
@@ -6367,7 +6368,7 @@ var CityGame;
             }
 
             gfx.position = this.sprite.position.clone();
-            gfx.position.y -= (this.sprite.height - SPRITE_HEIGHT);
+            gfx.position.y -= (this.sprite.height - CityGame.SPRITE_HEIGHT);
             this.board.addSpriteToLayer("cellOverlay", gfx, this.gridPos);
 
             this.overlay = gfx;
@@ -6385,7 +6386,7 @@ var CityGame;
             }
 
             if (willUpdateNeighbors === false) {
-                game.updateWorld();
+                CityGame.game.updateWorld();
             }
         };
         Cell.prototype.removeOverlay = function () {
@@ -6472,19 +6473,25 @@ var CityGame;
         }
         MapGeneration.makeBlankCells = makeBlankCells;
 
-        function convertCells(cells, board, autoInit) {
-            for (var i = 0; i < cells.length; i++) {
-                for (var j = 0; j < cells[i].length; j++) {
-                    cells[i][j] = new CityGame.Cell([i, j], getIndexedType(cells[i][j]), board, autoInit);
+        function convertCells(cellTypes, board, autoInit) {
+            var resultCells = [];
+
+            for (var i = 0; i < cellTypes.length; i++) {
+                resultCells.push[i] = [];
+
+                for (var j = 0; j < cellTypes[i].length; j++) {
+                    resultCells[i][j] = new CityGame.Cell([i, j], getIndexedType(cellTypes[i][j]), board, autoInit);
                 }
             }
             if (autoInit !== true) {
-                for (var i = 0; i < cells.length; i++) {
-                    for (var j = 0; j < cells[i].length; j++) {
-                        cells[i][j].init();
+                for (var i = 0; i < resultCells.length; i++) {
+                    for (var j = 0; j < resultCells[i].length; j++) {
+                        resultCells[i][j].init();
                     }
                 }
             }
+
+            return resultCells;
         }
         MapGeneration.convertCells = convertCells;
 
@@ -7104,13 +7111,13 @@ var CityGame;
 
             this.population = props.population || CityGame.randInt(this.totalSize / 15, this.totalSize / 10);
 
-            this.cells = CityGame.MapGeneration.makeBlankCells({
+            this.generationCells = CityGame.MapGeneration.makeBlankCells({
                 width: this.width,
                 height: this.height
             });
 
             if (props.savedCells) {
-                CityGame.MapGeneration.convertCells(this.cells, this, true);
+                this.cells = CityGame.MapGeneration.convertCells(this.generationCells, this, true);
                 CityGame.MapGeneration.readSavedMap({
                     board: this,
                     savedCells: props.savedCells
@@ -7135,7 +7142,7 @@ var CityGame;
                 landThreshhold: 0.4
             });
             CityGame.MapGeneration.applyCoastsToCells({
-                cells: this.cells,
+                cells: this.generationCells,
                 primaryType: "grass",
                 subType: "water",
                 coasts: coasts
@@ -7154,22 +7161,22 @@ var CityGame;
                 landThreshhold: 0.2
             }, [this.width / 2 - this.width / 8, 0]);
 
-            this.cells = CityGame.MapGeneration.smoothCells(this.cells, 0.6, 1, 4);
-            this.cells = CityGame.MapGeneration.smoothCells(this.cells, 0.6, 2, 2);
-            this.cells = CityGame.MapGeneration.smoothCells(this.cells, 0.7, 3, 1);
+            this.generationCells = CityGame.MapGeneration.smoothCells(this.generationCells, 0.6, 1, 4);
+            this.generationCells = CityGame.MapGeneration.smoothCells(this.generationCells, 0.6, 2, 2);
+            this.generationCells = CityGame.MapGeneration.smoothCells(this.generationCells, 0.7, 3, 1);
 
             if (rivers) {
                 CityGame.MapGeneration.applyCoastsToCells({
-                    cells: this.cells,
+                    cells: this.generationCells,
                     primaryType: "water",
                     subType: "grass",
                     coasts: rivers
                 });
             }
 
-            this.cells = CityGame.MapGeneration.smoothCells(this.cells, 0.5, 1, 2);
+            this.generationCells = CityGame.MapGeneration.smoothCells(this.generationCells, 0.5, 1, 2);
 
-            CityGame.MapGeneration.convertCells(this.cells, this, false);
+            this.cells = CityGame.MapGeneration.convertCells(this.generationCells, this, false);
 
             var finishTime = window.performance ? window.performance.now() : Date.now();
             var elapsed = finishTime - startTime;
@@ -7238,6 +7245,139 @@ var CityGame;
     })();
     CityGame.Board = Board;
 })(CityGame || (CityGame = {}));
+/// <reference path="../lib/pixi.d.ts" />
+var CityGame;
+(function (CityGame) {
+    var Camera = (function () {
+        function Camera(container, bound) {
+            this.bounds = {};
+            this.currZoom = 1;
+            this.container = container;
+            this.bounds.min = bound; // sets clamp limit to percentage of screen from 0.0 to 1.0
+            this.bounds.max = Number((1 - bound).toFixed(1));
+            this.setBounds();
+            this.zoomField = document.getElementById("zoom-amount");
+        }
+        Camera.prototype.startScroll = function (mousePos) {
+            this.setBounds();
+            this.startClick = mousePos;
+            this.startPos = [this.container.position.x, this.container.position.y];
+        };
+        Camera.prototype.end = function () {
+            this.startPos = undefined;
+        };
+        Camera.prototype.setBounds = function () {
+            var rect = this.container.getLocalBounds();
+            this.width = CityGame.SCREEN_WIDTH;
+            this.height = CityGame.SCREEN_HEIGHT;
+            this.bounds = {
+                xMin: (this.width * this.bounds.min) - rect.width * this.container.scale.x,
+                xMax: (this.width * this.bounds.max),
+                yMin: (this.height * this.bounds.min) - rect.height * this.container.scale.y,
+                yMax: (this.height * this.bounds.max),
+                min: this.bounds.min,
+                max: this.bounds.max
+            };
+        };
+        Camera.prototype.getDelta = function (currPos) {
+            var x = this.startClick[0] - currPos[0];
+            var y = this.startClick[1] - currPos[1];
+            return [-x, -y];
+        };
+        Camera.prototype.move = function (currPos) {
+            var delta = this.getDelta(currPos);
+            this.container.position.x = this.startPos[0] + delta[0];
+            this.container.position.y = this.startPos[1] + delta[1];
+            this.clampEdges();
+        };
+        Camera.prototype.zoom = function (zoomAmount) {
+            var container = this.container;
+            var oldZoom = this.currZoom;
+
+            var zoomDelta = oldZoom - zoomAmount;
+            var rect = container.getLocalBounds();
+
+            //these 2 get position of screen center in relation to the container
+            //0: far left 1: far right
+            var xRatio = 1 - ((container.x - CityGame.SCREEN_WIDTH / 2) / rect.width / oldZoom + 1);
+            var yRatio = 1 - ((container.y - CityGame.SCREEN_HEIGHT / 2) / rect.height / oldZoom + 1);
+
+            var xDelta = rect.width * xRatio * zoomDelta;
+            var yDelta = rect.height * yRatio * zoomDelta;
+            container.position.x += xDelta;
+            container.position.y += yDelta;
+            container.scale.set(zoomAmount, zoomAmount);
+            this.zoomField.value = this.currZoom = zoomAmount;
+
+            eventManager.dispatchEvent({ type: "updateZoomValue", content: this.currZoom });
+        };
+        Camera.prototype.deltaZoom = function (delta, scale) {
+            if (delta === 0) {
+                return;
+            }
+            var direction = delta < 0 ? "out" : "in";
+            var adjDelta = 1 + Math.abs(delta) * scale;
+            if (direction === "out") {
+                this.zoom(this.currZoom / adjDelta);
+            } else {
+                this.zoom(this.currZoom * adjDelta);
+            }
+        };
+        Camera.prototype.clampEdges = function () {
+            var x = this.container.position.x;
+            var y = this.container.position.y;
+
+            //horizontal
+            //left edge
+            if (x < this.bounds.xMin) {
+                x = this.bounds.xMin;
+            } else if (x > this.bounds.xMax) {
+                x = this.bounds.xMax;
+            }
+
+            //vertical
+            //top
+            if (y < this.bounds.yMin) {
+                y = this.bounds.yMin;
+            } else if (y > this.bounds.yMax) {
+                y = this.bounds.yMax;
+            }
+
+            this.container.position.set(x, y);
+        };
+        return Camera;
+    })();
+    CityGame.Camera = Camera;
+})(CityGame || (CityGame = {}));
+/// <reference path="../lib/pixi.d.ts" />
+var eventManager = new PIXI.EventTarget();
+/// <reference path="eventmanager.ts" />
+var CityGame;
+(function (CityGame) {
+    (function (Options) {
+        Options.drawClickPopups = true;
+        eventManager.addEventListener("toggleDrawClickPopups", function () {
+            Options.drawClickPopups = !Options.drawClickPopups;
+            eventManager.dispatchEvent({ type: "saveOptions", content: null });
+        });
+
+        Options.autosaveLimit = 3;
+        eventManager.addEventListener("setAutosaveLimit", function (e) {
+            Options.autosaveLimit = e.content;
+            eventManager.dispatchEvent({ type: "saveOptions", content: null });
+        });
+
+        Options.autoSwitchTools = false;
+        eventManager.addEventListener("toggleAutoSwitchTools", function (e) {
+            Options.autoSwitchTools = !Options.autoSwitchTools;
+            eventManager.dispatchEvent({ type: "saveOptions", content: null });
+        });
+    })(CityGame.Options || (CityGame.Options = {}));
+    var Options = CityGame.Options;
+})(CityGame || (CityGame = {}));
+/// <reference path="camera.ts" />
+/// <reference path="cell.ts" />
+/// <reference path="options.ts" />
 var CityGame;
 (function (CityGame) {
     var MouseEventHandler = (function () {
@@ -7259,18 +7399,18 @@ var CityGame;
                 if (e.target.localName !== "canvas")
                     return;
                 self.camera.deltaZoom(-e.detail, 0.05);
-                game.uiDrawer.clearAllObjects();
+                CityGame.game.uiDrawer.clearAllObjects();
             });
             _canvas.addEventListener("mousewheel", function (e) {
                 if (e.target.localName !== "canvas")
                     return;
                 self.camera.deltaZoom(e.wheelDelta / 40, 0.05);
-                game.uiDrawer.clearAllObjects();
+                CityGame.game.uiDrawer.clearAllObjects();
             });
             _canvas.addEventListener("mouseout", function (e) {
                 if (e.target.localName !== "canvas")
                     return;
-                game.uiDrawer.removeActive();
+                CityGame.game.uiDrawer.removeActive();
             });
         }
         MouseEventHandler.prototype.preventGhost = function (delay) {
@@ -7282,19 +7422,19 @@ var CityGame;
             }, delay);
         };
         MouseEventHandler.prototype.mouseDown = function (event, targetType) {
-            game.uiDrawer.removeActive();
+            CityGame.game.uiDrawer.removeActive();
             if (event.originalEvent.button === 2 && this.currAction !== undefined && targetType === "stage") {
-                if (game.activeTool.onFinish) {
-                    game.activeTool.onFinish();
+                if (CityGame.game.activeTool.onFinish) {
+                    CityGame.game.activeTool.onFinish();
                 }
 
                 this.currAction = undefined;
                 this.stashedAction = undefined;
                 this.startPoint = undefined;
                 this.camera.end();
-                game.uiDrawer.clearAllObjects();
-                game.highlighter.clearSprites();
-                game.updateWorld();
+                CityGame.game.uiDrawer.clearAllObjects();
+                CityGame.game.spriteHighlighter.clearSprites();
+                CityGame.game.updateWorld();
             } else if (event.originalEvent.ctrlKey || event.originalEvent.metaKey || (event.originalEvent.button === 1 || event.originalEvent.button === 2)) {
                 this.startScroll(event);
             } else if (targetType === "world") {
@@ -7329,14 +7469,14 @@ var CityGame;
             this.currAction = "scroll";
             this.startPoint = [event.global.x, event.global.y];
             this.camera.startScroll(this.startPoint);
-            game.uiDrawer.clearAllObjects();
+            CityGame.game.uiDrawer.clearAllObjects();
         };
         MouseEventHandler.prototype.startZoom = function (event) {
             if (this.currAction === "cellAction")
                 this.stashedAction = "cellAction";
             this.currAction = "zoom";
             this.startPoint = this.currPoint = [event.global.x, event.global.y];
-            game.uiDrawer.clearAllObjects();
+            CityGame.game.uiDrawer.clearAllObjects();
         };
         MouseEventHandler.prototype.stageMove = function (event) {
             if (this.currAction === "scroll") {
@@ -7366,12 +7506,12 @@ var CityGame;
         // (that have hit masks) to support slopes / variable height
         MouseEventHandler.prototype.startCellAction = function (event) {
             var pos = event.getLocalPosition(event.target);
-            var gridPos = CityGame.getOrthoCoord([pos.x, pos.y + 7], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
+            var gridPos = CityGame.getOrthoCoord([pos.x, pos.y + 7], [CityGame.TILE_WIDTH, CityGame.TILE_HEIGHT], [CityGame.TILES, CityGame.TILES]);
 
-            if (Options.autoSwitchTools) {
-                game.activeTool.tempContinuous = event.originalEvent.shiftKey;
+            if (CityGame.Options.autoSwitchTools) {
+                CityGame.game.activeTool.tempContinuous = event.originalEvent.shiftKey;
             } else {
-                game.activeTool.tempContinuous = !event.originalEvent.shiftKey;
+                CityGame.game.activeTool.tempContinuous = !event.originalEvent.shiftKey;
             }
 
             this.currAction = "cellAction";
@@ -7379,26 +7519,26 @@ var CityGame;
             this.currCell = gridPos;
 
             //this.selectedCells = [game.activeBoard.getCell(gridPos)];
-            this.selectedCells = game.activeBoard.getCells(game.activeTool.selectType(this.startCell, this.currCell));
+            this.selectedCells = CityGame.game.activeBoard.getCells(CityGame.game.activeTool.selectType(this.startCell, this.currCell));
 
-            game.highlighter.clearSprites();
-            if (game.activeTool.tintColor !== null) {
-                game.highlighter.tintCells(this.selectedCells, game.activeTool.tintColor);
+            CityGame.game.spriteHighlighter.clearSprites();
+            if (CityGame.game.activeTool.tintColor !== null) {
+                CityGame.game.spriteHighlighter.tintCells(this.selectedCells, CityGame.game.activeTool.tintColor);
             }
-            if (game.activeTool.onHover) {
-                game.uiDrawer.clearAllObjects();
-                game.activeTool.onHover(this.selectedCells);
+            if (CityGame.game.activeTool.onHover) {
+                CityGame.game.uiDrawer.clearAllObjects();
+                CityGame.game.activeTool.onHover(this.selectedCells);
             }
-            game.updateWorld();
+            CityGame.game.updateWorld();
         };
         MouseEventHandler.prototype.worldMove = function (event) {
             var pos = event.getLocalPosition(event.target);
-            var gridPos = CityGame.getOrthoCoord([pos.x, pos.y + 7], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
+            var gridPos = CityGame.getOrthoCoord([pos.x, pos.y + 7], [CityGame.TILE_WIDTH, CityGame.TILE_HEIGHT], [CityGame.TILES, CityGame.TILES]);
 
             if (!this.currCell || gridPos[0] !== this.currCell[0] || gridPos[1] !== this.currCell[1]) {
                 this.currCell = gridPos;
 
-                this.selectedCells = game.activeBoard.getCells(game.activeTool.selectType(this.startCell, this.currCell));
+                this.selectedCells = CityGame.game.activeBoard.getCells(CityGame.game.activeTool.selectType(this.startCell, this.currCell));
 
                 /*
                 this.selectedCells = game.activeBoard.getCell(this.currCell).getArea(
@@ -7407,41 +7547,41 @@ var CityGame;
                 centerSize: [4, 5],
                 excludeStart: true
                 });*/
-                game.highlighter.clearSprites();
-                if (game.activeTool.onHover) {
-                    game.uiDrawer.clearAllObjects();
-                    game.activeTool.onHover(this.selectedCells);
+                CityGame.game.spriteHighlighter.clearSprites();
+                if (CityGame.game.activeTool.onHover) {
+                    CityGame.game.uiDrawer.clearAllObjects();
+                    CityGame.game.activeTool.onHover(this.selectedCells);
                 }
-                if (game.activeTool.tintColor !== null) {
-                    game.highlighter.tintCells(this.selectedCells, game.activeTool.tintColor);
+                if (CityGame.game.activeTool.tintColor !== null) {
+                    CityGame.game.spriteHighlighter.tintCells(this.selectedCells, CityGame.game.activeTool.tintColor);
                 }
-                game.updateWorld();
+                CityGame.game.updateWorld();
             }
         };
         MouseEventHandler.prototype.worldEnd = function (event) {
-            game.activeTool.activate(this.selectedCells);
+            CityGame.game.activeTool.activate(this.selectedCells);
 
-            if (game.activeTool.onFinish) {
-                game.activeTool.onFinish();
+            if (CityGame.game.activeTool.onFinish) {
+                CityGame.game.activeTool.onFinish();
             }
 
-            game.uiDrawer.clearAllObjects();
-            game.highlighter.clearSprites();
+            CityGame.game.uiDrawer.clearAllObjects();
+            CityGame.game.spriteHighlighter.clearSprites();
             this.currAction = undefined;
             this.startCell = undefined;
             this.currCell = undefined;
             this.selectedCells = undefined;
 
-            game.updateWorld(true);
+            CityGame.game.updateWorld(true);
         };
         MouseEventHandler.prototype.hover = function (event) {
             var pos = event.getLocalPosition(event.target);
-            var gridPos = CityGame.getOrthoCoord([pos.x, pos.y + 7], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
-            var currCell = game.activeBoard.getCell(gridPos);
+            var gridPos = CityGame.getOrthoCoord([pos.x, pos.y + 7], [CityGame.TILE_WIDTH, CityGame.TILE_HEIGHT], [CityGame.TILES, CityGame.TILES]);
+            var currCell = CityGame.game.activeBoard.getCell(gridPos);
 
             // TEMPORARY
-            if ((!gridPos) || (gridPos[0] >= TILES || gridPos[1] >= TILES) || (gridPos[0] < 0 || gridPos[1] < 0)) {
-                game.uiDrawer.removeActive();
+            if ((!gridPos) || (gridPos[0] >= CityGame.TILES || gridPos[1] >= CityGame.TILES) || (gridPos[0] < 0 || gridPos[1] < 0)) {
+                CityGame.game.uiDrawer.removeActive();
                 return;
             }
 
@@ -7449,18 +7589,16 @@ var CityGame;
                 this.hoverCell = gridPos;
             if (gridPos[0] !== this.hoverCell[0] || gridPos[1] !== this.hoverCell[1]) {
                 this.hoverCell = gridPos;
-                game.uiDrawer.removeActive();
-                game.uiDrawer.clearAllObjects();
-                game.uiDrawer.makeCellTooltip(event, currCell, event.target);
-                game.uiDrawer.makeBuildingTipsForCell(currCell);
+                CityGame.game.uiDrawer.removeActive();
+                CityGame.game.uiDrawer.clearAllObjects();
+                CityGame.game.uiDrawer.makeCellTooltip(event, currCell, event.target);
+                CityGame.game.uiDrawer.makeBuildingTipsForCell(currCell);
             }
         };
         return MouseEventHandler;
     })();
     CityGame.MouseEventHandler = MouseEventHandler;
 })(CityGame || (CityGame = {}));
-/// <reference path="../lib/pixi.d.ts" />
-var eventManager = new PIXI.EventTarget();
 /// <reference path="eventmanager.ts" />
 var keyboardStates = {
     "default": {
@@ -7639,15 +7777,264 @@ var SpriteHighlighter = (function () {
     };
     return SpriteHighlighter;
 })();
+/// <reference path="../lib/pixi.d.ts" />
+/// <reference path="utility.ts" />
+var CityGame;
+(function (CityGame) {
+    var UIObject = (function (_super) {
+        __extends(UIObject, _super);
+        function UIObject(parent, destroyChildren) {
+            if (typeof destroyChildren === "undefined") { destroyChildren = true; }
+            _super.call(this);
+            this._timeouts = {};
+            this._callbacks = {
+                start: [],
+                added: [],
+                complete: []
+            };
+            this._delay = 0;
+            this._lifeTime = -1;
+            this.visible = false;
+            this.setParent(parent);
+            this._destroyChildren = destroyChildren;
+
+            return this;
+        }
+        UIObject.prototype.start = function () {
+            var self = this;
+
+            self.fireCallbacks("start");
+            self._timeouts["add"] = window.setTimeout(function UIObjectAddFN() {
+                self._parent.addChild(self);
+                self.visible = true;
+                self.fireCallbacks("added");
+
+                if (self._lifeTime > 0) {
+                    self._timeouts["remove"] = window.setTimeout(function UIObjectRemoveFN() {
+                        self.remove.call(self);
+                    }, self._lifeTime);
+                }
+            }, self._delay);
+            return this;
+        };
+        UIObject.prototype.setParent = function (parent) {
+            this._parent = parent;
+            return this;
+        };
+        UIObject.prototype.delay = function (time) {
+            this._delay = time;
+            return this;
+        };
+        UIObject.prototype.lifeTime = function (time) {
+            this._lifeTime = time;
+            return this;
+        };
+        UIObject.prototype.addChild = function (child) {
+            _super.prototype.addChild.call(this, child);
+            return this;
+        };
+        UIObject.prototype.fireCallbacks = function (id) {
+            if (!this._callbacks[id]) {
+                throw new Error("UIObject fired callbacks with id: " + id);
+                return;
+            }
+            var callbacks = this._callbacks[id];
+
+            for (var i = 0; i < callbacks.length; i++) {
+                callbacks[i].call();
+            }
+            return this;
+        };
+        UIObject.prototype.remove = function () {
+            this.fireCallbacks("complete");
+            this.clearTimeouts();
+            if (this.parent) {
+                this.parent.removeChild(this);
+            }
+            if (this._destroyChildren)
+                CityGame.deepDestroy(this);
+        };
+        UIObject.prototype.onStart = function (callback) {
+            this._callbacks["start"].push(callback);
+            return this;
+        };
+        UIObject.prototype.onAdded = function (callback) {
+            this._callbacks["added"].push(callback);
+            return this;
+        };
+        UIObject.prototype.onComplete = function (callback) {
+            this._callbacks["complete"].push(callback);
+            return this;
+        };
+        UIObject.prototype.clearTimeouts = function () {
+            for (var timeout in this._timeouts) {
+                window.clearTimeout(this._timeouts[timeout]);
+            }
+        };
+        return UIObject;
+    })(PIXI.DisplayObjectContainer);
+    CityGame.UIObject = UIObject;
+})(CityGame || (CityGame = {}));
+/// <reference path="../lib/pixi.d.ts" />
+/// <reference path="../lib/tween.js.d.ts" />
+/// <reference path="utility.ts" />
+var CityGame;
+(function (CityGame) {
+    function makeToolTip(data, text) {
+        var toolTip = new PIXI.DisplayObjectContainer;
+        var speechRect;
+
+        if (data.autoSize || !data.width) {
+            speechRect = makeSpeechRect(data, text);
+        } else {
+            speechRect = makeSpeechRect(data);
+        }
+        var speechPoly = speechRect[0];
+        var topLeft = speechRect[1];
+
+        var gfx = new PIXI.Graphics();
+        drawPolygon(gfx, speechPoly, data.style.lineStyle, data.style.fillStyle);
+
+        text.position.set(topLeft[0] + data.padding[0], topLeft[1] + data.padding[1]);
+
+        toolTip.addChild(gfx);
+        toolTip.addChild(text);
+
+        return toolTip;
+    }
+    CityGame.makeToolTip = makeToolTip;
+
+    function drawPolygon(gfx, polygon, lineStyle, fillStyle) {
+        //TODO : floating point errors
+        gfx.lineStyle(lineStyle.width, lineStyle.color, lineStyle.alpha);
+        gfx.beginFill(fillStyle.color, fillStyle.alpha);
+
+        gfx.moveTo(polygon[0][0], polygon[0][1]);
+
+        for (var i = 1; i < polygon.length; i++) {
+            if (!(polygon[i][0] === polygon[i - 1][0] && polygon[i][1] === polygon[i - 1][1])) {
+                var x = polygon[i][0];
+                var y = polygon[i][1];
+                gfx.lineTo(x, y);
+            }
+        }
+        gfx.endFill();
+
+        // draw dots at the corners
+        /*
+        for (var i = 1; i < polygon.length; i++)
+        {
+        gfx.beginFill();
+        gfx.drawEllipse(polygon[i][0], polygon[i][1], 3, 3);
+        gfx.endFill();
+        }
+        */
+        return gfx;
+    }
+    CityGame.drawPolygon = drawPolygon;
+
+    function makeSpeechRect(data, text) {
+        /*
+        4|---------------------------|3
+        |                           |
+        |                           |
+        |                           |
+        5|----|  /-------------------|2
+        6| / 1
+        |/
+        7,0
+        
+        7,0
+        |\
+        6| \ 1
+        5|----|  \-------------------|2
+        |                           |
+        |                           |
+        |                           |
+        4|---------------------------|3
+        */
+        var width = data.width || 200;
+        var height = data.height || 100;
+        var padding = data.padding || 10;
+
+        var tipPos = data.tipPos || 0.25;
+        var tipWidth = data.tipWidth || 10;
+        var tipHeight = data.tipHeight || 20;
+        var tipDir = data.tipDir || "right";
+        var pointing = data.pointing || "down";
+
+        if (text) {
+            width = text.width + padding[0] * 2;
+            height = text.height + padding[1] * 2;
+        }
+
+        var xMax = width * (1 - tipPos);
+        var yMax = height + tipHeight;
+        var xMin = -width * tipPos;
+        var yMin = tipHeight;
+        var dir = (pointing === "down") ? -1 : 1;
+
+        var polygon;
+        var topLeft;
+
+        // make base polygon
+        if (pointing === "down") {
+            polygon = [
+                [0, 0],
+                [0, -yMin],
+                [xMax, -yMin],
+                [xMax, -yMax],
+                [xMin, -yMax],
+                [xMin, -yMin],
+                [0, -yMin],
+                [0, 0]
+            ];
+            topLeft = [xMin, -yMax];
+        } else if (pointing === "up") {
+            polygon = [
+                [0, 0],
+                [0, yMin],
+                [xMax, yMin],
+                [xMax, yMax],
+                [xMin, yMax],
+                [xMin, yMin],
+                [0, yMin],
+                [0, 0]
+            ];
+            topLeft = [xMin, yMin];
+        }
+
+        // adjust direction tip slants in
+        if (tipDir === "right") {
+            polygon[1][0] = tipWidth;
+        } else if (tipDir === "left") {
+            polygon[6][0] = -tipWidth;
+        }
+
+        // adjust for extreme tip position
+        if (tipPos < 0) {
+            polygon[1][0] = polygon[5][0] + tipWidth;
+            polygon[5] = polygon[6] = [polygon[5][0], polygon[5][1] + tipWidth * dir];
+        } else if (tipPos > 1) {
+            polygon[6][0] = polygon[2][0] - tipWidth;
+            polygon[2] = polygon[1] = [polygon[2][0], polygon[2][1] + tipWidth * dir];
+        }
+
+        return [polygon, topLeft];
+    }
+    CityGame.makeSpeechRect = makeSpeechRect;
+})(CityGame || (CityGame = {}));
+/// <reference path="../lib/pixi.d.ts" />
+/// <reference path="uiobject.ts" />
+/// <reference path="uidrawingfunctions.ts" />
 var CityGame;
 (function (CityGame) {
     var UIDrawer = (function () {
         function UIDrawer() {
-            this.fonts = {};
             this.styles = {};
             this.textureCache = {};
             this.permanentUIObjects = [];
-            this.layer = game.layers["tooltips"];
+            this.layer = CityGame.game.layers["tooltips"];
             this.init();
         }
         UIDrawer.prototype.init = function () {
@@ -7721,9 +8108,9 @@ var CityGame;
 
             var text = cell.content ? cell.content.type.title || cell.content.type.type : cell.type["type"];
 
-            if (game.worldRenderer.currentMapmode === "landValue") {
+            if (CityGame.game.worldRenderer.currentMapmode === "landValue") {
                 text += "\nLand value: " + cell.landValue;
-                text += "\nApproximate cost: " + parseInt(game.players.player0.getCellBuyCost(cell));
+                text += "\nApproximate cost: " + CityGame.game.players["player0"].getCellBuyCost(cell);
             }
 
             /*
@@ -7739,7 +8126,7 @@ var CityGame;
             }
             }*/
             if (cell.content && cell.content.player && cell.content.baseProfit) {
-                var finalAmount = game.players.player0.getIndexedProfit(cell.content.type.categoryType, cell.content.modifiedProfit).toFixed(2);
+                var finalAmount = CityGame.game.players["player0"].getIndexedProfit(cell.content.type.categoryType, cell.content.modifiedProfit).toFixed(2);
                 text += "\n--------------\n";
                 text += "Base profit: " + cell.content.baseProfit.toFixed(2) + "/d" + "\n";
                 text += "-------\n";
@@ -7762,7 +8149,7 @@ var CityGame;
 
             // change slant of the tip based on screen position
             // 100 pix buffer is arbitrary for now
-            if (screenX + textObject.width + 100 > SCREEN_WIDTH) {
+            if (screenX + textObject.width + 100 > CityGame.SCREEN_WIDTH) {
                 tipDir = "left";
                 tipPos = 0.75;
             } else {
@@ -7776,9 +8163,9 @@ var CityGame;
             var x = cellX;
             var y = (cell.content && pointing === "down") ? cellY - cell.content.sprites[0].height * cell.content.sprites[0].worldTransform.a / 2 : cellY;
 
-            var uiObj = this.active = new UIObject(this.layer).delay(1000).lifeTime(-1);
+            var uiObj = this.active = new CityGame.UIObject(this.layer).delay(1000).lifeTime(-1);
 
-            var toolTip = makeToolTip({
+            var toolTip = CityGame.makeToolTip({
                 style: this.styles["base"],
                 autoSize: true,
                 tipPos: tipPos,
@@ -7788,7 +8175,7 @@ var CityGame;
                 pointing: pointing,
                 padding: [10, 10]
             }, textObject);
-            uiObj.position.set(Math.round(x), Math.round(y - (cell.sprite.height - SPRITE_HEIGHT)));
+            uiObj.position.set(Math.round(x), Math.round(y - (cell.sprite.height - CityGame.SPRITE_HEIGHT)));
 
             uiObj.addChild(toolTip);
             uiObj.start();
@@ -7844,7 +8231,7 @@ var CityGame;
             }
             for (var _type in toDrawOn) {
                 for (var i = 0; i < toDrawOn[_type].length; i++) {
-                    this.makeBuildingPlacementTip(toDrawOn[_type][i], _type, game.worldRenderer.worldSprite);
+                    this.makeBuildingPlacementTip(toDrawOn[_type][i], _type, CityGame.game.worldRenderer.worldSprite);
                 }
             }
         };
@@ -7852,7 +8239,7 @@ var CityGame;
             var pos = cell.getScreenPos(container);
             var content = new PIXI.Sprite(this.textureCache.buildingPlacement[type]);
 
-            var uiObj = new UIObject(this.layer, false);
+            var uiObj = new CityGame.UIObject(this.layer, false);
             uiObj.position.set(pos[0], pos[1] - 10);
 
             uiObj.addChild(content);
@@ -7874,7 +8261,7 @@ var CityGame;
             });
             tween.easing(easing);
 
-            var uiObj = new UIObject(this.layer).lifeTime(lifeTime).onAdded(function () {
+            var uiObj = new CityGame.UIObject(this.layer).lifeTime(lifeTime).onAdded(function () {
                 tween.start();
             }).onComplete(function () {
                 TWEEN.remove(tween);
@@ -7911,436 +8298,2814 @@ var CityGame;
     })();
     CityGame.UIDrawer = UIDrawer;
 })(CityGame || (CityGame = {}));
-/// <reference path="../../lib/react.d.ts" />
-/// <reference path="../../lib/pixi.d.ts" />
-var ReactUI = (function () {
-    function ReactUI(player, frameImages) {
+/// <reference path="../lib/pixi.d.ts" />
+///
+/// <reference path="spritehighlighter.ts" />
+/// <reference path="eventmanager.ts" />
+var SpriteBlinker = (function (_super) {
+    __extends(SpriteBlinker, _super);
+    function SpriteBlinker(delay, color, repeat, autoStart) {
+        if (typeof autoStart === "undefined") { autoStart = true; }
+        _super.call(this);
+        this.delay = delay;
+        this.color = color;
+        this.repeat = repeat;
+        this.toBlink = {};
         this.idGenerator = 0;
-        this.popups = {};
-        this.notifications = [];
-        this.topZIndex = 15;
-        this.icons = {};
-        this.player = player;
-        this.frameImages = frameImages;
-        this.init();
+        this.blinkFunctions = [];
+        this.onRemoveCallbacks = {};
+
+        this.repeat = repeat * 2;
+
+        this.makeBlinkFunctions();
+
+        if (autoStart)
+            this.start();
+
+        return this;
     }
-    ReactUI.prototype.init = function () {
-        React.initializeTouchEvents(true);
-        this.addEventListeners();
+    SpriteBlinker.prototype.getToBlink = function (id) {
+        if (id)
+            return this.toBlink[id];
+        else {
+            var cells = [];
 
-        this.icons = {
-            newEmployee: "img/icons/newemployee.png"
-        };
-
-        this.updateReact();
-
-        // chrome doesnt work when called via reuqestAnimationFrame
-        this.updateInterval = window.setInterval(this.updateReact.bind(this), 1000);
+            for (var group in this.toBlink) {
+                cells = cells.concat(this.toBlink[group]);
+            }
+            return cells;
+        }
     };
-    ReactUI.prototype.addEventListeners = function () {
-        var self = this;
-
-        eventManager.addEventListener("makeEmployeeActionPopup", function (event) {
-            self.makeEmployeeActionPopup(event.content);
-        });
-        eventManager.addEventListener("makeRecruitPopup", function (event) {
-            self.makeRecruitPopup(event.content);
-        });
-        eventManager.addEventListener("makeRecruitCompletePopup", function (event) {
-            self.makeRecruitCompletePopup(event.content);
-        });
-        eventManager.addEventListener("makeRecruitCompleteNotification", function (event) {
-            event.content.delay = 0;
-            self.makeNotification({
-                icon: self.icons.newEmployee,
-                onOk: self.makeRecruitCompletePopup.bind(self, event.content)
-            });
-        });
-        eventManager.addEventListener("makeCellBuyPopup", function (event) {
-            self.makeCellBuyPopup(event.content);
-        });
-        eventManager.addEventListener("makeConfirmPopup", function (event) {
-            self.makeConfirmPopup(event.content);
-        });
-        eventManager.addEventListener("makePopup", function (event) {
-            self.makePopup(event.content.type, event.content.props);
-        });
-        eventManager.addEventListener("makeInfoPopup", function (event) {
-            self.makeInfoPopup(event.content);
-        });
-        eventManager.addEventListener("makeBuildingSelectPopup", function (event) {
-            self.makeBuildingSelectPopup(event.content);
-        });
-        eventManager.addEventListener("makeBuildingConstructPopup", function (event) {
-            self.makeBuildingConstructPopup(event.content);
-        });
-        eventManager.addEventListener("makeInputPopup", function (event) {
-            self.makeInputPopup(event.content);
-        });
-        eventManager.addEventListener("makeLoadPopup", function (event) {
-            self.makeLoadPopup();
-        });
-        eventManager.addEventListener("makeSavePopup", function (event) {
-            self.makeSavePopup();
-        });
-        eventManager.addEventListener("makeModifierPopup", function (event) {
-            self.makeModifierPopup(event.content);
-        });
-        eventManager.addEventListener("makeNotification", function (event) {
-            self.makeNotification(event.content);
-        });
-        eventManager.addEventListener("closeTopPopup", function (event) {
-            self.closeTopPopup();
-        });
-        eventManager.addEventListener("clearReact", function (event) {
-            self.clear();
-        });
-        eventManager.addEventListener("updateReact", function (event) {
-            self.updateReact();
-        });
-    };
-
-    ///// /////
-    ReactUI.prototype.makePopup = function (type, props) {
-        var key = this.idGenerator++;
-
-        var onCloseCallback = props.onClose;
-        props.onClose = function () {
-            this.destroyPopup(key, onCloseCallback);
+    SpriteBlinker.prototype.makeBlinkFunctions = function () {
+        // allows dynamic assignment
+        var getColor = function getColorFN() {
+            return this.color;
         }.bind(this);
 
-        var zIndex = this.incrementZIndex();
-        var popupProps = {};
-        for (var prop in props) {
-            popupProps[prop] = props[prop];
-        }
-        ;
-        popupProps.key = key;
-
-        var container = document.getElementById("react-popups");
-         {
-        }
-        var basePos = {
-            top: 0,
-            left: 0
-        };
-        popupProps.initialStyle = {
-            top: window.innerHeight / 3.5 - 120 + Object.keys(this.popups).length * 15,
-            left: window.innerWidth / 3.5 - 120 + Object.keys(this.popups).length * 15,
-            zIndex: zIndex
-        };
-        popupProps.incrementZIndex = this.incrementZIndex.bind(this, key);
-
-        var popup = {
-            type: type,
-            props: popupProps,
-            zIndex: zIndex
-        };
-
-        this.popups[key] = popup;
-        this.updateReact();
-    };
-
-    ReactUI.prototype.makeEmployeeActionPopup = function (props) {
-        this.makePopup("EmployeeActionPopup", props);
-    };
-
-    ReactUI.prototype.makeInfoPopup = function (props) {
-        this.makePopup("InfoPopup", props);
-    };
-    ReactUI.prototype.makeLoadPopup = function () {
-        this.makePopup("LoadPopup", {
-            onOk: function (name) {
-                eventManager.dispatchEvent({
-                    type: "loadGame",
-                    content: name
-                });
-            }
-        });
-    };
-
-    ReactUI.prototype.makeSavePopup = function () {
-        this.makePopup("SavePopup", {
-            onOk: function (name) {
-                eventManager.dispatchEvent({
-                    type: "saveGame",
-                    content: name
-                });
-            }
-        });
-    };
-
-    ReactUI.prototype.makeModifierPopup = function (props) {
-        var onOk = props.onOk || function (selected) {
-            props.player.addModifier(selected.data.modifier);
-            eventManager.dispatchEvent({ type: "updateReact", content: "" });
-
-            return false;
-        };
-
-        this.makePopup("ModifierPopup", {
-            player: props.player,
-            text: props.text || null,
-            modifierList: props.modifierList || props.player.unlockedModifiers,
-            excludeCost: props.excludeCost || false,
-            onOk: onOk,
-            onClose: props.onClose || null,
-            okBtnText: props.okBtnText || "Buy"
-        });
-    };
-
-    ReactUI.prototype.makeRecruitPopup = function (props) {
-        var self = this;
-        var recruitWithSelected = function (selected) {
-            actions.recruitEmployee({
-                playerId: props.player.id,
-                employeeId: selected.employee.id
-            });
-        };
-        this.makeEmployeeActionPopup({
-            player: props.player,
-            relevantSkills: ["recruitment"],
-            text: "Select employee in charge of recruitment",
-            onOk: recruitWithSelected,
-            okBtnText: "Select",
-            action: {
-                actionText: "Scouting new employees would take:",
-                data: {
-                    time: {
-                        approximate: true,
-                        amount: 14
-                    }
-                }
-            }
-        });
-    };
-
-    ReactUI.prototype.makeRecruitCompletePopup = function (props) {
-        var self = this;
-        var recruitConfirmFN = function (selected) {
-            props.player.addEmployee(selected.employee);
-        };
-
-        if (!isFinite(props.delay))
-            props.delay = 2000;
-
-        var recruitCloseFN = function (selected) {
-            if (props.recruitingEmployee) {
-                props.recruitingEmployee.active = true;
-                self.updateReact();
-            }
-        };
-        this.makeEmployeeActionPopup({
-            employees: props.employees,
-            text: props.text || "Choose employee to recruit",
-            onOk: recruitConfirmFN,
-            onClose: recruitCloseFN,
-            okBtnText: "Recruit",
-            activationDelay: props.delay
-        });
-    };
-
-    ReactUI.prototype.makeCellBuyPopup = function (props) {
-        if (Object.keys(props.player.employees).length < 1) {
-            this.makeInfoPopup({ text: "Recruit some employees first" });
-            return;
-        }
-
-        if (props.player.ownedCells[props.cell.gridPos])
-            return;
-        if (props.cell.type.type === "water")
-            return;
-        if (props.cell.content)
-            return;
-
-        var buyCost = props.player.getCellBuyCost(props.cell);
-
-        var buySelected = function (selected) {
-            var adjusted = actions.getActionCost([selected.employee.skills["negotiation"]], buyCost).actual;
-
-            if (props.player.money < adjusted) {
-                eventManager.dispatchEvent({
-                    type: "makeInfoPopup",
-                    content: {
-                        text: "Not enough funds"
-                    }
-                });
-
-                return false;
-            }
-
-            actions.buyCell({
-                gridPos: props.cell.gridPos,
-                boardId: props.cell.board.id,
-                playerId: props.player.id,
-                employeeId: selected.employee.id
-            });
-
-            if (props.onOk)
-                props.onOk.call();
-            return true;
-        };
-        this.makeEmployeeActionPopup({
-            player: props.player,
-            relevantSkills: ["negotiation"],
-            text: "Select employee in charge of purchasing the plot",
-            onOk: buySelected,
-            okBtnText: "Buy",
-            action: {
-                target: props.cell,
-                actionText: "Buying this plot would take:",
-                data: {
-                    time: {
-                        approximate: true,
-                        amount: 14
-                    },
-                    cost: {
-                        approximate: false,
-                        amount: buyCost
-                    }
-                }
-            }
-        });
-    };
-    ReactUI.prototype.makeConfirmPopup = function (props) {
-        this.makePopup("ConfirmPopup", props);
-    };
-    ReactUI.prototype.makeBuildingSelectPopup = function (props) {
-        if (Object.keys(props.player.employees).length < 1) {
-            this.makeInfoPopup({ text: "Recruit some employees first" });
-            return;
-        }
-
-        this.makePopup("BuildingListPopup", {
-            player: props.player,
-            buildingTemplates: cg.content.buildings,
-            buildingImages: this.frameImages,
-            onOk: props.onOk
-        });
-    };
-    ReactUI.prototype.makeBuildingConstructPopup = function (props) {
-        var buildBuilding = function (selected) {
-            if (selected) {
-                actions.constructBuilding({
-                    playerId: props.player.id,
-                    gridPos: props.cell.gridPos,
-                    boardId: props.cell.board.id,
-                    buildingType: props.buildingTemplate.type,
-                    employeeId: selected.employee.id
-                });
-                props.onOk.call();
-            }
-        };
-        this.makeEmployeeActionPopup({
-            player: props.player,
-            relevantSkills: ["construction"],
-            text: "Select employee in charge of construction",
-            onOk: buildBuilding,
-            okBtnText: "Build",
-            action: {
-                target: props.cell,
-                actionText: "Constructing this building would take:",
-                data: {
-                    time: {
-                        approximate: true,
-                        amount: props.buildingTemplate.buildTime
-                    },
-                    cost: {
-                        approximate: false,
-                        amount: props.player.getBuildCost(props.buildingTemplate)
-                    }
-                },
-                baseDuration: props.buildingTemplate.buildTime,
-                exactCost: props.buildingTemplate.cost
-            }
-        });
-    };
-
-    ReactUI.prototype.makeInputPopup = function (props) {
-        this.makePopup("InputPopup", props);
-    };
-
-    ///// /////
-    ReactUI.prototype.makeNotification = function (props) {
-        props.id = this.idGenerator++;
-
-        props.onClose = function () {
-            props.onOk.call();
-            this.removeNotification(props.id);
+        var tintFN = function () {
+            this.tintCells(this.getToBlink(), getColor(), false);
         }.bind(this);
+        var clearFN = this.clearFN = function (id) {
+            this.tintCells(this.getToBlink(id), 0xFFFFFF, false);
+        }.bind(this);
+        this.blinkFunctions = [tintFN, clearFN];
 
-        this.notifications.push(props);
+        this.blink = function loopFN() {
+            this.blinkFunctions[0].call();
+            this.blinkFunctions[this.blinkFunctions.length - 1] = this.blinkFunctions.shift();
+            eventManager.dispatchEvent({ type: "updateWorld", content: "" });
 
-        this.updateReact();
+            if (this.repeat > 0) {
+                this.repeat--;
+                if (this.repeat <= 0)
+                    this.stop();
+            }
+        }.bind(this);
     };
-    ReactUI.prototype.removeNotification = function (id) {
-        this.notifications = this.notifications.filter(function (item) {
-            return item.id !== id;
-        });
-
-        this.updateReact();
-    };
-
-    ///// OTHER METHODS /////
-    ReactUI.prototype.incrementZIndex = function (key) {
-        var newZIndex = this.topZIndex++;
-        if (key) {
-            this.popups[key].zIndex = newZIndex;
+    SpriteBlinker.prototype.addCells = function (cells, onRemove, id) {
+        if (typeof id === "undefined") { id = this.idGenerator++; }
+        if (!this.toBlink[id])
+            this.toBlink[id] = cells;
+        else {
+            this.toBlink[id] = this.toBlink[id].concat(cells);
         }
-        return newZIndex;
-    };
-    ReactUI.prototype.destroyPopup = function (key, callback) {
-        if (callback)
-            callback.call();
 
-        this.popups[key] = null;
-        delete this.popups[key];
+        if (onRemove) {
+            this.onRemoveCallbacks[id] = onRemove;
+        }
 
-        this.updateReact();
+        return id;
     };
-    ReactUI.prototype.closeTopPopup = function () {
-        if (Object.keys(this.popups).length < 1)
+    SpriteBlinker.prototype.removeCells = function (id) {
+        if (!this.toBlink[id])
             return;
         else {
-            var max = 0;
-            var key;
-            for (var popup in this.popups) {
-                if (this.popups[popup].zIndex > max) {
-                    max = this.popups[popup].zIndex;
-                    key = popup;
+            if (Object.keys(this.toBlink).length <= 1) {
+                this.stop();
+            } else {
+                this.clearFN(id);
+                this.toBlink[id] = null;
+                delete this.toBlink[id];
+            }
+
+            if (this.onRemoveCallbacks[id]) {
+                this.onRemoveCallbacks[id].call();
+                this.onRemoveCallbacks[id] = null;
+                delete this.onRemoveCallbacks[id];
+            }
+        }
+
+        return id;
+    };
+    SpriteBlinker.prototype.start = function () {
+        // already running
+        if (this.intervalFN)
+            return this;
+
+        var self = this;
+
+        self.blink();
+        this.intervalFN = window.setInterval(self.blink, self.delay);
+
+        return this;
+    };
+    SpriteBlinker.prototype.pause = function () {
+        window.clearInterval(this.intervalFN);
+        this.intervalFN = null;
+
+        return this;
+    };
+    SpriteBlinker.prototype.stop = function () {
+        this.pause();
+        this.clearFN();
+        eventManager.dispatchEvent({ type: "updateWorld", content: "" });
+
+        this.toBlink = {};
+
+        return this;
+    };
+    return SpriteBlinker;
+})(SpriteHighlighter);
+/// <reference path="spriteblinker.ts" />
+var CityGame;
+(function (CityGame) {
+    (function (Actions) {
+        var blinkerTODO = new SpriteBlinker(600, 0x880055, -1, false);
+
+        function buyCell(props) {
+            // TODO circular reference
+            var _ = window;
+            var game = _.game;
+
+            var cell = game.getCell(props);
+            var player = game.players[props.playerId];
+
+            if (!cell || !player)
+                throw new Error();
+
+            var employee = player.employees[props.employeeId];
+            var data = CityGame.cloneObject(props);
+
+            if (data.finishedOn === undefined) {
+                data.time = getActionTime([employee.skills["negotiation"]], 14).approximate;
+            }
+
+            var price = player.getCellBuyCost(cell);
+            price = getActionCost([employee.skills["negotiation"]], price).actual;
+
+            var blinkerId = blinkerTODO.idGenerator++;
+
+            var onStartFN = function () {
+                if (!cell.content)
+                    cell.changeContent(cg.content.underPurchase, true);
+
+                employee.active = false;
+                employee.currAction = "buyCell";
+                player.subtractCost(price);
+                player.ownedCellsAmount++;
+
+                eventManager.dispatchEvent({ type: "updateWorld", content: "" });
+            };
+            var onCompleteFN = function () {
+                if (cell.content && cell.content.type.type === "underPurchase") {
+                    cell.removeContent();
+                }
+
+                employee.active = true;
+                employee.currAction = undefined;
+                employee.trainSkill("negotiation");
+                player.ownedCellsAmount--;
+                player.addCell(cell);
+
+                blinkerTODO.removeCells(blinkerId);
+                eventManager.dispatchEvent({ type: "updateWorld", content: "" });
+                return true;
+            };
+
+            var startBlinkFN = function () {
+                blinkerTODO.addCells([cell], null, blinkerId);
+                blinkerTODO.start();
+
+                window.setTimeout(onCompleteFN, 2400);
+            };
+
+            onStartFN.call(null);
+
+            eventManager.dispatchEvent({
+                type: "delayedAction",
+                content: {
+                    type: "buyCell",
+                    data: data,
+                    onComplete: startBlinkFN
+                }
+            });
+        }
+        Actions.buyCell = buyCell;
+        ;
+
+        function recruitEmployee(props) {
+            // TODO circular reference
+            var _ = window;
+            var game = _.game;
+
+            var player = game.players[props.playerId];
+            if (!player)
+                throw new Error("No player with that id found");
+            var employee = player.employees[props.employeeId];
+
+            var data = CityGame.cloneObject(props);
+            if (data.finishedOn === undefined) {
+                data.time = getActionTime([employee.skills["recruitment"]], 14).approximate;
+            }
+
+            var onStartFN = function () {
+                employee.active = false;
+                employee.currentAction = "recruit";
+            };
+
+            var employeeCount = getSkillAdjust([employee.skills["recruitment"]], 4, function employeeCountAdjustFN(avgSkill) {
+                return 1 / (1.5 / Math.log(avgSkill + 1));
+            }, 0.33);
+
+            if (!employee.player)
+                throw new Error("No player on employee");
+            var adjustedSkill = employee.skills["recruitment"] * employee.player.modifierEffects.recruitQuality;
+
+            var recruitCompleteFN = function () {
+                employee.active = true;
+                employee.currentAction = undefined;
+                employee.trainSkill("recruitment");
+
+                var newEmployees = CityGame.makeNewEmployees(employeeCount.actual, adjustedSkill);
+                eventManager.dispatchEvent({
+                    type: "makeRecruitCompleteNotification",
+                    content: {
+                        player: player,
+                        employees: newEmployees,
+                        text: [
+                            employee.name + " was able to scout the following people.",
+                            "Which one should we recruit?"],
+                        recruitingEmployee: employee
+                    }
+                });
+            };
+
+            onStartFN.call(null);
+
+            eventManager.dispatchEvent({
+                type: "delayedAction",
+                content: {
+                    type: "recruitEmployee",
+                    data: data,
+                    onComplete: recruitCompleteFN
+                }
+            });
+        }
+        Actions.recruitEmployee = recruitEmployee;
+
+        function constructBuilding(props) {
+            // TODO circular reference
+            var _ = window;
+            var game = _.game;
+
+            var cell = game.getCell(props);
+            var player = game.players[props.playerId];
+
+            if (!cell || !player)
+                throw new Error();
+
+            var employee = player.employees[props.employeeId];
+            var buildingType = findType(props.buildingType);
+
+            var data = CityGame.cloneObject(props);
+            if (data.finishedOn === undefined) {
+                data.time = getActionTime([employee.skills["construction"]], buildingType.buildTime).approximate;
+            }
+
+            var baseCost = player.getBuildCost(buildingType);
+            var adjustedCost = getActionCost([employee.skills["construction"]], baseCost).actual;
+
+            if (player.money < adjustedCost)
+                return;
+
+            var size = buildingType.size || [1, 1];
+            var endX = cell.gridPos[0] + size[0] - 1;
+            var endY = cell.gridPos[1] + size[1] - 1;
+
+            var buildArea = cell.board.getCells(CityGame.SelectionTypes.rectSelect(cell.gridPos, [endX, endY]));
+
+            var blinkerId = blinkerTODO.idGenerator++;
+
+            var onStartFN = function () {
+                for (var i = 0; i < buildArea.length; i++) {
+                    buildArea[i].changeContent(cg.content.underConstruction, true);
+                }
+
+                player.subtractCost(adjustedCost);
+                employee.active = false;
+                employee.currentAction = "constructBuilding";
+
+                player.amountBuiltPerType[buildingType.type]++;
+                eventManager.dispatchEvent({ type: "updateWorld", content: "" });
+            };
+            var constructBuildingCompleteFN = function () {
+                employee.active = true;
+                employee.currentAction = undefined;
+                employee.trainSkill("construction");
+                player.amountBuiltPerType[buildingType.type]--;
+                cell.changeContent(buildingType, true, player);
+
+                blinkerTODO.removeCells(blinkerId);
+                eventManager.dispatchEvent({ type: "updateWorld", content: "" });
+
+                return true;
+            };
+
+            var startBlinkFN = function () {
+                blinkerTODO.addCells(buildArea, null, blinkerId);
+                blinkerTODO.start();
+
+                window.setTimeout(constructBuildingCompleteFN, 2400);
+            };
+
+            onStartFN.call(null);
+
+            eventManager.dispatchEvent({
+                type: "delayedAction",
+                content: {
+                    type: "constructBuilding",
+                    data: data,
+                    onComplete: startBlinkFN
+                }
+            });
+        }
+        Actions.constructBuilding = constructBuilding;
+
+        function getSkillAdjust(skills, base, adjustFN, variance) {
+            var avgSkill = skills.reduce(function (a, b) {
+                return a + b;
+            }) / skills.length;
+            var workRate = adjustFN ? adjustFN(avgSkill) : Math.pow(1 - 0.166904 * Math.log(avgSkill), 1 / 2.5);
+
+            var approximate = Math.round(base * workRate);
+            var actual = Math.round(approximate + CityGame.randRange(-base * variance, base * variance));
+
+            return ({
+                approximate: approximate,
+                actual: actual < 1 ? 1 : actual
+            });
+        }
+        function getActionTime(skills, base) {
+            return getSkillAdjust(skills, base, null, 0.25);
+        }
+        Actions.getActionTime = getActionTime;
+
+        function getActionCost(skills, base) {
+            return getSkillAdjust(skills, base, null, 0);
+        }
+        Actions.getActionCost = getActionCost;
+    })(CityGame.Actions || (CityGame.Actions = {}));
+    var Actions = CityGame.Actions;
+})(CityGame || (CityGame = {}));
+/// <reference path="../../lib/react.d.ts" />
+///
+/// <reference path="../../data/cg.ts" />
+/// <reference path="../eventmanager.ts" />
+/// <reference path="../utility.ts" />
+var UIComponents;
+(function (UIComponents) {
+    /**
+    * props:
+    *   player
+    *   buildableTypes
+    */
+    UIComponents.SideMenuBuildings = React.createClass({
+        getInitialState: function () {
+            return ({
+                beautifyIndex: 0,
+                lastSelectedBuilding: playerBuildableBuildings[0],
+                currentPopOver: null
+            });
+        },
+        drawPopOver: function (building, parentRef) {
+            if (this.state.currentPopOver === building.type)
+                return;
+            var popOverNode = this.refs.popOver.getDOMNode();
+
+            var effectInfo = [
+                { title: "Affected by", target: effectSourcesIndex[building.categoryType] },
+                { title: "Affects", target: building.effectTargets }
+            ];
+
+            if (!this.indexedPopoverContent)
+                this.indexedPopoverContent = {};
+            if (!this.indexedPopoverContent[building.type]) {
+                var content = "";
+                content += "<div>Base profit $" + building.baseProfit + "/d</div>";
+
+                effectInfo.forEach(function (info) {
+                    if (!info.target || (info.target.positive.length < 1 && info.target.negative.length < 1)) {
+                        return;
+                    }
+                    content += "<h4>" + info.title + "</h4>";
+                    content += "<div class='tooltip-modifiers-container'>";
+                    for (var polarity in info.target) {
+                        var effects = info.target[polarity];
+
+                        content += "<div class='tooltip-modifiers " + "tooltip-modifiers-" + polarity + "'>";
+
+                        //content += "<h5 class='tooltip-modifiers-header'>";
+                        //  content += capitalize(polarity);
+                        //content += "</h5>";
+                        content += "<ul>";
+                        for (var i = 0; i < effects.length; i++) {
+                            content += "<li>" + capitalize(effects[i]) + "</li>";
+                        }
+                        content += "</ul>";
+                        content += "</div>";
+                    }
+                    content += "</div>";
+                });
+                this.indexedPopoverContent[building.type] = content;
+            }
+
+            popOverNode.innerHTML = this.indexedPopoverContent[building.type];
+
+            popOverNode.classList.remove("hidden");
+            popOverNode.style.top = this.refs[parentRef].getDOMNode().getBoundingClientRect().top + "px";
+
+            this.setState({ currentPopOver: building.type });
+        },
+        hidePopOver: function () {
+            if (!this.state.currentPopOver)
+                return;
+            this.refs.popOver.getDOMNode().classList.add("hidden");
+            this.setState({ currentPopOver: null });
+        },
+        handleBuildingSelect: function (building, e) {
+            if (this.props.player.money < this.props.player.getBuildCost(building)) {
+                return;
+            }
+            this.props.setSelectedTool(building.type);
+            this.setState({ lastSelectedBuilding: building });
+
+            var continuous = e && e.shiftKey ? e.shiftKey : false;
+
+            eventManager.dispatchEvent({
+                type: "changeBuildingType",
+                content: {
+                    building: building,
+                    continuous: continuous
+                }
+            });
+        },
+        componentDidMount: function () {
+            eventManager.addEventListener("resizeSmaller", function (e) {
+                this.setState({ beautifyIndex: 2 });
+            }.bind(this));
+
+            eventManager.addEventListener("resizeBigger", function (e) {
+                this.setState({ beautifyIndex: 0 });
+            }.bind(this));
+
+            eventManager.addEventListener("buildHotkey", function (e) {
+                this.handleBuildingSelect(this.state.lastSelectedBuilding, e.content);
+            }.bind(this));
+        },
+        render: function () {
+            var divs = [];
+            var player = this.props.player;
+
+            for (var i = 0; i < playerBuildableBuildings.length; i++) {
+                var building = playerBuildableBuildings[i];
+
+                var buildCost = player.getBuildCost(building);
+                var canAfford = player.money >= buildCost;
+                var amountBuilt = player.amountBuiltPerType[building.type];
+
+                var divProps = {
+                    className: "side-building",
+                    key: building.type,
+                    ref: building.type,
+                    onMouseLeave: this.hidePopOver,
+                    onTouchStart: this.handleBuildingSelect.bind(null, building),
+                    onMouseEnter: this.drawPopOver.bind(null, building, building.type)
+                };
+
+                /*
+                for (var polarity in building.effectTargets)
+                {
+                var targets = building.effectTargets[polarity];
+                if (targets.length < 1) continue;
+                else
+                {
+                var poleSign = (polarity === "negative") ? "-" : "+";
+                divProps.title += "\n-----";
+                divProps.title += "\n" + polarity + " effects:";
+                
+                for (var j = 0; j < targets.length; j++)
+                {
+                divProps.title += "\n" + targets[j] + " " + poleSign;
+                }
+                }
+                }*/
+                var imageProps = { className: "building-image" };
+                var titleProps = { className: "building-title" };
+                var costProps = { className: "building-cost" };
+                var amountProps = { className: "building-amount" };
+
+                if (!canAfford) {
+                    divProps.className += " disabled";
+                    costProps.className += " insufficient";
+                } else {
+                    divProps.className += " interactive";
+                    divProps.onClick = this.handleBuildingSelect.bind(null, building);
+                }
+
+                if (this.props.selectedTool && this.props.selectedTool === building.type) {
+                    divProps.className += " selected-tool";
+                }
+
+                var costText = "" + beautify(buildCost, this.state.beautifyIndex);
+
+                if (this.state.beautifyIndex < 2) {
+                    costText += "$";
+                }
+
+                var image = this.props.frameImages[building.icon];
+                imageProps.src = image.src;
+
+                var div = React.DOM.div(divProps, React.DOM.div({ className: "building-image-container" }, React.DOM.img(imageProps, null)), React.DOM.div({ className: "building-content" }, React.DOM.div({ className: "building-content-wrapper" }, React.DOM.div(titleProps, building.title), React.DOM.div(costProps, costText)), React.DOM.div(amountProps, amountBuilt)));
+
+                divs.push(div);
+            }
+
+            return (React.DOM.div({ id: "side-menu-buildings", className: "grid-column" }, divs, React.DOM.div({
+                id: "building-popover",
+                className: "hidden",
+                ref: "popOver"
+            }, "asdjhksadhja")));
+        }
+    });
+})(UIComponents || (UIComponents = {}));
+/// <reference path="../../lib/react.d.ts" />
+///
+/// <reference path="../eventmanager.ts" />
+var UIComponents;
+(function (UIComponents) {
+    UIComponents.SideMenuZoom = React.createClass({
+        getInitialState: function () {
+            return { zoom: 1 };
+        },
+        handleZoomChange: function (event) {
+            var target = event.target;
+
+            this.setState({ zoom: parseFloat(target.value) });
+        },
+        handleZoomSubmit: function (event) {
+            event.preventDefault();
+            eventManager.dispatchEvent({ type: "changeZoom", content: this.state.zoom });
+            return false;
+        },
+        handleMapmodeChange: function (event) {
+            var target = event.target;
+
+            eventManager.dispatchEvent({ type: "changeMapmode", content: target.value });
+        },
+        componentDidMount: function () {
+            var self = this;
+            var el = this.refs.zoomValue.getDOMNode();
+
+            eventManager.addEventListener("updateZoomValue", function (e) {
+                el.value = e.content.toFixed(3);
+                self.setState({ zoom: e.content });
+            });
+        },
+        render: function () {
+            var options = [];
+
+            ["terrain", "landValue", "underground"].forEach(function (type) {
+                var props = {
+                    key: type,
+                    value: type
+                };
+                var option = React.DOM.option(props, type);
+            });
+
+            return (React.DOM.select({
+                id: "side-menu-mapmode-select",
+                value: "landValue"
+            }, options), React.DOM.form({
+                id: "side-menu-zoom",
+                className: "grid-row",
+                onSubmit: this.handleZoomSubmit
+            }, React.DOM.input({
+                id: "zoom-amount",
+                ref: "zoomValue",
+                className: "grid-row",
+                type: "number",
+                defaultValue: "1",
+                step: 0.1,
+                onChange: this.handleZoomChange
+            }), React.DOM.button({ id: "zoomBtn", className: "grid-row" }, "zoom")));
+        }
+    });
+})(UIComponents || (UIComponents = {}));
+/// <reference path="../../lib/react.d.ts" />
+///
+/// <reference path="../eventmanager.ts" />
+var UIComponents;
+(function (UIComponents) {
+    UIComponents.SideMenuMapmode = React.createClass({
+        handleMapmodeChange: function (event) {
+            var target = event.target;
+
+            eventManager.dispatchEvent({ type: "changeMapmode", content: target.value });
+        },
+        render: function () {
+            var options = [];
+
+            ["terrain", "landValue", "underground"].forEach(function (type) {
+                var props = {
+                    key: type,
+                    value: type
+                };
+
+                var title = type === "landValue" ? "land value" : type;
+                options.push(React.DOM.option(props, title));
+            });
+
+            return (React.DOM.select({
+                id: "side-menu-mapmode-select",
+                className: "grid-row",
+                defaultValue: "landValue",
+                title: "Map mode",
+                onChange: this.handleMapmodeChange
+            }, options));
+        }
+    });
+})(UIComponents || (UIComponents = {}));
+/// <reference path="../../lib/react.d.ts" />
+///
+/// <reference path="../eventmanager.ts" />
+var UIComponents;
+(function (UIComponents) {
+    UIComponents.SideMenuSave = React.createClass({
+        handleSave: function () {
+            eventManager.dispatchEvent({
+                type: "makeSavePopup", content: ""
+            });
+        },
+        handleLoad: function () {
+            eventManager.dispatchEvent({
+                type: "makeLoadPopup", content: ""
+            });
+        },
+        render: function () {
+            return (React.DOM.div({ id: "save-buttons", className: "grid-row" }, React.DOM.div({
+                className: "grid-cell interactive",
+                onClick: this.handleSave,
+                onTouchStart: this.handleSave
+            }, "save"), React.DOM.div({
+                className: "grid-cell interactive",
+                onClick: this.handleLoad,
+                onTouchStart: this.handleLoad
+            }, "load")));
+        }
+    });
+})(UIComponents || (UIComponents = {}));
+/// <reference path="../../lib/react.d.ts" />
+///
+/// <reference path="../eventmanager.ts" />
+var UIComponents;
+(function (UIComponents) {
+    UIComponents.SideMenuStats = React.createClass({
+        getInitialState: function () {
+            return {
+                hasLevelUpUpgrade: false,
+                lastModifierCount: 0,
+                canPrestige: false
+            };
+        },
+        componentWillReceiveProps: function (newProps) {
+            var newUpgradeCount = Object.keys(newProps.player.unlockedLevelUpModifiers).length;
+
+            if (newUpgradeCount > 0) {
+                this.setState({ hasLevelUpUpgrade: true });
+            } else if (newProps.player.level >= 100) {
+                this.setState({ canPrestige: true });
+            }
+
+            this.setState({ lastModifierCount: newUpgradeCount });
+        },
+        componentDidMount: function () {
+            var money = this.refs.moneyText.getDOMNode();
+            var profit = this.refs.profitText.getDOMNode();
+
+            var exp = this.refs.exp.getDOMNode();
+
+            var expText = this.refs.expText.getDOMNode();
+            var levelText = this.refs.levelText.getDOMNode();
+
+            eventManager.addEventListener("updatePlayerMoney", function (event) {
+                money.innerHTML = event.content.total;
+                profit.innerHTML = "$" + event.content.rolling + "/d";
+            });
+
+            eventManager.addEventListener("updatePlayerExp", function (event) {
+                var expString = event.content.experience + " / " + event.content.nextLevel;
+                var levelString = "Level   " + event.content.level + " ";
+
+                exp.value = event.content.percentage;
+                expText.innerHTML = expString;
+                levelText.innerHTML = levelString;
+            });
+
+            // forces update, kinda dumb
+            this.props.player.addMoney(0);
+        },
+        handleOpenModifiers: function () {
+            var self = this;
+            var player = this.props.player;
+            var lastIndex = Object.keys(player.unlockedLevelUpModifiers).length - 1;
+            var lowestLevel = Object.keys(player.unlockedLevelUpModifiers).sort(function (a, b) {
+                return parseInt(a) < parseInt(b) ? 1 : -1;
+            })[lastIndex];
+
+            var lowestModifierList = player.unlockedLevelUpModifiers[lowestLevel];
+
+            if (!lowestModifierList) {
+                this.setState({
+                    hasLevelUpUpgrade: false
+                });
+
+                return;
+            }
+
+            eventManager.dispatchEvent({
+                type: "makeModifierPopup",
+                content: {
+                    player: player,
+                    text: [
+                        "Select your bonus perk for level " + lowestLevel,
+                        "You only get to pick one"],
+                    modifierList: lowestModifierList,
+                    excludeCost: true,
+                    okBtnText: "Select",
+                    onOk: function (selected) {
+                        var success = player.addLevelUpModifier(selected.data.modifier);
+                        eventManager.dispatchEvent({ type: "updateReact", content: "" });
+
+                        self.setState({
+                            hasLevelUpUpgrade: false
+                        });
+
+                        if (success !== false)
+                            return true;
+                        else
+                            return false;
+                    }
+                }
+            });
+        },
+        handleOpenPrestige: function () {
+            if (!this.state.canPrestige) {
+                return;
+            }
+            var onResetFN = function () {
+                this.setState({ canPrestige: false });
+            }.bind(this);
+
+            eventManager.dispatchEvent({
+                type: "prestigeReset",
+                content: onResetFN
+            });
+        },
+        render: function () {
+            var progressProps = {
+                id: "player-level",
+                ref: "exp",
+                value: 0,
+                max: 100
+            };
+            var divProps = {
+                id: "player-level-wrapper"
+            };
+
+            if (this.state.hasLevelUpUpgrade) {
+                progressProps.className = "new-modifier";
+
+                divProps.onClick = this.handleOpenModifiers;
+                divProps.onTouchStart = this.handleOpenModifiers;
+                divProps.className = "interactive";
+            } else if (this.state.canPrestige) {
+                progressProps.className = "new-modifier";
+
+                divProps.onClick = this.handleOpenPrestige;
+                divProps.onTouchStart = this.handleOpenPrestige;
+                divProps.className = "interactive";
+            }
+
+            return (React.DOM.div({ id: "side-menu-stats" }, React.DOM.div(divProps, React.DOM.progress(progressProps), React.DOM.div({
+                id: "level-string-container"
+            }, React.DOM.div({
+                id: "level-string-wrapper",
+                className: "stat-string-wrapper"
+            }, React.DOM.span({
+                ref: "levelText"
+            }, null), React.DOM.span({
+                ref: "expText"
+            }, null)))), React.DOM.div({ id: "money-string-container" }, React.DOM.div({
+                id: "money-string-wrapper",
+                className: "stat-string-wrapper"
+            }, React.DOM.span({
+                ref: "moneyText"
+            }, null), React.DOM.span({
+                ref: "profitText"
+            }, null)))));
+        }
+    });
+})(UIComponents || (UIComponents = {}));
+/// <reference path="../../lib/react.d.ts" />
+///
+/// <reference path="../eventmanager.ts" />
+var UIComponents;
+(function (UIComponents) {
+    UIComponents.SideMenuTools = React.createClass({
+        handleRecruit: function () {
+            eventManager.dispatchEvent({
+                type: "recruit",
+                content: ""
+            });
+        },
+        handleToolChange: function (type, e) {
+            this.props.setSelectedTool(type);
+
+            var continuous = false;
+
+            if (type !== "click" && e && e.shiftKey)
+                continuous = true;
+
+            eventManager.dispatchEvent({
+                type: "changeTool",
+                content: {
+                    type: type,
+                    continuous: continuous
+                }
+            });
+        },
+        componentDidMount: function () {
+            eventManager.addEventListener("buyHotkey", function (e) {
+                ;
+                this.handleToolChange("buy", e.content);
+            }.bind(this));
+
+            eventManager.addEventListener("sellHotkey", function (e) {
+                this.handleToolChange("sell", e.content);
+            }.bind(this));
+
+            eventManager.addEventListener("clickHotkey", function (e) {
+                this.handleToolChange("click", e.content);
+            }.bind(this));
+
+            eventManager.addEventListener("recruitHotkey", this.handleRecruit);
+        },
+        render: function () {
+            var props = {
+                click: {
+                    ref: "click",
+                    className: "grid-cell interactive",
+                    onClick: this.handleToolChange.bind(null, "click"),
+                    onTouchStart: this.handleToolChange.bind(null, "click")
+                },
+                buy: {
+                    ref: "buy",
+                    className: "grid-cell interactive",
+                    onClick: this.handleToolChange.bind(null, "buy"),
+                    onTouchStart: this.handleToolChange.bind(null, "buy")
+                },
+                sell: {
+                    ref: "sell",
+                    className: "grid-cell interactive",
+                    onClick: this.handleToolChange.bind(null, "sell"),
+                    onTouchStart: this.handleToolChange.bind(null, "sell")
+                },
+                recruit: {
+                    ref: "recruit",
+                    className: "grid-cell interactive",
+                    onClick: this.handleRecruit,
+                    onTouchStart: this.handleRecruit
+                }
+            };
+
+            var selectedTool = this.props.selectedTool;
+            if (Object.keys(this.props.player.employees).length < 1) {
+                props.recruit.className += " new-modifier";
+
+                props.click.className = "grid-cell disabled";
+                props.buy.className = "grid-cell disabled";
+                props.sell.className = "grid-cell disabled";
+            } else if (this.props.player.clicks <= 0) {
+                props.buy.className = "grid-cell disabled";
+                props.sell.className = "grid-cell disabled";
+            } else if (selectedTool && props[selectedTool]) {
+                props[selectedTool].className += " selected-tool";
+            }
+
+            return (React.DOM.div({ id: "side-menu-tools", className: "grid-column" }, React.DOM.div({ className: "grid-row" }, React.DOM.div(props.click, React.DOM.u(null, "c"), "lick"), React.DOM.div(props.recruit, React.DOM.u(null, "r"), "ecruit")), React.DOM.div({ className: "grid-row" }, React.DOM.div(props.buy, "b", React.DOM.u(null, "u"), "y plot"), React.DOM.div(props.sell, React.DOM.u(null, "s"), "ell"))));
+        }
+    });
+})(UIComponents || (UIComponents = {}));
+/// <reference path="../../lib/react.d.ts" />
+///
+/// <reference path="../eventmanager.ts" />
+var UIComponents;
+(function (UIComponents) {
+    UIComponents.SideMenuModifierButton = React.createClass({
+        getInitialState: function () {
+            return ({
+                hasNewModifier: false,
+                lastModifierCount: 0
+            });
+        },
+        handleOpenModifiers: function () {
+            this.setState({ hasNewModifier: false });
+            eventManager.dispatchEvent({
+                type: "makeModifierPopup",
+                content: {
+                    player: this.props.player,
+                    modifierList: this.props.player.unlockedModifiers
+                }
+            });
+        },
+        componentWillReceiveProps: function (newProps) {
+            var newModifierCount = newProps.player.unlockedModifiers.length;
+
+            if (newModifierCount > this.state.lastModifierCount) {
+                this.setState({ hasNewModifier: true });
+            }
+
+            this.setState({ lastModifierCount: newModifierCount });
+        },
+        render: function () {
+            var player = this.props.player;
+            var modifierCount = this.props.player.unlockedModifiers.length;
+
+            if (modifierCount > this.state.lastModifierCount) {
+                //this.setState({newModifier: true});
+            }
+
+            var divProps = {
+                id: "side-menu-modifiers",
+                className: "grid-cell interactive",
+                onClick: this.handleOpenModifiers,
+                onTouchStart: this.handleOpenModifiers
+            };
+            if (this.state.hasNewModifier) {
+                //divProps.className += " new-modifier";
+            }
+
+            var divText = "Available upgrades: ";
+            if (modifierCount > 0) {
+                divText += modifierCount;
+            }
+
+            return (React.DOM.div(divProps, divText));
+        }
+    });
+})(UIComponents || (UIComponents = {}));
+/// <reference path="../../lib/react.d.ts" />
+/// <reference path="sidemenubuildings.ts" />
+/// <reference path="sidemenuzoom.ts" />
+/// <reference path="sidemenumapmode.ts" />
+/// <reference path="sidemenusave.ts" />
+/// <reference path="sidemenustats.ts" />
+/// <reference path="sidemenutools.ts" />
+/// <reference path="sidemenumodifierbutton.ts" />
+var UIComponents;
+(function (UIComponents) {
+    UIComponents.SideMenu = React.createClass({
+        getInitialState: function () {
+            return { selectedTool: null };
+        },
+        setSelectedTool: function (type) {
+            this.setState({ selectedTool: type });
+        },
+        render: function () {
+            return (React.DOM.div({ id: "react-side-menu" }, UIComponents.SideMenuTools({
+                player: this.props.player,
+                setSelectedTool: this.setSelectedTool,
+                selectedTool: this.state.selectedTool
+            }), UIComponents.SideMenuBuildings({
+                player: this.props.player,
+                frameImages: this.props.frameImages,
+                setSelectedTool: this.setSelectedTool,
+                selectedTool: this.state.selectedTool,
+                // Todo react definitions
+                beautifyIndex: null,
+                lastSelectedBuilding: null
+            }), React.DOM.div({ id: "side-menu-other-buttons", className: "grid-column" }, UIComponents.SideMenuSave(), UIComponents.SideMenuMapmode(), UIComponents.SideMenuZoom()), UIComponents.SideMenuStats({
+                player: this.props.player,
+                // Todo react definitions
+                hasLevelUpUpgrade: null,
+                lastModifierCount: null
+            }), UIComponents.SideMenuModifierButton({
+                player: this.props.player,
+                // Todo react definitions
+                hasNewModifier: null,
+                lastModifierCount: null
+            })));
+        }
+    });
+})(UIComponents || (UIComponents = {}));
+// Using state for setting position = horrible performance
+// manipulating style directly works much better
+var UIComponents;
+(function (UIComponents) {
+    UIComponents.Draggable = {
+        handleDragStart: function (e) {
+            this.DOMNode.style.zIndex = this.props.incrementZIndex();
+
+            if (!e.nativeEvent.dataTransfer)
+                return;
+
+            //this.DOMNode.classList.add("dragging");
+            // browser overrides css cursor when dragging
+            e.nativeEvent.dataTransfer.dropEffect = "move";
+
+            this.offset = {
+                x: e.nativeEvent.pageX - parseInt(this.DOMNode.style.left),
+                y: e.nativeEvent.pageY - parseInt(this.DOMNode.style.top)
+            };
+        },
+        handleDrag: function (e) {
+            if (e.clientX === 0 && e.clientY === 0)
+                return;
+
+            var x = e.clientX - this.offset.x;
+            var y = e.clientY - this.offset.y;
+
+            var domWidth = parseInt(this.DOMNode.offsetWidth);
+            var domHeight = parseInt(this.DOMNode.offsetHeight);
+
+            var pixiWidth = parseInt(this.pixiContainer.offsetWidth);
+            var pixiHeight = parseInt(this.pixiContainer.offsetHeight);
+
+            var x2 = x + domWidth;
+            var y2 = y + domHeight;
+
+            if (x < 0)
+                x = 0;
+            else if (x2 > pixiWidth) {
+                x = pixiWidth - domWidth;
+            }
+            ;
+
+            if (y < 0)
+                y = 0;
+            else if (y2 > pixiHeight) {
+                y = pixiHeight - domHeight;
+            }
+            ;
+
+            this.DOMNode.style.left = x + "px";
+            this.DOMNode.style.top = y + "px";
+        },
+        handleDragEnd: function (e) {
+            //this.DOMNode.classList.remove("dragging");
+        },
+        componentDidMount: function () {
+            this.DOMNode = this.getDOMNode();
+            this.pixiContainer = document.getElementById("pixi-container");
+        }
+    };
+})(UIComponents || (UIComponents = {}));
+/// <reference path="../../lib/react.d.ts" />
+var UIComponents;
+(function (UIComponents) {
+    UIComponents.SplitMultilineText = {
+        splitMultilineText: function (text) {
+            if (Array.isArray(text)) {
+                var returnArr = [];
+                for (var i = 0; i < text.length; i++) {
+                    returnArr.push(text[i]);
+                    returnArr.push(React.DOM.br(null));
+                }
+                return returnArr;
+            } else {
+                return text;
+            }
+        }
+    };
+})(UIComponents || (UIComponents = {}));
+/// <reference path="../../lib/react.d.ts" />
+/// <reference path="splitmultilinetext.ts" />
+var UIComponents;
+(function (UIComponents) {
+    /**
+    * props:
+    *   listItems
+    *   initialColumns
+    *
+    * state:
+    *   selected
+    *   columns
+    *   sortBy
+    *
+    * children:
+    *   listelement:
+    *     key
+    *     tr
+    *     getData()
+    *
+    *  columns:
+    *    props (classes etc)
+    *    label
+    *    sorting (alphabet, numeric, null)
+    *    title?
+    */
+    UIComponents.List = React.createClass({
+        mixins: [UIComponents.SplitMultilineText],
+        getInitialState: function () {
+            var initialColumn = this.props.initialColumn || this.props.initialColumns[0];
+
+            var initialSelected = this.props.listItems[0];
+
+            return ({
+                columns: this.props.initialColumns,
+                selected: initialSelected,
+                sortBy: {
+                    column: initialColumn,
+                    order: initialColumn.defaultOrder || "desc",
+                    currColumnIndex: this.props.initialColumns.indexOf(initialColumn)
+                }
+            });
+        },
+        componentDidMount: function () {
+            var self = this;
+
+            this.handleSelectRow(this.props.sortedItems[0]);
+
+            this.getDOMNode().addEventListener("keydown", function (event) {
+                switch (event.keyCode) {
+                    case 40: {
+                        self.shiftSelection(1);
+                        break;
+                    }
+                    case 38: {
+                        self.shiftSelection(-1);
+                        break;
+                    }
+                    default: {
+                        return;
+                    }
+                }
+            });
+        },
+        handleSelectColumn: function (column) {
+            if (column.notSortable)
+                return;
+            var order;
+            if (this.state.sortBy.column.key === column.key) {
+                // flips order
+                order = this.state.sortBy.order === "desc" ? "asc" : "desc";
+            } else {
+                order = column.defaultOrder;
+            }
+
+            this.setState({
+                sortBy: {
+                    column: column,
+                    order: order,
+                    currColumnIndex: this.state.columns.indexOf(column)
+                }
+            });
+        },
+        handleSelectRow: function (row) {
+            if (this.props.onRowChange)
+                this.props.onRowChange.call(null, row);
+            this.setState({
+                selected: row
+            });
+        },
+        sort: function () {
+            var self = this;
+            var selectedColumn = this.state.sortBy.column;
+
+            var initialPropToSortBy = selectedColumn.propToSortBy || selectedColumn.key;
+
+            var itemsToSort = this.props.listItems;
+
+            var defaultSortFN = function (a, b) {
+                var propToSortBy = initialPropToSortBy;
+                var nextIndex = self.state.sortBy.currColumnIndex;
+
+                for (var i = 0; i < self.state.columns.length; i++) {
+                    if (a.data[propToSortBy] === b.data[propToSortBy]) {
+                        nextIndex = (nextIndex + 1) % self.state.columns.length;
+                        var nextColumn = self.state.columns[nextIndex];
+                        propToSortBy = nextColumn.propToSortBy || nextColumn.key;
+                    } else {
+                        break;
+                    }
+                }
+
+                return a.data[propToSortBy] > b.data[propToSortBy] ? 1 : -1;
+            };
+
+            if (selectedColumn.sortingFunction) {
+                itemsToSort.sort(function (a, b) {
+                    var sortFNResult = selectedColumn.sortingFunction(a, b);
+                    if (sortFNResult === 0) {
+                        sortFNResult = defaultSortFN(a, b);
+                    }
+                    return sortFNResult;
+                });
+            } else {
+                itemsToSort.sort(defaultSortFN);
+            }
+
+            if (this.state.sortBy.order === "desc") {
+                itemsToSort.reverse();
+            }
+
+            //else if (this.state.sortBy.order !== "desc") throw new Error("Invalid sort parameter");
+            this.props.sortedItems = itemsToSort;
+        },
+        shiftSelection: function (amountToShift) {
+            var reverseIndexes = {};
+            for (var i = 0; i < this.props.sortedItems.length; i++) {
+                reverseIndexes[this.props.sortedItems[i].key] = i;
+            }
+            ;
+            var currSelectedIndex = reverseIndexes[this.state.selected.key];
+            var nextIndex = (currSelectedIndex + amountToShift) % this.props.sortedItems.length;
+            if (nextIndex < 0) {
+                nextIndex += this.props.sortedItems.length;
+            }
+            this.setState({
+                selected: this.props.sortedItems[nextIndex]
+            });
+        },
+        render: function () {
+            var self = this;
+            var columns = [];
+            var headerLabels = [];
+
+            this.state.columns.forEach(function (column) {
+                var colProps = {
+                    key: column.key
+                };
+
+                if (self.props.colStylingFN) {
+                    colProps = self.props.colStylingFN(column, colProps);
+                }
+
+                columns.push(React.DOM.col(colProps));
+                headerLabels.push(React.DOM.th({
+                    className: !column.notSortable ? "sortable-column" : null,
+                    title: column.title || colProps.title || null,
+                    onMouseDown: self.handleSelectColumn.bind(null, column),
+                    onTouchStart: self.handleSelectColumn.bind(null, column),
+                    key: column.key
+                }, column.label));
+            });
+
+            this.sort();
+
+            var sortedItems = this.props.sortedItems;
+
+            var rows = [];
+            sortedItems.forEach(function (item) {
+                var cells = [];
+                for (var _column in self.state.columns) {
+                    var column = self.state.columns[_column];
+
+                    var cellProps = {
+                        key: "" + item.key + "_" + column.key
+                    };
+
+                    if (self.props.cellStylingFN) {
+                        cellProps = self.props.cellStylingFN(item, column, cellProps);
+                    }
+
+                    cells.push(React.DOM.td(cellProps, self.splitMultilineText(item.data[column.key]) || null));
+                }
+
+                var rowProps = {};
+                rowProps.key = item.key;
+                rowProps.onClick = self.handleSelectRow.bind(null, item);
+                rowProps.onTouchStart = self.handleSelectRow.bind(null, item);
+                if (self.state.selected && self.state.selected.key === item.key) {
+                    rowProps.className = "selected";
+                }
+                if (self.props.rowStylingFN)
+                    rowProps = self.props.rowStylingFN(item, rowProps);
+                rows.push(React.DOM.tr(rowProps, cells));
+            });
+
+            return (React.DOM.div(null, React.DOM.table({
+                tabIndex: 1
+            }, React.DOM.colgroup(null, columns), React.DOM.thead(null, React.DOM.tr(null, headerLabels)), React.DOM.tbody(null, rows))));
+        }
+    });
+})(UIComponents || (UIComponents = {}));
+/// <reference path="../../lib/react.d.ts" />
+///
+/// <reference path="../eventmanager.ts" />
+/// <reference path="../utility.ts" />
+///
+/// <reference path="list.ts" />
+var UIComponents;
+(function (UIComponents) {
+    UIComponents.ModifierList = React.createClass({
+        render: function () {
+            var rows = [];
+            for (var i = 0; i < this.props.modifiers.length; i++) {
+                var modifier = this.props.modifiers[i];
+                var item = {
+                    key: modifier.type,
+                    data: {
+                        title: modifier.title,
+                        description: modifier.description,
+                        modifier: modifier
+                    }
+                };
+                if (this.props.excludeCost !== true) {
+                    item.data.cost = modifier.cost || null;
+                    item.data.costString = modifier.cost !== undefined ? beautify(modifier.cost) + "$" : null;
+                }
+
+                rows.push(item);
+            }
+            var columns = [];
+            columns.push({
+                label: "Title",
+                key: "title"
+            });
+
+            if (this.props.excludeCost !== true) {
+                columns.push({
+                    label: "Cost",
+                    key: "costString",
+                    defaultOrder: "asc",
+                    propToSortBy: "cost"
+                });
+            }
+
+            columns.push({
+                label: "Description",
+                key: "description"
+            });
+
+            return (UIComponents.List({
+                // TODO fix declaration file and remove
+                // typescript qq without these
+                selected: null,
+                columns: null,
+                sortBy: null,
+                initialColumn: columns[1],
+                ref: "list",
+                className: "modifier-list",
+                rowStylingFN: this.props.rowStylingFN,
+                listItems: rows,
+                initialColumns: columns
+            }));
+        }
+    });
+})(UIComponents || (UIComponents = {}));
+/// <reference path="../../lib/react.d.ts" />
+///
+/// <reference path="../eventmanager.ts" />
+/// <reference path="../utility.ts" />
+var UIComponents;
+(function (UIComponents) {
+    UIComponents.StatList = React.createClass({
+        render: function () {
+            var rows = [];
+            for (var i = 0; i < this.props.stats.length; i++) {
+                var stat = this.props.stats[i];
+
+                var div = React.DOM.div({
+                    className: "stat-container",
+                    key: "" + i
+                }, React.DOM.div({
+                    className: "stat-main"
+                }, React.DOM.span({ className: "stat-title" }, stat.title), React.DOM.span({ className: "stat-content" }, stat.content)), stat.subContent ? React.DOM.small({ className: "stat-subContent" }, stat.subContent) : null);
+
+                rows.push(div);
+            }
+            ;
+
+            return (React.DOM.div({ className: "stat-group" }, React.DOM.div({ className: "stat-header" }, this.props.header), rows));
+        }
+    });
+})(UIComponents || (UIComponents = {}));
+/// <reference path="../../lib/react.d.ts" />
+///
+/// <reference path="../eventmanager.ts" />
+/// <reference path="../utility.ts" />
+///
+/// <reference path="list.ts" />
+var UIComponents;
+(function (UIComponents) {
+    UIComponents.EmployeeList = React.createClass({
+        applyRowStyle: function (item, rowProps) {
+            if (item.data.employee.active !== true) {
+                rowProps.className = "inactive";
+                rowProps.onClick = rowProps.onTouchStart = null;
+            }
+            return rowProps;
+        },
+        applyColStyle: function (column, colProps) {
+            if (this.props.relevantSkills && this.props.relevantSkills.length > 0) {
+                if (this.props.relevantSkills.indexOf(column.key) > -1) {
+                    colProps["className"] = "relevant-col";
                 }
             }
-            this.destroyPopup(key);
+
+            return colProps;
+        },
+        applyCellStyle: function (item, column, cellProps) {
+            if (this.props.relevantSkills && this.props.relevantSkills.length > 0) {
+                if (this.props.relevantSkills.indexOf(column.key) < 0 && column.key !== "name" && column.key !== "trait") {
+                    cellProps["className"] = "irrelevant-cell";
+                }
+            }
+
+            return cellProps;
+        },
+        sortEmployees: function (a, b) {
+            var employeeA = a.data.employee;
+            var employeeB = b.data.employee;
+
+            if (!employeeA.active && employeeB.active)
+                return -1;
+            else if (!employeeB.active && employeeA.active)
+                return 1;
+            else
+                return 0;
+        },
+        render: function () {
+            var stopBubble = function (e) {
+                e.stopPropagation();
+            };
+            var hasDeleteButton = false;
+
+            var rows = [];
+            for (var _emp in this.props.employees) {
+                var employee = this.props.employees[_emp];
+
+                var data = {
+                    name: employee.name,
+                    negotiation: employee.skills.negotiation,
+                    recruitment: employee.skills.recruitment,
+                    construction: employee.skills.construction,
+                    trait: null,
+                    traitTitle: null,
+                    employee: employee
+                };
+
+                if (employee.trait) {
+                    data.trait = React.DOM.div({ className: "employee-modifier-container" }, React.DOM.span(null, employee.trait.title), React.DOM.br(null), React.DOM.small(null, employee.trait.description));
+                    data.traitTitle = employee.trait.title;
+                }
+
+                if (employee.player) {
+                    hasDeleteButton = true;
+                    data.del = React.DOM.a({
+                        href: "#",
+                        onClick: function (player, employee) {
+                            eventManager.dispatchEvent({
+                                type: "makeConfirmPopup",
+                                content: {
+                                    text: "Are you sure you want to fire " + employee.name + "?",
+                                    onOk: function () {
+                                        player.removeEmployee(employee);
+                                    }
+                                }
+                            });
+                        }.bind(null, employee.player, employee)
+                    }, "X");
+                }
+
+                rows.push({
+                    key: employee.id,
+                    data: data
+                });
+            }
+            var columns = [
+                {
+                    label: "Name",
+                    key: "name",
+                    sortingFunction: this.sortEmployees,
+                    defaultOrder: "asc"
+                },
+                {
+                    label: "neg",
+                    key: "negotiation",
+                    sortingFunction: this.sortEmployees,
+                    defaultOrder: "desc",
+                    title: "Negotiation\nGives a discount when buying new plots"
+                },
+                {
+                    label: "rec",
+                    key: "recruitment",
+                    sortingFunction: this.sortEmployees,
+                    defaultOrder: "desc",
+                    title: "Recruitment\nAble to find better new recruits"
+                },
+                {
+                    label: "con",
+                    key: "construction",
+                    sortingFunction: this.sortEmployees,
+                    defaultOrder: "desc",
+                    title: "Construction\nDecreases building cost and time"
+                },
+                {
+                    label: "trait",
+                    key: "trait",
+                    defaultOrder: "desc",
+                    propToSortBy: "traitTitle",
+                    title: "Traits\nMouse over trait to see benefits. Traits do not stack."
+                }
+            ];
+
+            var initialColumnIndex = 0;
+            if (this.props.relevantSkills && this.props.relevantSkills.length > 0) {
+                for (var i = 0; i < columns.length; i++) {
+                    if (columns[i].key === this.props.relevantSkills[0]) {
+                        initialColumnIndex = i;
+                    }
+                }
+            }
+
+            if (hasDeleteButton) {
+                columns.push({
+                    label: "fire",
+                    key: "del",
+                    notSortable: true
+                });
+            }
+
+            return (UIComponents.List({
+                // TODO fix declaration file and remove
+                // typescript qq without these
+                selected: null,
+                columns: null,
+                sortBy: null,
+                initialColumn: columns[initialColumnIndex],
+                ref: "list",
+                rowStylingFN: this.applyRowStyle,
+                colStylingFN: this.applyColStyle,
+                cellStylingFN: this.applyCellStyle,
+                onRowChange: this.props.onRowChange || null,
+                listItems: rows,
+                initialColumns: columns
+            }));
         }
-    };
+    });
+})(UIComponents || (UIComponents = {}));
+/// <reference path="../../lib/react.d.ts" />
+/// <reference path="../../data/levelupmodifiers.ts" />
+/// <reference path="../eventmanager.ts" />
+/// <reference path="../utility.ts" />
+/// <reference path="draggable.ts" />
+/// <reference path="splitmultilinetext.ts" />
+/// <reference path="modifierlist.ts" />
+/// <reference path="statlist.ts" />
+/// <reference path="employeelist.ts" />
+/// <reference path="list.ts" />
+var UIComponents;
+(function (UIComponents) {
+    UIComponents.Stats = React.createClass({
+        mixins: [UIComponents.SplitMultilineText],
+        toggleSelf: function () {
+            eventManager.dispatchEvent({ type: "toggleFullScreenPopup", content: null });
+        },
+        render: function () {
+            var player = this.props.player;
+            var allStats = [];
 
-    ReactUI.prototype.clear = function () {
-        this.clearNotifications();
-        this.clearAllPopups();
-    };
-    ReactUI.prototype.clearNotifications = function () {
-        this.notifications = [];
-    };
-    ReactUI.prototype.clearAllPopups = function () {
-        this.popups = {};
-    };
+            var clicks = player.clicks;
 
-    ReactUI.prototype.updateReact = function () {
-        if (document.hidden) {
-            return;
+            var generalStats = [
+                {
+                    title: "Money:",
+                    content: "$" + beautify(player.money)
+                },
+                {
+                    title: "Clicks:",
+                    content: player.clicks
+                },
+                {
+                    title: "Money from clicks:",
+                    content: "$" + (player.incomePerType.click ? beautify(player.incomePerType.click) : 0)
+                },
+                {
+                    title: "Owned plots:",
+                    content: player.ownedCellsAmount
+                },
+                {
+                    title: "Owned buildings:",
+                    content: (function (player) {
+                        var amount = 0;
+                        for (var category in player.ownedContent) {
+                            amount += player.ownedContent[category].length;
+                        }
+                        return amount;
+                    }(player))
+                }
+            ];
+            var generalStatList = UIComponents.StatList({
+                stats: generalStats,
+                header: "General",
+                key: "generalStatList"
+            });
+
+            allStats.push(generalStatList);
+
+            var prestigeModifier = 1 + player.prestige * 0.005;
+            if (player.LevelUpModifiers.prestigeEffectIncrease1) {
+                prestigeModifier *= (1 + player.prestige * 0.0025);
+            }
+            var prestigeStats = [
+                {
+                    title: "Times reset:",
+                    content: player.timesReset
+                },
+                {
+                    title: "Prestige:",
+                    content: player.prestige.toFixed(),
+                    subContent: "for a total of " + ((prestigeModifier - 1) * 100).toFixed(1) + "% " + "extra profit"
+                },
+                {
+                    title: "Current experience:",
+                    content: beautify(player.experience)
+                },
+                {
+                    title: "Total experience:",
+                    content: beautify(player.totalResetExperience + player.experience)
+                }
+            ];
+            var prestigeStatList = UIComponents.StatList({
+                stats: prestigeStats,
+                header: "Prestige",
+                key: "prestigeStatList"
+            });
+
+            allStats.push(prestigeStatList);
+
+            if (player.permanentLevelupUpgrades.length > 0) {
+                var permModifiers = [];
+                for (var i = 0; i < player.permanentLevelupUpgrades.length; i++) {
+                    permModifiers.push(LevelUpModifiers[player.permanentLevelupUpgrades[i]]);
+                }
+                var permModifierList = UIComponents.ModifierList({
+                    ref: "permModifierList",
+                    modifiers: permModifiers,
+                    excludeCost: true
+                });
+
+                allStats.push(React.DOM.div({ className: "stat-group", key: "permModifierList" }, React.DOM.div({ className: "stat-header" }, "Permanent perks"), permModifierList));
+            }
+
+            if (Object.keys(player.LevelUpModifiers).length > 0) {
+                var perks = [];
+                for (var _mod in player.LevelUpModifiers) {
+                    if (player.permanentLevelupUpgrades.indexOf(_mod) > -1)
+                        continue;
+                    else
+                        perks.push(player.LevelUpModifiers[_mod]);
+                }
+                var perkList = UIComponents.ModifierList({
+                    ref: "perkList",
+                    modifiers: perks,
+                    excludeCost: true
+                });
+
+                allStats.push(React.DOM.div({ className: "stat-group", key: "perkList" }, React.DOM.div({ className: "stat-header" }, "Unlocked perks"), perkList));
+            }
+
+            if (Object.keys(player.modifiers).length > 0) {
+                var unlocks = [];
+                for (var _mod in player.modifiers) {
+                    unlocks.push(player.modifiers[_mod]);
+                }
+                var unlockList = UIComponents.ModifierList({
+                    ref: "unlockList",
+                    modifiers: unlocks,
+                    excludeCost: true
+                });
+
+                allStats.push(React.DOM.div({ className: "stat-group", key: "unlockList" }, React.DOM.div({ className: "stat-header" }, "Upgrades"), unlockList));
+            }
+            if (Object.keys(player.employees).length > 0) {
+                var employeeList = UIComponents.EmployeeList({
+                    ref: "employeeList",
+                    employees: player.employees
+                });
+
+                allStats.push(React.DOM.div({ className: "stat-group", key: "employeeList" }, React.DOM.div({ className: "stat-header" }, "Employees"), employeeList));
+            }
+
+            return (React.DOM.div({ className: "all-stats" }, React.DOM.a({
+                id: "close-info", className: "close-popup", href: "#",
+                onClick: this.toggleSelf,
+                onTouchStart: this.toggleSelf
+            }, "X"), allStats));
         }
+    });
+})(UIComponents || (UIComponents = {}));
+/// <reference path="../../lib/react.d.ts" />
+///
+/// <reference path="../eventmanager.ts" />
+/// <reference path="../utility.ts" />
+var UIComponents;
+(function (UIComponents) {
+    UIComponents.OptionList = React.createClass({
+        render: function () {
+            var rows = [];
+            for (var i = 0; i < this.props.options.length; i++) {
+                var option = this.props.options[i];
 
-        React.renderComponent(UIComponents.Stage({
-            popups: this.popups,
-            notifications: this.notifications,
-            player: this.player,
-            frameImages: this.frameImages,
-            showStats: undefined,
-            fullScreenPopups: undefined
-        }), document.getElementById("react-container"));
-    };
-    return ReactUI;
-})();
+                var div = React.DOM.div({
+                    className: "stat-container",
+                    key: "" + i
+                }, React.DOM.div({
+                    className: "stat-main"
+                }, option.content), option.subContent ? React.DOM.small({ className: "stat-subContent" }, option.subContent) : null);
+
+                rows.push(div);
+            }
+            ;
+
+            return (React.DOM.div({ className: "stat-group" }, React.DOM.div({ className: "stat-header" }, this.props.header), rows));
+        }
+    });
+})(UIComponents || (UIComponents = {}));
+/// <reference path="../../lib/react.d.ts" />
+///
+/// <reference path="../eventmanager.ts" />
+/// <reference path="../utility.ts" />
+///
+/// <reference path="optionlist.ts" />
+///
+/// <reference path="../options.ts" />
+var UIComponents;
+(function (UIComponents) {
+    UIComponents.OptionsPopup = React.createClass({
+        toggleSelf: function () {
+            eventManager.dispatchEvent({ type: "toggleFullScreenPopup", content: null });
+        },
+        handleImport: function () {
+            var imported = this.refs.importTextArea.getDOMNode().value;
+            if (!imported)
+                return;
+            var decoded = LZString.decompressFromBase64(imported);
+
+            localStorage.setItem("tempImported", decoded);
+
+            eventManager.dispatchEvent({ type: "loadGame", content: "tempImported" });
+
+            localStorage.removeItem("tempImported");
+        },
+        handleExport: function () {
+            eventManager.dispatchEvent({ type: "saveGame", content: "tempImported" });
+
+            var encoded = LZString.compressToBase64(localStorage.getItem("tempImported"));
+            this.refs.importTextArea.getDOMNode().value = encoded;
+
+            localStorage.removeItem("tempImported");
+        },
+        render: function () {
+            var allOptions = [];
+
+            var importExport = [
+                {
+                    content: React.DOM.div({ id: "import-export-container" }, React.DOM.div({ id: "import-export-buttons" }, React.DOM.button({
+                        id: "import-button",
+                        onClick: this.handleImport,
+                        onTouchStart: this.handleImport
+                    }, "Import"), React.DOM.button({
+                        id: "export-button",
+                        onClick: this.handleExport,
+                        onTouchStart: this.handleExport
+                    }, "Export")), React.DOM.textarea({ id: "import-export-text", ref: "importTextArea" }))
+                }
+            ];
+            var importExportList = UIComponents.OptionList({
+                options: importExport,
+                header: "Import & Export",
+                key: "importExportList"
+            });
+
+            allOptions.push(importExportList);
+
+            var visualOptions = [
+                {
+                    content: React.DOM.div(null, React.DOM.input({
+                        type: "checkbox",
+                        id: "draw-click-popups",
+                        name: "draw-click-popups",
+                        defaultChecked: Options.drawClickPopups,
+                        onChange: function () {
+                            eventManager.dispatchEvent({
+                                type: "toggleDrawClickPopups", content: ""
+                            });
+                        }
+                    }), React.DOM.label({
+                        htmlFor: "draw-click-popups"
+                    }, "Draw click popups"))
+                }
+            ];
+            var visualOptionList = UIComponents.OptionList({
+                options: visualOptions,
+                header: "Visual & Performance",
+                key: "visualOptionList"
+            });
+
+            allOptions.push(visualOptionList);
+
+            var otherOptions = [
+                {
+                    content: React.DOM.div({
+                        title: "Amount of rolling autosaves to keep"
+                    }, React.DOM.input({
+                        type: "number",
+                        id: "autosave-limit",
+                        className: "small-number-input",
+                        defaultValue: Options.autosaveLimit,
+                        step: 1,
+                        min: 1,
+                        max: 9,
+                        onChange: function (e) {
+                            var _target = e.target;
+                            var value = _target.value;
+                            if (value === Options.autosaveLimit)
+                                return;
+                            eventManager.dispatchEvent({
+                                type: "setAutosaveLimit",
+                                content: value
+                            });
+                        }
+                    }), React.DOM.label({
+                        htmlFor: "autosave-limit"
+                    }, "Autosave limit"))
+                },
+                {
+                    content: React.DOM.div({
+                        title: "Automatically switch back to clicking after performing an action\n" + "Can be overridden by holding shift key"
+                    }, React.DOM.input({
+                        type: "checkbox",
+                        id: "auto-switch-tools",
+                        name: "auto-switch-tools",
+                        defaultChecked: Options.autoSwitchTools,
+                        onChange: function () {
+                            eventManager.dispatchEvent({
+                                type: "toggleAutoSwitchTools", content: ""
+                            });
+                        }
+                    }), React.DOM.label({
+                        htmlFor: "auto-switch-tools"
+                    }, "Automatically switch to clicking"))
+                }
+            ];
+            var otherOptionList = UIComponents.OptionList({
+                options: otherOptions,
+                header: "Other",
+                key: "otherOptionList"
+            });
+
+            allOptions.push(otherOptionList);
+
+            return (React.DOM.div({ className: "all-options" }, React.DOM.a({
+                id: "close-info", className: "close-popup", href: "#",
+                onClick: this.toggleSelf,
+                onTouchStart: this.toggleSelf
+            }, "X"), allOptions));
+        }
+    });
+})(UIComponents || (UIComponents = {}));
+/// <reference path="../../lib/react.d.ts" />
+var UIComponents;
+(function (UIComponents) {
+    UIComponents.Notifications = React.createClass({
+        render: function () {
+            var allNotifications = [];
+
+            for (var i = 0; i < this.props.notifications.length; i++) {
+                var current = this.props.notifications[i];
+
+                var newNotification = React.DOM.div({
+                    key: "" + i,
+                    className: "react-notification",
+                    onClick: current.onClose
+                }, React.DOM.img({ src: current.icon }));
+
+                allNotifications.push(newNotification);
+            }
+
+            return (React.DOM.div({ id: "react-notifications" }, allNotifications));
+        }
+    });
+})(UIComponents || (UIComponents = {}));
+/// <reference path="../../lib/react.d.ts" />
+///
+/// <reference path="../eventmanager.ts" />
+/// <reference path="../utility.ts" />
+///
+/// <reference path="optionlist.ts" />
+/// <reference path="splitmultilinetext.ts" />
+var UIComponents;
+(function (UIComponents) {
+    UIComponents.Changelog = React.createClass({
+        mixins: [UIComponents.SplitMultilineText],
+        toggleSelf: function () {
+            eventManager.dispatchEvent({ type: "toggleFullScreenPopup", content: null });
+        },
+        getInitialState: function () {
+            return { changelog: null };
+        },
+        componentDidMount: function () {
+            var self = this;
+
+            var request = new XMLHttpRequest();
+            request.overrideMimeType("application/json");
+            request.open("GET", "changelog.json", true);
+            request.responseType = "json";
+            request.onload = function () {
+                self.setState({ changelog: request.response });
+            };
+            request.send();
+        },
+        render: function () {
+            var allChanges = [];
+
+            if (this.state.changelog) {
+                for (var date in this.state.changelog) {
+                    var _changelog = this.state.changelog[date];
+                    var changelogList = [];
+                    for (var i = 0; i < _changelog.length; i++) {
+                        changelogList.push({ content: _changelog[i] });
+                    }
+
+                    allChanges.push(UIComponents.OptionList({
+                        options: changelogList,
+                        header: date,
+                        key: date
+                    }));
+                }
+            }
+
+            return (React.DOM.div({ className: "all-changes" }, React.DOM.a({
+                id: "close-info", className: "close-popup", href: "#",
+                onClick: this.toggleSelf,
+                onTouchStart: this.toggleSelf
+            }, "X"), allChanges));
+        }
+    });
+})(UIComponents || (UIComponents = {}));
+/// <reference path="../../lib/react.d.ts" />
+/// <reference path="sidemenu.ts" />
+/// <reference path="stats.ts" />
+/// <reference path="options.ts" />
+/// <reference path="notifications.ts" />
+/// <reference path="changelog.ts" />
+/// <reference path="../eventmanager.ts" />
+var UIComponents;
+(function (UIComponents) {
+    UIComponents.Stage = React.createClass({
+        getDefaultProps: function () {
+            return ({
+                fullScreenPopups: {
+                    stats: function () {
+                        return (React.DOM.div({ className: "fullscreen-popup-wrapper" }, React.DOM.div({ id: "stats-container", className: "fullscreen-popup" }, UIComponents.Stats({ player: this.props.player }))));
+                    },
+                    options: function () {
+                        return (React.DOM.div({ className: "fullscreen-popup-wrapper" }, React.DOM.div({ id: "options-container", className: "fullscreen-popup" }, UIComponents.OptionsPopup(null))));
+                    },
+                    changelog: function () {
+                        return (React.DOM.div({ className: "fullscreen-popup-wrapper" }, React.DOM.div({ id: "changelog-container", className: "fullscreen-popup" }, UIComponents.Changelog(null))));
+                    }
+                }
+            });
+        },
+        getInitialState: function () {
+            return { showFullScreenPopup: null };
+        },
+        componentDidMount: function () {
+            var self = this;
+            eventManager.addEventListener("toggleFullScreenPopup", function (event) {
+                if (event.content === self.state.showFullScreenPopup) {
+                    self.setState({ showFullScreenPopup: null });
+                } else {
+                    self.setState({ showFullScreenPopup: event.content });
+                }
+            });
+        },
+        render: function () {
+            var self = this;
+            var popups = [];
+            for (var _popup in this.props.popups) {
+                var popup = this.props.popups[_popup];
+                popups.push(UIComponents[popup.type].call(null, popup.props));
+            }
+            ;
+
+            var fullScreenPopup = this.state.showFullScreenPopup ? this.props.fullScreenPopups[this.state.showFullScreenPopup].call(this) : null;
+
+            return (React.DOM.div({ id: "react-wrapper" }, React.DOM.div({
+                id: "react-popups",
+                onDragEnter: function (e) {
+                    e.preventDefault();
+                },
+                onDragOver: function (e) {
+                    e.preventDefault();
+                },
+                onDrop: function (e) {
+                    e.preventDefault();
+                },
+                onDragLeave: function (e) {
+                    e.preventDefault();
+                }
+            }, popups, UIComponents.Notifications({
+                notifications: this.props.notifications
+            })), fullScreenPopup, UIComponents.SideMenu({
+                player: this.props.player,
+                frameImages: this.props.frameImages,
+                // todo react definitions
+                selectedTool: null
+            })));
+        }
+    });
+})(UIComponents || (UIComponents = {}));
+/// <reference path="../../lib/react.d.ts" />
+/// <reference path="../../lib/pixi.d.ts" />
+/// <reference path="../player.ts" />
+/// <reference path="../employee.ts" />
+/// <reference path="../actions.ts" />
+/// <reference path="stage.ts" />
+var CityGame;
+(function (CityGame) {
+    var ReactUI = (function () {
+        function ReactUI(player, frameImages) {
+            this.idGenerator = 0;
+            this.popups = {};
+            this.notifications = [];
+            this.topZIndex = 15;
+            this.icons = {};
+            this.player = player;
+            this.frameImages = frameImages;
+            this.init();
+        }
+        ReactUI.prototype.init = function () {
+            React.initializeTouchEvents(true);
+            this.addEventListeners();
+
+            this.icons = {
+                newEmployee: "img/icons/newemployee.png"
+            };
+
+            this.updateReact();
+
+            // chrome doesnt work when called via reuqestAnimationFrame
+            this.updateInterval = window.setInterval(this.updateReact.bind(this), 1000);
+        };
+        ReactUI.prototype.addEventListeners = function () {
+            var self = this;
+
+            eventManager.addEventListener("makeEmployeeActionPopup", function (event) {
+                self.makeEmployeeActionPopup(event.content);
+            });
+            eventManager.addEventListener("makeRecruitPopup", function (event) {
+                self.makeRecruitPopup(event.content);
+            });
+            eventManager.addEventListener("makeRecruitCompletePopup", function (event) {
+                self.makeRecruitCompletePopup(event.content);
+            });
+            eventManager.addEventListener("makeRecruitCompleteNotification", function (event) {
+                event.content.delay = 0;
+                self.makeNotification({
+                    icon: self.icons.newEmployee,
+                    onOk: self.makeRecruitCompletePopup.bind(self, event.content)
+                });
+            });
+            eventManager.addEventListener("makeCellBuyPopup", function (event) {
+                self.makeCellBuyPopup(event.content);
+            });
+            eventManager.addEventListener("makeConfirmPopup", function (event) {
+                self.makeConfirmPopup(event.content);
+            });
+            eventManager.addEventListener("makePopup", function (event) {
+                self.makePopup(event.content.type, event.content.props);
+            });
+            eventManager.addEventListener("makeInfoPopup", function (event) {
+                self.makeInfoPopup(event.content);
+            });
+            eventManager.addEventListener("makeBuildingSelectPopup", function (event) {
+                self.makeBuildingSelectPopup(event.content);
+            });
+            eventManager.addEventListener("makeBuildingConstructPopup", function (event) {
+                self.makeBuildingConstructPopup(event.content);
+            });
+            eventManager.addEventListener("makeInputPopup", function (event) {
+                self.makeInputPopup(event.content);
+            });
+            eventManager.addEventListener("makeLoadPopup", function (event) {
+                self.makeLoadPopup();
+            });
+            eventManager.addEventListener("makeSavePopup", function (event) {
+                self.makeSavePopup();
+            });
+            eventManager.addEventListener("makeModifierPopup", function (event) {
+                self.makeModifierPopup(event.content);
+            });
+            eventManager.addEventListener("makeNotification", function (event) {
+                self.makeNotification(event.content);
+            });
+            eventManager.addEventListener("closeTopPopup", function (event) {
+                self.closeTopPopup();
+            });
+            eventManager.addEventListener("clearReact", function (event) {
+                self.clear();
+            });
+            eventManager.addEventListener("updateReact", function (event) {
+                self.updateReact();
+            });
+        };
+
+        ///// /////
+        ReactUI.prototype.makePopup = function (type, props) {
+            var key = this.idGenerator++;
+
+            var onCloseCallback = props.onClose;
+            props.onClose = function () {
+                this.destroyPopup(key, onCloseCallback);
+            }.bind(this);
+
+            var zIndex = this.incrementZIndex();
+            var popupProps = {};
+            for (var prop in props) {
+                popupProps[prop] = props[prop];
+            }
+            ;
+            popupProps.key = key;
+
+            var container = document.getElementById("react-popups");
+             {
+            }
+            var basePos = {
+                top: 0,
+                left: 0
+            };
+            popupProps.initialStyle = {
+                top: window.innerHeight / 3.5 - 120 + Object.keys(this.popups).length * 15,
+                left: window.innerWidth / 3.5 - 120 + Object.keys(this.popups).length * 15,
+                zIndex: zIndex
+            };
+            popupProps.incrementZIndex = this.incrementZIndex.bind(this, key);
+
+            var popup = {
+                type: type,
+                props: popupProps,
+                zIndex: zIndex
+            };
+
+            this.popups[key] = popup;
+            this.updateReact();
+        };
+
+        ReactUI.prototype.makeEmployeeActionPopup = function (props) {
+            this.makePopup("EmployeeActionPopup", props);
+        };
+
+        ReactUI.prototype.makeInfoPopup = function (props) {
+            this.makePopup("InfoPopup", props);
+        };
+        ReactUI.prototype.makeLoadPopup = function () {
+            this.makePopup("LoadPopup", {
+                onOk: function (name) {
+                    eventManager.dispatchEvent({
+                        type: "loadGame",
+                        content: name
+                    });
+                }
+            });
+        };
+
+        ReactUI.prototype.makeSavePopup = function () {
+            this.makePopup("SavePopup", {
+                onOk: function (name) {
+                    eventManager.dispatchEvent({
+                        type: "saveGame",
+                        content: name
+                    });
+                }
+            });
+        };
+
+        ReactUI.prototype.makeModifierPopup = function (props) {
+            var onOk = props.onOk || function (selected) {
+                props.player.addModifier(selected.data.modifier);
+                eventManager.dispatchEvent({ type: "updateReact", content: "" });
+
+                return false;
+            };
+
+            this.makePopup("ModifierPopup", {
+                player: props.player,
+                text: props.text || null,
+                modifierList: props.modifierList || props.player.unlockedModifiers,
+                excludeCost: props.excludeCost || false,
+                onOk: onOk,
+                onClose: props.onClose || null,
+                okBtnText: props.okBtnText || "Buy"
+            });
+        };
+
+        ReactUI.prototype.makeRecruitPopup = function (props) {
+            var self = this;
+            var recruitWithSelected = function (selected) {
+                actions.recruitEmployee({
+                    playerId: props.player.id,
+                    employeeId: selected.employee.id
+                });
+            };
+            this.makeEmployeeActionPopup({
+                player: props.player,
+                relevantSkills: ["recruitment"],
+                text: "Select employee in charge of recruitment",
+                onOk: recruitWithSelected,
+                okBtnText: "Select",
+                action: {
+                    actionText: "Scouting new employees would take:",
+                    data: {
+                        time: {
+                            approximate: true,
+                            amount: 14
+                        }
+                    }
+                }
+            });
+        };
+
+        ReactUI.prototype.makeRecruitCompletePopup = function (props) {
+            var self = this;
+            var recruitConfirmFN = function (selected) {
+                props.player.addEmployee(selected.employee);
+            };
+
+            if (!isFinite(props.delay))
+                props.delay = 2000;
+
+            var recruitCloseFN = function (selected) {
+                if (props.recruitingEmployee) {
+                    props.recruitingEmployee.active = true;
+                    self.updateReact();
+                }
+            };
+            this.makeEmployeeActionPopup({
+                employees: props.employees,
+                text: props.text || "Choose employee to recruit",
+                onOk: recruitConfirmFN,
+                onClose: recruitCloseFN,
+                okBtnText: "Recruit",
+                activationDelay: props.delay
+            });
+        };
+
+        ReactUI.prototype.makeCellBuyPopup = function (props) {
+            if (Object.keys(props.player.employees).length < 1) {
+                this.makeInfoPopup({ text: "Recruit some employees first" });
+                return;
+            }
+
+            if (props.player.ownedCells[props.cell.gridPos])
+                return;
+            if (props.cell.type.type === "water")
+                return;
+            if (props.cell.content)
+                return;
+
+            var buyCost = props.player.getCellBuyCost(props.cell);
+
+            var buySelected = function (selected) {
+                var adjusted = actions.getActionCost([selected.employee.skills["negotiation"]], buyCost).actual;
+
+                if (props.player.money < adjusted) {
+                    eventManager.dispatchEvent({
+                        type: "makeInfoPopup",
+                        content: {
+                            text: "Not enough funds"
+                        }
+                    });
+
+                    return false;
+                }
+
+                actions.buyCell({
+                    gridPos: props.cell.gridPos,
+                    boardId: props.cell.board.id,
+                    playerId: props.player.id,
+                    employeeId: selected.employee.id
+                });
+
+                if (props.onOk)
+                    props.onOk.call();
+                return true;
+            };
+            this.makeEmployeeActionPopup({
+                player: props.player,
+                relevantSkills: ["negotiation"],
+                text: "Select employee in charge of purchasing the plot",
+                onOk: buySelected,
+                okBtnText: "Buy",
+                action: {
+                    target: props.cell,
+                    actionText: "Buying this plot would take:",
+                    data: {
+                        time: {
+                            approximate: true,
+                            amount: 14
+                        },
+                        cost: {
+                            approximate: false,
+                            amount: buyCost
+                        }
+                    }
+                }
+            });
+        };
+        ReactUI.prototype.makeConfirmPopup = function (props) {
+            this.makePopup("ConfirmPopup", props);
+        };
+        ReactUI.prototype.makeBuildingSelectPopup = function (props) {
+            if (Object.keys(props.player.employees).length < 1) {
+                this.makeInfoPopup({ text: "Recruit some employees first" });
+                return;
+            }
+
+            this.makePopup("BuildingListPopup", {
+                player: props.player,
+                buildingTemplates: cg.content.buildings,
+                buildingImages: this.frameImages,
+                onOk: props.onOk
+            });
+        };
+        ReactUI.prototype.makeBuildingConstructPopup = function (props) {
+            var buildBuilding = function (selected) {
+                if (selected) {
+                    actions.constructBuilding({
+                        playerId: props.player.id,
+                        gridPos: props.cell.gridPos,
+                        boardId: props.cell.board.id,
+                        buildingType: props.buildingTemplate.type,
+                        employeeId: selected.employee.id
+                    });
+                    props.onOk.call();
+                }
+            };
+            this.makeEmployeeActionPopup({
+                player: props.player,
+                relevantSkills: ["construction"],
+                text: "Select employee in charge of construction",
+                onOk: buildBuilding,
+                okBtnText: "Build",
+                action: {
+                    target: props.cell,
+                    actionText: "Constructing this building would take:",
+                    data: {
+                        time: {
+                            approximate: true,
+                            amount: props.buildingTemplate.buildTime
+                        },
+                        cost: {
+                            approximate: false,
+                            amount: props.player.getBuildCost(props.buildingTemplate)
+                        }
+                    },
+                    baseDuration: props.buildingTemplate.buildTime,
+                    exactCost: props.buildingTemplate.cost
+                }
+            });
+        };
+
+        ReactUI.prototype.makeInputPopup = function (props) {
+            this.makePopup("InputPopup", props);
+        };
+
+        ///// /////
+        ReactUI.prototype.makeNotification = function (props) {
+            props.id = this.idGenerator++;
+
+            props.onClose = function () {
+                props.onOk.call();
+                this.removeNotification(props.id);
+            }.bind(this);
+
+            this.notifications.push(props);
+
+            this.updateReact();
+        };
+        ReactUI.prototype.removeNotification = function (id) {
+            this.notifications = this.notifications.filter(function (item) {
+                return item.id !== id;
+            });
+
+            this.updateReact();
+        };
+
+        ///// OTHER METHODS /////
+        ReactUI.prototype.incrementZIndex = function (key) {
+            var newZIndex = this.topZIndex++;
+            if (key) {
+                this.popups[key].zIndex = newZIndex;
+            }
+            return newZIndex;
+        };
+        ReactUI.prototype.destroyPopup = function (key, callback) {
+            if (callback)
+                callback.call();
+
+            this.popups[key] = null;
+            delete this.popups[key];
+
+            this.updateReact();
+        };
+        ReactUI.prototype.closeTopPopup = function () {
+            if (Object.keys(this.popups).length < 1)
+                return;
+            else {
+                var max = 0;
+                var key;
+                for (var popup in this.popups) {
+                    if (this.popups[popup].zIndex > max) {
+                        max = this.popups[popup].zIndex;
+                        key = popup;
+                    }
+                }
+                this.destroyPopup(key);
+            }
+        };
+
+        ReactUI.prototype.clear = function () {
+            this.clearNotifications();
+            this.clearAllPopups();
+        };
+        ReactUI.prototype.clearNotifications = function () {
+            this.notifications = [];
+        };
+        ReactUI.prototype.clearAllPopups = function () {
+            this.popups = {};
+        };
+
+        ReactUI.prototype.updateReact = function () {
+            if (document.hidden) {
+                return;
+            }
+
+            React.renderComponent(UIComponents.Stage({
+                popups: this.popups,
+                notifications: this.notifications,
+                player: this.player,
+                frameImages: this.frameImages,
+                showStats: undefined,
+                fullScreenPopups: undefined
+            }), document.getElementById("react-container"));
+        };
+        return ReactUI;
+    })();
+    CityGame.ReactUI = ReactUI;
+})(CityGame || (CityGame = {}));
+var CityGame;
+(function (CityGame) {
+    /**
+    * @class Timer
+    * @classdesc Timing module
+    * @memberof CityGame
+    *
+    * @param    autostart      {boolean}
+    *
+    * @property startTime      First start
+    * @property totalTime      Time since clock first started
+    * @property runningTime    Time clock has been running since start
+    * @property deltaTime      Time since last deltaTime call or start in ms
+    * @property _runStartTime  Time clock last started running
+    * @property _previousTime  Same as delta
+    *
+    */
+    var Timer = (function () {
+        function Timer(autoStart) {
+            this.autoStart = autoStart;
+            this.runningTime = 0;
+            this.running = false;
+            if (window.performance && window.performance.now) {
+                this.getTime = function getTimeFn() {
+                    return window.performance.now();
+                };
+            } else {
+                this.getTime = Date.now;
+            }
+
+            if (autoStart !== false) {
+                this.start();
+            }
+        }
+        /////////////
+        // Methods //
+        /////////////
+        /**
+        * @method CityGame.Timer#start
+        */
+        Timer.prototype.start = function () {
+            if (this.running) {
+                return;
+            }
+            var now = this.getTime();
+            if (!this.startTime) {
+                this.startTime = now;
+            }
+            this._runStartTime = now;
+            this._previousTime = now;
+            this.running = true;
+        };
+
+        /**
+        * @method CityGame.Timer#stop
+        */
+        Timer.prototype.stop = function () {
+            this.getRunningTime();
+            this.running = false;
+        };
+
+        /**
+        * @method CityGame.Timer#getTotalTime
+        */
+        Timer.prototype.getTotalTime = function () {
+            this.totalTime = this.getTime() - this.startTime;
+            return this.totalTime;
+        };
+
+        /**
+        * @method CityGame.Timer#getRunningTime
+        */
+        Timer.prototype.getRunningTime = function () {
+            if (!this.running) {
+                return this.runningTime;
+            }
+            var now = this.getTime();
+            this.runningTime += now - this._runStartTime;
+            this._runStartTime = now;
+            return this.runningTime;
+        };
+
+        /**
+        * @method CityGame.Timer#getDelta
+        */
+        Timer.prototype.getDelta = function () {
+            var now = this.getTime();
+            this.deltaTime = (now - this._previousTime) * 0.001;
+            this._previousTime = now;
+            return this.deltaTime;
+        };
+        return Timer;
+    })();
+    CityGame.Timer = Timer;
+})(CityGame || (CityGame = {}));
+var CityGame;
+(function (CityGame) {
+    var System = (function () {
+        function System(activationRate, currTick) {
+            this.activationRate = activationRate;
+            this.updateTicks(currTick);
+
+            if (activationRate < 1) {
+                console.warn("<1 activationRate on system", this);
+            }
+        }
+        System.prototype.activate = function (any) {
+        };
+
+        System.prototype.updateTicks = function (currTick) {
+            this.lastTick = currTick;
+            this.nextTick = currTick + this.activationRate;
+        };
+
+        System.prototype.tick = function (currTick) {
+            if (currTick >= this.nextTick) {
+                // do something
+                this.activate(currTick);
+
+                this.updateTicks(currTick);
+            }
+        };
+        return System;
+    })();
+    CityGame.System = System;
+})(CityGame || (CityGame = {}));
+/// <reference path="system.ts" />
+// This is a seperate system, because even though it should be easier
+// with just setinterval theres some weird scope fuckery where blurred
+// tabs keep calling the function with outdated values
+var CityGame;
+(function (CityGame) {
+    (function (Systems) {
+        var AutosaveSystem = (function (_super) {
+            __extends(AutosaveSystem, _super);
+            function AutosaveSystem(activationRate, systemsManager) {
+                _super.call(this, activationRate, systemsManager.tickNumber);
+                this.systemsManager = systemsManager;
+            }
+            AutosaveSystem.prototype.activate = function (currTick) {
+                eventManager.dispatchEvent({ type: "autosave", content: "" });
+            };
+            return AutosaveSystem;
+        })(CityGame.System);
+        Systems.AutosaveSystem = AutosaveSystem;
+    })(CityGame.Systems || (CityGame.Systems = {}));
+    var Systems = CityGame.Systems;
+})(CityGame || (CityGame = {}));
+/// <reference path="system.ts" />
+var CityGame;
+(function (CityGame) {
+    (function (Systems) {
+        var DateSystem = (function (_super) {
+            __extends(DateSystem, _super);
+            function DateSystem(activationRate, systemsManager, dateElem, startDate) {
+                _super.call(this, activationRate, systemsManager.tickNumber);
+                this.year = startDate ? startDate.year : 2000;
+                this.month = startDate ? startDate.month : 1;
+                this.day = startDate ? startDate.day : 1;
+
+                this.dateElem = dateElem;
+
+                this.updateDate();
+            }
+            DateSystem.prototype.activate = function () {
+                this.incrementDate();
+            };
+            DateSystem.prototype.incrementDate = function () {
+                this.day++;
+
+                this.fireCallbacks(this.onDayChange, this.day);
+
+                this.calculateDate();
+            };
+            DateSystem.prototype.calculateDate = function () {
+                if (this.day > 30) {
+                    this.day -= 30;
+                    this.month++;
+
+                    this.fireCallbacks(this.onMonthChange, this.month);
+                }
+                if (this.month > 12) {
+                    this.month -= 12;
+                    this.year++;
+
+                    this.fireCallbacks(this.onYearChange, this.year);
+                }
+                if (this.day > 30 || this.month > 12) {
+                    this.calculateDate();
+                } else {
+                    this.updateDate();
+                }
+            };
+
+            DateSystem.prototype.fireCallbacks = function (targets, date) {
+                if (!targets)
+                    return;
+                for (var i = 0; i < targets.length; i++) {
+                    targets[i].call(date);
+                }
+            };
+
+            DateSystem.prototype.getDate = function () {
+                var dateObj = {
+                    year: this.year,
+                    month: this.month,
+                    day: this.day
+                };
+                return dateObj;
+            };
+            DateSystem.prototype.setDate = function (newDate) {
+                this.year = newDate.year;
+                this.month = newDate.month;
+                this.day = newDate.day;
+
+                this.updateDate();
+            };
+            DateSystem.prototype.toString = function () {
+                return "" + this.day + "." + this.month + "." + this.year;
+            };
+            DateSystem.prototype.updateDate = function () {
+                this.dateElem.innerHTML = this.toString();
+            };
+            return DateSystem;
+        })(CityGame.System);
+        Systems.DateSystem = DateSystem;
+    })(CityGame.Systems || (CityGame.Systems = {}));
+    var Systems = CityGame.Systems;
+})(CityGame || (CityGame = {}));
+/// <reference path="system.ts" />
+var CityGame;
+(function (CityGame) {
+    (function (Systems) {
+        var DelayedActionSystem = (function (_super) {
+            __extends(DelayedActionSystem, _super);
+            function DelayedActionSystem(activationRate, systemsManager) {
+                _super.call(this, activationRate, systemsManager.tickNumber);
+                this.callbacks = {};
+                this.systemsManager = systemsManager;
+                this.addEventListeners();
+            }
+            DelayedActionSystem.prototype.addEventListeners = function () {
+                var self = this;
+                eventManager.addEventListener("delayedAction", function (event) {
+                    var action = event.content;
+                    action.data.finishedOn = action.data.finishedOn || self.lastTick + action.data.time;
+
+                    self.addAction(action);
+                });
+            };
+
+            DelayedActionSystem.prototype.addAction = function (action) {
+                if (!this.callbacks[action.data.finishedOn]) {
+                    this.callbacks[action.data.finishedOn] = [];
+                }
+                this.callbacks[action.data.finishedOn].push(action);
+            };
+
+            DelayedActionSystem.prototype.activate = function (currTick) {
+                if (this.callbacks[currTick]) {
+                    for (var i = 0; i < this.callbacks[currTick].length; i++) {
+                        this.callbacks[currTick][i].onComplete.call();
+                    }
+                    this.callbacks[currTick] = null;
+                    delete this.callbacks[currTick];
+                }
+            };
+
+            DelayedActionSystem.prototype.reset = function () {
+                this.callbacks = {};
+            };
+            return DelayedActionSystem;
+        })(CityGame.System);
+        Systems.DelayedActionSystem = DelayedActionSystem;
+    })(CityGame.Systems || (CityGame.Systems = {}));
+    var Systems = CityGame.Systems;
+})(CityGame || (CityGame = {}));
+/// <reference path="system.ts" />
+var CityGame;
+(function (CityGame) {
+    (function (Systems) {
+        var ProfitSystem = (function (_super) {
+            __extends(ProfitSystem, _super);
+            function ProfitSystem(activationRate, systemsManager, players, targetTypes) {
+                _super.call(this, activationRate, systemsManager.tickNumber);
+                this.systemsManager = systemsManager;
+                this.players = players;
+                this.targetTypes = targetTypes;
+            }
+            ProfitSystem.prototype.activate = function () {
+                var currentDate = this.systemsManager.systems.date.getDate();
+                for (var _player in this.players) {
+                    var player = this.players[_player];
+
+                    for (var ii = 0; ii < this.targetTypes.length; ii++) {
+                        var profitPerThisType = 0;
+                        var targets = player.ownedContent[this.targetTypes[ii]];
+
+                        if (targets.length < 1)
+                            continue;
+
+                        for (var jj = 0; jj < targets.length; jj++) {
+                            var profit = targets[jj].modifiedProfit;
+
+                            // content isn't removed in place
+                            // which means the array here is the pre-splicing ver
+                            // which probably makes this whole system pointless
+                            //
+                            // but this check means it doesn't fall apart at least
+                            if (isFinite(profit))
+                                profitPerThisType += profit;
+                        }
+                        player.addMoney(profitPerThisType, this.targetTypes[ii], targets.length, currentDate);
+                    }
+                }
+            };
+            return ProfitSystem;
+        })(CityGame.System);
+        Systems.ProfitSystem = ProfitSystem;
+    })(CityGame.Systems || (CityGame.Systems = {}));
+    var Systems = CityGame.Systems;
+})(CityGame || (CityGame = {}));
+/// <reference path="../timer.ts" />
+/// <reference path="system.ts" />
+/// <reference path="autosavesystem.ts" />
+/// <reference path="datesystem.ts" />
+/// <reference path="delayedactionsystem.ts" />
+/// <reference path="profitsystem.ts" />
 var CityGame;
 (function (CityGame) {
     /**
@@ -8357,22 +11122,35 @@ var CityGame;
     *
     */
     var SystemsManager = (function () {
-        function SystemsManager(tickTime) {
-            this.systems = {};
+        function SystemsManager(tickTime, players) {
             this.tickNumber = 0;
             this.accumulated = 0;
             this.paused = false;
             this.speed = 1;
-            this.timer = new Strawb.Timer();
+            this.timer = new CityGame.Timer();
             this.tickTime = tickTime / 1000;
 
-            this.init();
+            this.init(players);
         }
-        SystemsManager.prototype.init = function () {
+        SystemsManager.prototype.init = function (players) {
             this.addEventListeners();
+            this.makeSystems(players);
         };
-        SystemsManager.prototype.addSystem = function (name, system) {
-            this.systems[name] = system;
+        SystemsManager.prototype.makeSystems = function (players) {
+            this.systems = {
+                dailyProfitSystem: new CityGame.Systems.ProfitSystem(1, this, players, ["fastfood", "shopping", "parking", "factory", "hotel", "apartment", "office"]),
+                delayedAction: new CityGame.Systems.DelayedActionSystem(1, this),
+                autosave: new CityGame.Systems.AutosaveSystem(60, this),
+                date: new CityGame.Systems.DateSystem(1, this, document.getElementById("date"))
+            };
+            /*
+            var monthlyProfitSystem = new Systems.ProfitSystem(30, this, players,
+            ["apartment"]);
+            var quarterlyProfitSystem = new Systems.ProfitSystem(90, this, players,
+            ["office"]);
+            this.addSystem("monthlyProfitSystem", monthlyProfitSystem);
+            this.addSystem("quarterlyProfitSystem", quarterlyProfitSystem);
+            */
         };
         SystemsManager.prototype.addEventListeners = function () {
             var self = this;
@@ -8484,8 +11262,8 @@ var CityGame;
             this.bindElements();
             this.loadOptions();
 
-            for (var i = 0; i < AMT_OF_BOARDS; i++) {
-                this.boards.push(new CityGame.Board({ width: TILES }));
+            for (var i = 0; i < CityGame.AMT_OF_BOARDS; i++) {
+                this.boards.push(new CityGame.Board({ width: CityGame.TILES }));
             }
             this.changeActiveBoard(0);
             this.updateBoardSelect();
@@ -8493,37 +11271,20 @@ var CityGame;
             this.spriteHighlighter = new SpriteHighlighter();
 
             this.mouseEventHandler = new CityGame.MouseEventHandler();
-            this.mouseEventHandler.camera = new Camera(this.layers["main"], 0.5);
+            this.mouseEventHandler.camera = new CityGame.Camera(this.layers["main"], 0.5);
 
             this.keyboardEventHandler = new KeyboardEventHandler();
 
             this.uiDrawer = new CityGame.UIDrawer();
 
-            this.systemsManager = new CityGame.SystemsManager(1000);
             var id = "player" + (CityGame.idGenerator.player++);
             var player = new CityGame.Player(id);
 
             //player.addMoney(100, "initial");
-            this.reactUI = new ReactUI(player, this.frameImages);
+            this.reactUI = new CityGame.ReactUI(player, this.frameImages);
             this.players[player.id] = player;
 
-            // TODO have content types register themselves
-            var dailyProfitSystem = new ProfitSystem(1, this.systemsManager, this.players, ["fastfood", "shopping", "parking", "factory", "hotel", "apartment", "office"]);
-            this.systemsManager.addSystem("dailyProfitSystem", dailyProfitSystem);
-
-            /*
-            var monthlyProfitSystem = new ProfitSystem(30, this.systemsManager, this.players,
-            ["apartment"]);
-            var quarterlyProfitSystem = new ProfitSystem(90, this.systemsManager, this.players,
-            ["office"]);
-            this.systemsManager.addSystem("monthlyProfitSystem", monthlyProfitSystem);
-            this.systemsManager.addSystem("quarterlyProfitSystem", quarterlyProfitSystem);
-            */
-            this.systemsManager.addSystem("delayedAction", new DelayedActionSystem(1, this.systemsManager));
-            this.systemsManager.addSystem("autosave", new AutosaveSystem(60, this.systemsManager));
-
-            var dateSystem = new DateSystem(1, this.systemsManager, document.getElementById("date"));
-            this.systemsManager.addSystem("date", dateSystem);
+            this.systemsManager = new CityGame.SystemsManager(1000);
 
             this.editModes = ["play", "edit-world"];
             this.switchEditingMode("play");
@@ -8540,16 +11301,16 @@ var CityGame;
         };
         Game.prototype.initContainers = function () {
             var _stage = this.stage = new PIXI.Stage(0xFFFFFF);
-            var _renderer = this.renderer = PIXI.autoDetectRenderer(SCREEN_WIDTH, SCREEN_HEIGHT, null, false, true);
+            var _renderer = this.renderer = PIXI.autoDetectRenderer(CityGame.SCREEN_WIDTH, CityGame.SCREEN_HEIGHT, null, false, true);
 
             var _main = this.layers["main"] = new PIXI.DisplayObjectContainer();
-            _main.position.set(SCREEN_WIDTH / 2 - WORLD_WIDTH / 2, SCREEN_HEIGHT / 2 - WORLD_HEIGHT / 2);
+            _main.position.set(CityGame.SCREEN_WIDTH / 2 - CityGame.WORLD_WIDTH / 2, CityGame.SCREEN_HEIGHT / 2 - CityGame.WORLD_HEIGHT / 2);
             _stage.addChild(_main);
 
             var _tooltips = this.layers["tooltips"] = new PIXI.DisplayObjectContainer();
             _stage.addChild(_tooltips);
 
-            this.worldRenderer = new WorldRenderer(WORLD_WIDTH, WORLD_HEIGHT);
+            this.worldRenderer = new WorldRenderer(CityGame.WORLD_WIDTH, CityGame.WORLD_HEIGHT);
             _main.addChild(this.worldRenderer.worldSprite);
 
             var _game = this;
@@ -8564,7 +11325,7 @@ var CityGame;
                 _game.mouseEventHandler.mouseUp(event, "stage");
             };
             _stage.mouseupoutside = _stage.touchendoutside = function (event) {
-                game.mouseEventHandler.mouseUp(event, "stage");
+                CityGame.game.mouseEventHandler.mouseUp(event, "stage");
             };
         };
         Game.prototype.initTools = function () {
@@ -8593,7 +11354,7 @@ var CityGame;
             var zoomBtn = document.getElementById("zoomBtn");
             CityGame.addClickAndTouchEventListener(zoomBtn, function () {
                 var zoomAmount = document.getElementById("zoom-amount")["value"];
-                game.mouseEventHandler.camera.zoom(zoomAmount);
+                CityGame.game.mouseEventHandler.camera.zoom(zoomAmount);
             });
 
             for (var toolName in this.tools) {
@@ -8705,7 +11466,7 @@ var CityGame;
                 self.changeTool(e.content.type);
                 var continuous;
 
-                if (Options.autoSwitchTools) {
+                if (CityGame.Options.autoSwitchTools) {
                     continuous = e.content.continuous;
                 } else {
                     continuous = !e.content.continuous;
@@ -8718,7 +11479,7 @@ var CityGame;
             this.bindRenderer();
 
             //resize
-            window.addEventListener("resize", game.resize, false);
+            window.addEventListener("resize", CityGame.game.resize, false);
 
             eventManager.addEventListener("autosave", function (e) {
                 self.autosave();
@@ -8732,10 +11493,10 @@ var CityGame;
 
             //regen world
             CityGame.addClickAndTouchEventListener(document.getElementById("regen-world"), function () {
-                var oldMapmode = game.worldRenderer.currentMapmode;
+                var oldMapmode = CityGame.game.worldRenderer.currentMapmode;
                 self.resetLayers();
                 self.activeBoard.destroy();
-                self.boards[self.indexOfActiveBoard] = new CityGame.Board({ width: TILES });
+                self.boards[self.indexOfActiveBoard] = new CityGame.Board({ width: CityGame.TILES });
 
                 self.changeActiveBoard(self.indexOfActiveBoard);
 
@@ -8810,10 +11571,10 @@ var CityGame;
         };
         Game.prototype.resize = function () {
             var container = window.getComputedStyle(document.getElementById("pixi-container"), null);
-            SCREEN_WIDTH = parseInt(container.width);
-            SCREEN_HEIGHT = parseInt(container.height);
-            if (game.renderer) {
-                game.renderer.resize(SCREEN_WIDTH, SCREEN_HEIGHT);
+            CityGame.SCREEN_WIDTH = parseInt(container.width);
+            CityGame.SCREEN_HEIGHT = parseInt(container.height);
+            if (CityGame.game.renderer) {
+                CityGame.game.renderer.resize(CityGame.SCREEN_WIDTH, CityGame.SCREEN_HEIGHT);
             }
             if (window.innerWidth <= 600) {
                 eventManager.dispatchEvent({ type: "resizeSmaller", content: "" });
@@ -8883,7 +11644,7 @@ var CityGame;
         };
         Game.prototype.autosave = function () {
             // TODO
-            var autosaveLimit = Options.autosaveLimit;
+            var autosaveLimit = CityGame.Options.autosaveLimit;
             var autosaves = [];
             for (var saveGame in localStorage) {
                 if (saveGame.match(/autosave/)) {
@@ -9042,8 +11803,8 @@ var CityGame;
                 newBoards.push(board);
             }
 
-            game.boards = newBoards;
-            game.changeActiveBoard(cachedBoardIndex);
+            CityGame.game.boards = newBoards;
+            CityGame.game.changeActiveBoard(cachedBoardIndex);
 
             eventManager.dispatchEvent({ type: "updateWorld", content: { clear: true } });
             this.updateBoardSelect();
@@ -9135,13 +11896,13 @@ var CityGame;
             player.updateElements();
         };
         Game.prototype.saveOptions = function () {
-            localStorage.setItem("options", JSON.stringify(Options));
+            localStorage.setItem("options", JSON.stringify(CityGame.Options));
         };
         Game.prototype.loadOptions = function () {
             var parsed = JSON.parse(localStorage.getItem("options"));
 
             for (var _prop in parsed) {
-                Options[_prop] = parsed[_prop];
+                CityGame.Options[_prop] = parsed[_prop];
             }
         };
         Game.prototype.saveActions = function (system) {
@@ -9159,7 +11920,7 @@ var CityGame;
             return toSave;
         };
         Game.prototype.loadActions = function (toLoad) {
-            game.systemsManager.systems.delayedAction.reset();
+            CityGame.game.systemsManager.systems.delayedAction.reset();
             if (!toLoad || toLoad.length < 1)
                 return;
             for (var i = 0; i < toLoad.length; i++) {
@@ -9199,7 +11960,7 @@ var CityGame;
                 this.resetLayers();
                 this.destroyAllBoards();
 
-                var newBoards = [new CityGame.Board({ width: TILES })];
+                var newBoards = [new CityGame.Board({ width: CityGame.TILES })];
 
                 this.boards = newBoards;
                 this.changeActiveBoard(0);
@@ -9380,8 +12141,11 @@ var Loader = (function () {
 })();
 /// <reference path="game.ts" />
 /// <reference path="loader.ts" />
-var TILE_WIDTH = 64, TILE_HEIGHT = 32, SPRITE_HEIGHT = 31, TILES = 32, WORLD_WIDTH = TILES * TILE_WIDTH, WORLD_HEIGHT = TILES * TILE_HEIGHT, ZOOM_LEVELS = [1], AMT_OF_BOARDS = 1;
+var CityGame;
+(function (CityGame) {
+    CityGame.TILE_WIDTH = 64, CityGame.TILE_HEIGHT = 32, CityGame.SCREEN_WIDTH = 0, CityGame.SCREEN_HEIGHT = 0, CityGame.SPRITE_HEIGHT = 31, CityGame.TILES = 32, CityGame.WORLD_WIDTH = CityGame.TILES * CityGame.TILE_WIDTH, CityGame.WORLD_HEIGHT = CityGame.TILES * CityGame.TILE_HEIGHT, CityGame.ZOOM_LEVELS = [1], CityGame.AMT_OF_BOARDS = 1;
 
-var game = new CityGame.Game();
-var loader = new CityGame.Loader(game);
+    CityGame.game = new CityGame.Game();
+    CityGame.loader = new CityGame.Loader(CityGame.game);
+})(CityGame || (CityGame = {}));
 //# sourceMappingURL=main.js.map

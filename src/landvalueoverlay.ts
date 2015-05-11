@@ -1,6 +1,6 @@
 /// <reference path="../lib/pixi.d.ts" />
 
-/// <reference path="js/utility.d.ts" />
+/// <reference path="utility.ts" />
 
 function makeLandValueOverlay(board)
 {

@@ -1,12 +1,12 @@
 /// <reference path="../../lib/react.d.ts" />
 
-/// <reference path="js/sidemenubuildings.d.ts" />
-/// <reference path="js/sidemenuzoom.d.ts" />
-/// <reference path="js/sidemenumapmode.d.ts" />
-/// <reference path="js/sidemenusave.d.ts" />
-/// <reference path="js/sidemenustats.d.ts" />
-/// <reference path="js/sidemenutools.d.ts" />
-/// <reference path="js/sidemenumodifierbutton.d.ts" />
+/// <reference path="sidemenubuildings.ts" />
+/// <reference path="sidemenuzoom.ts" />
+/// <reference path="sidemenumapmode.ts" />
+/// <reference path="sidemenusave.ts" />
+/// <reference path="sidemenustats.ts" />
+/// <reference path="sidemenutools.ts" />
+/// <reference path="sidemenumodifierbutton.ts" />
 
 module UIComponents
 {

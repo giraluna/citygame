@@ -1,3 +1,5 @@
+/// <reference path="system.ts" />
+
 module CityGame
 {
   export module Systems

@@ -16,6 +16,7 @@ module CityGame
     width: number;
     height: number;
     totalSize: number;
+    generationCells: string[][];
     cells: Cell[][];
     mapGenInfo: any = {};
     layers: any = {};
@@ -43,7 +44,7 @@ module CityGame
       this.population = props.population ||
         randInt(this.totalSize / 15, this.totalSize / 10);
 
-      this.cells = MapGeneration.makeBlankCells(
+      this.generationCells = MapGeneration.makeBlankCells(
       {
         width: this.width,
         height: this.height,
@@ -51,7 +52,7 @@ module CityGame
 
       if (props.savedCells)
       {
-        MapGeneration.convertCells(this.cells, this, true);
+        this.cells = MapGeneration.convertCells(this.generationCells, this, true);
         MapGeneration.readSavedMap(
         {
           board: this,
@@ -83,7 +84,7 @@ module CityGame
       });
       MapGeneration.applyCoastsToCells(
       {
-        cells: this.cells,
+        cells: this.generationCells,
         primaryType: "grass",
         subType: "water",
         coasts: coasts
@@ -106,24 +107,24 @@ module CityGame
       },
       [this.width / 2 - this.width / 8, 0]);
 
-      this.cells = MapGeneration.smoothCells( this.cells, 0.6, 1, 4 );
-      this.cells = MapGeneration.smoothCells( this.cells, 0.6, 2, 2 );
-      this.cells = MapGeneration.smoothCells( this.cells, 0.7, 3, 1 );
+      this.generationCells = MapGeneration.smoothCells( this.generationCells, 0.6, 1, 4 );
+      this.generationCells = MapGeneration.smoothCells( this.generationCells, 0.6, 2, 2 );
+      this.generationCells = MapGeneration.smoothCells( this.generationCells, 0.7, 3, 1 );
 
       if (rivers)
       {
         MapGeneration.applyCoastsToCells(
         {
-          cells: this.cells,
+          cells: this.generationCells,
           primaryType: "water",
           subType: "grass",
           coasts: rivers
         });
       }
 
-      this.cells = MapGeneration.smoothCells( this.cells, 0.5, 1, 2 );
+      this.generationCells = MapGeneration.smoothCells( this.generationCells, 0.5, 1, 2 );
 
-      MapGeneration.convertCells(this.cells, this, false);
+      this.cells = MapGeneration.convertCells(this.generationCells, this, false);
 
     
       var finishTime = window.performance ? window.performance.now() : Date.now();

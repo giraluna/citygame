@@ -1,9 +1,9 @@
 /// <reference path="../../lib/react.d.ts" />
 /// 
-/// <reference path="../js/eventlistener.d.ts" />
-/// <reference path="../js/utility.d.ts" />
+/// <reference path="../eventmanager.ts" />
+/// <reference path="../utility.ts" />
 /// 
-/// <reference path="js/list.d.ts" />
+/// <reference path="list.ts" />
 
 module UIComponents
 {

@@ -42,7 +42,7 @@ module CityGame
     return target[_rnd];
   }
 
-  export function setDeepProperties(baseObj, target: any[], props)
+  export function setDeepProperties(baseObj: any, target: any[], props)
   {
     if (target.length <= 0)
     {
@@ -67,26 +67,26 @@ module CityGame
     }
   }
 
-  export function deepDestroy(object)
+  export function deepDestroy(toDestroy: any): void
   {
-    if (object.texture)
+    if (toDestroy.texture)
     {
-      if (object.texture.baseTexture.source._pixiId)
+      if (toDestroy.texture.baseTexture.source._pixiId)
       {
-        PIXI.Texture.removeTextureFromCache(object.texture.baseTexture.source._pixiId);
+        PIXI.Texture.removeTextureFromCache(toDestroy.texture.baseTexture.source._pixiId);
       }
-      object.texture.destroy(true);
+      toDestroy.texture.destroy(true);
     }
 
-    if ( !object.children || object.children.length <= 0)
+    if ( !toDestroy.children || toDestroy.children.length <= 0)
     {
       return;
     }
     else
     {
-      for (var i = 0; i < object.children.length; i++)
+      for (var i = 0; i < toDestroy.children.length; i++)
       {
-        deepDestroy(object.children[i]);
+        deepDestroy(toDestroy.children[i]);
       }
     }
   }
@@ -436,7 +436,7 @@ module CityGame
 
     if (excludeStart)
     {
-      rect = rect.filter(function(pos)
+      rect = rect.filter(function(pos: number[])
       {
         if
         (
@@ -444,7 +444,7 @@ module CityGame
           pos[1] < start[1] && pos[1] > end[1]
         )
         {
-          return pos;
+          return true;
         }
       });
     }

@@ -1,3 +1,11 @@
+/// <reference path="../timer.ts" />
+
+/// <reference path="system.ts" />
+/// <reference path="autosavesystem.ts" />
+/// <reference path="datesystem.ts" />
+/// <reference path="delayedactionsystem.ts" />
+/// <reference path="profitsystem.ts" />
+
 module CityGame
 {
   /**
@@ -15,8 +23,14 @@ module CityGame
     */
   export class SystemsManager
   {
-    systems: any = {};
-    timer: Strawb.Timer;
+    systems:
+    {
+      dailyProfitSystem: Systems.ProfitSystem;
+      delayedAction: Systems.DelayedActionSystem;
+      autosave: Systems.AutosaveSystem;
+      date: Systems.DateSystem;
+    };
+    timer: Timer;
     tickTime: number;
     tickNumber: number = 0;
     accumulated: number = 0;
@@ -24,20 +38,37 @@ module CityGame
     speed: number = 1;
     speedBeforePausing: number;
 
-    constructor(tickTime)
+    constructor(tickTime: number, players: Player[])
     {
-      this.timer = new Strawb.Timer();
+      this.timer = new Timer();
       this.tickTime = tickTime / 1000;
 
-      this.init();
+      this.init(players);
     }
-    init()
+    init(players: Player[])
     {
       this.addEventListeners();
+      this.makeSystems(players);
     }
-    addSystem(name: string, system: System)
+    makeSystems(players: Player[])
     {
-      this.systems[name] = system;
+      this.systems =
+      {
+        dailyProfitSystem: new Systems.ProfitSystem(1, this, players,
+          ["fastfood", "shopping", "parking", "factory", "hotel", "apartment", "office"]),
+        delayedAction: new Systems.DelayedActionSystem(1, this),
+        autosave: new Systems.AutosaveSystem(60, this),
+        date: new Systems.DateSystem(1, this,
+          document.getElementById("date"))
+      }
+      /*
+      var monthlyProfitSystem = new Systems.ProfitSystem(30, this, players,
+        ["apartment"]);
+      var quarterlyProfitSystem = new Systems.ProfitSystem(90, this, players,
+        ["office"]);
+      this.addSystem("monthlyProfitSystem", monthlyProfitSystem);
+      this.addSystem("quarterlyProfitSystem", quarterlyProfitSystem);
+      */
     }
     addEventListeners()
     {

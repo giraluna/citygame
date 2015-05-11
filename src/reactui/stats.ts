@@ -1,17 +1,17 @@
 /// <reference path="../../lib/react.d.ts" />
-/// 
-/// <reference path="../../data/js/levelupmodifiers.d.ts" />
-/// 
-/// <reference path="../js/eventlistener.d.ts" />
-/// <reference path="../js/utility.d.ts" />
-///
-/// <reference path="js/draggable.d.ts" />
-/// <reference path="js/splitmultilinetext.d.ts" />
-/// <reference path="js/modifierlist.d.ts" />
-/// <reference path="js/statlist.d.ts" />
-/// <reference path="js/employeelist.d.ts" />
-/// 
-/// <reference path="js/list.d.ts" />
+
+/// <reference path="../../data/levelupmodifiers.ts" />
+
+/// <reference path="../eventmanager.ts" />
+/// <reference path="../utility.ts" />
+
+/// <reference path="draggable.ts" />
+/// <reference path="splitmultilinetext.ts" />
+/// <reference path="modifierlist.ts" />
+/// <reference path="statlist.ts" />
+/// <reference path="employeelist.ts" />
+
+/// <reference path="list.ts" />
 
 module UIComponents
 {

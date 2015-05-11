@@ -1,12 +1,12 @@
 /// <reference path="../../lib/react.d.ts" />
-/// 
-/// <reference path="js/sidemenu.d.ts" />
-/// <reference path="js/stats.d.ts" />
-/// <reference path="js/options.d.ts" />
-/// <reference path="js/notifications.d.ts" />
-/// <reference path="js/changelog.d.ts" />
 
-/// <reference path="../js/eventlistener.d.ts" />
+/// <reference path="sidemenu.ts" />
+/// <reference path="stats.ts" />
+/// <reference path="options.ts" />
+/// <reference path="notifications.ts" />
+/// <reference path="changelog.ts" />
+
+/// <reference path="../eventmanager.ts" />
 
 module UIComponents
 {

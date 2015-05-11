@@ -1,5 +1,5 @@
 /// <reference path="../../lib/react.d.ts" />
-/// <reference path="../js/utility.d.ts" />
+/// <reference path="../utility.ts" />
 
 module UIComponents
 {

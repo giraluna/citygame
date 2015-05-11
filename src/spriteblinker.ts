@@ -4,7 +4,7 @@
 /// <reference path="eventmanager.ts" />
 
 
-class SpriteBlinker extends Highlighter
+class SpriteBlinker extends SpriteHighlighter
 {
   toBlink: { [key: string] : PIXI.Sprite[] } = {};
   idGenerator: number = 0;

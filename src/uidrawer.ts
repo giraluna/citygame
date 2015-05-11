@@ -1,9 +1,24 @@
+/// <reference path="../lib/pixi.d.ts" />
+/// <reference path="uiobject.ts" />
+/// <reference path="uidrawingfunctions.ts" />
+
 module CityGame
 {
+  export interface IFontDefinition
+  {
+    font: string;
+    fill: string; //hex color string
+    align: string;
+    stroke?: string; //hex color string
+    strokeThickness?: number;
+  }
   export class UIDrawer
   {
     layer: PIXI.DisplayObjectContainer;
-    fonts: any = {};
+    fonts:
+    {
+      [fontName: string]: IFontDefinition;
+    };
     styles: any = {};
     textureCache: any = {};
     active: UIObject;
@@ -109,7 +124,7 @@ module CityGame
       if (game.worldRenderer.currentMapmode === "landValue")
       {
         text += "\nLand value: " + cell.landValue;
-        text += "\nApproximate cost: " + parseInt(game.players.player0.getCellBuyCost(cell));
+        text += "\nApproximate cost: " + game.players["player0"].getCellBuyCost(cell);
       }
       /*
       else
@@ -126,7 +141,7 @@ module CityGame
 
       if (cell.content && cell.content.player && cell.content.baseProfit)
       {
-        var finalAmount = game.players.player0.getIndexedProfit(
+        var finalAmount = game.players["player0"].getIndexedProfit(
           cell.content.type.categoryType, cell.content.modifiedProfit).toFixed(2);
         text += "\n--------------\n";
         text += "Base profit: " + cell.content.baseProfit.toFixed(2) + "/d" + "\n";

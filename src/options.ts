@@ -1,25 +1,28 @@
-/// <reference path="js/eventlistener.d.ts" />
+/// <reference path="eventmanager.ts" />
 
-module Options
+module CityGame
 {
-  export var drawClickPopups = true;
-  eventManager.addEventListener("toggleDrawClickPopups", function()
+  export module Options
   {
-    drawClickPopups = !drawClickPopups;
-    eventManager.dispatchEvent({type:"saveOptions", content:null});
-  });
+    export var drawClickPopups = true;
+    eventManager.addEventListener("toggleDrawClickPopups", function()
+    {
+      drawClickPopups = !drawClickPopups;
+      eventManager.dispatchEvent({type:"saveOptions", content:null});
+    });
 
-  export var autosaveLimit = 3;
-  eventManager.addEventListener("setAutosaveLimit", function(e)
-  {
-    autosaveLimit = e.content;
-    eventManager.dispatchEvent({type:"saveOptions", content:null});
-  });
+    export var autosaveLimit = 3;
+    eventManager.addEventListener("setAutosaveLimit", function(e)
+    {
+      autosaveLimit = e.content;
+      eventManager.dispatchEvent({type:"saveOptions", content:null});
+    });
 
-  export var autoSwitchTools = false;
-  eventManager.addEventListener("toggleAutoSwitchTools", function(e)
-  {
-    autoSwitchTools = !autoSwitchTools;
-    eventManager.dispatchEvent({type:"saveOptions", content:null});
-  });
+    export var autoSwitchTools = false;
+    eventManager.addEventListener("toggleAutoSwitchTools", function(e)
+    {
+      autoSwitchTools = !autoSwitchTools;
+      eventManager.dispatchEvent({type:"saveOptions", content:null});
+    });
+  }
 }

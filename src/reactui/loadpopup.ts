@@ -1,9 +1,9 @@
 /// <reference path="../../lib/react.d.ts" />
 /// 
-/// <reference path="../js/eventlistener.d.ts" />
+/// <reference path="../eventmanager.ts" />
 ///
-/// <reference path="js/draggable.d.ts" />
-/// <reference path="js/splitmultilinetext.d.ts" />
+/// <reference path="draggable.ts" />
+/// <reference path="splitmultilinetext.ts" />
 /// 
 /// <reference path="js/list.d.ts" />
 

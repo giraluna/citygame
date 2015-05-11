@@ -1,8 +1,10 @@
+/// <reference path="system.ts" />
+
 module CityGame
 {
   export module Systems
   {
-    interface IDateObj
+    export interface IDateObj
     {
       year: number;
       month: number;

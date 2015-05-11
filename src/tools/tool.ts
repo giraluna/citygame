@@ -1,9 +1,12 @@
+/// <reference path="../cell.ts" />
+/// <reference path="../selectiontypes.ts" />
+
 module CityGame
 {
   export class Tool
   {
     type: string;
-    selectType: any;
+    selectType: ISelectionType;
     tintColor: number;
     activateCost: number;
     mapmode: string = "default";

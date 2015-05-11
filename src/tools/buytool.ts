@@ -1,3 +1,5 @@
+/// <reference path="tool.ts" />
+
 module CityGame
 {
   export module Tools

@@ -1,9 +1,4 @@
-/// <reference path="../lib/pixi.d.ts" />
-/// 
-/// <reference path="js/eventlistener.d.ts" />
-/// 
-
-class Highlighter
+class SpriteHighlighter
 {
   currHighlighted: PIXI.Sprite[] = [];
   currTransparent: PIXI.Sprite[] = [];

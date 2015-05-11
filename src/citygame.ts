@@ -2561,11 +2561,14 @@ class MouseEventHandler
     var pos = event.getLocalPosition(event.target);
     var gridPos = getOrthoCoord([pos.x, pos.y+7], [TILE_WIDTH, TILE_HEIGHT], [TILES, TILES]);
 
-    if (event.originalEvent.shiftKey)
+    if (Options.autoSwitchTools)
     {
-      game.activeTool.tempContinuous = true;
+      game.activeTool.tempContinuous = event.originalEvent.shiftKey;
     }
-    else game.activeTool.tempContinuous = false;
+    else
+    {
+      game.activeTool.tempContinuous = !event.originalEvent.shiftKey;
+    }
 
     this.currAction = "cellAction";
     this.startCell = gridPos;

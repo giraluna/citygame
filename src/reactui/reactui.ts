@@ -279,7 +279,7 @@ module CityGame
       var recruitWithSelected = function(selected)
       {
 
-        actions.recruitEmployee(
+        Actions.recruitEmployee(
         {
           playerId: props.player.id,
           employeeId: selected.employee.id
@@ -364,7 +364,7 @@ module CityGame
 
       var buySelected = function(selected)
       {
-        var adjusted = actions.getActionCost(
+        var adjusted = Actions.getActionCost(
           [selected.employee.skills["negotiation"]], buyCost).actual;
 
         if (props.player.money < adjusted)
@@ -381,7 +381,7 @@ module CityGame
           return false;
         }
 
-        actions.buyCell(
+        Actions.buyCell(
         {
           gridPos: props.cell.gridPos,
           boardId: props.cell.board.id,
@@ -464,7 +464,7 @@ module CityGame
       {
         if (selected)
         {
-          actions.constructBuilding(
+          Actions.constructBuilding(
           {
             playerId: props.player.id,
             gridPos: props.cell.gridPos,

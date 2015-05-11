@@ -10,7 +10,7 @@ module CityGame
       {
         super();
         this.type = "remove";
-        this.selectType = rectSelect;
+        this.selectType = SelectionTypes.rectSelect;
         this.tintColor = 0xFF5555;
         this.mapmode = undefined;
       } 

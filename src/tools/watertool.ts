@@ -10,7 +10,7 @@ module CityGame
       {
         super();
         this.type = "water";
-        this.selectType = rectSelect;
+        this.selectType = SelectionTypes.rectSelect;
         this.tintColor = 0x4444FF;
         this.mapmode = undefined;
       } 

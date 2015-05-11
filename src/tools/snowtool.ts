@@ -10,7 +10,7 @@ module CityGame
       {
         super();
         this.type = "snow";
-        this.selectType = rectSelect;
+        this.selectType = SelectionTypes.rectSelect;
         this.tintColor = 0xBBDFD7;
         this.mapmode = undefined;
       } 

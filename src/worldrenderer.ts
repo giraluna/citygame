@@ -1,3 +1,5 @@
+/// <reference path="landvalueoverlay.ts" />
+
 module CityGame
 {
   export class WorldRenderer

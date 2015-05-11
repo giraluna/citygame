@@ -10,7 +10,7 @@ module CityGame
       {
         super();
         this.type = "sand";
-        this.selectType = rectSelect;
+        this.selectType = SelectionTypes.rectSelect;
         this.tintColor = 0xE2BF93;
         this.mapmode = undefined;
       } 

@@ -6,10 +6,10 @@ module CityGame
   {
     export class ProfitSystem extends System
     {
-      players: {[key:string]: Player};
+      players: Player[];
       targetTypes: string[];
 
-      constructor(activationRate: number, systemsManager: SystemsManager, players: {[key:string]: Player},
+      constructor(activationRate: number, systemsManager: SystemsManager, players: Player[],
         targetTypes: string[])
       {
         super(activationRate, systemsManager.tickNumber);
@@ -21,20 +21,20 @@ module CityGame
       activate()
       {
         var currentDate = this.systemsManager.systems.date.getDate();
-        for (var _player in this.players)
+        for (var i = 0; i < this.players.length; i++)
         {
-          var player = this.players[_player];
+          var player = this.players[i];
 
-          for (var ii = 0; ii < this.targetTypes.length; ii++)
+          for (var j = 0; j < this.targetTypes.length; j++)
           {
             var profitPerThisType = 0;
-            var targets = player.ownedContent[this.targetTypes[ii]];
+            var targets = player.ownedContent[this.targetTypes[j]];
             
             if (targets.length < 1) continue;
 
-            for (var jj = 0; jj < targets.length; jj++)
+            for (var k = 0; k < targets.length; k++)
             {
-              var profit = targets[jj].modifiedProfit;
+              var profit = targets[k].modifiedProfit;
 
               // content isn't removed in place
               // which means the array here is the pre-splicing ver
@@ -43,7 +43,7 @@ module CityGame
               // but this check means it doesn't fall apart at least
               if (isFinite(profit)) profitPerThisType += profit;
             }
-            player.addMoney(profitPerThisType, this.targetTypes[ii],
+            player.addMoney(profitPerThisType, this.targetTypes[j],
               targets.length, currentDate);
           }
         }

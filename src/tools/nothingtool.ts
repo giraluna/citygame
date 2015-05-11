@@ -10,7 +10,7 @@ module CityGame
       {
         super();
         this.type = "nothing";
-        this.selectType = singleSelect;
+        this.selectType = SelectionTypes.singleSelect;
         this.tintColor = null;
         this.mapmode = undefined;
         this.button = null;

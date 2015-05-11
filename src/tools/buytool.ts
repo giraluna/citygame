@@ -10,7 +10,7 @@ module CityGame
       {
         super();
         this.type = "buy";
-        this.selectType = singleSelect;
+        this.selectType = SelectionTypes.singleSelect;
         this.tintColor = 0x22EE22;
         this.mapmode = undefined;
       }

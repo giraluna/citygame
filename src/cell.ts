@@ -105,7 +105,7 @@ module CityGame
       centerSize?:number[];
       anchor?:string;
       excludeStart?: boolean;
-    })
+    }): Cell[]
     {
       var props = Object.create(_props);
 

@@ -10,7 +10,7 @@ module CityGame
       {
         super();
         this.type = "remove";
-        this.selectType = rectSelect;
+        this.selectType = SelectionTypes.rectSelect;
         this.tintColor = 0xFF5555;
         this.mapmode = undefined;
         this.button = null;
@@ -35,15 +35,15 @@ module CityGame
       onActivate(target: Cell, props?: any)
       {
         var onlySellBuildings = props.onlySellBuildings;
-        var playerOwnsCell = (target.player && target.player.id === game.players.player0.id);
+        var playerOwnsCell = (target.player && target.player.id === game.players["player0"].id);
         if (onlySellBuildings && target.content && playerOwnsCell)
         {
-          game.players.player0.sellContent(target.content);
+          game.players["player0"].sellContent(target.content);
           target.changeContent("none");
         }
         else if (!onlySellBuildings && playerOwnsCell)
         {
-          game.players.player0.sellCell(target);
+          game.players["player0"].sellCell(target);
         }
 
         if (!this.continuous && !this.tempContinuous)

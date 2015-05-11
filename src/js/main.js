@@ -8299,6 +8299,290 @@ var CityGame;
     CityGame.UIDrawer = UIDrawer;
 })(CityGame || (CityGame = {}));
 /// <reference path="../lib/pixi.d.ts" />
+/// <reference path="utility.ts" />
+var CityGame;
+(function (CityGame) {
+    function makeLandValueOverlay(board) {
+        var cellsToOverlay = [];
+        var minValue, maxValue;
+        var colorIndexes = {};
+
+        function getRelativeValue(val) {
+            var difference = maxValue - minValue;
+            if (difference < 1)
+                difference = 1;
+
+            // clamps to n different colors
+            var threshhold = difference / 6;
+            if (threshhold < 1)
+                threshhold = 1;
+            var relative = (Math.round(val / threshhold) * threshhold - minValue) / (difference);
+            return relative;
+        }
+
+        for (var i = 0; i < board.width; i++) {
+            for (var j = 0; j < board.height; j++) {
+                var cell = board.cells[i][j];
+                if (cell.type.type !== "water") {
+                    if (!minValue) {
+                        minValue = maxValue = cell.landValue;
+                    } else {
+                        if (cell.landValue < minValue)
+                            minValue = cell.landValue;
+                        else if (cell.landValue > maxValue)
+                            maxValue = cell.landValue;
+                    }
+
+                    cellsToOverlay.push({
+                        value: cell.landValue,
+                        sprite: cell.sprite
+                    });
+                }
+            }
+        }
+
+        var container = new PIXI.DisplayObjectContainer();
+
+        for (var i = 0; i < cellsToOverlay.length; i++) {
+            var cell = cellsToOverlay[i];
+
+            if (!colorIndexes[cell.value]) {
+                var relativeValue = getRelativeValue(cell.value);
+
+                //relativeValue += relativeValue * 0.3;
+                if (relativeValue < 0)
+                    relativeValue = 0;
+                else if (relativeValue > 1)
+                    relativeValue = 1;
+
+                var hue = 100 - 100 * relativeValue;
+                var saturation = 1 - 0.2 * relativeValue;
+                var luminesence = 0.75 + 0.25 * relativeValue;
+
+                colorIndexes[cell.value] = CityGame.hslToHex(hue / 360, saturation, luminesence / 2);
+            }
+
+            var color = colorIndexes[cell.value];
+
+            var _s = PIXI.Sprite.fromFrame("blank.png");
+            _s.position = cell.sprite.position.clone();
+            _s.position.y -= cell.sprite.height - 31;
+            _s.anchor = cell.sprite.anchor.clone();
+            _s.tint = color;
+
+            container.addChild(_s);
+        }
+
+        return container;
+    }
+    CityGame.makeLandValueOverlay = makeLandValueOverlay;
+})(CityGame || (CityGame = {}));
+/// <reference path="landvalueoverlay.ts" />
+var CityGame;
+(function (CityGame) {
+    var WorldRenderer = (function () {
+        function WorldRenderer(width, height) {
+            this.layers = {};
+            this.zoomLevel = CityGame.ZOOM_LEVELS[0];
+            this.mapmodes = {
+                default: {
+                    layers: [
+                        { type: "ground" },
+                        { type: "cellOverlay" },
+                        { type: "content" }
+                    ]
+                },
+                landValue: {
+                    layers: [
+                        { type: "ground" },
+                        { type: "landValueOverlay", alpha: 0.7 },
+                        { type: "cellOverlay" },
+                        { type: "content" }
+                    ]
+                },
+                underground: {
+                    layers: [
+                        { type: "underground" },
+                        { type: "undergroundContent" },
+                        { type: "ground", alpha: 0.15 }
+                    ],
+                    properties: {
+                        offsetY: 32
+                    }
+                }
+            };
+            this.currentMapmode = "default";
+            this.initContainers(width, height);
+            this.initLayers();
+            this.addEventListeners();
+        }
+        WorldRenderer.prototype.addEventListeners = function () {
+            var self = this;
+            eventManager.addEventListener("changeZoomLevel", function (event) {
+                self.changeZoomLevel(event.content.zoomLevel);
+            });
+            eventManager.addEventListener("updateWorld", function (event) {
+                self.render(event.content.clear);
+            });
+
+            var mapmodeSelect = document.getElementById("mapmode-select");
+            mapmodeSelect.addEventListener("change", function (event) {
+                self.setMapmode(mapmodeSelect.value);
+            });
+
+            eventManager.addEventListener("changeMapmode", function (event) {
+                self.setMapmode(event.content);
+                mapmodeSelect.value = event.content;
+            });
+            eventManager.addEventListener("updateLandValueMapmode", function (event) {
+                if (self.currentMapmode !== "landValue")
+                    return;
+
+                var zoomLayer = self.layers["zoom" + self.zoomLevel];
+                zoomLayer.landValueOverlay = CityGame.makeLandValueOverlay(CityGame.game.activeBoard);
+                self.changeMapmode("landValue");
+            });
+        };
+        WorldRenderer.prototype.initContainers = function (width, height) {
+            this.renderTexture = new PIXI.RenderTexture(width, height, CityGame.game.renderer, PIXI.scaleModes.NEAREST);
+
+            var _ws = this.worldSprite = new PIXI.Sprite(this.renderTexture);
+
+            _ws.hitArea = CityGame.arrayToPolygon(CityGame.rectToIso(_ws.width, _ws.height));
+            _ws.interactive = true;
+
+            for (var i = 0; i < CityGame.ZOOM_LEVELS.length; i++) {
+                var zoomStr = "zoom" + CityGame.ZOOM_LEVELS[i];
+                var zoomLayer = this.layers[zoomStr] = {};
+                this.mapmodes[zoomStr] = {};
+
+                var main = zoomLayer["main"] = new PIXI.DisplayObjectContainer();
+            }
+
+            var self = this;
+            _ws.mousedown = _ws.touchstart = function (event) {
+                CityGame.game.mouseEventHandler.mouseDown(event, "world");
+            };
+            _ws.mousemove = _ws.touchmove = function (event) {
+                CityGame.game.mouseEventHandler.mouseMove(event, "world");
+            };
+
+            _ws.mouseup = _ws.touchend = function (event) {
+                CityGame.game.mouseEventHandler.mouseUp(event, "world");
+            };
+            _ws.mouseupoutside = _ws.touchendoutside = function (event) {
+                CityGame.game.mouseEventHandler.mouseUp(event, "world");
+            };
+        };
+        WorldRenderer.prototype.initLayers = function () {
+            for (var i = 0; i < CityGame.ZOOM_LEVELS.length; i++) {
+                var zoomStr = "zoom" + CityGame.ZOOM_LEVELS[i];
+                var zoomLayer = this.layers[zoomStr];
+                var main = zoomLayer["main"];
+
+                zoomLayer["underground"] = new PIXI.DisplayObjectContainer();
+                zoomLayer["undergroundContent"] = new PIXI.DisplayObjectContainer();
+                zoomLayer["ground"] = new PIXI.DisplayObjectContainer();
+                zoomLayer["landValueOverlay"] = new PIXI.DisplayObjectContainer();
+                zoomLayer["cellOverlay"] = new PIXI.DisplayObjectContainer();
+                zoomLayer["content"] = new PIXI.DisplayObjectContainer();
+            }
+        };
+        WorldRenderer.prototype.clearLayers = function () {
+            for (var i = 0; i < CityGame.ZOOM_LEVELS.length; i++) {
+                var zoomStr = "zoom" + CityGame.ZOOM_LEVELS[i];
+                var zoomLayer = this.layers[zoomStr];
+                var main = zoomLayer["main"];
+
+                for (var layer in zoomLayer) {
+                    if (zoomLayer[layer].children.length > 0) {
+                        zoomLayer[layer].removeChildren();
+                    }
+                }
+
+                if (main.children.length > 0)
+                    main.removeChildren();
+            }
+            //this.currentMapmode = undefined;
+        };
+        WorldRenderer.prototype.setBoard = function (board) {
+            this.clearLayers();
+
+            for (var zoomLevel in board.layers) {
+                for (var layer in board.layers[zoomLevel]) {
+                    this.layers[zoomLevel][layer].addChild(board.layers[zoomLevel][layer]);
+                }
+            }
+
+            this.setMapmode(this.currentMapmode);
+        };
+        WorldRenderer.prototype.changeZoomLevel = function (level) {
+            this.zoomLevel = level;
+            this.render();
+        };
+        WorldRenderer.prototype.setMapmode = function (newMapmode) {
+            var zoomLayer = this.layers["zoom" + this.zoomLevel];
+            switch (newMapmode) {
+                case "default":
+                case "terrain": {
+                    this.changeMapmode("default");
+                    return;
+                }
+                case "landValue": {
+                    zoomLayer.landValueOverlay = CityGame.makeLandValueOverlay(CityGame.game.activeBoard);
+
+                    this.changeMapmode("landValue");
+                    return;
+                }
+                case "underground": {
+                    if (zoomLayer.underground.children <= 0) {
+                        for (var i = 0; i < zoomLayer.ground.children[0].children.length; i++) {
+                            var currSprite = zoomLayer.ground.children[0].children[i];
+
+                            var _s = PIXI.Sprite.fromFrame("underground.png");
+                            _s.position = currSprite.position.clone();
+                            _s.anchor = currSprite.anchor.clone();
+                            zoomLayer.underground.addChild(_s);
+                        }
+                    }
+                    this.changeMapmode("underground");
+                    return;
+                }
+            }
+        };
+        WorldRenderer.prototype.changeMapmode = function (newMapmode) {
+            var zoomStr = "zoom" + this.zoomLevel;
+            var zoomLayer = this.layers[zoomStr];
+
+            if (zoomLayer.main.children.length > 0) {
+                zoomLayer.main.removeChildren();
+            }
+
+            for (var i = 0; i < this.mapmodes[newMapmode].layers.length; i++) {
+                var layerToAdd = this.mapmodes[newMapmode].layers[i];
+                zoomLayer.main.addChild(zoomLayer[layerToAdd.type]);
+
+                zoomLayer[layerToAdd.type].alpha = layerToAdd.alpha || 1;
+            }
+
+            var props = this.mapmodes[newMapmode].properties || {};
+
+            this.worldSprite.y = props.offsetY || 0;
+
+            this.currentMapmode = newMapmode;
+            this.render();
+        };
+        WorldRenderer.prototype.render = function (clear) {
+            if (typeof clear === "undefined") { clear = true; }
+            var zoomStr = "zoom" + this.zoomLevel;
+            var activeMainLayer = this.layers[zoomStr]["main"];
+            this.renderTexture.render(activeMainLayer, null, clear);
+        };
+        return WorldRenderer;
+    })();
+    CityGame.WorldRenderer = WorldRenderer;
+})(CityGame || (CityGame = {}));
+/// <reference path="../lib/pixi.d.ts" />
 ///
 /// <reference path="spritehighlighter.ts" />
 /// <reference path="eventmanager.ts" />
@@ -8672,608 +8956,629 @@ var CityGame;
 /// <reference path="../../data/cg.ts" />
 /// <reference path="../eventmanager.ts" />
 /// <reference path="../utility.ts" />
-var UIComponents;
-(function (UIComponents) {
-    /**
-    * props:
-    *   player
-    *   buildableTypes
-    */
-    UIComponents.SideMenuBuildings = React.createClass({
-        getInitialState: function () {
-            return ({
-                beautifyIndex: 0,
-                lastSelectedBuilding: playerBuildableBuildings[0],
-                currentPopOver: null
-            });
-        },
-        drawPopOver: function (building, parentRef) {
-            if (this.state.currentPopOver === building.type)
-                return;
-            var popOverNode = this.refs.popOver.getDOMNode();
-
-            var effectInfo = [
-                { title: "Affected by", target: effectSourcesIndex[building.categoryType] },
-                { title: "Affects", target: building.effectTargets }
-            ];
-
-            if (!this.indexedPopoverContent)
-                this.indexedPopoverContent = {};
-            if (!this.indexedPopoverContent[building.type]) {
-                var content = "";
-                content += "<div>Base profit $" + building.baseProfit + "/d</div>";
-
-                effectInfo.forEach(function (info) {
-                    if (!info.target || (info.target.positive.length < 1 && info.target.negative.length < 1)) {
-                        return;
-                    }
-                    content += "<h4>" + info.title + "</h4>";
-                    content += "<div class='tooltip-modifiers-container'>";
-                    for (var polarity in info.target) {
-                        var effects = info.target[polarity];
-
-                        content += "<div class='tooltip-modifiers " + "tooltip-modifiers-" + polarity + "'>";
-
-                        //content += "<h5 class='tooltip-modifiers-header'>";
-                        //  content += capitalize(polarity);
-                        //content += "</h5>";
-                        content += "<ul>";
-                        for (var i = 0; i < effects.length; i++) {
-                            content += "<li>" + capitalize(effects[i]) + "</li>";
-                        }
-                        content += "</ul>";
-                        content += "</div>";
-                    }
-                    content += "</div>";
+var CityGame;
+(function (CityGame) {
+    (function (UIComponents) {
+        /**
+        * props:
+        *   player
+        *   buildableTypes
+        */
+        UIComponents.SideMenuBuildings = React.createClass({
+            getInitialState: function () {
+                return ({
+                    beautifyIndex: 0,
+                    lastSelectedBuilding: playerBuildableBuildings[0],
+                    currentPopOver: null
                 });
-                this.indexedPopoverContent[building.type] = content;
-            }
+            },
+            drawPopOver: function (building, parentRef) {
+                if (this.state.currentPopOver === building.type)
+                    return;
+                var popOverNode = this.refs.popOver.getDOMNode();
 
-            popOverNode.innerHTML = this.indexedPopoverContent[building.type];
+                var effectInfo = [
+                    { title: "Affected by", target: effectSourcesIndex[building.categoryType] },
+                    { title: "Affects", target: building.effectTargets }
+                ];
 
-            popOverNode.classList.remove("hidden");
-            popOverNode.style.top = this.refs[parentRef].getDOMNode().getBoundingClientRect().top + "px";
+                if (!this.indexedPopoverContent)
+                    this.indexedPopoverContent = {};
+                if (!this.indexedPopoverContent[building.type]) {
+                    var content = "";
+                    content += "<div>Base profit $" + building.baseProfit + "/d</div>";
 
-            this.setState({ currentPopOver: building.type });
-        },
-        hidePopOver: function () {
-            if (!this.state.currentPopOver)
-                return;
-            this.refs.popOver.getDOMNode().classList.add("hidden");
-            this.setState({ currentPopOver: null });
-        },
-        handleBuildingSelect: function (building, e) {
-            if (this.props.player.money < this.props.player.getBuildCost(building)) {
-                return;
-            }
-            this.props.setSelectedTool(building.type);
-            this.setState({ lastSelectedBuilding: building });
+                    effectInfo.forEach(function (info) {
+                        if (!info.target || (info.target.positive.length < 1 && info.target.negative.length < 1)) {
+                            return;
+                        }
+                        content += "<h4>" + info.title + "</h4>";
+                        content += "<div class='tooltip-modifiers-container'>";
+                        for (var polarity in info.target) {
+                            var effects = info.target[polarity];
 
-            var continuous = e && e.shiftKey ? e.shiftKey : false;
+                            content += "<div class='tooltip-modifiers " + "tooltip-modifiers-" + polarity + "'>";
 
-            eventManager.dispatchEvent({
-                type: "changeBuildingType",
-                content: {
-                    building: building,
-                    continuous: continuous
+                            //content += "<h5 class='tooltip-modifiers-header'>";
+                            //  content += capitalize(polarity);
+                            //content += "</h5>";
+                            content += "<ul>";
+                            for (var i = 0; i < effects.length; i++) {
+                                content += "<li>" + CityGame.capitalize(effects[i]) + "</li>";
+                            }
+                            content += "</ul>";
+                            content += "</div>";
+                        }
+                        content += "</div>";
+                    });
+                    this.indexedPopoverContent[building.type] = content;
                 }
-            });
-        },
-        componentDidMount: function () {
-            eventManager.addEventListener("resizeSmaller", function (e) {
-                this.setState({ beautifyIndex: 2 });
-            }.bind(this));
 
-            eventManager.addEventListener("resizeBigger", function (e) {
-                this.setState({ beautifyIndex: 0 });
-            }.bind(this));
+                popOverNode.innerHTML = this.indexedPopoverContent[building.type];
 
-            eventManager.addEventListener("buildHotkey", function (e) {
-                this.handleBuildingSelect(this.state.lastSelectedBuilding, e.content);
-            }.bind(this));
-        },
-        render: function () {
-            var divs = [];
-            var player = this.props.player;
+                popOverNode.classList.remove("hidden");
+                popOverNode.style.top = this.refs[parentRef].getDOMNode().getBoundingClientRect().top + "px";
 
-            for (var i = 0; i < playerBuildableBuildings.length; i++) {
-                var building = playerBuildableBuildings[i];
+                this.setState({ currentPopOver: building.type });
+            },
+            hidePopOver: function () {
+                if (!this.state.currentPopOver)
+                    return;
+                this.refs.popOver.getDOMNode().classList.add("hidden");
+                this.setState({ currentPopOver: null });
+            },
+            handleBuildingSelect: function (building, e) {
+                if (this.props.player.money < this.props.player.getBuildCost(building)) {
+                    return;
+                }
+                this.props.setSelectedTool(building.type);
+                this.setState({ lastSelectedBuilding: building });
 
-                var buildCost = player.getBuildCost(building);
-                var canAfford = player.money >= buildCost;
-                var amountBuilt = player.amountBuiltPerType[building.type];
+                var continuous = e && e.shiftKey ? e.shiftKey : false;
+
+                eventManager.dispatchEvent({
+                    type: "changeBuildingType",
+                    content: {
+                        building: building,
+                        continuous: continuous
+                    }
+                });
+            },
+            componentDidMount: function () {
+                eventManager.addEventListener("resizeSmaller", function (e) {
+                    this.setState({ beautifyIndex: 2 });
+                }.bind(this));
+
+                eventManager.addEventListener("resizeBigger", function (e) {
+                    this.setState({ beautifyIndex: 0 });
+                }.bind(this));
+
+                eventManager.addEventListener("buildHotkey", function (e) {
+                    this.handleBuildingSelect(this.state.lastSelectedBuilding, e.content);
+                }.bind(this));
+            },
+            render: function () {
+                var divs = [];
+                var player = this.props.player;
+
+                for (var i = 0; i < playerBuildableBuildings.length; i++) {
+                    var building = playerBuildableBuildings[i];
+
+                    var buildCost = player.getBuildCost(building);
+                    var canAfford = player.money >= buildCost;
+                    var amountBuilt = player.amountBuiltPerType[building.type];
+
+                    var divProps = {
+                        className: "side-building",
+                        key: building.type,
+                        ref: building.type,
+                        onMouseLeave: this.hidePopOver,
+                        onTouchStart: this.handleBuildingSelect.bind(null, building),
+                        onMouseEnter: this.drawPopOver.bind(null, building, building.type)
+                    };
+
+                    /*
+                    for (var polarity in building.effectTargets)
+                    {
+                    var targets = building.effectTargets[polarity];
+                    if (targets.length < 1) continue;
+                    else
+                    {
+                    var poleSign = (polarity === "negative") ? "-" : "+";
+                    divProps.title += "\n-----";
+                    divProps.title += "\n" + polarity + " effects:";
+                    
+                    for (var j = 0; j < targets.length; j++)
+                    {
+                    divProps.title += "\n" + targets[j] + " " + poleSign;
+                    }
+                    }
+                    }*/
+                    var imageProps = { className: "building-image" };
+                    var titleProps = { className: "building-title" };
+                    var costProps = { className: "building-cost" };
+                    var amountProps = { className: "building-amount" };
+
+                    if (!canAfford) {
+                        divProps.className += " disabled";
+                        costProps.className += " insufficient";
+                    } else {
+                        divProps.className += " interactive";
+                        divProps.onClick = this.handleBuildingSelect.bind(null, building);
+                    }
+
+                    if (this.props.selectedTool && this.props.selectedTool === building.type) {
+                        divProps.className += " selected-tool";
+                    }
+
+                    var costText = "" + CityGame.beautify(buildCost, this.state.beautifyIndex);
+
+                    if (this.state.beautifyIndex < 2) {
+                        costText += "$";
+                    }
+
+                    var image = this.props.frameImages[building.icon];
+                    imageProps.src = image.src;
+
+                    var div = React.DOM.div(divProps, React.DOM.div({ className: "building-image-container" }, React.DOM.img(imageProps, null)), React.DOM.div({ className: "building-content" }, React.DOM.div({ className: "building-content-wrapper" }, React.DOM.div(titleProps, building.title), React.DOM.div(costProps, costText)), React.DOM.div(amountProps, amountBuilt)));
+
+                    divs.push(div);
+                }
+
+                return (React.DOM.div({ id: "side-menu-buildings", className: "grid-column" }, divs, React.DOM.div({
+                    id: "building-popover",
+                    className: "hidden",
+                    ref: "popOver"
+                }, "asdjhksadhja")));
+            }
+        });
+    })(CityGame.UIComponents || (CityGame.UIComponents = {}));
+    var UIComponents = CityGame.UIComponents;
+})(CityGame || (CityGame = {}));
+/// <reference path="../../lib/react.d.ts" />
+///
+/// <reference path="../eventmanager.ts" />
+var CityGame;
+(function (CityGame) {
+    (function (UIComponents) {
+        UIComponents.SideMenuZoom = React.createClass({
+            getInitialState: function () {
+                return { zoom: 1 };
+            },
+            handleZoomChange: function (event) {
+                var target = event.target;
+
+                this.setState({ zoom: parseFloat(target.value) });
+            },
+            handleZoomSubmit: function (event) {
+                event.preventDefault();
+                eventManager.dispatchEvent({ type: "changeZoom", content: this.state.zoom });
+                return false;
+            },
+            handleMapmodeChange: function (event) {
+                var target = event.target;
+
+                eventManager.dispatchEvent({ type: "changeMapmode", content: target.value });
+            },
+            componentDidMount: function () {
+                var self = this;
+                var el = this.refs.zoomValue.getDOMNode();
+
+                eventManager.addEventListener("updateZoomValue", function (e) {
+                    el.value = e.content.toFixed(3);
+                    self.setState({ zoom: e.content });
+                });
+            },
+            render: function () {
+                var options = [];
+
+                ["terrain", "landValue", "underground"].forEach(function (type) {
+                    var props = {
+                        key: type,
+                        value: type
+                    };
+                    var option = React.DOM.option(props, type);
+                });
+
+                return (React.DOM.select({
+                    id: "side-menu-mapmode-select",
+                    value: "landValue"
+                }, options), React.DOM.form({
+                    id: "side-menu-zoom",
+                    className: "grid-row",
+                    onSubmit: this.handleZoomSubmit
+                }, React.DOM.input({
+                    id: "zoom-amount",
+                    ref: "zoomValue",
+                    className: "grid-row",
+                    type: "number",
+                    defaultValue: "1",
+                    step: 0.1,
+                    onChange: this.handleZoomChange
+                }), React.DOM.button({ id: "zoomBtn", className: "grid-row" }, "zoom")));
+            }
+        });
+    })(CityGame.UIComponents || (CityGame.UIComponents = {}));
+    var UIComponents = CityGame.UIComponents;
+})(CityGame || (CityGame = {}));
+/// <reference path="../../lib/react.d.ts" />
+///
+/// <reference path="../eventmanager.ts" />
+var CityGame;
+(function (CityGame) {
+    (function (UIComponents) {
+        UIComponents.SideMenuMapmode = React.createClass({
+            handleMapmodeChange: function (event) {
+                var target = event.target;
+
+                eventManager.dispatchEvent({ type: "changeMapmode", content: target.value });
+            },
+            render: function () {
+                var options = [];
+
+                ["terrain", "landValue", "underground"].forEach(function (type) {
+                    var props = {
+                        key: type,
+                        value: type
+                    };
+
+                    var title = type === "landValue" ? "land value" : type;
+                    options.push(React.DOM.option(props, title));
+                });
+
+                return (React.DOM.select({
+                    id: "side-menu-mapmode-select",
+                    className: "grid-row",
+                    defaultValue: "landValue",
+                    title: "Map mode",
+                    onChange: this.handleMapmodeChange
+                }, options));
+            }
+        });
+    })(CityGame.UIComponents || (CityGame.UIComponents = {}));
+    var UIComponents = CityGame.UIComponents;
+})(CityGame || (CityGame = {}));
+/// <reference path="../../lib/react.d.ts" />
+///
+/// <reference path="../eventmanager.ts" />
+var CityGame;
+(function (CityGame) {
+    (function (UIComponents) {
+        UIComponents.SideMenuSave = React.createClass({
+            handleSave: function () {
+                eventManager.dispatchEvent({
+                    type: "makeSavePopup", content: ""
+                });
+            },
+            handleLoad: function () {
+                eventManager.dispatchEvent({
+                    type: "makeLoadPopup", content: ""
+                });
+            },
+            render: function () {
+                return (React.DOM.div({ id: "save-buttons", className: "grid-row" }, React.DOM.div({
+                    className: "grid-cell interactive",
+                    onClick: this.handleSave,
+                    onTouchStart: this.handleSave
+                }, "save"), React.DOM.div({
+                    className: "grid-cell interactive",
+                    onClick: this.handleLoad,
+                    onTouchStart: this.handleLoad
+                }, "load")));
+            }
+        });
+    })(CityGame.UIComponents || (CityGame.UIComponents = {}));
+    var UIComponents = CityGame.UIComponents;
+})(CityGame || (CityGame = {}));
+/// <reference path="../../lib/react.d.ts" />
+///
+/// <reference path="../eventmanager.ts" />
+var CityGame;
+(function (CityGame) {
+    (function (UIComponents) {
+        UIComponents.SideMenuStats = React.createClass({
+            getInitialState: function () {
+                return {
+                    hasLevelUpUpgrade: false,
+                    lastModifierCount: 0,
+                    canPrestige: false
+                };
+            },
+            componentWillReceiveProps: function (newProps) {
+                var newUpgradeCount = Object.keys(newProps.player.unlockedLevelUpModifiers).length;
+
+                if (newUpgradeCount > 0) {
+                    this.setState({ hasLevelUpUpgrade: true });
+                } else if (newProps.player.level >= 100) {
+                    this.setState({ canPrestige: true });
+                }
+
+                this.setState({ lastModifierCount: newUpgradeCount });
+            },
+            componentDidMount: function () {
+                var money = this.refs.moneyText.getDOMNode();
+                var profit = this.refs.profitText.getDOMNode();
+
+                var exp = this.refs.exp.getDOMNode();
+
+                var expText = this.refs.expText.getDOMNode();
+                var levelText = this.refs.levelText.getDOMNode();
+
+                eventManager.addEventListener("updatePlayerMoney", function (event) {
+                    money.innerHTML = event.content.total;
+                    profit.innerHTML = "$" + event.content.rolling + "/d";
+                });
+
+                eventManager.addEventListener("updatePlayerExp", function (event) {
+                    var expString = event.content.experience + " / " + event.content.nextLevel;
+                    var levelString = "Level   " + event.content.level + " ";
+
+                    exp.value = event.content.percentage;
+                    expText.innerHTML = expString;
+                    levelText.innerHTML = levelString;
+                });
+
+                // forces update, kinda dumb
+                this.props.player.addMoney(0);
+            },
+            handleOpenModifiers: function () {
+                var self = this;
+                var player = this.props.player;
+                var lastIndex = Object.keys(player.unlockedLevelUpModifiers).length - 1;
+                var lowestLevel = Object.keys(player.unlockedLevelUpModifiers).sort(function (a, b) {
+                    return parseInt(a) < parseInt(b) ? 1 : -1;
+                })[lastIndex];
+
+                var lowestModifierList = player.unlockedLevelUpModifiers[lowestLevel];
+
+                if (!lowestModifierList) {
+                    this.setState({
+                        hasLevelUpUpgrade: false
+                    });
+
+                    return;
+                }
+
+                eventManager.dispatchEvent({
+                    type: "makeModifierPopup",
+                    content: {
+                        player: player,
+                        text: [
+                            "Select your bonus perk for level " + lowestLevel,
+                            "You only get to pick one"],
+                        modifierList: lowestModifierList,
+                        excludeCost: true,
+                        okBtnText: "Select",
+                        onOk: function (selected) {
+                            var success = player.addLevelUpModifier(selected.data.modifier);
+                            eventManager.dispatchEvent({ type: "updateReact", content: "" });
+
+                            self.setState({
+                                hasLevelUpUpgrade: false
+                            });
+
+                            if (success !== false)
+                                return true;
+                            else
+                                return false;
+                        }
+                    }
+                });
+            },
+            handleOpenPrestige: function () {
+                if (!this.state.canPrestige) {
+                    return;
+                }
+                var onResetFN = function () {
+                    this.setState({ canPrestige: false });
+                }.bind(this);
+
+                eventManager.dispatchEvent({
+                    type: "prestigeReset",
+                    content: onResetFN
+                });
+            },
+            render: function () {
+                var progressProps = {
+                    id: "player-level",
+                    ref: "exp",
+                    value: 0,
+                    max: 100
+                };
+                var divProps = {
+                    id: "player-level-wrapper"
+                };
+
+                if (this.state.hasLevelUpUpgrade) {
+                    progressProps.className = "new-modifier";
+
+                    divProps.onClick = this.handleOpenModifiers;
+                    divProps.onTouchStart = this.handleOpenModifiers;
+                    divProps.className = "interactive";
+                } else if (this.state.canPrestige) {
+                    progressProps.className = "new-modifier";
+
+                    divProps.onClick = this.handleOpenPrestige;
+                    divProps.onTouchStart = this.handleOpenPrestige;
+                    divProps.className = "interactive";
+                }
+
+                return (React.DOM.div({ id: "side-menu-stats" }, React.DOM.div(divProps, React.DOM.progress(progressProps), React.DOM.div({
+                    id: "level-string-container"
+                }, React.DOM.div({
+                    id: "level-string-wrapper",
+                    className: "stat-string-wrapper"
+                }, React.DOM.span({
+                    ref: "levelText"
+                }, null), React.DOM.span({
+                    ref: "expText"
+                }, null)))), React.DOM.div({ id: "money-string-container" }, React.DOM.div({
+                    id: "money-string-wrapper",
+                    className: "stat-string-wrapper"
+                }, React.DOM.span({
+                    ref: "moneyText"
+                }, null), React.DOM.span({
+                    ref: "profitText"
+                }, null)))));
+            }
+        });
+    })(CityGame.UIComponents || (CityGame.UIComponents = {}));
+    var UIComponents = CityGame.UIComponents;
+})(CityGame || (CityGame = {}));
+/// <reference path="../../lib/react.d.ts" />
+///
+/// <reference path="../eventmanager.ts" />
+var CityGame;
+(function (CityGame) {
+    (function (UIComponents) {
+        UIComponents.SideMenuTools = React.createClass({
+            handleRecruit: function () {
+                eventManager.dispatchEvent({
+                    type: "recruit",
+                    content: ""
+                });
+            },
+            handleToolChange: function (type, e) {
+                this.props.setSelectedTool(type);
+
+                var continuous = false;
+
+                if (type !== "click" && e && e.shiftKey)
+                    continuous = true;
+
+                eventManager.dispatchEvent({
+                    type: "changeTool",
+                    content: {
+                        type: type,
+                        continuous: continuous
+                    }
+                });
+            },
+            componentDidMount: function () {
+                eventManager.addEventListener("buyHotkey", function (e) {
+                    ;
+                    this.handleToolChange("buy", e.content);
+                }.bind(this));
+
+                eventManager.addEventListener("sellHotkey", function (e) {
+                    this.handleToolChange("sell", e.content);
+                }.bind(this));
+
+                eventManager.addEventListener("clickHotkey", function (e) {
+                    this.handleToolChange("click", e.content);
+                }.bind(this));
+
+                eventManager.addEventListener("recruitHotkey", this.handleRecruit);
+            },
+            render: function () {
+                var props = {
+                    click: {
+                        ref: "click",
+                        className: "grid-cell interactive",
+                        onClick: this.handleToolChange.bind(null, "click"),
+                        onTouchStart: this.handleToolChange.bind(null, "click")
+                    },
+                    buy: {
+                        ref: "buy",
+                        className: "grid-cell interactive",
+                        onClick: this.handleToolChange.bind(null, "buy"),
+                        onTouchStart: this.handleToolChange.bind(null, "buy")
+                    },
+                    sell: {
+                        ref: "sell",
+                        className: "grid-cell interactive",
+                        onClick: this.handleToolChange.bind(null, "sell"),
+                        onTouchStart: this.handleToolChange.bind(null, "sell")
+                    },
+                    recruit: {
+                        ref: "recruit",
+                        className: "grid-cell interactive",
+                        onClick: this.handleRecruit,
+                        onTouchStart: this.handleRecruit
+                    }
+                };
+
+                var selectedTool = this.props.selectedTool;
+                if (Object.keys(this.props.player.employees).length < 1) {
+                    props.recruit.className += " new-modifier";
+
+                    props.click.className = "grid-cell disabled";
+                    props.buy.className = "grid-cell disabled";
+                    props.sell.className = "grid-cell disabled";
+                } else if (this.props.player.clicks <= 0) {
+                    props.buy.className = "grid-cell disabled";
+                    props.sell.className = "grid-cell disabled";
+                } else if (selectedTool && props[selectedTool]) {
+                    props[selectedTool].className += " selected-tool";
+                }
+
+                return (React.DOM.div({ id: "side-menu-tools", className: "grid-column" }, React.DOM.div({ className: "grid-row" }, React.DOM.div(props.click, React.DOM.u(null, "c"), "lick"), React.DOM.div(props.recruit, React.DOM.u(null, "r"), "ecruit")), React.DOM.div({ className: "grid-row" }, React.DOM.div(props.buy, "b", React.DOM.u(null, "u"), "y plot"), React.DOM.div(props.sell, React.DOM.u(null, "s"), "ell"))));
+            }
+        });
+    })(CityGame.UIComponents || (CityGame.UIComponents = {}));
+    var UIComponents = CityGame.UIComponents;
+})(CityGame || (CityGame = {}));
+/// <reference path="../../lib/react.d.ts" />
+///
+/// <reference path="../eventmanager.ts" />
+var CityGame;
+(function (CityGame) {
+    (function (UIComponents) {
+        UIComponents.SideMenuModifierButton = React.createClass({
+            getInitialState: function () {
+                return ({
+                    hasNewModifier: false,
+                    lastModifierCount: 0
+                });
+            },
+            handleOpenModifiers: function () {
+                this.setState({ hasNewModifier: false });
+                eventManager.dispatchEvent({
+                    type: "makeModifierPopup",
+                    content: {
+                        player: this.props.player,
+                        modifierList: this.props.player.unlockedModifiers
+                    }
+                });
+            },
+            componentWillReceiveProps: function (newProps) {
+                var newModifierCount = newProps.player.unlockedModifiers.length;
+
+                if (newModifierCount > this.state.lastModifierCount) {
+                    this.setState({ hasNewModifier: true });
+                }
+
+                this.setState({ lastModifierCount: newModifierCount });
+            },
+            render: function () {
+                var player = this.props.player;
+                var modifierCount = this.props.player.unlockedModifiers.length;
+
+                if (modifierCount > this.state.lastModifierCount) {
+                    //this.setState({newModifier: true});
+                }
 
                 var divProps = {
-                    className: "side-building",
-                    key: building.type,
-                    ref: building.type,
-                    onMouseLeave: this.hidePopOver,
-                    onTouchStart: this.handleBuildingSelect.bind(null, building),
-                    onMouseEnter: this.drawPopOver.bind(null, building, building.type)
+                    id: "side-menu-modifiers",
+                    className: "grid-cell interactive",
+                    onClick: this.handleOpenModifiers,
+                    onTouchStart: this.handleOpenModifiers
                 };
-
-                /*
-                for (var polarity in building.effectTargets)
-                {
-                var targets = building.effectTargets[polarity];
-                if (targets.length < 1) continue;
-                else
-                {
-                var poleSign = (polarity === "negative") ? "-" : "+";
-                divProps.title += "\n-----";
-                divProps.title += "\n" + polarity + " effects:";
-                
-                for (var j = 0; j < targets.length; j++)
-                {
-                divProps.title += "\n" + targets[j] + " " + poleSign;
-                }
-                }
-                }*/
-                var imageProps = { className: "building-image" };
-                var titleProps = { className: "building-title" };
-                var costProps = { className: "building-cost" };
-                var amountProps = { className: "building-amount" };
-
-                if (!canAfford) {
-                    divProps.className += " disabled";
-                    costProps.className += " insufficient";
-                } else {
-                    divProps.className += " interactive";
-                    divProps.onClick = this.handleBuildingSelect.bind(null, building);
+                if (this.state.hasNewModifier) {
+                    //divProps.className += " new-modifier";
                 }
 
-                if (this.props.selectedTool && this.props.selectedTool === building.type) {
-                    divProps.className += " selected-tool";
+                var divText = "Available upgrades: ";
+                if (modifierCount > 0) {
+                    divText += modifierCount;
                 }
 
-                var costText = "" + beautify(buildCost, this.state.beautifyIndex);
-
-                if (this.state.beautifyIndex < 2) {
-                    costText += "$";
-                }
-
-                var image = this.props.frameImages[building.icon];
-                imageProps.src = image.src;
-
-                var div = React.DOM.div(divProps, React.DOM.div({ className: "building-image-container" }, React.DOM.img(imageProps, null)), React.DOM.div({ className: "building-content" }, React.DOM.div({ className: "building-content-wrapper" }, React.DOM.div(titleProps, building.title), React.DOM.div(costProps, costText)), React.DOM.div(amountProps, amountBuilt)));
-
-                divs.push(div);
+                return (React.DOM.div(divProps, divText));
             }
-
-            return (React.DOM.div({ id: "side-menu-buildings", className: "grid-column" }, divs, React.DOM.div({
-                id: "building-popover",
-                className: "hidden",
-                ref: "popOver"
-            }, "asdjhksadhja")));
-        }
-    });
-})(UIComponents || (UIComponents = {}));
-/// <reference path="../../lib/react.d.ts" />
-///
-/// <reference path="../eventmanager.ts" />
-var UIComponents;
-(function (UIComponents) {
-    UIComponents.SideMenuZoom = React.createClass({
-        getInitialState: function () {
-            return { zoom: 1 };
-        },
-        handleZoomChange: function (event) {
-            var target = event.target;
-
-            this.setState({ zoom: parseFloat(target.value) });
-        },
-        handleZoomSubmit: function (event) {
-            event.preventDefault();
-            eventManager.dispatchEvent({ type: "changeZoom", content: this.state.zoom });
-            return false;
-        },
-        handleMapmodeChange: function (event) {
-            var target = event.target;
-
-            eventManager.dispatchEvent({ type: "changeMapmode", content: target.value });
-        },
-        componentDidMount: function () {
-            var self = this;
-            var el = this.refs.zoomValue.getDOMNode();
-
-            eventManager.addEventListener("updateZoomValue", function (e) {
-                el.value = e.content.toFixed(3);
-                self.setState({ zoom: e.content });
-            });
-        },
-        render: function () {
-            var options = [];
-
-            ["terrain", "landValue", "underground"].forEach(function (type) {
-                var props = {
-                    key: type,
-                    value: type
-                };
-                var option = React.DOM.option(props, type);
-            });
-
-            return (React.DOM.select({
-                id: "side-menu-mapmode-select",
-                value: "landValue"
-            }, options), React.DOM.form({
-                id: "side-menu-zoom",
-                className: "grid-row",
-                onSubmit: this.handleZoomSubmit
-            }, React.DOM.input({
-                id: "zoom-amount",
-                ref: "zoomValue",
-                className: "grid-row",
-                type: "number",
-                defaultValue: "1",
-                step: 0.1,
-                onChange: this.handleZoomChange
-            }), React.DOM.button({ id: "zoomBtn", className: "grid-row" }, "zoom")));
-        }
-    });
-})(UIComponents || (UIComponents = {}));
-/// <reference path="../../lib/react.d.ts" />
-///
-/// <reference path="../eventmanager.ts" />
-var UIComponents;
-(function (UIComponents) {
-    UIComponents.SideMenuMapmode = React.createClass({
-        handleMapmodeChange: function (event) {
-            var target = event.target;
-
-            eventManager.dispatchEvent({ type: "changeMapmode", content: target.value });
-        },
-        render: function () {
-            var options = [];
-
-            ["terrain", "landValue", "underground"].forEach(function (type) {
-                var props = {
-                    key: type,
-                    value: type
-                };
-
-                var title = type === "landValue" ? "land value" : type;
-                options.push(React.DOM.option(props, title));
-            });
-
-            return (React.DOM.select({
-                id: "side-menu-mapmode-select",
-                className: "grid-row",
-                defaultValue: "landValue",
-                title: "Map mode",
-                onChange: this.handleMapmodeChange
-            }, options));
-        }
-    });
-})(UIComponents || (UIComponents = {}));
-/// <reference path="../../lib/react.d.ts" />
-///
-/// <reference path="../eventmanager.ts" />
-var UIComponents;
-(function (UIComponents) {
-    UIComponents.SideMenuSave = React.createClass({
-        handleSave: function () {
-            eventManager.dispatchEvent({
-                type: "makeSavePopup", content: ""
-            });
-        },
-        handleLoad: function () {
-            eventManager.dispatchEvent({
-                type: "makeLoadPopup", content: ""
-            });
-        },
-        render: function () {
-            return (React.DOM.div({ id: "save-buttons", className: "grid-row" }, React.DOM.div({
-                className: "grid-cell interactive",
-                onClick: this.handleSave,
-                onTouchStart: this.handleSave
-            }, "save"), React.DOM.div({
-                className: "grid-cell interactive",
-                onClick: this.handleLoad,
-                onTouchStart: this.handleLoad
-            }, "load")));
-        }
-    });
-})(UIComponents || (UIComponents = {}));
-/// <reference path="../../lib/react.d.ts" />
-///
-/// <reference path="../eventmanager.ts" />
-var UIComponents;
-(function (UIComponents) {
-    UIComponents.SideMenuStats = React.createClass({
-        getInitialState: function () {
-            return {
-                hasLevelUpUpgrade: false,
-                lastModifierCount: 0,
-                canPrestige: false
-            };
-        },
-        componentWillReceiveProps: function (newProps) {
-            var newUpgradeCount = Object.keys(newProps.player.unlockedLevelUpModifiers).length;
-
-            if (newUpgradeCount > 0) {
-                this.setState({ hasLevelUpUpgrade: true });
-            } else if (newProps.player.level >= 100) {
-                this.setState({ canPrestige: true });
-            }
-
-            this.setState({ lastModifierCount: newUpgradeCount });
-        },
-        componentDidMount: function () {
-            var money = this.refs.moneyText.getDOMNode();
-            var profit = this.refs.profitText.getDOMNode();
-
-            var exp = this.refs.exp.getDOMNode();
-
-            var expText = this.refs.expText.getDOMNode();
-            var levelText = this.refs.levelText.getDOMNode();
-
-            eventManager.addEventListener("updatePlayerMoney", function (event) {
-                money.innerHTML = event.content.total;
-                profit.innerHTML = "$" + event.content.rolling + "/d";
-            });
-
-            eventManager.addEventListener("updatePlayerExp", function (event) {
-                var expString = event.content.experience + " / " + event.content.nextLevel;
-                var levelString = "Level   " + event.content.level + " ";
-
-                exp.value = event.content.percentage;
-                expText.innerHTML = expString;
-                levelText.innerHTML = levelString;
-            });
-
-            // forces update, kinda dumb
-            this.props.player.addMoney(0);
-        },
-        handleOpenModifiers: function () {
-            var self = this;
-            var player = this.props.player;
-            var lastIndex = Object.keys(player.unlockedLevelUpModifiers).length - 1;
-            var lowestLevel = Object.keys(player.unlockedLevelUpModifiers).sort(function (a, b) {
-                return parseInt(a) < parseInt(b) ? 1 : -1;
-            })[lastIndex];
-
-            var lowestModifierList = player.unlockedLevelUpModifiers[lowestLevel];
-
-            if (!lowestModifierList) {
-                this.setState({
-                    hasLevelUpUpgrade: false
-                });
-
-                return;
-            }
-
-            eventManager.dispatchEvent({
-                type: "makeModifierPopup",
-                content: {
-                    player: player,
-                    text: [
-                        "Select your bonus perk for level " + lowestLevel,
-                        "You only get to pick one"],
-                    modifierList: lowestModifierList,
-                    excludeCost: true,
-                    okBtnText: "Select",
-                    onOk: function (selected) {
-                        var success = player.addLevelUpModifier(selected.data.modifier);
-                        eventManager.dispatchEvent({ type: "updateReact", content: "" });
-
-                        self.setState({
-                            hasLevelUpUpgrade: false
-                        });
-
-                        if (success !== false)
-                            return true;
-                        else
-                            return false;
-                    }
-                }
-            });
-        },
-        handleOpenPrestige: function () {
-            if (!this.state.canPrestige) {
-                return;
-            }
-            var onResetFN = function () {
-                this.setState({ canPrestige: false });
-            }.bind(this);
-
-            eventManager.dispatchEvent({
-                type: "prestigeReset",
-                content: onResetFN
-            });
-        },
-        render: function () {
-            var progressProps = {
-                id: "player-level",
-                ref: "exp",
-                value: 0,
-                max: 100
-            };
-            var divProps = {
-                id: "player-level-wrapper"
-            };
-
-            if (this.state.hasLevelUpUpgrade) {
-                progressProps.className = "new-modifier";
-
-                divProps.onClick = this.handleOpenModifiers;
-                divProps.onTouchStart = this.handleOpenModifiers;
-                divProps.className = "interactive";
-            } else if (this.state.canPrestige) {
-                progressProps.className = "new-modifier";
-
-                divProps.onClick = this.handleOpenPrestige;
-                divProps.onTouchStart = this.handleOpenPrestige;
-                divProps.className = "interactive";
-            }
-
-            return (React.DOM.div({ id: "side-menu-stats" }, React.DOM.div(divProps, React.DOM.progress(progressProps), React.DOM.div({
-                id: "level-string-container"
-            }, React.DOM.div({
-                id: "level-string-wrapper",
-                className: "stat-string-wrapper"
-            }, React.DOM.span({
-                ref: "levelText"
-            }, null), React.DOM.span({
-                ref: "expText"
-            }, null)))), React.DOM.div({ id: "money-string-container" }, React.DOM.div({
-                id: "money-string-wrapper",
-                className: "stat-string-wrapper"
-            }, React.DOM.span({
-                ref: "moneyText"
-            }, null), React.DOM.span({
-                ref: "profitText"
-            }, null)))));
-        }
-    });
-})(UIComponents || (UIComponents = {}));
-/// <reference path="../../lib/react.d.ts" />
-///
-/// <reference path="../eventmanager.ts" />
-var UIComponents;
-(function (UIComponents) {
-    UIComponents.SideMenuTools = React.createClass({
-        handleRecruit: function () {
-            eventManager.dispatchEvent({
-                type: "recruit",
-                content: ""
-            });
-        },
-        handleToolChange: function (type, e) {
-            this.props.setSelectedTool(type);
-
-            var continuous = false;
-
-            if (type !== "click" && e && e.shiftKey)
-                continuous = true;
-
-            eventManager.dispatchEvent({
-                type: "changeTool",
-                content: {
-                    type: type,
-                    continuous: continuous
-                }
-            });
-        },
-        componentDidMount: function () {
-            eventManager.addEventListener("buyHotkey", function (e) {
-                ;
-                this.handleToolChange("buy", e.content);
-            }.bind(this));
-
-            eventManager.addEventListener("sellHotkey", function (e) {
-                this.handleToolChange("sell", e.content);
-            }.bind(this));
-
-            eventManager.addEventListener("clickHotkey", function (e) {
-                this.handleToolChange("click", e.content);
-            }.bind(this));
-
-            eventManager.addEventListener("recruitHotkey", this.handleRecruit);
-        },
-        render: function () {
-            var props = {
-                click: {
-                    ref: "click",
-                    className: "grid-cell interactive",
-                    onClick: this.handleToolChange.bind(null, "click"),
-                    onTouchStart: this.handleToolChange.bind(null, "click")
-                },
-                buy: {
-                    ref: "buy",
-                    className: "grid-cell interactive",
-                    onClick: this.handleToolChange.bind(null, "buy"),
-                    onTouchStart: this.handleToolChange.bind(null, "buy")
-                },
-                sell: {
-                    ref: "sell",
-                    className: "grid-cell interactive",
-                    onClick: this.handleToolChange.bind(null, "sell"),
-                    onTouchStart: this.handleToolChange.bind(null, "sell")
-                },
-                recruit: {
-                    ref: "recruit",
-                    className: "grid-cell interactive",
-                    onClick: this.handleRecruit,
-                    onTouchStart: this.handleRecruit
-                }
-            };
-
-            var selectedTool = this.props.selectedTool;
-            if (Object.keys(this.props.player.employees).length < 1) {
-                props.recruit.className += " new-modifier";
-
-                props.click.className = "grid-cell disabled";
-                props.buy.className = "grid-cell disabled";
-                props.sell.className = "grid-cell disabled";
-            } else if (this.props.player.clicks <= 0) {
-                props.buy.className = "grid-cell disabled";
-                props.sell.className = "grid-cell disabled";
-            } else if (selectedTool && props[selectedTool]) {
-                props[selectedTool].className += " selected-tool";
-            }
-
-            return (React.DOM.div({ id: "side-menu-tools", className: "grid-column" }, React.DOM.div({ className: "grid-row" }, React.DOM.div(props.click, React.DOM.u(null, "c"), "lick"), React.DOM.div(props.recruit, React.DOM.u(null, "r"), "ecruit")), React.DOM.div({ className: "grid-row" }, React.DOM.div(props.buy, "b", React.DOM.u(null, "u"), "y plot"), React.DOM.div(props.sell, React.DOM.u(null, "s"), "ell"))));
-        }
-    });
-})(UIComponents || (UIComponents = {}));
-/// <reference path="../../lib/react.d.ts" />
-///
-/// <reference path="../eventmanager.ts" />
-var UIComponents;
-(function (UIComponents) {
-    UIComponents.SideMenuModifierButton = React.createClass({
-        getInitialState: function () {
-            return ({
-                hasNewModifier: false,
-                lastModifierCount: 0
-            });
-        },
-        handleOpenModifiers: function () {
-            this.setState({ hasNewModifier: false });
-            eventManager.dispatchEvent({
-                type: "makeModifierPopup",
-                content: {
-                    player: this.props.player,
-                    modifierList: this.props.player.unlockedModifiers
-                }
-            });
-        },
-        componentWillReceiveProps: function (newProps) {
-            var newModifierCount = newProps.player.unlockedModifiers.length;
-
-            if (newModifierCount > this.state.lastModifierCount) {
-                this.setState({ hasNewModifier: true });
-            }
-
-            this.setState({ lastModifierCount: newModifierCount });
-        },
-        render: function () {
-            var player = this.props.player;
-            var modifierCount = this.props.player.unlockedModifiers.length;
-
-            if (modifierCount > this.state.lastModifierCount) {
-                //this.setState({newModifier: true});
-            }
-
-            var divProps = {
-                id: "side-menu-modifiers",
-                className: "grid-cell interactive",
-                onClick: this.handleOpenModifiers,
-                onTouchStart: this.handleOpenModifiers
-            };
-            if (this.state.hasNewModifier) {
-                //divProps.className += " new-modifier";
-            }
-
-            var divText = "Available upgrades: ";
-            if (modifierCount > 0) {
-                divText += modifierCount;
-            }
-
-            return (React.DOM.div(divProps, divText));
-        }
-    });
-})(UIComponents || (UIComponents = {}));
+        });
+    })(CityGame.UIComponents || (CityGame.UIComponents = {}));
+    var UIComponents = CityGame.UIComponents;
+})(CityGame || (CityGame = {}));
 /// <reference path="../../lib/react.d.ts" />
 /// <reference path="sidemenubuildings.ts" />
 /// <reference path="sidemenuzoom.ts" />
@@ -9282,590 +9587,612 @@ var UIComponents;
 /// <reference path="sidemenustats.ts" />
 /// <reference path="sidemenutools.ts" />
 /// <reference path="sidemenumodifierbutton.ts" />
-var UIComponents;
-(function (UIComponents) {
-    UIComponents.SideMenu = React.createClass({
-        getInitialState: function () {
-            return { selectedTool: null };
-        },
-        setSelectedTool: function (type) {
-            this.setState({ selectedTool: type });
-        },
-        render: function () {
-            return (React.DOM.div({ id: "react-side-menu" }, UIComponents.SideMenuTools({
-                player: this.props.player,
-                setSelectedTool: this.setSelectedTool,
-                selectedTool: this.state.selectedTool
-            }), UIComponents.SideMenuBuildings({
-                player: this.props.player,
-                frameImages: this.props.frameImages,
-                setSelectedTool: this.setSelectedTool,
-                selectedTool: this.state.selectedTool,
-                // Todo react definitions
-                beautifyIndex: null,
-                lastSelectedBuilding: null
-            }), React.DOM.div({ id: "side-menu-other-buttons", className: "grid-column" }, UIComponents.SideMenuSave(), UIComponents.SideMenuMapmode(), UIComponents.SideMenuZoom()), UIComponents.SideMenuStats({
-                player: this.props.player,
-                // Todo react definitions
-                hasLevelUpUpgrade: null,
-                lastModifierCount: null
-            }), UIComponents.SideMenuModifierButton({
-                player: this.props.player,
-                // Todo react definitions
-                hasNewModifier: null,
-                lastModifierCount: null
-            })));
-        }
-    });
-})(UIComponents || (UIComponents = {}));
+var CityGame;
+(function (CityGame) {
+    (function (UIComponents) {
+        UIComponents.SideMenu = React.createClass({
+            getInitialState: function () {
+                return { selectedTool: null };
+            },
+            setSelectedTool: function (type) {
+                this.setState({ selectedTool: type });
+            },
+            render: function () {
+                return (React.DOM.div({ id: "react-side-menu" }, CityGame.UIComponents.SideMenuTools({
+                    player: this.props.player,
+                    setSelectedTool: this.setSelectedTool,
+                    selectedTool: this.state.selectedTool
+                }), CityGame.UIComponents.SideMenuBuildings({
+                    player: this.props.player,
+                    frameImages: this.props.frameImages,
+                    setSelectedTool: this.setSelectedTool,
+                    selectedTool: this.state.selectedTool,
+                    // Todo react definitions
+                    beautifyIndex: null,
+                    lastSelectedBuilding: null
+                }), React.DOM.div({ id: "side-menu-other-buttons", className: "grid-column" }, CityGame.UIComponents.SideMenuSave(), CityGame.UIComponents.SideMenuMapmode(), CityGame.UIComponents.SideMenuZoom()), CityGame.UIComponents.SideMenuStats({
+                    player: this.props.player,
+                    // Todo react definitions
+                    hasLevelUpUpgrade: null,
+                    lastModifierCount: null
+                }), CityGame.UIComponents.SideMenuModifierButton({
+                    player: this.props.player,
+                    // Todo react definitions
+                    hasNewModifier: null,
+                    lastModifierCount: null
+                })));
+            }
+        });
+    })(CityGame.UIComponents || (CityGame.UIComponents = {}));
+    var UIComponents = CityGame.UIComponents;
+})(CityGame || (CityGame = {}));
 // Using state for setting position = horrible performance
 // manipulating style directly works much better
-var UIComponents;
-(function (UIComponents) {
-    UIComponents.Draggable = {
-        handleDragStart: function (e) {
-            this.DOMNode.style.zIndex = this.props.incrementZIndex();
+var CityGame;
+(function (CityGame) {
+    // manipulating style directly works much better
+    (function (UIComponents) {
+        UIComponents.Draggable = {
+            handleDragStart: function (e) {
+                this.DOMNode.style.zIndex = this.props.incrementZIndex();
 
-            if (!e.nativeEvent.dataTransfer)
-                return;
+                if (!e.nativeEvent.dataTransfer)
+                    return;
 
-            //this.DOMNode.classList.add("dragging");
-            // browser overrides css cursor when dragging
-            e.nativeEvent.dataTransfer.dropEffect = "move";
+                //this.DOMNode.classList.add("dragging");
+                // browser overrides css cursor when dragging
+                e.nativeEvent.dataTransfer.dropEffect = "move";
 
-            this.offset = {
-                x: e.nativeEvent.pageX - parseInt(this.DOMNode.style.left),
-                y: e.nativeEvent.pageY - parseInt(this.DOMNode.style.top)
-            };
-        },
-        handleDrag: function (e) {
-            if (e.clientX === 0 && e.clientY === 0)
-                return;
+                this.offset = {
+                    x: e.nativeEvent.pageX - parseInt(this.DOMNode.style.left),
+                    y: e.nativeEvent.pageY - parseInt(this.DOMNode.style.top)
+                };
+            },
+            handleDrag: function (e) {
+                if (e.clientX === 0 && e.clientY === 0)
+                    return;
 
-            var x = e.clientX - this.offset.x;
-            var y = e.clientY - this.offset.y;
+                var x = e.clientX - this.offset.x;
+                var y = e.clientY - this.offset.y;
 
-            var domWidth = parseInt(this.DOMNode.offsetWidth);
-            var domHeight = parseInt(this.DOMNode.offsetHeight);
+                var domWidth = parseInt(this.DOMNode.offsetWidth);
+                var domHeight = parseInt(this.DOMNode.offsetHeight);
 
-            var pixiWidth = parseInt(this.pixiContainer.offsetWidth);
-            var pixiHeight = parseInt(this.pixiContainer.offsetHeight);
+                var pixiWidth = parseInt(this.pixiContainer.offsetWidth);
+                var pixiHeight = parseInt(this.pixiContainer.offsetHeight);
 
-            var x2 = x + domWidth;
-            var y2 = y + domHeight;
+                var x2 = x + domWidth;
+                var y2 = y + domHeight;
 
-            if (x < 0)
-                x = 0;
-            else if (x2 > pixiWidth) {
-                x = pixiWidth - domWidth;
-            }
-            ;
-
-            if (y < 0)
-                y = 0;
-            else if (y2 > pixiHeight) {
-                y = pixiHeight - domHeight;
-            }
-            ;
-
-            this.DOMNode.style.left = x + "px";
-            this.DOMNode.style.top = y + "px";
-        },
-        handleDragEnd: function (e) {
-            //this.DOMNode.classList.remove("dragging");
-        },
-        componentDidMount: function () {
-            this.DOMNode = this.getDOMNode();
-            this.pixiContainer = document.getElementById("pixi-container");
-        }
-    };
-})(UIComponents || (UIComponents = {}));
-/// <reference path="../../lib/react.d.ts" />
-var UIComponents;
-(function (UIComponents) {
-    UIComponents.SplitMultilineText = {
-        splitMultilineText: function (text) {
-            if (Array.isArray(text)) {
-                var returnArr = [];
-                for (var i = 0; i < text.length; i++) {
-                    returnArr.push(text[i]);
-                    returnArr.push(React.DOM.br(null));
+                if (x < 0)
+                    x = 0;
+                else if (x2 > pixiWidth) {
+                    x = pixiWidth - domWidth;
                 }
-                return returnArr;
-            } else {
-                return text;
+                ;
+
+                if (y < 0)
+                    y = 0;
+                else if (y2 > pixiHeight) {
+                    y = pixiHeight - domHeight;
+                }
+                ;
+
+                this.DOMNode.style.left = x + "px";
+                this.DOMNode.style.top = y + "px";
+            },
+            handleDragEnd: function (e) {
+                //this.DOMNode.classList.remove("dragging");
+            },
+            componentDidMount: function () {
+                this.DOMNode = this.getDOMNode();
+                this.pixiContainer = document.getElementById("pixi-container");
             }
-        }
-    };
-})(UIComponents || (UIComponents = {}));
+        };
+    })(CityGame.UIComponents || (CityGame.UIComponents = {}));
+    var UIComponents = CityGame.UIComponents;
+})(CityGame || (CityGame = {}));
+/// <reference path="../../lib/react.d.ts" />
+var CityGame;
+(function (CityGame) {
+    (function (UIComponents) {
+        UIComponents.SplitMultilineText = {
+            splitMultilineText: function (text) {
+                if (Array.isArray(text)) {
+                    var returnArr = [];
+                    for (var i = 0; i < text.length; i++) {
+                        returnArr.push(text[i]);
+                        returnArr.push(React.DOM.br(null));
+                    }
+                    return returnArr;
+                } else {
+                    return text;
+                }
+            }
+        };
+    })(CityGame.UIComponents || (CityGame.UIComponents = {}));
+    var UIComponents = CityGame.UIComponents;
+})(CityGame || (CityGame = {}));
 /// <reference path="../../lib/react.d.ts" />
 /// <reference path="splitmultilinetext.ts" />
-var UIComponents;
-(function (UIComponents) {
-    /**
-    * props:
-    *   listItems
-    *   initialColumns
-    *
-    * state:
-    *   selected
-    *   columns
-    *   sortBy
-    *
-    * children:
-    *   listelement:
-    *     key
-    *     tr
-    *     getData()
-    *
-    *  columns:
-    *    props (classes etc)
-    *    label
-    *    sorting (alphabet, numeric, null)
-    *    title?
-    */
-    UIComponents.List = React.createClass({
-        mixins: [UIComponents.SplitMultilineText],
-        getInitialState: function () {
-            var initialColumn = this.props.initialColumn || this.props.initialColumns[0];
+var CityGame;
+(function (CityGame) {
+    (function (UIComponents) {
+        /**
+        * props:
+        *   listItems
+        *   initialColumns
+        *
+        * state:
+        *   selected
+        *   columns
+        *   sortBy
+        *
+        * children:
+        *   listelement:
+        *     key
+        *     tr
+        *     getData()
+        *
+        *  columns:
+        *    props (classes etc)
+        *    label
+        *    sorting (alphabet, numeric, null)
+        *    title?
+        */
+        UIComponents.List = React.createClass({
+            mixins: [CityGame.UIComponents.SplitMultilineText],
+            getInitialState: function () {
+                var initialColumn = this.props.initialColumn || this.props.initialColumns[0];
 
-            var initialSelected = this.props.listItems[0];
+                var initialSelected = this.props.listItems[0];
 
-            return ({
-                columns: this.props.initialColumns,
-                selected: initialSelected,
-                sortBy: {
-                    column: initialColumn,
-                    order: initialColumn.defaultOrder || "desc",
-                    currColumnIndex: this.props.initialColumns.indexOf(initialColumn)
-                }
-            });
-        },
-        componentDidMount: function () {
-            var self = this;
-
-            this.handleSelectRow(this.props.sortedItems[0]);
-
-            this.getDOMNode().addEventListener("keydown", function (event) {
-                switch (event.keyCode) {
-                    case 40: {
-                        self.shiftSelection(1);
-                        break;
+                return ({
+                    columns: this.props.initialColumns,
+                    selected: initialSelected,
+                    sortBy: {
+                        column: initialColumn,
+                        order: initialColumn.defaultOrder || "desc",
+                        currColumnIndex: this.props.initialColumns.indexOf(initialColumn)
                     }
-                    case 38: {
-                        self.shiftSelection(-1);
-                        break;
-                    }
-                    default: {
-                        return;
-                    }
-                }
-            });
-        },
-        handleSelectColumn: function (column) {
-            if (column.notSortable)
-                return;
-            var order;
-            if (this.state.sortBy.column.key === column.key) {
-                // flips order
-                order = this.state.sortBy.order === "desc" ? "asc" : "desc";
-            } else {
-                order = column.defaultOrder;
-            }
-
-            this.setState({
-                sortBy: {
-                    column: column,
-                    order: order,
-                    currColumnIndex: this.state.columns.indexOf(column)
-                }
-            });
-        },
-        handleSelectRow: function (row) {
-            if (this.props.onRowChange)
-                this.props.onRowChange.call(null, row);
-            this.setState({
-                selected: row
-            });
-        },
-        sort: function () {
-            var self = this;
-            var selectedColumn = this.state.sortBy.column;
-
-            var initialPropToSortBy = selectedColumn.propToSortBy || selectedColumn.key;
-
-            var itemsToSort = this.props.listItems;
-
-            var defaultSortFN = function (a, b) {
-                var propToSortBy = initialPropToSortBy;
-                var nextIndex = self.state.sortBy.currColumnIndex;
-
-                for (var i = 0; i < self.state.columns.length; i++) {
-                    if (a.data[propToSortBy] === b.data[propToSortBy]) {
-                        nextIndex = (nextIndex + 1) % self.state.columns.length;
-                        var nextColumn = self.state.columns[nextIndex];
-                        propToSortBy = nextColumn.propToSortBy || nextColumn.key;
-                    } else {
-                        break;
-                    }
-                }
-
-                return a.data[propToSortBy] > b.data[propToSortBy] ? 1 : -1;
-            };
-
-            if (selectedColumn.sortingFunction) {
-                itemsToSort.sort(function (a, b) {
-                    var sortFNResult = selectedColumn.sortingFunction(a, b);
-                    if (sortFNResult === 0) {
-                        sortFNResult = defaultSortFN(a, b);
-                    }
-                    return sortFNResult;
                 });
-            } else {
-                itemsToSort.sort(defaultSortFN);
-            }
+            },
+            componentDidMount: function () {
+                var self = this;
 
-            if (this.state.sortBy.order === "desc") {
-                itemsToSort.reverse();
-            }
+                this.handleSelectRow(this.props.sortedItems[0]);
 
-            //else if (this.state.sortBy.order !== "desc") throw new Error("Invalid sort parameter");
-            this.props.sortedItems = itemsToSort;
-        },
-        shiftSelection: function (amountToShift) {
-            var reverseIndexes = {};
-            for (var i = 0; i < this.props.sortedItems.length; i++) {
-                reverseIndexes[this.props.sortedItems[i].key] = i;
-            }
-            ;
-            var currSelectedIndex = reverseIndexes[this.state.selected.key];
-            var nextIndex = (currSelectedIndex + amountToShift) % this.props.sortedItems.length;
-            if (nextIndex < 0) {
-                nextIndex += this.props.sortedItems.length;
-            }
-            this.setState({
-                selected: this.props.sortedItems[nextIndex]
-            });
-        },
-        render: function () {
-            var self = this;
-            var columns = [];
-            var headerLabels = [];
+                this.getDOMNode().addEventListener("keydown", function (event) {
+                    switch (event.keyCode) {
+                        case 40: {
+                            self.shiftSelection(1);
+                            break;
+                        }
+                        case 38: {
+                            self.shiftSelection(-1);
+                            break;
+                        }
+                        default: {
+                            return;
+                        }
+                    }
+                });
+            },
+            handleSelectColumn: function (column) {
+                if (column.notSortable)
+                    return;
+                var order;
+                if (this.state.sortBy.column.key === column.key) {
+                    // flips order
+                    order = this.state.sortBy.order === "desc" ? "asc" : "desc";
+                } else {
+                    order = column.defaultOrder;
+                }
 
-            this.state.columns.forEach(function (column) {
-                var colProps = {
-                    key: column.key
+                this.setState({
+                    sortBy: {
+                        column: column,
+                        order: order,
+                        currColumnIndex: this.state.columns.indexOf(column)
+                    }
+                });
+            },
+            handleSelectRow: function (row) {
+                if (this.props.onRowChange)
+                    this.props.onRowChange.call(null, row);
+                this.setState({
+                    selected: row
+                });
+            },
+            sort: function () {
+                var self = this;
+                var selectedColumn = this.state.sortBy.column;
+
+                var initialPropToSortBy = selectedColumn.propToSortBy || selectedColumn.key;
+
+                var itemsToSort = this.props.listItems;
+
+                var defaultSortFN = function (a, b) {
+                    var propToSortBy = initialPropToSortBy;
+                    var nextIndex = self.state.sortBy.currColumnIndex;
+
+                    for (var i = 0; i < self.state.columns.length; i++) {
+                        if (a.data[propToSortBy] === b.data[propToSortBy]) {
+                            nextIndex = (nextIndex + 1) % self.state.columns.length;
+                            var nextColumn = self.state.columns[nextIndex];
+                            propToSortBy = nextColumn.propToSortBy || nextColumn.key;
+                        } else {
+                            break;
+                        }
+                    }
+
+                    return a.data[propToSortBy] > b.data[propToSortBy] ? 1 : -1;
                 };
 
-                if (self.props.colStylingFN) {
-                    colProps = self.props.colStylingFN(column, colProps);
+                if (selectedColumn.sortingFunction) {
+                    itemsToSort.sort(function (a, b) {
+                        var sortFNResult = selectedColumn.sortingFunction(a, b);
+                        if (sortFNResult === 0) {
+                            sortFNResult = defaultSortFN(a, b);
+                        }
+                        return sortFNResult;
+                    });
+                } else {
+                    itemsToSort.sort(defaultSortFN);
                 }
 
-                columns.push(React.DOM.col(colProps));
-                headerLabels.push(React.DOM.th({
-                    className: !column.notSortable ? "sortable-column" : null,
-                    title: column.title || colProps.title || null,
-                    onMouseDown: self.handleSelectColumn.bind(null, column),
-                    onTouchStart: self.handleSelectColumn.bind(null, column),
-                    key: column.key
-                }, column.label));
-            });
+                if (this.state.sortBy.order === "desc") {
+                    itemsToSort.reverse();
+                }
 
-            this.sort();
+                //else if (this.state.sortBy.order !== "desc") throw new Error("Invalid sort parameter");
+                this.props.sortedItems = itemsToSort;
+            },
+            shiftSelection: function (amountToShift) {
+                var reverseIndexes = {};
+                for (var i = 0; i < this.props.sortedItems.length; i++) {
+                    reverseIndexes[this.props.sortedItems[i].key] = i;
+                }
+                ;
+                var currSelectedIndex = reverseIndexes[this.state.selected.key];
+                var nextIndex = (currSelectedIndex + amountToShift) % this.props.sortedItems.length;
+                if (nextIndex < 0) {
+                    nextIndex += this.props.sortedItems.length;
+                }
+                this.setState({
+                    selected: this.props.sortedItems[nextIndex]
+                });
+            },
+            render: function () {
+                var self = this;
+                var columns = [];
+                var headerLabels = [];
 
-            var sortedItems = this.props.sortedItems;
-
-            var rows = [];
-            sortedItems.forEach(function (item) {
-                var cells = [];
-                for (var _column in self.state.columns) {
-                    var column = self.state.columns[_column];
-
-                    var cellProps = {
-                        key: "" + item.key + "_" + column.key
+                this.state.columns.forEach(function (column) {
+                    var colProps = {
+                        key: column.key
                     };
 
-                    if (self.props.cellStylingFN) {
-                        cellProps = self.props.cellStylingFN(item, column, cellProps);
+                    if (self.props.colStylingFN) {
+                        colProps = self.props.colStylingFN(column, colProps);
                     }
 
-                    cells.push(React.DOM.td(cellProps, self.splitMultilineText(item.data[column.key]) || null));
-                }
+                    columns.push(React.DOM.col(colProps));
+                    headerLabels.push(React.DOM.th({
+                        className: !column.notSortable ? "sortable-column" : null,
+                        title: column.title || colProps.title || null,
+                        onMouseDown: self.handleSelectColumn.bind(null, column),
+                        onTouchStart: self.handleSelectColumn.bind(null, column),
+                        key: column.key
+                    }, column.label));
+                });
 
-                var rowProps = {};
-                rowProps.key = item.key;
-                rowProps.onClick = self.handleSelectRow.bind(null, item);
-                rowProps.onTouchStart = self.handleSelectRow.bind(null, item);
-                if (self.state.selected && self.state.selected.key === item.key) {
-                    rowProps.className = "selected";
-                }
-                if (self.props.rowStylingFN)
-                    rowProps = self.props.rowStylingFN(item, rowProps);
-                rows.push(React.DOM.tr(rowProps, cells));
-            });
+                this.sort();
 
-            return (React.DOM.div(null, React.DOM.table({
-                tabIndex: 1
-            }, React.DOM.colgroup(null, columns), React.DOM.thead(null, React.DOM.tr(null, headerLabels)), React.DOM.tbody(null, rows))));
-        }
-    });
-})(UIComponents || (UIComponents = {}));
+                var sortedItems = this.props.sortedItems;
+
+                var rows = [];
+                sortedItems.forEach(function (item) {
+                    var cells = [];
+                    for (var _column in self.state.columns) {
+                        var column = self.state.columns[_column];
+
+                        var cellProps = {
+                            key: "" + item.key + "_" + column.key
+                        };
+
+                        if (self.props.cellStylingFN) {
+                            cellProps = self.props.cellStylingFN(item, column, cellProps);
+                        }
+
+                        cells.push(React.DOM.td(cellProps, self.splitMultilineText(item.data[column.key]) || null));
+                    }
+
+                    var rowProps = {};
+                    rowProps.key = item.key;
+                    rowProps.onClick = self.handleSelectRow.bind(null, item);
+                    rowProps.onTouchStart = self.handleSelectRow.bind(null, item);
+                    if (self.state.selected && self.state.selected.key === item.key) {
+                        rowProps.className = "selected";
+                    }
+                    if (self.props.rowStylingFN)
+                        rowProps = self.props.rowStylingFN(item, rowProps);
+                    rows.push(React.DOM.tr(rowProps, cells));
+                });
+
+                return (React.DOM.div(null, React.DOM.table({
+                    tabIndex: 1
+                }, React.DOM.colgroup(null, columns), React.DOM.thead(null, React.DOM.tr(null, headerLabels)), React.DOM.tbody(null, rows))));
+            }
+        });
+    })(CityGame.UIComponents || (CityGame.UIComponents = {}));
+    var UIComponents = CityGame.UIComponents;
+})(CityGame || (CityGame = {}));
 /// <reference path="../../lib/react.d.ts" />
 ///
 /// <reference path="../eventmanager.ts" />
 /// <reference path="../utility.ts" />
 ///
 /// <reference path="list.ts" />
-var UIComponents;
-(function (UIComponents) {
-    UIComponents.ModifierList = React.createClass({
-        render: function () {
-            var rows = [];
-            for (var i = 0; i < this.props.modifiers.length; i++) {
-                var modifier = this.props.modifiers[i];
-                var item = {
-                    key: modifier.type,
-                    data: {
-                        title: modifier.title,
-                        description: modifier.description,
-                        modifier: modifier
+var CityGame;
+(function (CityGame) {
+    (function (UIComponents) {
+        UIComponents.ModifierList = React.createClass({
+            render: function () {
+                var rows = [];
+                for (var i = 0; i < this.props.modifiers.length; i++) {
+                    var modifier = this.props.modifiers[i];
+                    var item = {
+                        key: modifier.type,
+                        data: {
+                            title: modifier.title,
+                            description: modifier.description,
+                            modifier: modifier
+                        }
+                    };
+                    if (this.props.excludeCost !== true) {
+                        item.data.cost = modifier.cost || null;
+                        item.data.costString = modifier.cost !== undefined ? CityGame.beautify(modifier.cost) + "$" : null;
                     }
-                };
+
+                    rows.push(item);
+                }
+                var columns = [];
+                columns.push({
+                    label: "Title",
+                    key: "title"
+                });
+
                 if (this.props.excludeCost !== true) {
-                    item.data.cost = modifier.cost || null;
-                    item.data.costString = modifier.cost !== undefined ? beautify(modifier.cost) + "$" : null;
+                    columns.push({
+                        label: "Cost",
+                        key: "costString",
+                        defaultOrder: "asc",
+                        propToSortBy: "cost"
+                    });
                 }
 
-                rows.push(item);
-            }
-            var columns = [];
-            columns.push({
-                label: "Title",
-                key: "title"
-            });
-
-            if (this.props.excludeCost !== true) {
                 columns.push({
-                    label: "Cost",
-                    key: "costString",
-                    defaultOrder: "asc",
-                    propToSortBy: "cost"
+                    label: "Description",
+                    key: "description"
                 });
+
+                return (CityGame.UIComponents.List({
+                    // TODO fix declaration file and remove
+                    // typescript qq without these
+                    selected: null,
+                    columns: null,
+                    sortBy: null,
+                    initialColumn: columns[1],
+                    ref: "list",
+                    className: "modifier-list",
+                    rowStylingFN: this.props.rowStylingFN,
+                    listItems: rows,
+                    initialColumns: columns
+                }));
             }
-
-            columns.push({
-                label: "Description",
-                key: "description"
-            });
-
-            return (UIComponents.List({
-                // TODO fix declaration file and remove
-                // typescript qq without these
-                selected: null,
-                columns: null,
-                sortBy: null,
-                initialColumn: columns[1],
-                ref: "list",
-                className: "modifier-list",
-                rowStylingFN: this.props.rowStylingFN,
-                listItems: rows,
-                initialColumns: columns
-            }));
-        }
-    });
-})(UIComponents || (UIComponents = {}));
+        });
+    })(CityGame.UIComponents || (CityGame.UIComponents = {}));
+    var UIComponents = CityGame.UIComponents;
+})(CityGame || (CityGame = {}));
 /// <reference path="../../lib/react.d.ts" />
 ///
 /// <reference path="../eventmanager.ts" />
 /// <reference path="../utility.ts" />
-var UIComponents;
-(function (UIComponents) {
-    UIComponents.StatList = React.createClass({
-        render: function () {
-            var rows = [];
-            for (var i = 0; i < this.props.stats.length; i++) {
-                var stat = this.props.stats[i];
+var CityGame;
+(function (CityGame) {
+    (function (UIComponents) {
+        UIComponents.StatList = React.createClass({
+            render: function () {
+                var rows = [];
+                for (var i = 0; i < this.props.stats.length; i++) {
+                    var stat = this.props.stats[i];
 
-                var div = React.DOM.div({
-                    className: "stat-container",
-                    key: "" + i
-                }, React.DOM.div({
-                    className: "stat-main"
-                }, React.DOM.span({ className: "stat-title" }, stat.title), React.DOM.span({ className: "stat-content" }, stat.content)), stat.subContent ? React.DOM.small({ className: "stat-subContent" }, stat.subContent) : null);
+                    var div = React.DOM.div({
+                        className: "stat-container",
+                        key: "" + i
+                    }, React.DOM.div({
+                        className: "stat-main"
+                    }, React.DOM.span({ className: "stat-title" }, stat.title), React.DOM.span({ className: "stat-content" }, stat.content)), stat.subContent ? React.DOM.small({ className: "stat-subContent" }, stat.subContent) : null);
 
-                rows.push(div);
+                    rows.push(div);
+                }
+                ;
+
+                return (React.DOM.div({ className: "stat-group" }, React.DOM.div({ className: "stat-header" }, this.props.header), rows));
             }
-            ;
-
-            return (React.DOM.div({ className: "stat-group" }, React.DOM.div({ className: "stat-header" }, this.props.header), rows));
-        }
-    });
-})(UIComponents || (UIComponents = {}));
+        });
+    })(CityGame.UIComponents || (CityGame.UIComponents = {}));
+    var UIComponents = CityGame.UIComponents;
+})(CityGame || (CityGame = {}));
 /// <reference path="../../lib/react.d.ts" />
 ///
 /// <reference path="../eventmanager.ts" />
 /// <reference path="../utility.ts" />
 ///
 /// <reference path="list.ts" />
-var UIComponents;
-(function (UIComponents) {
-    UIComponents.EmployeeList = React.createClass({
-        applyRowStyle: function (item, rowProps) {
-            if (item.data.employee.active !== true) {
-                rowProps.className = "inactive";
-                rowProps.onClick = rowProps.onTouchStart = null;
-            }
-            return rowProps;
-        },
-        applyColStyle: function (column, colProps) {
-            if (this.props.relevantSkills && this.props.relevantSkills.length > 0) {
-                if (this.props.relevantSkills.indexOf(column.key) > -1) {
-                    colProps["className"] = "relevant-col";
+var CityGame;
+(function (CityGame) {
+    (function (UIComponents) {
+        UIComponents.EmployeeList = React.createClass({
+            applyRowStyle: function (item, rowProps) {
+                if (item.data.employee.active !== true) {
+                    rowProps.className = "inactive";
+                    rowProps.onClick = rowProps.onTouchStart = null;
                 }
-            }
-
-            return colProps;
-        },
-        applyCellStyle: function (item, column, cellProps) {
-            if (this.props.relevantSkills && this.props.relevantSkills.length > 0) {
-                if (this.props.relevantSkills.indexOf(column.key) < 0 && column.key !== "name" && column.key !== "trait") {
-                    cellProps["className"] = "irrelevant-cell";
-                }
-            }
-
-            return cellProps;
-        },
-        sortEmployees: function (a, b) {
-            var employeeA = a.data.employee;
-            var employeeB = b.data.employee;
-
-            if (!employeeA.active && employeeB.active)
-                return -1;
-            else if (!employeeB.active && employeeA.active)
-                return 1;
-            else
-                return 0;
-        },
-        render: function () {
-            var stopBubble = function (e) {
-                e.stopPropagation();
-            };
-            var hasDeleteButton = false;
-
-            var rows = [];
-            for (var _emp in this.props.employees) {
-                var employee = this.props.employees[_emp];
-
-                var data = {
-                    name: employee.name,
-                    negotiation: employee.skills.negotiation,
-                    recruitment: employee.skills.recruitment,
-                    construction: employee.skills.construction,
-                    trait: null,
-                    traitTitle: null,
-                    employee: employee
-                };
-
-                if (employee.trait) {
-                    data.trait = React.DOM.div({ className: "employee-modifier-container" }, React.DOM.span(null, employee.trait.title), React.DOM.br(null), React.DOM.small(null, employee.trait.description));
-                    data.traitTitle = employee.trait.title;
-                }
-
-                if (employee.player) {
-                    hasDeleteButton = true;
-                    data.del = React.DOM.a({
-                        href: "#",
-                        onClick: function (player, employee) {
-                            eventManager.dispatchEvent({
-                                type: "makeConfirmPopup",
-                                content: {
-                                    text: "Are you sure you want to fire " + employee.name + "?",
-                                    onOk: function () {
-                                        player.removeEmployee(employee);
-                                    }
-                                }
-                            });
-                        }.bind(null, employee.player, employee)
-                    }, "X");
-                }
-
-                rows.push({
-                    key: employee.id,
-                    data: data
-                });
-            }
-            var columns = [
-                {
-                    label: "Name",
-                    key: "name",
-                    sortingFunction: this.sortEmployees,
-                    defaultOrder: "asc"
-                },
-                {
-                    label: "neg",
-                    key: "negotiation",
-                    sortingFunction: this.sortEmployees,
-                    defaultOrder: "desc",
-                    title: "Negotiation\nGives a discount when buying new plots"
-                },
-                {
-                    label: "rec",
-                    key: "recruitment",
-                    sortingFunction: this.sortEmployees,
-                    defaultOrder: "desc",
-                    title: "Recruitment\nAble to find better new recruits"
-                },
-                {
-                    label: "con",
-                    key: "construction",
-                    sortingFunction: this.sortEmployees,
-                    defaultOrder: "desc",
-                    title: "Construction\nDecreases building cost and time"
-                },
-                {
-                    label: "trait",
-                    key: "trait",
-                    defaultOrder: "desc",
-                    propToSortBy: "traitTitle",
-                    title: "Traits\nMouse over trait to see benefits. Traits do not stack."
-                }
-            ];
-
-            var initialColumnIndex = 0;
-            if (this.props.relevantSkills && this.props.relevantSkills.length > 0) {
-                for (var i = 0; i < columns.length; i++) {
-                    if (columns[i].key === this.props.relevantSkills[0]) {
-                        initialColumnIndex = i;
+                return rowProps;
+            },
+            applyColStyle: function (column, colProps) {
+                if (this.props.relevantSkills && this.props.relevantSkills.length > 0) {
+                    if (this.props.relevantSkills.indexOf(column.key) > -1) {
+                        colProps["className"] = "relevant-col";
                     }
                 }
-            }
 
-            if (hasDeleteButton) {
-                columns.push({
-                    label: "fire",
-                    key: "del",
-                    notSortable: true
-                });
-            }
+                return colProps;
+            },
+            applyCellStyle: function (item, column, cellProps) {
+                if (this.props.relevantSkills && this.props.relevantSkills.length > 0) {
+                    if (this.props.relevantSkills.indexOf(column.key) < 0 && column.key !== "name" && column.key !== "trait") {
+                        cellProps["className"] = "irrelevant-cell";
+                    }
+                }
 
-            return (UIComponents.List({
-                // TODO fix declaration file and remove
-                // typescript qq without these
-                selected: null,
-                columns: null,
-                sortBy: null,
-                initialColumn: columns[initialColumnIndex],
-                ref: "list",
-                rowStylingFN: this.applyRowStyle,
-                colStylingFN: this.applyColStyle,
-                cellStylingFN: this.applyCellStyle,
-                onRowChange: this.props.onRowChange || null,
-                listItems: rows,
-                initialColumns: columns
-            }));
-        }
-    });
-})(UIComponents || (UIComponents = {}));
+                return cellProps;
+            },
+            sortEmployees: function (a, b) {
+                var employeeA = a.data.employee;
+                var employeeB = b.data.employee;
+
+                if (!employeeA.active && employeeB.active)
+                    return -1;
+                else if (!employeeB.active && employeeA.active)
+                    return 1;
+                else
+                    return 0;
+            },
+            render: function () {
+                var stopBubble = function (e) {
+                    e.stopPropagation();
+                };
+                var hasDeleteButton = false;
+
+                var rows = [];
+                for (var _emp in this.props.employees) {
+                    var employee = this.props.employees[_emp];
+
+                    var data = {
+                        name: employee.name,
+                        negotiation: employee.skills.negotiation,
+                        recruitment: employee.skills.recruitment,
+                        construction: employee.skills.construction,
+                        trait: null,
+                        traitTitle: null,
+                        employee: employee
+                    };
+
+                    if (employee.trait) {
+                        data.trait = React.DOM.div({ className: "employee-modifier-container" }, React.DOM.span(null, employee.trait.title), React.DOM.br(null), React.DOM.small(null, employee.trait.description));
+                        data.traitTitle = employee.trait.title;
+                    }
+
+                    if (employee.player) {
+                        hasDeleteButton = true;
+                        data.del = React.DOM.a({
+                            href: "#",
+                            onClick: function (player, employee) {
+                                eventManager.dispatchEvent({
+                                    type: "makeConfirmPopup",
+                                    content: {
+                                        text: "Are you sure you want to fire " + employee.name + "?",
+                                        onOk: function () {
+                                            player.removeEmployee(employee);
+                                        }
+                                    }
+                                });
+                            }.bind(null, employee.player, employee)
+                        }, "X");
+                    }
+
+                    rows.push({
+                        key: employee.id,
+                        data: data
+                    });
+                }
+                var columns = [
+                    {
+                        label: "Name",
+                        key: "name",
+                        sortingFunction: this.sortEmployees,
+                        defaultOrder: "asc"
+                    },
+                    {
+                        label: "neg",
+                        key: "negotiation",
+                        sortingFunction: this.sortEmployees,
+                        defaultOrder: "desc",
+                        title: "Negotiation\nGives a discount when buying new plots"
+                    },
+                    {
+                        label: "rec",
+                        key: "recruitment",
+                        sortingFunction: this.sortEmployees,
+                        defaultOrder: "desc",
+                        title: "Recruitment\nAble to find better new recruits"
+                    },
+                    {
+                        label: "con",
+                        key: "construction",
+                        sortingFunction: this.sortEmployees,
+                        defaultOrder: "desc",
+                        title: "Construction\nDecreases building cost and time"
+                    },
+                    {
+                        label: "trait",
+                        key: "trait",
+                        defaultOrder: "desc",
+                        propToSortBy: "traitTitle",
+                        title: "Traits\nMouse over trait to see benefits. Traits do not stack."
+                    }
+                ];
+
+                var initialColumnIndex = 0;
+                if (this.props.relevantSkills && this.props.relevantSkills.length > 0) {
+                    for (var i = 0; i < columns.length; i++) {
+                        if (columns[i].key === this.props.relevantSkills[0]) {
+                            initialColumnIndex = i;
+                        }
+                    }
+                }
+
+                if (hasDeleteButton) {
+                    columns.push({
+                        label: "fire",
+                        key: "del",
+                        notSortable: true
+                    });
+                }
+
+                return (CityGame.UIComponents.List({
+                    // TODO fix declaration file and remove
+                    // typescript qq without these
+                    selected: null,
+                    columns: null,
+                    sortBy: null,
+                    initialColumn: columns[initialColumnIndex],
+                    ref: "list",
+                    rowStylingFN: this.applyRowStyle,
+                    colStylingFN: this.applyColStyle,
+                    cellStylingFN: this.applyCellStyle,
+                    onRowChange: this.props.onRowChange || null,
+                    listItems: rows,
+                    initialColumns: columns
+                }));
+            }
+        });
+    })(CityGame.UIComponents || (CityGame.UIComponents = {}));
+    var UIComponents = CityGame.UIComponents;
+})(CityGame || (CityGame = {}));
 /// <reference path="../../lib/react.d.ts" />
 /// <reference path="../../data/levelupmodifiers.ts" />
 /// <reference path="../eventmanager.ts" />
@@ -9876,174 +10203,180 @@ var UIComponents;
 /// <reference path="statlist.ts" />
 /// <reference path="employeelist.ts" />
 /// <reference path="list.ts" />
-var UIComponents;
-(function (UIComponents) {
-    UIComponents.Stats = React.createClass({
-        mixins: [UIComponents.SplitMultilineText],
-        toggleSelf: function () {
-            eventManager.dispatchEvent({ type: "toggleFullScreenPopup", content: null });
-        },
-        render: function () {
-            var player = this.props.player;
-            var allStats = [];
+var CityGame;
+(function (CityGame) {
+    (function (UIComponents) {
+        UIComponents.Stats = React.createClass({
+            mixins: [CityGame.UIComponents.SplitMultilineText],
+            toggleSelf: function () {
+                eventManager.dispatchEvent({ type: "toggleFullScreenPopup", content: null });
+            },
+            render: function () {
+                var player = this.props.player;
+                var allStats = [];
 
-            var clicks = player.clicks;
+                var clicks = player.clicks;
 
-            var generalStats = [
-                {
-                    title: "Money:",
-                    content: "$" + beautify(player.money)
-                },
-                {
-                    title: "Clicks:",
-                    content: player.clicks
-                },
-                {
-                    title: "Money from clicks:",
-                    content: "$" + (player.incomePerType.click ? beautify(player.incomePerType.click) : 0)
-                },
-                {
-                    title: "Owned plots:",
-                    content: player.ownedCellsAmount
-                },
-                {
-                    title: "Owned buildings:",
-                    content: (function (player) {
-                        var amount = 0;
-                        for (var category in player.ownedContent) {
-                            amount += player.ownedContent[category].length;
-                        }
-                        return amount;
-                    }(player))
-                }
-            ];
-            var generalStatList = UIComponents.StatList({
-                stats: generalStats,
-                header: "General",
-                key: "generalStatList"
-            });
-
-            allStats.push(generalStatList);
-
-            var prestigeModifier = 1 + player.prestige * 0.005;
-            if (player.LevelUpModifiers.prestigeEffectIncrease1) {
-                prestigeModifier *= (1 + player.prestige * 0.0025);
-            }
-            var prestigeStats = [
-                {
-                    title: "Times reset:",
-                    content: player.timesReset
-                },
-                {
-                    title: "Prestige:",
-                    content: player.prestige.toFixed(),
-                    subContent: "for a total of " + ((prestigeModifier - 1) * 100).toFixed(1) + "% " + "extra profit"
-                },
-                {
-                    title: "Current experience:",
-                    content: beautify(player.experience)
-                },
-                {
-                    title: "Total experience:",
-                    content: beautify(player.totalResetExperience + player.experience)
-                }
-            ];
-            var prestigeStatList = UIComponents.StatList({
-                stats: prestigeStats,
-                header: "Prestige",
-                key: "prestigeStatList"
-            });
-
-            allStats.push(prestigeStatList);
-
-            if (player.permanentLevelupUpgrades.length > 0) {
-                var permModifiers = [];
-                for (var i = 0; i < player.permanentLevelupUpgrades.length; i++) {
-                    permModifiers.push(LevelUpModifiers[player.permanentLevelupUpgrades[i]]);
-                }
-                var permModifierList = UIComponents.ModifierList({
-                    ref: "permModifierList",
-                    modifiers: permModifiers,
-                    excludeCost: true
+                var generalStats = [
+                    {
+                        title: "Money:",
+                        content: "$" + CityGame.beautify(player.money)
+                    },
+                    {
+                        title: "Clicks:",
+                        content: player.clicks
+                    },
+                    {
+                        title: "Money from clicks:",
+                        content: "$" + (player.incomePerType.click ? CityGame.beautify(player.incomePerType.click) : 0)
+                    },
+                    {
+                        title: "Owned plots:",
+                        content: player.ownedCellsAmount
+                    },
+                    {
+                        title: "Owned buildings:",
+                        content: (function (player) {
+                            var amount = 0;
+                            for (var category in player.ownedContent) {
+                                amount += player.ownedContent[category].length;
+                            }
+                            return amount;
+                        }(player))
+                    }
+                ];
+                var generalStatList = CityGame.UIComponents.StatList({
+                    stats: generalStats,
+                    header: "General",
+                    key: "generalStatList"
                 });
 
-                allStats.push(React.DOM.div({ className: "stat-group", key: "permModifierList" }, React.DOM.div({ className: "stat-header" }, "Permanent perks"), permModifierList));
-            }
+                allStats.push(generalStatList);
 
-            if (Object.keys(player.LevelUpModifiers).length > 0) {
-                var perks = [];
-                for (var _mod in player.LevelUpModifiers) {
-                    if (player.permanentLevelupUpgrades.indexOf(_mod) > -1)
-                        continue;
-                    else
-                        perks.push(player.LevelUpModifiers[_mod]);
+                var prestigeModifier = 1 + player.prestige * 0.005;
+                if (player.LevelUpModifiers.prestigeEffectIncrease1) {
+                    prestigeModifier *= (1 + player.prestige * 0.0025);
                 }
-                var perkList = UIComponents.ModifierList({
-                    ref: "perkList",
-                    modifiers: perks,
-                    excludeCost: true
+                var prestigeStats = [
+                    {
+                        title: "Times reset:",
+                        content: player.timesReset
+                    },
+                    {
+                        title: "Prestige:",
+                        content: player.prestige.toFixed(),
+                        subContent: "for a total of " + ((prestigeModifier - 1) * 100).toFixed(1) + "% " + "extra profit"
+                    },
+                    {
+                        title: "Current experience:",
+                        content: CityGame.beautify(player.experience)
+                    },
+                    {
+                        title: "Total experience:",
+                        content: CityGame.beautify(player.totalResetExperience + player.experience)
+                    }
+                ];
+                var prestigeStatList = CityGame.UIComponents.StatList({
+                    stats: prestigeStats,
+                    header: "Prestige",
+                    key: "prestigeStatList"
                 });
 
-                allStats.push(React.DOM.div({ className: "stat-group", key: "perkList" }, React.DOM.div({ className: "stat-header" }, "Unlocked perks"), perkList));
-            }
+                allStats.push(prestigeStatList);
 
-            if (Object.keys(player.modifiers).length > 0) {
-                var unlocks = [];
-                for (var _mod in player.modifiers) {
-                    unlocks.push(player.modifiers[_mod]);
+                if (player.permanentLevelupUpgrades.length > 0) {
+                    var permModifiers = [];
+                    for (var i = 0; i < player.permanentLevelupUpgrades.length; i++) {
+                        permModifiers.push(CityGame.LevelUpModifiers[player.permanentLevelupUpgrades[i]]);
+                    }
+                    var permModifierList = CityGame.UIComponents.ModifierList({
+                        ref: "permModifierList",
+                        modifiers: permModifiers,
+                        excludeCost: true
+                    });
+
+                    allStats.push(React.DOM.div({ className: "stat-group", key: "permModifierList" }, React.DOM.div({ className: "stat-header" }, "Permanent perks"), permModifierList));
                 }
-                var unlockList = UIComponents.ModifierList({
-                    ref: "unlockList",
-                    modifiers: unlocks,
-                    excludeCost: true
-                });
 
-                allStats.push(React.DOM.div({ className: "stat-group", key: "unlockList" }, React.DOM.div({ className: "stat-header" }, "Upgrades"), unlockList));
+                if (Object.keys(player.LevelUpModifiers).length > 0) {
+                    var perks = [];
+                    for (var _mod in player.LevelUpModifiers) {
+                        if (player.permanentLevelupUpgrades.indexOf(_mod) > -1)
+                            continue;
+                        else
+                            perks.push(player.LevelUpModifiers[_mod]);
+                    }
+                    var perkList = CityGame.UIComponents.ModifierList({
+                        ref: "perkList",
+                        modifiers: perks,
+                        excludeCost: true
+                    });
+
+                    allStats.push(React.DOM.div({ className: "stat-group", key: "perkList" }, React.DOM.div({ className: "stat-header" }, "Unlocked perks"), perkList));
+                }
+
+                if (Object.keys(player.modifiers).length > 0) {
+                    var unlocks = [];
+                    for (var _mod in player.modifiers) {
+                        unlocks.push(player.modifiers[_mod]);
+                    }
+                    var unlockList = CityGame.UIComponents.ModifierList({
+                        ref: "unlockList",
+                        modifiers: unlocks,
+                        excludeCost: true
+                    });
+
+                    allStats.push(React.DOM.div({ className: "stat-group", key: "unlockList" }, React.DOM.div({ className: "stat-header" }, "Upgrades"), unlockList));
+                }
+                if (Object.keys(player.employees).length > 0) {
+                    var employeeList = CityGame.UIComponents.EmployeeList({
+                        ref: "employeeList",
+                        employees: player.employees
+                    });
+
+                    allStats.push(React.DOM.div({ className: "stat-group", key: "employeeList" }, React.DOM.div({ className: "stat-header" }, "Employees"), employeeList));
+                }
+
+                return (React.DOM.div({ className: "all-stats" }, React.DOM.a({
+                    id: "close-info", className: "close-popup", href: "#",
+                    onClick: this.toggleSelf,
+                    onTouchStart: this.toggleSelf
+                }, "X"), allStats));
             }
-            if (Object.keys(player.employees).length > 0) {
-                var employeeList = UIComponents.EmployeeList({
-                    ref: "employeeList",
-                    employees: player.employees
-                });
-
-                allStats.push(React.DOM.div({ className: "stat-group", key: "employeeList" }, React.DOM.div({ className: "stat-header" }, "Employees"), employeeList));
-            }
-
-            return (React.DOM.div({ className: "all-stats" }, React.DOM.a({
-                id: "close-info", className: "close-popup", href: "#",
-                onClick: this.toggleSelf,
-                onTouchStart: this.toggleSelf
-            }, "X"), allStats));
-        }
-    });
-})(UIComponents || (UIComponents = {}));
+        });
+    })(CityGame.UIComponents || (CityGame.UIComponents = {}));
+    var UIComponents = CityGame.UIComponents;
+})(CityGame || (CityGame = {}));
 /// <reference path="../../lib/react.d.ts" />
 ///
 /// <reference path="../eventmanager.ts" />
 /// <reference path="../utility.ts" />
-var UIComponents;
-(function (UIComponents) {
-    UIComponents.OptionList = React.createClass({
-        render: function () {
-            var rows = [];
-            for (var i = 0; i < this.props.options.length; i++) {
-                var option = this.props.options[i];
+var CityGame;
+(function (CityGame) {
+    (function (UIComponents) {
+        UIComponents.OptionList = React.createClass({
+            render: function () {
+                var rows = [];
+                for (var i = 0; i < this.props.options.length; i++) {
+                    var option = this.props.options[i];
 
-                var div = React.DOM.div({
-                    className: "stat-container",
-                    key: "" + i
-                }, React.DOM.div({
-                    className: "stat-main"
-                }, option.content), option.subContent ? React.DOM.small({ className: "stat-subContent" }, option.subContent) : null);
+                    var div = React.DOM.div({
+                        className: "stat-container",
+                        key: "" + i
+                    }, React.DOM.div({
+                        className: "stat-main"
+                    }, option.content), option.subContent ? React.DOM.small({ className: "stat-subContent" }, option.subContent) : null);
 
-                rows.push(div);
+                    rows.push(div);
+                }
+                ;
+
+                return (React.DOM.div({ className: "stat-group" }, React.DOM.div({ className: "stat-header" }, this.props.header), rows));
             }
-            ;
-
-            return (React.DOM.div({ className: "stat-group" }, React.DOM.div({ className: "stat-header" }, this.props.header), rows));
-        }
-    });
-})(UIComponents || (UIComponents = {}));
+        });
+    })(CityGame.UIComponents || (CityGame.UIComponents = {}));
+    var UIComponents = CityGame.UIComponents;
+})(CityGame || (CityGame = {}));
 /// <reference path="../../lib/react.d.ts" />
 ///
 /// <reference path="../eventmanager.ts" />
@@ -10052,164 +10385,170 @@ var UIComponents;
 /// <reference path="optionlist.ts" />
 ///
 /// <reference path="../options.ts" />
-var UIComponents;
-(function (UIComponents) {
-    UIComponents.OptionsPopup = React.createClass({
-        toggleSelf: function () {
-            eventManager.dispatchEvent({ type: "toggleFullScreenPopup", content: null });
-        },
-        handleImport: function () {
-            var imported = this.refs.importTextArea.getDOMNode().value;
-            if (!imported)
-                return;
-            var decoded = LZString.decompressFromBase64(imported);
+var CityGame;
+(function (CityGame) {
+    (function (UIComponents) {
+        UIComponents.OptionsPopup = React.createClass({
+            toggleSelf: function () {
+                eventManager.dispatchEvent({ type: "toggleFullScreenPopup", content: null });
+            },
+            handleImport: function () {
+                var imported = this.refs.importTextArea.getDOMNode().value;
+                if (!imported)
+                    return;
+                var decoded = LZString.decompressFromBase64(imported);
 
-            localStorage.setItem("tempImported", decoded);
+                localStorage.setItem("tempImported", decoded);
 
-            eventManager.dispatchEvent({ type: "loadGame", content: "tempImported" });
+                eventManager.dispatchEvent({ type: "loadGame", content: "tempImported" });
 
-            localStorage.removeItem("tempImported");
-        },
-        handleExport: function () {
-            eventManager.dispatchEvent({ type: "saveGame", content: "tempImported" });
+                localStorage.removeItem("tempImported");
+            },
+            handleExport: function () {
+                eventManager.dispatchEvent({ type: "saveGame", content: "tempImported" });
 
-            var encoded = LZString.compressToBase64(localStorage.getItem("tempImported"));
-            this.refs.importTextArea.getDOMNode().value = encoded;
+                var encoded = LZString.compressToBase64(localStorage.getItem("tempImported"));
+                this.refs.importTextArea.getDOMNode().value = encoded;
 
-            localStorage.removeItem("tempImported");
-        },
-        render: function () {
-            var allOptions = [];
+                localStorage.removeItem("tempImported");
+            },
+            render: function () {
+                var allOptions = [];
 
-            var importExport = [
-                {
-                    content: React.DOM.div({ id: "import-export-container" }, React.DOM.div({ id: "import-export-buttons" }, React.DOM.button({
-                        id: "import-button",
-                        onClick: this.handleImport,
-                        onTouchStart: this.handleImport
-                    }, "Import"), React.DOM.button({
-                        id: "export-button",
-                        onClick: this.handleExport,
-                        onTouchStart: this.handleExport
-                    }, "Export")), React.DOM.textarea({ id: "import-export-text", ref: "importTextArea" }))
-                }
-            ];
-            var importExportList = UIComponents.OptionList({
-                options: importExport,
-                header: "Import & Export",
-                key: "importExportList"
-            });
+                var importExport = [
+                    {
+                        content: React.DOM.div({ id: "import-export-container" }, React.DOM.div({ id: "import-export-buttons" }, React.DOM.button({
+                            id: "import-button",
+                            onClick: this.handleImport,
+                            onTouchStart: this.handleImport
+                        }, "Import"), React.DOM.button({
+                            id: "export-button",
+                            onClick: this.handleExport,
+                            onTouchStart: this.handleExport
+                        }, "Export")), React.DOM.textarea({ id: "import-export-text", ref: "importTextArea" }))
+                    }
+                ];
+                var importExportList = CityGame.UIComponents.OptionList({
+                    options: importExport,
+                    header: "Import & Export",
+                    key: "importExportList"
+                });
 
-            allOptions.push(importExportList);
+                allOptions.push(importExportList);
 
-            var visualOptions = [
-                {
-                    content: React.DOM.div(null, React.DOM.input({
-                        type: "checkbox",
-                        id: "draw-click-popups",
-                        name: "draw-click-popups",
-                        defaultChecked: Options.drawClickPopups,
-                        onChange: function () {
-                            eventManager.dispatchEvent({
-                                type: "toggleDrawClickPopups", content: ""
-                            });
-                        }
-                    }), React.DOM.label({
-                        htmlFor: "draw-click-popups"
-                    }, "Draw click popups"))
-                }
-            ];
-            var visualOptionList = UIComponents.OptionList({
-                options: visualOptions,
-                header: "Visual & Performance",
-                key: "visualOptionList"
-            });
+                var visualOptions = [
+                    {
+                        content: React.DOM.div(null, React.DOM.input({
+                            type: "checkbox",
+                            id: "draw-click-popups",
+                            name: "draw-click-popups",
+                            defaultChecked: CityGame.Options.drawClickPopups,
+                            onChange: function () {
+                                eventManager.dispatchEvent({
+                                    type: "toggleDrawClickPopups", content: ""
+                                });
+                            }
+                        }), React.DOM.label({
+                            htmlFor: "draw-click-popups"
+                        }, "Draw click popups"))
+                    }
+                ];
+                var visualOptionList = CityGame.UIComponents.OptionList({
+                    options: visualOptions,
+                    header: "Visual & Performance",
+                    key: "visualOptionList"
+                });
 
-            allOptions.push(visualOptionList);
+                allOptions.push(visualOptionList);
 
-            var otherOptions = [
-                {
-                    content: React.DOM.div({
-                        title: "Amount of rolling autosaves to keep"
-                    }, React.DOM.input({
-                        type: "number",
-                        id: "autosave-limit",
-                        className: "small-number-input",
-                        defaultValue: Options.autosaveLimit,
-                        step: 1,
-                        min: 1,
-                        max: 9,
-                        onChange: function (e) {
-                            var _target = e.target;
-                            var value = _target.value;
-                            if (value === Options.autosaveLimit)
-                                return;
-                            eventManager.dispatchEvent({
-                                type: "setAutosaveLimit",
-                                content: value
-                            });
-                        }
-                    }), React.DOM.label({
-                        htmlFor: "autosave-limit"
-                    }, "Autosave limit"))
-                },
-                {
-                    content: React.DOM.div({
-                        title: "Automatically switch back to clicking after performing an action\n" + "Can be overridden by holding shift key"
-                    }, React.DOM.input({
-                        type: "checkbox",
-                        id: "auto-switch-tools",
-                        name: "auto-switch-tools",
-                        defaultChecked: Options.autoSwitchTools,
-                        onChange: function () {
-                            eventManager.dispatchEvent({
-                                type: "toggleAutoSwitchTools", content: ""
-                            });
-                        }
-                    }), React.DOM.label({
-                        htmlFor: "auto-switch-tools"
-                    }, "Automatically switch to clicking"))
-                }
-            ];
-            var otherOptionList = UIComponents.OptionList({
-                options: otherOptions,
-                header: "Other",
-                key: "otherOptionList"
-            });
+                var otherOptions = [
+                    {
+                        content: React.DOM.div({
+                            title: "Amount of rolling autosaves to keep"
+                        }, React.DOM.input({
+                            type: "number",
+                            id: "autosave-limit",
+                            className: "small-number-input",
+                            defaultValue: CityGame.Options.autosaveLimit,
+                            step: 1,
+                            min: 1,
+                            max: 9,
+                            onChange: function (e) {
+                                var _target = e.target;
+                                var value = _target.value;
+                                if (value === CityGame.Options.autosaveLimit)
+                                    return;
+                                eventManager.dispatchEvent({
+                                    type: "setAutosaveLimit",
+                                    content: value
+                                });
+                            }
+                        }), React.DOM.label({
+                            htmlFor: "autosave-limit"
+                        }, "Autosave limit"))
+                    },
+                    {
+                        content: React.DOM.div({
+                            title: "Automatically switch back to clicking after performing an action\n" + "Can be overridden by holding shift key"
+                        }, React.DOM.input({
+                            type: "checkbox",
+                            id: "auto-switch-tools",
+                            name: "auto-switch-tools",
+                            defaultChecked: CityGame.Options.autoSwitchTools,
+                            onChange: function () {
+                                eventManager.dispatchEvent({
+                                    type: "toggleAutoSwitchTools", content: ""
+                                });
+                            }
+                        }), React.DOM.label({
+                            htmlFor: "auto-switch-tools"
+                        }, "Automatically switch to clicking"))
+                    }
+                ];
+                var otherOptionList = CityGame.UIComponents.OptionList({
+                    options: otherOptions,
+                    header: "Other",
+                    key: "otherOptionList"
+                });
 
-            allOptions.push(otherOptionList);
+                allOptions.push(otherOptionList);
 
-            return (React.DOM.div({ className: "all-options" }, React.DOM.a({
-                id: "close-info", className: "close-popup", href: "#",
-                onClick: this.toggleSelf,
-                onTouchStart: this.toggleSelf
-            }, "X"), allOptions));
-        }
-    });
-})(UIComponents || (UIComponents = {}));
-/// <reference path="../../lib/react.d.ts" />
-var UIComponents;
-(function (UIComponents) {
-    UIComponents.Notifications = React.createClass({
-        render: function () {
-            var allNotifications = [];
-
-            for (var i = 0; i < this.props.notifications.length; i++) {
-                var current = this.props.notifications[i];
-
-                var newNotification = React.DOM.div({
-                    key: "" + i,
-                    className: "react-notification",
-                    onClick: current.onClose
-                }, React.DOM.img({ src: current.icon }));
-
-                allNotifications.push(newNotification);
+                return (React.DOM.div({ className: "all-options" }, React.DOM.a({
+                    id: "close-info", className: "close-popup", href: "#",
+                    onClick: this.toggleSelf,
+                    onTouchStart: this.toggleSelf
+                }, "X"), allOptions));
             }
+        });
+    })(CityGame.UIComponents || (CityGame.UIComponents = {}));
+    var UIComponents = CityGame.UIComponents;
+})(CityGame || (CityGame = {}));
+/// <reference path="../../lib/react.d.ts" />
+var CityGame;
+(function (CityGame) {
+    (function (UIComponents) {
+        UIComponents.Notifications = React.createClass({
+            render: function () {
+                var allNotifications = [];
 
-            return (React.DOM.div({ id: "react-notifications" }, allNotifications));
-        }
-    });
-})(UIComponents || (UIComponents = {}));
+                for (var i = 0; i < this.props.notifications.length; i++) {
+                    var current = this.props.notifications[i];
+
+                    var newNotification = React.DOM.div({
+                        key: "" + i,
+                        className: "react-notification",
+                        onClick: current.onClose
+                    }, React.DOM.img({ src: current.icon }));
+
+                    allNotifications.push(newNotification);
+                }
+
+                return (React.DOM.div({ id: "react-notifications" }, allNotifications));
+            }
+        });
+    })(CityGame.UIComponents || (CityGame.UIComponents = {}));
+    var UIComponents = CityGame.UIComponents;
+})(CityGame || (CityGame = {}));
 /// <reference path="../../lib/react.d.ts" />
 ///
 /// <reference path="../eventmanager.ts" />
@@ -10217,55 +10556,58 @@ var UIComponents;
 ///
 /// <reference path="optionlist.ts" />
 /// <reference path="splitmultilinetext.ts" />
-var UIComponents;
-(function (UIComponents) {
-    UIComponents.Changelog = React.createClass({
-        mixins: [UIComponents.SplitMultilineText],
-        toggleSelf: function () {
-            eventManager.dispatchEvent({ type: "toggleFullScreenPopup", content: null });
-        },
-        getInitialState: function () {
-            return { changelog: null };
-        },
-        componentDidMount: function () {
-            var self = this;
+var CityGame;
+(function (CityGame) {
+    (function (UIComponents) {
+        UIComponents.Changelog = React.createClass({
+            mixins: [CityGame.UIComponents.SplitMultilineText],
+            toggleSelf: function () {
+                eventManager.dispatchEvent({ type: "toggleFullScreenPopup", content: null });
+            },
+            getInitialState: function () {
+                return { changelog: null };
+            },
+            componentDidMount: function () {
+                var self = this;
 
-            var request = new XMLHttpRequest();
-            request.overrideMimeType("application/json");
-            request.open("GET", "changelog.json", true);
-            request.responseType = "json";
-            request.onload = function () {
-                self.setState({ changelog: request.response });
-            };
-            request.send();
-        },
-        render: function () {
-            var allChanges = [];
+                var request = new XMLHttpRequest();
+                request.overrideMimeType("application/json");
+                request.open("GET", "changelog.json", true);
+                request.responseType = "json";
+                request.onload = function () {
+                    self.setState({ changelog: request.response });
+                };
+                request.send();
+            },
+            render: function () {
+                var allChanges = [];
 
-            if (this.state.changelog) {
-                for (var date in this.state.changelog) {
-                    var _changelog = this.state.changelog[date];
-                    var changelogList = [];
-                    for (var i = 0; i < _changelog.length; i++) {
-                        changelogList.push({ content: _changelog[i] });
+                if (this.state.changelog) {
+                    for (var date in this.state.changelog) {
+                        var _changelog = this.state.changelog[date];
+                        var changelogList = [];
+                        for (var i = 0; i < _changelog.length; i++) {
+                            changelogList.push({ content: _changelog[i] });
+                        }
+
+                        allChanges.push(CityGame.UIComponents.OptionList({
+                            options: changelogList,
+                            header: date,
+                            key: date
+                        }));
                     }
-
-                    allChanges.push(UIComponents.OptionList({
-                        options: changelogList,
-                        header: date,
-                        key: date
-                    }));
                 }
-            }
 
-            return (React.DOM.div({ className: "all-changes" }, React.DOM.a({
-                id: "close-info", className: "close-popup", href: "#",
-                onClick: this.toggleSelf,
-                onTouchStart: this.toggleSelf
-            }, "X"), allChanges));
-        }
-    });
-})(UIComponents || (UIComponents = {}));
+                return (React.DOM.div({ className: "all-changes" }, React.DOM.a({
+                    id: "close-info", className: "close-popup", href: "#",
+                    onClick: this.toggleSelf,
+                    onTouchStart: this.toggleSelf
+                }, "X"), allChanges));
+            }
+        });
+    })(CityGame.UIComponents || (CityGame.UIComponents = {}));
+    var UIComponents = CityGame.UIComponents;
+})(CityGame || (CityGame = {}));
 /// <reference path="../../lib/react.d.ts" />
 /// <reference path="sidemenu.ts" />
 /// <reference path="stats.ts" />
@@ -10273,73 +10615,76 @@ var UIComponents;
 /// <reference path="notifications.ts" />
 /// <reference path="changelog.ts" />
 /// <reference path="../eventmanager.ts" />
-var UIComponents;
-(function (UIComponents) {
-    UIComponents.Stage = React.createClass({
-        getDefaultProps: function () {
-            return ({
-                fullScreenPopups: {
-                    stats: function () {
-                        return (React.DOM.div({ className: "fullscreen-popup-wrapper" }, React.DOM.div({ id: "stats-container", className: "fullscreen-popup" }, UIComponents.Stats({ player: this.props.player }))));
-                    },
-                    options: function () {
-                        return (React.DOM.div({ className: "fullscreen-popup-wrapper" }, React.DOM.div({ id: "options-container", className: "fullscreen-popup" }, UIComponents.OptionsPopup(null))));
-                    },
-                    changelog: function () {
-                        return (React.DOM.div({ className: "fullscreen-popup-wrapper" }, React.DOM.div({ id: "changelog-container", className: "fullscreen-popup" }, UIComponents.Changelog(null))));
+var CityGame;
+(function (CityGame) {
+    (function (UIComponents) {
+        UIComponents.Stage = React.createClass({
+            getDefaultProps: function () {
+                return ({
+                    fullScreenPopups: {
+                        stats: function () {
+                            return (React.DOM.div({ className: "fullscreen-popup-wrapper" }, React.DOM.div({ id: "stats-container", className: "fullscreen-popup" }, CityGame.UIComponents.Stats({ player: this.props.player }))));
+                        },
+                        options: function () {
+                            return (React.DOM.div({ className: "fullscreen-popup-wrapper" }, React.DOM.div({ id: "options-container", className: "fullscreen-popup" }, CityGame.UIComponents.OptionsPopup(null))));
+                        },
+                        changelog: function () {
+                            return (React.DOM.div({ className: "fullscreen-popup-wrapper" }, React.DOM.div({ id: "changelog-container", className: "fullscreen-popup" }, CityGame.UIComponents.Changelog(null))));
+                        }
                     }
+                });
+            },
+            getInitialState: function () {
+                return { showFullScreenPopup: null };
+            },
+            componentDidMount: function () {
+                var self = this;
+                eventManager.addEventListener("toggleFullScreenPopup", function (event) {
+                    if (event.content === self.state.showFullScreenPopup) {
+                        self.setState({ showFullScreenPopup: null });
+                    } else {
+                        self.setState({ showFullScreenPopup: event.content });
+                    }
+                });
+            },
+            render: function () {
+                var self = this;
+                var popups = [];
+                for (var _popup in this.props.popups) {
+                    var popup = this.props.popups[_popup];
+                    popups.push(CityGame.UIComponents[popup.type].call(null, popup.props));
                 }
-            });
-        },
-        getInitialState: function () {
-            return { showFullScreenPopup: null };
-        },
-        componentDidMount: function () {
-            var self = this;
-            eventManager.addEventListener("toggleFullScreenPopup", function (event) {
-                if (event.content === self.state.showFullScreenPopup) {
-                    self.setState({ showFullScreenPopup: null });
-                } else {
-                    self.setState({ showFullScreenPopup: event.content });
-                }
-            });
-        },
-        render: function () {
-            var self = this;
-            var popups = [];
-            for (var _popup in this.props.popups) {
-                var popup = this.props.popups[_popup];
-                popups.push(UIComponents[popup.type].call(null, popup.props));
+                ;
+
+                var fullScreenPopup = this.state.showFullScreenPopup ? this.props.fullScreenPopups[this.state.showFullScreenPopup].call(this) : null;
+
+                return (React.DOM.div({ id: "react-wrapper" }, React.DOM.div({
+                    id: "react-popups",
+                    onDragEnter: function (e) {
+                        e.preventDefault();
+                    },
+                    onDragOver: function (e) {
+                        e.preventDefault();
+                    },
+                    onDrop: function (e) {
+                        e.preventDefault();
+                    },
+                    onDragLeave: function (e) {
+                        e.preventDefault();
+                    }
+                }, popups, CityGame.UIComponents.Notifications({
+                    notifications: this.props.notifications
+                })), fullScreenPopup, CityGame.UIComponents.SideMenu({
+                    player: this.props.player,
+                    frameImages: this.props.frameImages,
+                    // todo react definitions
+                    selectedTool: null
+                })));
             }
-            ;
-
-            var fullScreenPopup = this.state.showFullScreenPopup ? this.props.fullScreenPopups[this.state.showFullScreenPopup].call(this) : null;
-
-            return (React.DOM.div({ id: "react-wrapper" }, React.DOM.div({
-                id: "react-popups",
-                onDragEnter: function (e) {
-                    e.preventDefault();
-                },
-                onDragOver: function (e) {
-                    e.preventDefault();
-                },
-                onDrop: function (e) {
-                    e.preventDefault();
-                },
-                onDragLeave: function (e) {
-                    e.preventDefault();
-                }
-            }, popups, UIComponents.Notifications({
-                notifications: this.props.notifications
-            })), fullScreenPopup, UIComponents.SideMenu({
-                player: this.props.player,
-                frameImages: this.props.frameImages,
-                // todo react definitions
-                selectedTool: null
-            })));
-        }
-    });
-})(UIComponents || (UIComponents = {}));
+        });
+    })(CityGame.UIComponents || (CityGame.UIComponents = {}));
+    var UIComponents = CityGame.UIComponents;
+})(CityGame || (CityGame = {}));
 /// <reference path="../../lib/react.d.ts" />
 /// <reference path="../../lib/pixi.d.ts" />
 /// <reference path="../player.ts" />
@@ -10527,7 +10872,7 @@ var CityGame;
         ReactUI.prototype.makeRecruitPopup = function (props) {
             var self = this;
             var recruitWithSelected = function (selected) {
-                actions.recruitEmployee({
+                CityGame.Actions.recruitEmployee({
                     playerId: props.player.id,
                     employeeId: selected.employee.id
                 });
@@ -10591,7 +10936,7 @@ var CityGame;
             var buyCost = props.player.getCellBuyCost(props.cell);
 
             var buySelected = function (selected) {
-                var adjusted = actions.getActionCost([selected.employee.skills["negotiation"]], buyCost).actual;
+                var adjusted = CityGame.Actions.getActionCost([selected.employee.skills["negotiation"]], buyCost).actual;
 
                 if (props.player.money < adjusted) {
                     eventManager.dispatchEvent({
@@ -10604,7 +10949,7 @@ var CityGame;
                     return false;
                 }
 
-                actions.buyCell({
+                CityGame.Actions.buyCell({
                     gridPos: props.cell.gridPos,
                     boardId: props.cell.board.id,
                     playerId: props.player.id,
@@ -10656,7 +11001,7 @@ var CityGame;
         ReactUI.prototype.makeBuildingConstructPopup = function (props) {
             var buildBuilding = function (selected) {
                 if (selected) {
-                    actions.constructBuilding({
+                    CityGame.Actions.constructBuilding({
                         playerId: props.player.id,
                         gridPos: props.cell.gridPos,
                         boardId: props.cell.board.id,
@@ -10765,7 +11110,7 @@ var CityGame;
                 return;
             }
 
-            React.renderComponent(UIComponents.Stage({
+            React.renderComponent(CityGame.UIComponents.Stage({
                 popups: this.popups,
                 notifications: this.notifications,
                 player: this.player,
@@ -11069,18 +11414,18 @@ var CityGame;
             }
             ProfitSystem.prototype.activate = function () {
                 var currentDate = this.systemsManager.systems.date.getDate();
-                for (var _player in this.players) {
-                    var player = this.players[_player];
+                for (var i = 0; i < this.players.length; i++) {
+                    var player = this.players[i];
 
-                    for (var ii = 0; ii < this.targetTypes.length; ii++) {
+                    for (var j = 0; j < this.targetTypes.length; j++) {
                         var profitPerThisType = 0;
-                        var targets = player.ownedContent[this.targetTypes[ii]];
+                        var targets = player.ownedContent[this.targetTypes[j]];
 
                         if (targets.length < 1)
                             continue;
 
-                        for (var jj = 0; jj < targets.length; jj++) {
-                            var profit = targets[jj].modifiedProfit;
+                        for (var k = 0; k < targets.length; k++) {
+                            var profit = targets[k].modifiedProfit;
 
                             // content isn't removed in place
                             // which means the array here is the pre-splicing ver
@@ -11090,7 +11435,7 @@ var CityGame;
                             if (isFinite(profit))
                                 profitPerThisType += profit;
                         }
-                        player.addMoney(profitPerThisType, this.targetTypes[ii], targets.length, currentDate);
+                        player.addMoney(profitPerThisType, this.targetTypes[j], targets.length, currentDate);
                     }
                 }
             };
@@ -11232,17 +11577,642 @@ var CityGame;
     })();
     CityGame.SystemsManager = SystemsManager;
 })(CityGame || (CityGame = {}));
+/// <reference path="../cell.ts" />
+/// <reference path="../selectiontypes.ts" />
+var CityGame;
+(function (CityGame) {
+    var Tool = (function () {
+        function Tool() {
+            this.mapmode = "default";
+            this.continuous = true;
+            this.tempContinuous = true;
+        }
+        Tool.prototype.activate = function (target) {
+            for (var i = 0; i < target.length; i++) {
+                this.onActivate(target[i]);
+            }
+        };
+        Tool.prototype.onChange = function () {
+        };
+        Tool.prototype.onActivate = function (target, props) {
+        };
+        Tool.prototype.onHover = function (targets) {
+        };
+        Tool.prototype.onFinish = function () {
+        };
+        return Tool;
+    })();
+    CityGame.Tool = Tool;
+})(CityGame || (CityGame = {}));
+/// <reference path="tool.ts" />
+var CityGame;
+(function (CityGame) {
+    (function (Tools) {
+        var NothingTool = (function (_super) {
+            __extends(NothingTool, _super);
+            function NothingTool() {
+                _super.call(this);
+                this.type = "nothing";
+                this.selectType = CityGame.SelectionTypes.singleSelect;
+                this.tintColor = null;
+                this.mapmode = undefined;
+                this.button = null;
+            }
+            NothingTool.prototype.onActivate = function (target) {
+            };
+            return NothingTool;
+        })(CityGame.Tool);
+        Tools.NothingTool = NothingTool;
+    })(CityGame.Tools || (CityGame.Tools = {}));
+    var Tools = CityGame.Tools;
+})(CityGame || (CityGame = {}));
+/// <reference path="tool.ts" />
+var CityGame;
+(function (CityGame) {
+    (function (Tools) {
+        var WaterTool = (function (_super) {
+            __extends(WaterTool, _super);
+            function WaterTool() {
+                _super.call(this);
+                this.type = "water";
+                this.selectType = CityGame.SelectionTypes.rectSelect;
+                this.tintColor = 0x4444FF;
+                this.mapmode = undefined;
+            }
+            WaterTool.prototype.onActivate = function (target) {
+                target.replace(cg["terrain"]["water"]);
+            };
+            return WaterTool;
+        })(CityGame.Tool);
+        Tools.WaterTool = WaterTool;
+    })(CityGame.Tools || (CityGame.Tools = {}));
+    var Tools = CityGame.Tools;
+})(CityGame || (CityGame = {}));
+/// <reference path="tool.ts" />
+var CityGame;
+(function (CityGame) {
+    (function (Tools) {
+        var GrassTool = (function (_super) {
+            __extends(GrassTool, _super);
+            function GrassTool() {
+                _super.call(this);
+                this.type = "grass";
+                this.selectType = CityGame.SelectionTypes.rectSelect;
+                this.tintColor = 0x617A4E;
+                this.mapmode = undefined;
+            }
+            GrassTool.prototype.onActivate = function (target) {
+                target.replace(cg["terrain"]["grass"]);
+            };
+            return GrassTool;
+        })(CityGame.Tool);
+        Tools.GrassTool = GrassTool;
+    })(CityGame.Tools || (CityGame.Tools = {}));
+    var Tools = CityGame.Tools;
+})(CityGame || (CityGame = {}));
+/// <reference path="tool.ts" />
+var CityGame;
+(function (CityGame) {
+    (function (Tools) {
+        var SandTool = (function (_super) {
+            __extends(SandTool, _super);
+            function SandTool() {
+                _super.call(this);
+                this.type = "sand";
+                this.selectType = CityGame.SelectionTypes.rectSelect;
+                this.tintColor = 0xE2BF93;
+                this.mapmode = undefined;
+            }
+            SandTool.prototype.onActivate = function (target) {
+                target.replace(cg["terrain"]["sand"]);
+            };
+            return SandTool;
+        })(CityGame.Tool);
+        Tools.SandTool = SandTool;
+    })(CityGame.Tools || (CityGame.Tools = {}));
+    var Tools = CityGame.Tools;
+})(CityGame || (CityGame = {}));
+/// <reference path="tool.ts" />
+var CityGame;
+(function (CityGame) {
+    (function (Tools) {
+        var SnowTool = (function (_super) {
+            __extends(SnowTool, _super);
+            function SnowTool() {
+                _super.call(this);
+                this.type = "snow";
+                this.selectType = CityGame.SelectionTypes.rectSelect;
+                this.tintColor = 0xBBDFD7;
+                this.mapmode = undefined;
+            }
+            SnowTool.prototype.onActivate = function (target) {
+                target.replace(cg["terrain"]["snow"]);
+            };
+            return SnowTool;
+        })(CityGame.Tool);
+        Tools.SnowTool = SnowTool;
+    })(CityGame.Tools || (CityGame.Tools = {}));
+    var Tools = CityGame.Tools;
+})(CityGame || (CityGame = {}));
+/// <reference path="tool.ts" />
+var CityGame;
+(function (CityGame) {
+    (function (Tools) {
+        var RemoveTool = (function (_super) {
+            __extends(RemoveTool, _super);
+            function RemoveTool() {
+                _super.call(this);
+                this.type = "remove";
+                this.selectType = CityGame.SelectionTypes.rectSelect;
+                this.tintColor = 0xFF5555;
+                this.mapmode = undefined;
+            }
+            RemoveTool.prototype.onActivate = function (target) {
+                if (CityGame.game.worldRenderer.currentMapmode !== "underground") {
+                    target.changeContent("none");
+                } else {
+                    target.changeUndergroundContent();
+                }
+            };
+            return RemoveTool;
+        })(CityGame.Tool);
+        Tools.RemoveTool = RemoveTool;
+    })(CityGame.Tools || (CityGame.Tools = {}));
+    var Tools = CityGame.Tools;
+})(CityGame || (CityGame = {}));
+/// <reference path="tool.ts" />
+var CityGame;
+(function (CityGame) {
+    (function (Tools) {
+        var PlantTool = (function (_super) {
+            __extends(PlantTool, _super);
+            function PlantTool() {
+                _super.call(this);
+                this.type = "plant";
+                this.selectType = CityGame.SelectionTypes.rectSelect;
+                this.tintColor = 0x338833;
+                this.mapmode = undefined;
+            }
+            PlantTool.prototype.onActivate = function (target) {
+                target.addPlant();
+            };
+            return PlantTool;
+        })(CityGame.Tool);
+        Tools.PlantTool = PlantTool;
+    })(CityGame.Tools || (CityGame.Tools = {}));
+    var Tools = CityGame.Tools;
+})(CityGame || (CityGame = {}));
+/// <reference path="tool.ts" />
+var CityGame;
+(function (CityGame) {
+    (function (Tools) {
+        var HouseTool = (function (_super) {
+            __extends(HouseTool, _super);
+            function HouseTool() {
+                _super.call(this);
+                this.type = "house";
+                this.selectType = CityGame.SelectionTypes.rectSelect;
+                this.tintColor = 0x696969;
+                this.mapmode = undefined;
+            }
+            HouseTool.prototype.onActivate = function (target) {
+                // TODO
+                var toChange;
+                while (true) {
+                    toChange = CityGame.getRandomProperty(cg["content"]["buildings"]);
+
+                    //toChange = cg.content.buildings.bigoffice;
+                    if (toChange.categoryType && toChange.categoryType === "apartment") {
+                        break;
+                    }
+                }
+
+                target.changeContent(toChange);
+            };
+            return HouseTool;
+        })(CityGame.Tool);
+        Tools.HouseTool = HouseTool;
+    })(CityGame.Tools || (CityGame.Tools = {}));
+    var Tools = CityGame.Tools;
+})(CityGame || (CityGame = {}));
+/// <reference path="tool.ts" />
+var CityGame;
+(function (CityGame) {
+    (function (Tools) {
+        var RoadTool = (function (_super) {
+            __extends(RoadTool, _super);
+            function RoadTool() {
+                _super.call(this);
+                this.type = "road";
+                this.selectType = CityGame.SelectionTypes.manhattanSelect;
+                this.tintColor = 0x696969;
+            }
+            RoadTool.prototype.onActivate = function (target) {
+                target.changeContent(cg["content"]["roads"]["road_nesw"]);
+            };
+            return RoadTool;
+        })(CityGame.Tool);
+        Tools.RoadTool = RoadTool;
+    })(CityGame.Tools || (CityGame.Tools = {}));
+    var Tools = CityGame.Tools;
+})(CityGame || (CityGame = {}));
+/// <reference path="tool.ts" />
+var CityGame;
+(function (CityGame) {
+    (function (Tools) {
+        var SubwayTool = (function (_super) {
+            __extends(SubwayTool, _super);
+            function SubwayTool() {
+                _super.call(this);
+                this.type = "subway";
+                this.selectType = CityGame.SelectionTypes.manhattanSelect;
+                this.tintColor = 0x696969;
+                this.mapmode = "underground";
+            }
+            SubwayTool.prototype.onActivate = function (target) {
+                target.changeUndergroundContent(cg["content"]["tubes"]["tube_nesw"]);
+            };
+            return SubwayTool;
+        })(CityGame.Tool);
+        Tools.SubwayTool = SubwayTool;
+    })(CityGame.Tools || (CityGame.Tools = {}));
+    var Tools = CityGame.Tools;
+})(CityGame || (CityGame = {}));
+/// <reference path="tool.ts" />
+var CityGame;
+(function (CityGame) {
+    (function (Tools) {
+        var ClickTool = (function (_super) {
+            __extends(ClickTool, _super);
+            function ClickTool() {
+                _super.call(this);
+                this.type = "click";
+                this.selectType = CityGame.SelectionTypes.singleSelect;
+                this.tintColor = null;
+                this.mapmode = undefined;
+                this.button = null;
+            }
+            ClickTool.prototype.onChange = function () {
+                if (CityGame.game.players["player0"].clicks < 1) {
+                    var textContainer = new PIXI.DisplayObjectContainer();
+                    var bigText = new PIXI.Text("Click here!", {
+                        font: "bold 50px Arial",
+                        fill: "#FFFFFF",
+                        stroke: "#000000",
+                        strokeThickness: 6,
+                        align: "center"
+                    });
+                    var smallText = new PIXI.Text("Click on buildings you own for extra income", {
+                        font: "bold 30px Arial",
+                        fill: "#FFFFFF",
+                        stroke: "#000000",
+                        strokeThickness: 4,
+                        align: "center"
+                    });
+                    textContainer.addChild(bigText);
+                    bigText.position.x -= bigText.width / 2;
+                    textContainer.addChild(smallText);
+                    smallText.position.x -= smallText.width / 2;
+                    smallText.position.y += bigText.height;
+                    textContainer.position.y -= bigText.height;
+
+                    CityGame.game.uiDrawer.makeFadeyPopup([CityGame.SCREEN_WIDTH / 2, CityGame.SCREEN_HEIGHT / 2], [0, 0], 3000, textContainer, TWEEN.Easing.Quartic.In);
+                }
+            };
+            ClickTool.prototype.onActivate = function (target) {
+                var player = CityGame.game.players["player0"];
+                var baseAmount = 0;
+
+                if (target.content && target.content.player && target.content.player.id === player.id) {
+                    baseAmount += player.getIndexedProfitWithoutGlobals(target.content.type.categoryType, target.content.modifiedProfit) * 0.25;
+                }
+
+                var finalAmount = player.addMoney(baseAmount, "click");
+                player.addClicks(1);
+
+                if (CityGame.Options.drawClickPopups) {
+                    CityGame.game.uiDrawer.makeCellPopup(target, "" + finalAmount.toFixed(3), CityGame.game.worldRenderer.worldSprite);
+                }
+            };
+            return ClickTool;
+        })(CityGame.Tool);
+        Tools.ClickTool = ClickTool;
+    })(CityGame.Tools || (CityGame.Tools = {}));
+    var Tools = CityGame.Tools;
+})(CityGame || (CityGame = {}));
+/// <reference path="tool.ts" />
+var CityGame;
+(function (CityGame) {
+    (function (Tools) {
+        var BuyTool = (function (_super) {
+            __extends(BuyTool, _super);
+            function BuyTool() {
+                _super.call(this);
+                this.type = "buy";
+                this.selectType = CityGame.SelectionTypes.singleSelect;
+                this.tintColor = 0x22EE22;
+                this.mapmode = undefined;
+            }
+            BuyTool.prototype.onActivate = function (target) {
+                eventManager.dispatchEvent({
+                    type: "makeCellBuyPopup", content: {
+                        player: CityGame.game.players["player0"],
+                        cell: target
+                    }
+                });
+                if (!this.continuous && !this.tempContinuous) {
+                    eventManager.dispatchEvent({
+                        type: "clickHotkey",
+                        content: ""
+                    });
+                }
+            };
+            return BuyTool;
+        })(CityGame.Tool);
+        Tools.BuyTool = BuyTool;
+    })(CityGame.Tools || (CityGame.Tools = {}));
+    var Tools = CityGame.Tools;
+})(CityGame || (CityGame = {}));
+/// <reference path="../eventmanager.ts" />
+/// <reference path="../options.ts" />
+/// <reference path="tool.ts" />
+var CityGame;
+(function (CityGame) {
+    (function (Tools) {
+        var BuildTool = (function (_super) {
+            __extends(BuildTool, _super);
+            function BuildTool() {
+                _super.call(this);
+                this.timesTriedToBuiltOnNonOwnedPlot = 0;
+                this.ghostSprites = [];
+                this.type = "build";
+                this.mapmode = undefined;
+                this.button = null;
+
+                this.setDefaults();
+            }
+            BuildTool.prototype.setDefaults = function () {
+                this.selectedBuildingType = undefined;
+                this.selectType = CityGame.SelectionTypes.singleSelect;
+                this.tintColor = 0xFFFFFF;
+                this.canBuild = false;
+                this.mainCell = undefined;
+                this.continuous = false;
+                eventManager.dispatchEvent({
+                    type: "clickHotkey",
+                    content: ""
+                });
+            };
+            BuildTool.prototype.changeBuilding = function (buildingType, continuous) {
+                if (typeof continuous === "undefined") { continuous = false; }
+                if (CityGame.Options.autoSwitchTools) {
+                    this.continuous = continuous;
+                } else
+                    this.continuous = !continuous;
+
+                if (this.selectedBuildingType === buildingType)
+                    return;
+
+                this.selectedBuildingType = buildingType;
+                var size = buildingType.size || [1, 1];
+
+                this.selectType = function (a, b) {
+                    var start = CityGame.game.activeBoard.getCell(b);
+
+                    if (!start)
+                        return b;
+                    else {
+                        this.mainCell = start;
+                    }
+
+                    var buildable = start.checkBuildable(this.selectedBuildingType, CityGame.game.players["player0"]);
+
+                    if (buildable) {
+                        this.tintColor = 0x338833;
+                        this.canBuild = true;
+                    } else {
+                        this.tintColor = 0xFF5555;
+                        this.canBuild = false;
+                    }
+                    return CityGame.SelectionTypes.rectSelect(b, [b[0] + size[0] - 1, b[1] + size[1] - 1]);
+                }.bind(this);
+            };
+
+            BuildTool.prototype.activate = function (selectedCells) {
+                if (this.canBuild === true) {
+                    var cost = CityGame.game.players["player0"].getBuildCost(this.selectedBuildingType);
+                    if (CityGame.game.players["player0"].money >= cost) {
+                        eventManager.dispatchEvent({
+                            type: "makeBuildingConstructPopup",
+                            content: {
+                                player: CityGame.game.players["player0"],
+                                buildingTemplate: this.selectedBuildingType,
+                                cell: this.mainCell,
+                                onOk: (this.continuous || this.tempContinuous ? function () {
+                                    return;
+                                } : this.setDefaults.bind(this))
+                            }
+                        });
+                    } else {
+                        eventManager.dispatchEvent({
+                            type: "makeInfoPopup",
+                            content: {
+                                text: "Not enough funds"
+                            }
+                        });
+                    }
+                    ;
+                } else if (!selectedCells[0].player || selectedCells[0].player.id !== CityGame.game.players["player0"].id) {
+                    for (var i = 0; i < selectedCells.length; i++) {
+                        eventManager.dispatchEvent({
+                            type: "makeCellBuyPopup", content: {
+                                player: CityGame.game.players["player0"],
+                                cell: selectedCells[i],
+                                onOk: (this.continuous || this.tempContinuous ? function () {
+                                    return;
+                                } : this.setDefaults.bind(this))
+                            }
+                        });
+                    }
+                }
+
+                this.onFinish();
+            };
+            BuildTool.prototype.onHover = function (targets) {
+                var baseCell = targets[0];
+                if (!baseCell)
+                    return;
+
+                var _b = baseCell.gridPos;
+                var size = this.selectedBuildingType.size || [1, 1];
+                var buildArea = baseCell.board.getCells(CityGame.SelectionTypes.rectSelect(_b, [_b[0] + size[0] - 1, _b[1] + size[1] - 1]));
+                var belowBuildArea = CityGame.getArea({
+                    targetArray: baseCell.board.cells,
+                    start: _b,
+                    centerSize: size,
+                    size: 2,
+                    anchor: "nw"
+                });
+
+                this.clearEffects();
+
+                for (var i = 0; i < belowBuildArea.length; i++) {
+                    CityGame.game.spriteHighlighter.alphaBuildings(belowBuildArea, 0.2);
+                }
+
+                if (!baseCell.content) {
+                    for (var i = 0; i < buildArea.length; i++) {
+                        var _cell = buildArea[i];
+                        if (_cell.content) {
+                            this.clearGhostBuilding();
+                            break;
+                        }
+                        var _s = new CityGame.Sprite(this.selectedBuildingType, i);
+                        _s.alpha = 0.6;
+                        this.ghostSprites.push({
+                            sprite: _s,
+                            pos: _cell.gridPos
+                        });
+
+                        _s.position = _cell.board.getCell(_cell.gridPos).sprite.position.clone();
+
+                        if (_cell.type.type !== "water") {
+                            _s.position.y -= (_cell.sprite.height - CityGame.SPRITE_HEIGHT);
+                        }
+
+                        _cell.board.addSpriteToLayer("content", _s, _cell.gridPos);
+                    }
+                }
+
+                var effects = {
+                    positive: [],
+                    negative: []
+                };
+
+                for (var i = 0; i < this.selectedBuildingType.translatedEffects.length; i++) {
+                    var modifier = this.selectedBuildingType.translatedEffects[i];
+                    var categoryType = this.selectedBuildingType.categoryType;
+                    var effectedCells = baseCell.getArea({
+                        size: modifier.range,
+                        centerSize: modifier.center,
+                        excludeStart: true
+                    });
+
+                    for (var j = 0; j < effectedCells.length; j++) {
+                        var cell = effectedCells[j];
+
+                        var polarity = cell.getModifierPolarity(modifier);
+
+                        if (polarity === null)
+                            continue;
+                        else {
+                            var type = (polarity === true ? "positive1" : "negative1");
+                            var cells = cell.content ? cell.content.cells : [cell];
+                            for (var k = 0; k < cells.length; k++) {
+                                CityGame.game.uiDrawer.makeBuildingPlacementTip(cells[k], type, CityGame.game.worldRenderer.worldSprite);
+                            }
+                        }
+                    }
+                }
+
+                CityGame.game.uiDrawer.makeBuildingTips(buildArea, this.selectedBuildingType);
+            };
+            BuildTool.prototype.onFinish = function () {
+                this.clearEffects();
+                this.mainCell = undefined;
+            };
+            BuildTool.prototype.clearEffects = function () {
+                CityGame.game.spriteHighlighter.clearAlpha();
+                this.clearGhostBuilding();
+            };
+            BuildTool.prototype.clearGhostBuilding = function () {
+                for (var i = 0; i < this.ghostSprites.length; i++) {
+                    var _s = this.ghostSprites[i].sprite;
+                    var _pos = this.ghostSprites[i].pos;
+                    this.mainCell.board.removeSpriteFromLayer("content", _s, _pos);
+                }
+                this.ghostSprites = [];
+            };
+            return BuildTool;
+        })(CityGame.Tool);
+        Tools.BuildTool = BuildTool;
+    })(CityGame.Tools || (CityGame.Tools = {}));
+    var Tools = CityGame.Tools;
+})(CityGame || (CityGame = {}));
+/// <reference path="tool.ts" />
+var CityGame;
+(function (CityGame) {
+    (function (Tools) {
+        var SellTool = (function (_super) {
+            __extends(SellTool, _super);
+            function SellTool() {
+                _super.call(this);
+                this.type = "remove";
+                this.selectType = CityGame.SelectionTypes.rectSelect;
+                this.tintColor = 0xFF5555;
+                this.mapmode = undefined;
+                this.button = null;
+            }
+            SellTool.prototype.activate = function (selectedCells) {
+                var onlySellBuildings = false;
+
+                for (var i = 0; i < selectedCells.length; i++) {
+                    if (selectedCells[i].content && selectedCells[i].player) {
+                        onlySellBuildings = true;
+                    }
+                }
+
+                for (var i = 0; i < selectedCells.length; i++) {
+                    this.onActivate(selectedCells[i], { onlySellBuildings: onlySellBuildings });
+                }
+            };
+            SellTool.prototype.onActivate = function (target, props) {
+                var onlySellBuildings = props.onlySellBuildings;
+                var playerOwnsCell = (target.player && target.player.id === CityGame.game.players["player0"].id);
+                if (onlySellBuildings && target.content && playerOwnsCell) {
+                    CityGame.game.players["player0"].sellContent(target.content);
+                    target.changeContent("none");
+                } else if (!onlySellBuildings && playerOwnsCell) {
+                    CityGame.game.players["player0"].sellCell(target);
+                }
+
+                if (!this.continuous && !this.tempContinuous) {
+                    eventManager.dispatchEvent({
+                        type: "clickHotkey",
+                        content: ""
+                    });
+                }
+            };
+            return SellTool;
+        })(CityGame.Tool);
+        Tools.SellTool = SellTool;
+    })(CityGame.Tools || (CityGame.Tools = {}));
+    var Tools = CityGame.Tools;
+})(CityGame || (CityGame = {}));
 /// <reference path="../lib/pixi.d.ts" />
 /// <reference path="board.ts" />
 /// <reference path="mouseeventhandler.ts" />
 /// <reference path="keyboardeventhandler.ts" />
 /// <reference path="spritehighlighter.ts" />
 /// <reference path="uidrawer.ts" />
+/// <reference path="worldrenderer.ts" />
 /// <reference path="reactui/reactui.ts" />
 /// <reference path="systems/systemsmanager.ts" />
-/// <reference path="board.ts" />
-/// <reference path="board.ts" />
-/// <reference path="board.ts" />
+/// <reference path="tools/tool.ts" />
+/// <reference path="tools/nothingtool.ts" />
+/// <reference path="tools/watertool.ts" />
+/// <reference path="tools/grasstool.ts" />
+/// <reference path="tools/sandtool.ts" />
+/// <reference path="tools/snowtool.ts" />
+/// <reference path="tools/removetool.ts" />
+/// <reference path="tools/planttool.ts" />
+/// <reference path="tools/housetool.ts" />
+/// <reference path="tools/roadtool.ts" />
+/// <reference path="tools/subwaytool.ts" />
+/// <reference path="tools/clicktool.ts" />
+/// <reference path="tools/buytool.ts" />
+/// <reference path="tools/buildtool.ts" />
+/// <reference path="tools/selltool.ts" />
 var CityGame;
 (function (CityGame) {
     var Game = (function () {
@@ -11284,7 +12254,11 @@ var CityGame;
             this.reactUI = new CityGame.ReactUI(player, this.frameImages);
             this.players[player.id] = player;
 
-            this.systemsManager = new CityGame.SystemsManager(1000);
+            var playersArray = [];
+            for (var playerId in this.players) {
+                playersArray.push(this.players[playerId]);
+            }
+            this.systemsManager = new CityGame.SystemsManager(1000, playersArray);
 
             this.editModes = ["play", "edit-world"];
             this.switchEditingMode("play");
@@ -11310,7 +12284,7 @@ var CityGame;
             var _tooltips = this.layers["tooltips"] = new PIXI.DisplayObjectContainer();
             _stage.addChild(_tooltips);
 
-            this.worldRenderer = new WorldRenderer(CityGame.WORLD_WIDTH, CityGame.WORLD_HEIGHT);
+            this.worldRenderer = new CityGame.WorldRenderer(CityGame.WORLD_WIDTH, CityGame.WORLD_HEIGHT);
             _main.addChild(this.worldRenderer.worldSprite);
 
             var _game = this;
@@ -11329,22 +12303,22 @@ var CityGame;
             };
         };
         Game.prototype.initTools = function () {
-            this.tools.nothing = new NothingTool();
+            this.tools.nothing = new CityGame.Tools.NothingTool();
 
-            this.tools.water = new WaterTool();
-            this.tools.grass = new GrassTool();
-            this.tools.sand = new SandTool();
-            this.tools.snow = new SnowTool();
-            this.tools.remove = new RemoveTool();
-            this.tools.plant = new PlantTool();
-            this.tools.house = new HouseTool();
-            this.tools.road = new RoadTool();
-            this.tools.subway = new SubwayTool();
+            this.tools.water = new CityGame.Tools.WaterTool();
+            this.tools.grass = new CityGame.Tools.GrassTool();
+            this.tools.sand = new CityGame.Tools.SandTool();
+            this.tools.snow = new CityGame.Tools.SnowTool();
+            this.tools.remove = new CityGame.Tools.RemoveTool();
+            this.tools.plant = new CityGame.Tools.PlantTool();
+            this.tools.house = new CityGame.Tools.HouseTool();
+            this.tools.road = new CityGame.Tools.RoadTool();
+            this.tools.subway = new CityGame.Tools.SubwayTool();
 
-            this.tools.click = new ClickTool();
-            this.tools.buy = new BuyTool();
-            this.tools.build = new BuildTool();
-            this.tools.sell = new SellTool();
+            this.tools.click = new CityGame.Tools.ClickTool();
+            this.tools.buy = new CityGame.Tools.BuyTool();
+            this.tools.build = new CityGame.Tools.BuildTool();
+            this.tools.sell = new CityGame.Tools.SellTool();
         };
 
         Game.prototype.bindElements = function () {
@@ -11926,7 +12900,7 @@ var CityGame;
             for (var i = 0; i < toLoad.length; i++) {
                 var currAction = toLoad[i];
 
-                actions[currAction.type].call(null, currAction.data);
+                CityGame.Actions[currAction.type].call(null, currAction.data);
             }
         };
         Game.prototype.prestigeReset = function (onReset) {
@@ -12056,89 +13030,93 @@ var CityGame;
 /// <reference path="../lib/pixi.d.ts" />
 /// <reference path="utility.ts" />
 
-var Loader = (function () {
-    function Loader(game) {
-        this.loaded = {
-            fonts: true,
-            //fonts: false,
-            sprites: false,
-            dom: false
-        };
-        var self = this;
-        this.game = game;
-        document.addEventListener('DOMContentLoaded', function () {
-            self.loaded.dom = true;
+var CityGame;
+(function (CityGame) {
+    var Loader = (function () {
+        function Loader(game) {
+            this.loaded = {
+                fonts: true,
+                //fonts: false,
+                sprites: false,
+                dom: false
+            };
+            var self = this;
+            this.game = game;
+            document.addEventListener('DOMContentLoaded', function () {
+                self.loaded.dom = true;
 
-            //info
-            addClickAndTouchEventListener(document.getElementById("show-info"), function () {
-                var _elStyle = document.getElementById("info-container").style;
-                if (_elStyle.display === "flex") {
-                    _elStyle.display = "none";
-                } else {
-                    _elStyle.display = "flex";
-                }
-            });
-            addClickAndTouchEventListener(document.getElementById("close-info"), function () {
-                document.getElementById("info-container").style.display = "none";
-            });
+                //info
+                CityGame.addClickAndTouchEventListener(document.getElementById("show-info"), function () {
+                    var _elStyle = document.getElementById("info-container").style;
+                    if (_elStyle.display === "flex") {
+                        _elStyle.display = "none";
+                    } else {
+                        _elStyle.display = "flex";
+                    }
+                });
+                CityGame.addClickAndTouchEventListener(document.getElementById("close-info"), function () {
+                    document.getElementById("info-container").style.display = "none";
+                });
 
-            self.checkLoaded();
-        });
-
-        //PIXI.scaleModes.DEFAULT = PIXI.scaleModes.NEAREST;
-        this.startTime = window.performance ? window.performance.now() : Date.now();
-
-        this.loadFonts();
-        this.loadSprites();
-    }
-    Loader.prototype.loadFonts = function () {
-        // TODO
-        return;
-        var self = this;
-        WebFontConfig = {
-            google: {
-                families: ['Snippet']
-            },
-            active: function () {
-                self.loaded.fonts = true;
                 self.checkLoaded();
-            }
-        };
-        (function () {
-            var wf = document.createElement('script');
-            wf.src = ('https:' == document.location.protocol ? 'https' : 'http') + '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
-            wf.type = 'text/javascript';
-            wf.async = true;
-            var s = document.getElementsByTagName('script')[0];
-            s.parentNode.insertBefore(wf, s);
-        })();
-    };
-    Loader.prototype.loadSprites = function () {
-        var self = this;
-        var loader = new PIXI.JsonLoader("img\/sprites.json");
-        loader.addEventListener("loaded", function (event) {
-            self.spriteImages = spritesheetToImages(event.content.json, event.content.baseUrl);
-            self.loaded.sprites = true;
-            self.checkLoaded();
-        });
+            });
 
-        loader.load();
-    };
+            //PIXI.scaleModes.DEFAULT = PIXI.scaleModes.NEAREST;
+            this.startTime = window.performance ? window.performance.now() : Date.now();
 
-    Loader.prototype.checkLoaded = function () {
-        for (var prop in this.loaded) {
-            if (!this.loaded[prop]) {
-                return;
-            }
+            this.loadFonts();
+            this.loadSprites();
         }
-        this.game.frameImages = this.spriteImages;
-        this.game.init();
-        var finishTime = window.performance ? window.performance.now() : Date.now();
-        var elapsed = finishTime - this.startTime;
-        console.log("loaded in " + Math.round(elapsed) + " ms");
-    };
-    return Loader;
-})();
+        Loader.prototype.loadFonts = function () {
+            // TODO
+            return;
+            var self = this;
+            WebFontConfig = {
+                google: {
+                    families: ['Snippet']
+                },
+                active: function () {
+                    self.loaded.fonts = true;
+                    self.checkLoaded();
+                }
+            };
+            (function () {
+                var wf = document.createElement('script');
+                wf.src = ('https:' == document.location.protocol ? 'https' : 'http') + '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+                wf.type = 'text/javascript';
+                wf.async = true;
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(wf, s);
+            })();
+        };
+        Loader.prototype.loadSprites = function () {
+            var self = this;
+            var loader = new PIXI.JsonLoader("img\/sprites.json");
+            loader.addEventListener("loaded", function (event) {
+                self.spriteImages = CityGame.spritesheetToImages(event.content.json, event.content.baseUrl);
+                self.loaded.sprites = true;
+                self.checkLoaded();
+            });
+
+            loader.load();
+        };
+
+        Loader.prototype.checkLoaded = function () {
+            for (var prop in this.loaded) {
+                if (!this.loaded[prop]) {
+                    return;
+                }
+            }
+            this.game.frameImages = this.spriteImages;
+            this.game.init();
+            var finishTime = window.performance ? window.performance.now() : Date.now();
+            var elapsed = finishTime - this.startTime;
+            console.log("loaded in " + Math.round(elapsed) + " ms");
+        };
+        return Loader;
+    })();
+    CityGame.Loader = Loader;
+})(CityGame || (CityGame = {}));
 /// <reference path="game.ts" />
 /// <reference path="loader.ts" />
 var CityGame;

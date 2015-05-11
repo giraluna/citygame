@@ -14,8 +14,6 @@ module CityGame
       ZOOM_LEVELS = [1],
       AMT_OF_BOARDS = 1;
 
-  export var game = new CityGame.Game();
-  export var loader = new CityGame.Loader(game);
+  export var game = new Game();
+  export var loader = new Loader(game);
 }
-
-

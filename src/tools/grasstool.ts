@@ -10,7 +10,7 @@ module CityGame
       {
         super();
         this.type = "grass";
-        this.selectType = rectSelect;
+        this.selectType = SelectionTypes.rectSelect;
         this.tintColor = 0x617A4E;
         this.mapmode = undefined;
       } 

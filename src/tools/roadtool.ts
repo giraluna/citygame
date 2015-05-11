@@ -10,7 +10,7 @@ module CityGame
       {
         super();
         this.type = "road";
-        this.selectType = manhattanSelect;
+        this.selectType = SelectionTypes.manhattanSelect;
         this.tintColor = 0x696969;
       } 
       onActivate(target: Cell)

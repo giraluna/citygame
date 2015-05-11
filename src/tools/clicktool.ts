@@ -10,14 +10,14 @@ module CityGame
       {
         super();
         this.type = "click";
-        this.selectType = singleSelect;
+        this.selectType = SelectionTypes.singleSelect;
         this.tintColor = null;
         this.mapmode = undefined;
         this.button = null;
       }
       onChange()
       {
-        if (game.players.player0.clicks < 1)
+        if (game.players["player0"].clicks < 1)
         {
           var textContainer = new PIXI.DisplayObjectContainer();
           var bigText = new PIXI.Text("Click here!",
@@ -54,7 +54,7 @@ module CityGame
       }
       onActivate(target: Cell)
       {
-        var player = game.players.player0;
+        var player = game.players["player0"];
         var baseAmount = 0;
 
         if (target.content && target.content.player &&

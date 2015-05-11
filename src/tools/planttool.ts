@@ -10,7 +10,7 @@ module CityGame
       {
         super();
         this.type = "plant";
-        this.selectType = rectSelect;
+        this.selectType = SelectionTypes.rectSelect;
         this.tintColor = 0x338833;
         this.mapmode = undefined;
       } 

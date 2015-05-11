@@ -5,11 +5,25 @@
 /// <reference path="keyboardeventhandler.ts" />
 /// <reference path="spritehighlighter.ts" />
 /// <reference path="uidrawer.ts" />
+/// <reference path="worldrenderer.ts" />
 /// <reference path="reactui/reactui.ts" />
 /// <reference path="systems/systemsmanager.ts" />
-/// <reference path="board.ts" />
-/// <reference path="board.ts" />
-/// <reference path="board.ts" />
+
+/// <reference path="tools/tool.ts" />
+/// <reference path="tools/nothingtool.ts" />
+/// <reference path="tools/watertool.ts" />
+/// <reference path="tools/grasstool.ts" />
+/// <reference path="tools/sandtool.ts" />
+/// <reference path="tools/snowtool.ts" />
+/// <reference path="tools/removetool.ts" />
+/// <reference path="tools/planttool.ts" />
+/// <reference path="tools/housetool.ts" />
+/// <reference path="tools/roadtool.ts" />
+/// <reference path="tools/subwaytool.ts" />
+/// <reference path="tools/clicktool.ts" />
+/// <reference path="tools/buytool.ts" />
+/// <reference path="tools/buildtool.ts" />
+/// <reference path="tools/selltool.ts" />
 
 module CityGame
 {
@@ -70,7 +84,12 @@ module CityGame
       this.reactUI = new ReactUI(player, this.frameImages);
       this.players[player.id] = player;
 
-      this.systemsManager = new SystemsManager(1000);
+      var playersArray = [];
+      for (var playerId in this.players)
+      {
+        playersArray.push(this.players[playerId]);
+      }
+      this.systemsManager = new SystemsManager(1000, playersArray);
 
       this.editModes = ["play", "edit-world"];
       this.switchEditingMode("play");
@@ -123,22 +142,22 @@ module CityGame
       }
       initTools()
       {
-        this.tools.nothing = new NothingTool();
+        this.tools.nothing = new Tools.NothingTool();
 
-        this.tools.water = new WaterTool();
-        this.tools.grass = new GrassTool();
-        this.tools.sand = new SandTool();
-        this.tools.snow = new SnowTool();
-        this.tools.remove = new RemoveTool();
-        this.tools.plant = new PlantTool();
-        this.tools.house = new HouseTool();
-        this.tools.road = new RoadTool();
-        this.tools.subway = new SubwayTool();
+        this.tools.water = new Tools.WaterTool();
+        this.tools.grass = new Tools.GrassTool();
+        this.tools.sand = new Tools.SandTool();
+        this.tools.snow = new Tools.SnowTool();
+        this.tools.remove = new Tools.RemoveTool();
+        this.tools.plant = new Tools.PlantTool();
+        this.tools.house = new Tools.HouseTool();
+        this.tools.road = new Tools.RoadTool();
+        this.tools.subway = new Tools.SubwayTool();
 
-        this.tools.click = new ClickTool();
-        this.tools.buy = new BuyTool();
-        this.tools.build = new BuildTool();
-        this.tools.sell = new SellTool();
+        this.tools.click = new Tools.ClickTool();
+        this.tools.buy = new Tools.BuyTool();
+        this.tools.build = new Tools.BuildTool();
+        this.tools.sell = new Tools.SellTool();
       }
 
       bindElements()
@@ -833,7 +852,7 @@ module CityGame
         Options[_prop] = parsed[_prop];
       }
     }
-    saveActions(system: DelayedActionSystem)
+    saveActions(system: Systems.DelayedActionSystem)
     {
       var toSave = [];
 
@@ -857,7 +876,7 @@ module CityGame
       {
         var currAction = toLoad[i];
 
-        actions[currAction.type].call(null, currAction.data);
+        Actions[currAction.type].call(null, currAction.data);
       }
     }
     prestigeReset(onReset)

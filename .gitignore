@@ -8,3 +8,5 @@
 *.blend[12345]
 *.dmp
 node_modules
+*.pyc
+*.py

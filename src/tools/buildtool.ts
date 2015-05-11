@@ -31,7 +31,7 @@ module CityGame
       setDefaults()
       {
         this.selectedBuildingType = undefined;
-        this.selectType = singleSelect;
+        this.selectType = SelectionTypes.singleSelect;
         this.tintColor = 0xFFFFFF;
         this.canBuild = false;
         this.mainCell = undefined;
@@ -66,7 +66,7 @@ module CityGame
           }
 
           var buildable = start.checkBuildable(
-            this.selectedBuildingType, game.players.player0);
+            this.selectedBuildingType, game.players["player0"]);
 
           if (buildable)
           {
@@ -78,7 +78,7 @@ module CityGame
             this.tintColor = 0xFF5555;
             this.canBuild = false;
           }
-          return rectSelect(b, [b[0]+size[0]-1,b[1]+size[1]-1]);
+          return SelectionTypes.rectSelect(b, [b[0]+size[0]-1,b[1]+size[1]-1]);
         }.bind(this);
       }
 
@@ -86,15 +86,15 @@ module CityGame
       {
         if (this.canBuild === true)
         {
-          var cost = game.players.player0.getBuildCost(this.selectedBuildingType);
-          if (game.players.player0.money >= cost)
+          var cost = game.players["player0"].getBuildCost(this.selectedBuildingType);
+          if (game.players["player0"].money >= cost)
           {
             eventManager.dispatchEvent(
             {
               type: "makeBuildingConstructPopup",
               content:
               {
-                player: game.players.player0,
+                player: game.players["player0"],
                 buildingTemplate: this.selectedBuildingType,
                 cell: this.mainCell,
                 onOk: ( this.continuous || this.tempContinuous ?
@@ -115,7 +115,7 @@ module CityGame
           };
         }
         else if ( !selectedCells[0].player ||
-          selectedCells[0].player.id !== game.players.player0.id)
+          selectedCells[0].player.id !== game.players["player0"].id)
         {
           /*
           this.timesTriedToBuiltOnNonOwnedPlot++;
@@ -154,7 +154,7 @@ module CityGame
         var _b = baseCell.gridPos
         var size = this.selectedBuildingType.size || [1,1];
         var buildArea = baseCell.board.getCells(
-          rectSelect(_b, [_b[0]+size[0]-1,_b[1]+size[1]-1]));
+          SelectionTypes.rectSelect(_b, [_b[0]+size[0]-1,_b[1]+size[1]-1]));
         var belowBuildArea = getArea(
         {
           targetArray: baseCell.board.cells,
@@ -168,7 +168,7 @@ module CityGame
 
         for (var i = 0; i < belowBuildArea.length; i++)
         {
-          game.highlighter.alphaBuildings(belowBuildArea, 0.2);
+          game.spriteHighlighter.alphaBuildings(belowBuildArea, 0.2);
         }
 
         if (!baseCell.content)
@@ -218,9 +218,9 @@ module CityGame
             excludeStart: true
           });
 
-          for (var _cell in effectedCells)
+          for (var j = 0; j < effectedCells.length; j++)
           {
-            var cell = effectedCells[_cell];
+            var cell = effectedCells[j];
 
             var polarity = cell.getModifierPolarity(modifier);
 
@@ -228,10 +228,10 @@ module CityGame
             else
             {
               var type = (polarity === true ? "positive1" : "negative1");
-              var cells = cell.content ? cell.content.cells : cell;
-              for (var j = 0; j < cells.length; j++)
+              var cells = cell.content ? cell.content.cells : [cell];
+              for (var k = 0; k < cells.length; k++)
               {
-                game.uiDrawer.makeBuildingPlacementTip(cells[j], type,
+                game.uiDrawer.makeBuildingPlacementTip(cells[k], type,
                   game.worldRenderer.worldSprite);
               }
             }
@@ -247,7 +247,7 @@ module CityGame
       }
       clearEffects()
       {
-        game.highlighter.clearAlpha();
+        game.spriteHighlighter.clearAlpha();
         this.clearGhostBuilding();
       }
       clearGhostBuilding()

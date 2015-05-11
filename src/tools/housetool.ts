@@ -10,7 +10,7 @@ module CityGame
       {
         super();
         this.type = "house";
-        this.selectType = rectSelect;
+        this.selectType = SelectionTypes.rectSelect;
         this.tintColor = 0x696969;
         this.mapmode = undefined;
       } 

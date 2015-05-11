@@ -1,3 +1,11 @@
+/// <reference path="../lib/pixi.d.ts" />
+
+/// <reference path="arraylogic.ts" />
+/// <reference path="board.ts" />
+/// <reference path="groundsprite.ts" />
+/// <reference path="content.ts" />
+/// <reference path="player.ts" />
+
 module CityGame
 {
   export interface neighborCells
@@ -110,7 +118,7 @@ module CityGame
     {
       var centerEnd = [this.gridPos[0] + centerSize[0]-1,
         this.gridPos[1] + centerSize[1]-1]
-      var center = this.board.getCells(rectSelect(this.gridPos, centerEnd));
+      var center = this.board.getCells(SelectionTypes.rectSelect(this.gridPos, centerEnd));
 
       return getDistanceFromCell(this.board.cells, center, radius, true);
     }
@@ -167,7 +175,7 @@ module CityGame
       
       if (update)
       {
-        getTubeConnections(this, 1);
+        this.setTubeConnections(1);
       }
     }
     changeContent( type, update:boolean=true, player?: Player, checkPlayer:boolean = true)
@@ -180,7 +188,7 @@ module CityGame
         var endX = this.gridPos[0] + type.size[0]-1;
         var endY = this.gridPos[1] + type.size[1]-1;
 
-        buildArea = this.board.getCells( rectSelect(this.gridPos, [endX, endY]) );
+        buildArea = this.board.getCells( SelectionTypes.rectSelect(this.gridPos, [endX, endY]) );
       }
       else
       {
@@ -240,7 +248,7 @@ module CityGame
 
         if (endX >= this.board.width || endY >= this.board.height) return false;
 
-        buildArea = this.board.getCells( rectSelect(this.gridPos, [endX, endY]) );
+        buildArea = this.board.getCells( SelectionTypes.rectSelect(this.gridPos, [endX, endY]) );
       }
       else
       {
@@ -317,7 +325,7 @@ module CityGame
     }
     updateCell()
     {
-      getRoadConnections(this, 1);
+      this.setRoadConnections(1);
     }
     addContent( type: any, cells: Cell[], player?: Player )
     {
@@ -643,6 +651,81 @@ module CityGame
       {
         this.landValue = Math.round(this.baseLandValue * 0.8);
       }
+    }
+    forEachNeighborWithQualifier(target: Cell,
+      qualifier: (toCheck: Cell) => boolean,
+      operator: (toOperateOn: Cell, directions: string) => void,
+      depth: number)
+    {
+      var connections = {};
+      var dir = "";
+      var neighbors = target.getNeighbors(false);
+      for ( var direction in neighbors )
+      {
+        if (neighbors[direction] && qualifier(neighbors[direction]))
+        {
+          connections[direction] = true;
+        }
+      }
+
+      if (depth > 0)
+      {
+        for (var connection in connections)
+        {
+          this.forEachNeighborWithQualifier( neighbors[connection], qualifier, operator, depth - 1 );
+        }
+      }
+
+      for (var connection in connections)
+      {
+        dir += connection;
+      }
+      if (dir === "")
+      {
+        return null;
+      }
+      else if (dir === "n" || dir === "s" || dir === "ns")
+      {
+        dir = "v";
+      }
+      else if (dir === "e" || dir === "w" || dir === "ew")
+      {
+        dir = "h";
+      }
+      if (qualifier(target))
+      {
+        operator(target, dir);
+      }
+    }
+
+    setRoadConnections(depth: number)
+    {
+      var qualifierFN = function(toCheck: Cell)
+      {
+        return toCheck.content && toCheck.content.baseType === "road";
+      }
+      var operatorFN = function(toOperateOn: Cell, directions: string)
+      {
+        var finalRoad = cg["content"]["roads"]["road_" + directions];
+        toOperateOn.changeContent(finalRoad, false);
+      }
+      this.forEachNeighborWithQualifier(this, qualifierFN, operatorFN, depth);
+    }
+
+    setTubeConnections(depth: number)
+    {
+      var qualifierFN = function(toCheck: Cell)
+      {
+        return toCheck.undergroundContent &&
+          toCheck.undergroundContent.baseType === "tube"
+      }
+      var operatorFN = function(toOperateOn: Cell, directions: string)
+      {
+        var finalTube = cg["content"]["tubes"]["tube_" + directions];
+        toOperateOn.changeUndergroundContent(finalTube, false);
+      }
+
+      this.forEachNeighborWithQualifier(this, qualifierFN, operatorFN, depth);
     }
     addOverlay(color, depth:number = 1)
     {

@@ -3,7 +3,6 @@ module CityGame
   export class Sprite extends PIXI.Sprite
   {
     type: string;
-    content: Content;
 
     constructor( template, frameIndex?: number )
     {

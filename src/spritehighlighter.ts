@@ -1,3 +1,5 @@
+/// <reference path="../lib/pixi.d.ts" />
+
 class SpriteHighlighter
 {
   currHighlighted: PIXI.Sprite[] = [];

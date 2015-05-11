@@ -1,5 +1,3 @@
-/// <reference path="../src/js/arraylogic.d.ts" />
-
 module cellModifiers
 {
 

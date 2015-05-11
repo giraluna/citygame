@@ -6,7 +6,7 @@
 /// <reference path="spritehighlighter.ts" />
 /// <reference path="uidrawer.ts" />
 /// <reference path="reactui/reactui.ts" />
-/// <reference path="systemsmanager.ts" />
+/// <reference path="systems/systemsmanager.ts" />
 /// <reference path="board.ts" />
 /// <reference path="board.ts" />
 /// <reference path="board.ts" />
@@ -103,19 +103,6 @@ module CityGame
       this.updateWorld();
 
       window.setInterval(this.updateSystems.bind(this), 1000);
-
-      /*
-      game.uiDrawer.makeFadeyPopup(
-        [SCREEN_WIDTH / 2, SCREEN_HEIGHT/2],
-        [0, 0],
-        5000,
-        new PIXI.Text("ctrl+click to scroll\nshift+click to zoom",{
-          font: "bold 50px Arial",
-          fill: "#222222",
-          align: "center"
-        }),
-        TWEEN.Easing.Quartic.In
-      );*/
       }
       initContainers()
       {
@@ -781,10 +768,10 @@ module CityGame
       {
         data.modifiers.push(player.modifiers[_mod].type);
       }
-      data.levelUpModifiers = [];
-      for (var _mod in player.levelUpModifiers)
+      data.LevelUpModifiers = [];
+      for (var _mod in player.LevelUpModifiers)
       {
-        data.levelUpModifiers.push(player.levelUpModifiers[_mod].type);
+        data.LevelUpModifiers.push(player.LevelUpModifiers[_mod].type);
       }
       data.levelsAlreadyPicked = player.levelsAlreadyPicked;
 
@@ -821,11 +808,11 @@ module CityGame
       for (var _mod in data.modifiers)
       {
         player.addModifier(
-          playerModifiers[data.modifiers[_mod]], "modifiers", false);
+          PlayerModifiers[data.modifiers[_mod]], "modifiers", false);
       }
-      for (var _mod in data.levelUpModifiers)
+      for (var _mod in data.LevelUpModifiers)
       {
-        player.addLevelUpModifier(levelUpModifiers[data.levelUpModifiers[_mod]], false, false);
+        player.addLevelUpModifier(LevelUpModifiers[data.LevelUpModifiers[_mod]], false, false);
       }
       player.levelsAlreadyPicked = data.levelsAlreadyPicked || {};
 
@@ -938,9 +925,9 @@ module CityGame
       }.bind(this);
 
       var modifiersAvailableToPerm = [];
-      for (var _mod in player.levelUpModifiers)
+      for (var _mod in player.LevelUpModifiers)
       {
-        var modifier = player.levelUpModifiers[_mod];
+        var modifier = player.LevelUpModifiers[_mod];
         if (player.permanentLevelupUpgrades.indexOf(modifier.type) < 0)
         {
           modifiersAvailableToPerm.push(modifier);

@@ -1,3 +1,5 @@
+/// <reference path="../eventmanager.ts" />
+/// <reference path="../options.ts" />
 /// <reference path="tool.ts" />
 
 module CityGame

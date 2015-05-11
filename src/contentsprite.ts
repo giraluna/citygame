@@ -1,3 +1,6 @@
+/// <reference path="sprite.ts" />
+/// <reference path="content.ts" />
+
 module CityGame
 {
   export class ContentSprite extends Sprite

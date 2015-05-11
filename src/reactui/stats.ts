@@ -72,7 +72,7 @@ module UIComponents
       allStats.push(generalStatList);
 
       var prestigeModifier = 1 + player.prestige * 0.005
-      if (player.levelUpModifiers.prestigeEffectIncrease1)
+      if (player.LevelUpModifiers.prestigeEffectIncrease1)
       {
         prestigeModifier *= (1 + player.prestige * 0.0025);
       }
@@ -111,7 +111,7 @@ module UIComponents
         var permModifiers = [];
         for (var i = 0; i < player.permanentLevelupUpgrades.length; i++)
         {
-          permModifiers.push(levelUpModifiers[player.permanentLevelupUpgrades[i]]);
+          permModifiers.push(LevelUpModifiers[player.permanentLevelupUpgrades[i]]);
         }
         var permModifierList = UIComponents.ModifierList(
         {
@@ -128,13 +128,13 @@ module UIComponents
         );
       }
 
-      if (Object.keys(player.levelUpModifiers).length > 0)
+      if (Object.keys(player.LevelUpModifiers).length > 0)
       {
         var perks = [];
-        for (var _mod in player.levelUpModifiers)
+        for (var _mod in player.LevelUpModifiers)
         {
           if (player.permanentLevelupUpgrades.indexOf(_mod) > -1) continue;
-          else perks.push(player.levelUpModifiers[_mod]);
+          else perks.push(player.LevelUpModifiers[_mod]);
         }
         var perkList = UIComponents.ModifierList(
         {

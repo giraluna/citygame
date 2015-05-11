@@ -1,3 +1,7 @@
+/// <reference path="contentsprite.ts" />
+/// <reference path="cell.ts" />
+/// <reference path="player.ts" />
+
 module CityGame
 {
   export class Content
@@ -6,7 +10,7 @@ module CityGame
     baseType: string;
     categoryType: string;
     id: number;
-    sprites: Sprite[] = [];
+    sprites: ContentSprite[] = [];
     cells: Cell[];
     baseCell: Cell;
     size: number[];

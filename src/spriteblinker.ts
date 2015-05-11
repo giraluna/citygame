@@ -1,11 +1,10 @@
 /// <reference path="../lib/pixi.d.ts" />
 /// 
-/// <reference path="js/spritehighlighter.d.ts" />
-/// <reference path="js/eventlistener.d.ts" />
-/// 
+/// <reference path="spritehighlighter.ts" />
+/// <reference path="eventmanager.ts" />
 
 
-class Blinker extends Highlighter
+class SpriteBlinker extends Highlighter
 {
   toBlink: { [key: string] : PIXI.Sprite[] } = {};
   idGenerator: number = 0;

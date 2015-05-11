@@ -1,10 +1,4 @@
-/// <reference path="js/employee.d.ts" />
-/// <reference path="js/player.d.ts" />
-/// <reference path="js/utility.d.ts" />
-/// <reference path="js/eventlistener.d.ts" />
-/// <reference path="js/spriteblinker.d.ts" />
-/// 
-/// <reference path="../data/js/cg.d.ts" />
+/// <reference path="spriteblinker.ts" />
 
 module actions
 {

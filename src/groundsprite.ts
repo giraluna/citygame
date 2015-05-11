@@ -1,3 +1,6 @@
+/// <reference path="sprite.ts" />
+/// <reference path="cell.ts" />
+
 module CityGame
 {
   export class GroundSprite extends Sprite

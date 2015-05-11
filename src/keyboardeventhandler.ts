@@ -1,4 +1,4 @@
-/// <reference path="js/eventlistener.d.ts" />
+/// <reference path="eventmanager.ts" />
 
 var keyboardStates =
 {

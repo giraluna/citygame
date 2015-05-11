@@ -1,20 +1,5 @@
 /// <reference path="../../lib/react.d.ts" />
 /// <reference path="../../lib/pixi.d.ts" />
-/// 
-/// <reference path="../../data/js/cg.d.ts" />
-/// 
-/// <reference path="../js/player.d.ts" />
-/// <reference path="../js/actions.d.ts" />
-/// <reference path="../js/eventlistener.d.ts" />
-/// 
-/// <reference path="js/employeelist.d.ts" />
-/// <reference path="js/employee.d.ts" />
-/// <reference path="js/employeeaction.d.ts" />
-/// <reference path="js/modifierpopup.d.ts" />
-/// <reference path="js/employeeactionpopup.d.ts" />
-/// <reference path="js/inputpopup.d.ts" />
-/// <reference path="js/actioninfo.d.ts" />
-/// <reference path="js/stage.d.ts" />
 
 class ReactUI
 {

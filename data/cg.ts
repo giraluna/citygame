@@ -1,4 +1,4 @@
-/// <reference path="js/cellmodifiers.d.ts" />
+/// <reference path="cellmodifiers.ts" />
 
 var cg: any =
 {

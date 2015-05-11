@@ -150,39 +150,6 @@ var cg: any =
             }
           ]
         },
-      },
-      "sand":
-      {
-        "cactus":
-        {
-          "type": "cactus",
-          "baseType": "plant",
-          "anchor": [0.5, 1.5],
-          "frame": ["cactus.png"],
-          "canBuildOn": ["sand"]
-        }
-      },
-      "water":
-      {
-        "tentacle":
-        {
-          "type": "tentacle",
-          "baseType": "plant",
-          "anchor": [0.5, 1.5],
-          "frame": ["tentacle.png"],
-          "canBuildOn": ["water"]
-        }
-      },
-      "snow":
-      {
-        "snowman":
-        {
-          "type": "snowman",
-          "baseType": "plant",
-          "anchor": [0.5, 1.25],
-          "frame": ["snowman.png"],
-          "canBuildOn": ["snow"]
-        }
       }
     },
     "roads":

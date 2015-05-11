@@ -3,7 +3,7 @@ declare module 'react' {
 }
 
 declare module React {
-    
+    export var addons: any;
 	/**
 	 * Configure React's event system to handle touch events on mobile devices.
 	 * @param shouldUseTouch true if React should active touch events, false if it should not  
@@ -31,7 +31,7 @@ declare module React {
      * @param callback an optional callback that will be executed after the component is rendered or updated. 
      */
 	function renderComponent<C extends ReactComponent<any, any>>(component: C, container: Element, callback?: () => void): C;
-    
+    function render<C extends ReactComponent<any, any>>(component: C, container: Element, callback?: () => void): C;
     /**
      * Remove a mounted React component from the DOM and clean up its event handlers and state. 
      * If no component was mounted in the container, calling this function does nothing. 
@@ -198,7 +198,7 @@ declare module React {
     }
     
     
-    interface ReactComponentSpec<P,S> extends ReactMixin<P, S> {
+    interface ReactComponentSpec<P,any> extends ReactMixin<P, any> {
         
          /**
          * The mixins array allows you to use mixins to share behavior among multiple components. 
@@ -218,7 +218,7 @@ declare module React {
         /**
          * Invoked once before the component is mounted. The return value will be used as the initial value of this.state.
          */
-        getInitialState?(): S;
+        getInitialState?(): any;
         
         
         /**
@@ -384,7 +384,7 @@ declare module React {
         role?: string;
         scrollLeft?: number;
         scrollTop?: number;
-        style?: { [styleNam: string]: string };
+        style?: { [styleName: string]: any };
         tabIndex?: number;
         title?: string;
         
@@ -428,7 +428,7 @@ declare module React {
         src?: string;
         step?: number;
         type?: string;
-        value?: string;
+        value?: any;
         width?: number;
     }
 

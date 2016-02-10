@@ -350,7 +350,7 @@ td {
   color: #888;
 }
 #side-menu-buildings {
-  flex: 1 0;
+  flex: 1 1 auto;
   order: 2;
   overflow-y: scroll;
   -webkit-touch-callout: none;

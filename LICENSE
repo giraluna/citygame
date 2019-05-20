@@ -1,16 +1,8 @@
-Sprites and 3d models not otherwise specified:
+Unless otherwise specified:
 
 Copyright (c) 2014 github.com/giraluna
 
 Licensed under GPL2 license. http://www.gnu.org/licenses/gpl-2.0.txt
-
------
-
-Code not otherwise specified
-
-Copyright (c) 2014 github.com/giraluna
-
-Feel free to copy and modify the code for personal use. Do not re-host, otherwise profit from or present the code as your own.
 
 -----
 
@@ -26,7 +18,7 @@ This file originated at the 32bit Graphics Development Repository: http://jupix.
 
 -----
 
-Sprites "tree#" & "house#"
+Sprites "tree#.png", "house#.png", "soccerstadium.png":
 
 http://www.tt-forums.net/viewtopic.php?f=36&t=61581&sid=c91254af8ad9fc370144f1952691cf08
 

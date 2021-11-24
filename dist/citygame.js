@@ -926,7 +926,9 @@ var UIComponents;
         render: function () {
             var savedGames = [];
 
-            for (var savedGame in localStorage) {
+            for (let i = 0; i < localStorage.length; i++)
+            {
+                savedGame = localStorage.key(i);
                 if (savedGame === "options")
                     continue;
                 var parsed = JSON.parse(localStorage[savedGame]);
@@ -1065,7 +1067,9 @@ var UIComponents;
 
             var toSaveAs = this.refs.inputElement.getDOMNode().value;
             var overwriting = false;
-            for (var save in localStorage) {
+            for (let i = 0; i < localStorage.length; i++)
+            {
+                save = localStorage.key(i);
                 if (toSaveAs === save)
                     overwriting = true;
             }
@@ -1106,7 +1110,9 @@ var UIComponents;
             var self = this;
             var savedGames = [];
 
-            for (var savedGame in localStorage) {
+            for (let i = 0; i < localStorage.length; i++)
+            {
+                savedGame = localStorage.key(i);
                 if (savedGame === "options")
                     continue;
                 var parsed = JSON.parse(localStorage[savedGame]);
@@ -2556,7 +2562,7 @@ var UIComponents;
                 var poleSign = (polarity === "negative") ? "-" : "+";
                 divProps.title += "\n-----";
                 divProps.title += "\n" + polarity + " effects:";
-                
+
                 for (var j = 0; j < targets.length; j++)
                 {
                 divProps.title += "\n" + targets[j] + " " + poleSign;
@@ -12167,7 +12173,9 @@ var Game = (function () {
         // TODO
         var autosaveLimit = Options.autosaveLimit;
         var autosaves = [];
-        for (var saveGame in localStorage) {
+        for (let i = 0; i < localStorage.length; i++)
+        {
+            saveGame = localStorage.key(i);
             if (saveGame.match(/autosave/)) {
                 autosaves.push(saveGame);
             }
@@ -12626,7 +12634,7 @@ var Scroller = (function () {
         /*
         if (oldZoom <= 0.5 && zoomAmount > 0.5)
         {
-        
+
         }
         else if ( oldZoom <= 1.5 && oldZoom >= 0.5)
         {
@@ -13936,7 +13944,7 @@ function makeSpeechRect(data, text) {
     6| /
     |/
     0, 7
-    
+
     0,7
     |\
     6| \ 1

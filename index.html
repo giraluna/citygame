@@ -14,8 +14,7 @@
   <script src="lib/react-0.11.0.js"></script>
   <script src="lib/lz-string-1.3.3.js"></script>
 
-  
-  <script src="dist/citygame.min.js"></script>
+  <script src="dist/citygame.js"></script>
 
   <!-- Google analytics -->
   <script>
@@ -38,7 +37,7 @@
   <div id="pixi-container">
     <!-- <canvas></canvas> -->
   </div>
-   
+
   <div id="side-menu" class="debug-hidden">
     <!-- The real side menu is under react-container. This is kept here for debug and laziness purposes -->
     <select name="editmode" id="editmode-select">
@@ -56,7 +55,7 @@
       <button id="houseBtn">house</button>
       <button id="roadBtn">road</button>
       <button id="subwayBtn">subway</button>
-      
+
     </div>
     <button id="removeBtn">remove</button>
     <div id="action-buttons" class="play">
@@ -75,8 +74,8 @@
         <option value="landValue">value</option>
         <option value="underground">underground</option>
       </select>
-  
-      
+
+
 
       <form id="zoom">
         <input type="number" id="zoom-amount" value=1 step=0.1>
